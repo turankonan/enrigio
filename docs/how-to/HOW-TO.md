@@ -96,10 +96,20 @@ engines use internally (a content keyword list straight from the source), and
 **Opportunities** keeps a prioritized, refreshed version of this table
 automatically.
 
-We executed the competitor step on the spot. Reading the stored "rigosis
-alternative" responses, GPT names **İnnova, KoçSistem, and Netaş** as the
-regional integrator alternatives — those three are now configured, so the
-next daily run produces the first honest Share of Voice.
+We executed the competitor step on the spot — first by hand, then properly.
+Manually reading eight "rigosis alternative" responses surfaced İnnova,
+KoçSistem, and Netaş. But that sample missed the more important names: the
+answers to the *commercial* prompts mention **Konsalt in 28 runs and Kafein
+in 9** — more than İnnova's 20. That gap became the product's first Rigosis
+feature: **Discover from answers** (Settings → Competitors) scans the stored
+responses and suggests every organization the engines present as an
+alternative, with an evidence quote per suggestion. On this dataset it found
+15 candidates — Kafein and Konsalt included, plus OpenText-partner rivals
+like Basistek, NTT DATA Turkey, and Duosis that nobody had thought to look
+for. Five are now configured (Kafein, Konsalt, İnnova, KoçSistem, Netaş), so
+the next daily run produces the first honest Share of Voice.
+
+![Discover competitors](images/10-discover-competitors.png)
 
 ![Competitors](images/09-competitors.png)
 
