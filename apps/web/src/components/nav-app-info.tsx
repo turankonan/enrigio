@@ -1,15 +1,13 @@
-import { IconBrandGithub, IconWorld } from "@tabler/icons-react";
+import { IconWorld } from "@tabler/icons-react";
 import { useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
-
-const REPO_URL = "https://github.com/SemiHop/elmo";
 
 export function NavAppInfo() {
 	const context = useRouteContext({ strict: false }) as { clientConfig?: ClientConfig };
 	const mode = context.clientConfig?.mode;
 
-	// Whitelabel deployments hide the version/website/github links.
+	// Whitelabel deployments hide the version/website links.
 	if (mode === "whitelabel") return null;
 
 	const linkClass =
@@ -26,12 +24,6 @@ export function NavAppInfo() {
 						<IconWorld className="size-4" />
 					</TooltipTrigger>
 					<TooltipContent>rigosis.com</TooltipContent>
-				</Tooltip>
-				<Tooltip>
-					<TooltipTrigger render={<a href={REPO_URL} target="_blank" rel="noreferrer" className={linkClass} />}>
-						<IconBrandGithub className="size-4" />
-					</TooltipTrigger>
-					<TooltipContent>View on GitHub</TooltipContent>
 				</Tooltip>
 			</div>
 		</div>
