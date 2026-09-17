@@ -110,8 +110,8 @@ export function ChartExportPreview({
 							{name}
 						</span>
 					) : (
-						<span className="font-titan-one font-normal lowercase text-blue-600" style={{ fontSize: 24 }}>
-							answerecho
+						<span className="font-ubuntu font-bold tracking-tight text-[#32373c]" style={{ fontSize: 22 }}>
+							Answer<span className="text-[#277a33]">Echo</span>
 						</span>
 					)}
 				</div>

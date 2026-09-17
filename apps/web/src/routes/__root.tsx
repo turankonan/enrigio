@@ -2,7 +2,7 @@
 
 // Preloaded so the wordmark font downloads in parallel with the CSS rather than
 // after it. Must resolve to the same emitted asset as the @font-face src.
-import titanOneFont from "@fontsource/titan-one/files/titan-one-latin-400-normal.woff2?url";
+import wordmarkFont from "@fontsource/ubuntu/files/ubuntu-latin-700-normal.woff2?url";
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, HeadContent, Outlet, ScriptOnce, Scripts } from "@tanstack/react-router";
@@ -108,7 +108,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 								rel: "preload",
 								as: "font",
 								type: "font/woff2",
-								href: titanOneFont,
+								href: wordmarkFont,
 								// Inside a conditional spread the literal widens to `string`,
 								// which doesn't satisfy React's `CrossOrigin` union.
 								crossOrigin: "anonymous" as const,

@@ -252,6 +252,9 @@ importers:
       '@fontsource/titan-one':
         specifier: ^5.3.0
         version: 5.3.0
+      '@fontsource/ubuntu':
+        specifier: ^5.3.0
+        version: 5.3.0
       '@modelcontextprotocol/sdk':
         specifier: ^1.30.0
         version: 1.30.0(supports-color@7.2.0)(zod@4.5.4)
@@ -1835,6 +1838,9 @@ packages:
 
   '@fontsource/titan-one@5.3.0':
     resolution: {integrity: sha512-PpYfmhzzC3OVK+tQ2T5n5gx/+L6u+B0u//hu0/wqs0XBx45o8nPhFySl1/+NGYt92WE0MUuUVl0P2mF0/8xykw==}
+
+  '@fontsource/ubuntu@5.3.0':
+    resolution: {integrity: sha512-LsjJXgE430QLs8LKfn1RIFbbdGAiZBU1gao8ASa4Z2kGNGh7lMb7Rzx09v3bLLuuK+3XA/JSLgPWTAbLD6r1fg==}
 
   '@google-cloud/secret-manager@6.3.0':
     resolution: {integrity: sha512-TUuzu8CchbCd2cXd0pYJSXvDBsEVX3wpZu4iOpdLrXLbYbvCDKhdjDyOyC7vo14qQRE9J6Z0AL2hfX08H+fh3A==}
@@ -10172,6 +10178,8 @@ snapshots:
   '@fontsource/geist-sans@5.3.0': {}
 
   '@fontsource/titan-one@5.3.0': {}
+
+  '@fontsource/ubuntu@5.3.0': {}
 
   '@google-cloud/secret-manager@6.3.0(supports-color@7.2.0)':
     dependencies:

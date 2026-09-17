@@ -30,10 +30,14 @@ export const CRISP_WEBSITE_ID = "2f79a110-4e29-41a8-b45d-4993df6ff487";
 /**
  * AnswerEcho brand constants — used for icon generation, manifest, and the brand kit.
  */
-export const ANSWERECHO_BRAND_COLOR = "#2563eb"; // blue-600
-export const ANSWERECHO_BRAND_FONT = "Titan One";
-export const ANSWERECHO_THEME_COLOR = "#2563eb";
+export const ANSWERECHO_BRAND_COLOR = "#39b54a"; // Rigosis green — fills only, never carries white text (2.9:1)
+export const ANSWERECHO_BRAND_FONT = "Ubuntu";
+export const ANSWERECHO_THEME_COLOR = "#39b54a";
 export const ANSWERECHO_BACKGROUND_COLOR = "#ffffff";
+/** Ink — headings, wordmark, and the glyph on the green mark. */
+export const ANSWERECHO_INK_COLOR = "#32373c";
+/** Darkened brand green for interactive elements; 5.4:1 with white, passes AA. */
+export const ANSWERECHO_ACTION_COLOR = "#277a33";
 
 /**
  * Default chart colors for the AnswerEcho product.
