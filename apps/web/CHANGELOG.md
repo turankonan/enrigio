@@ -16,7 +16,7 @@
 
 ### Minor Changes
 
-- c9142f7: Elmo now serves a full external API and an MCP server. `/api/v1` covers brands, prompts, competitors, reports, analytics, models, tags, and opportunities. `/api/mcp` connects Claude Code, Codex, Cursor, OpenCode, and VS Code, either by signing in from the client or with an API key. Keys belong to an organization and are issued read-only or read-write from Settings, which now also has API and MCP pages describing your own deployment.
+- c9142f7: AnswerEcho now serves a full external API and an MCP server. `/api/v1` covers brands, prompts, competitors, reports, analytics, models, tags, and opportunities. `/api/mcp` connects Claude Code, Codex, Cursor, OpenCode, and VS Code, either by signing in from the client or with an API key. Keys belong to an organization and are issued read-only or read-write from Settings, which now also has API and MCP pages describing your own deployment.
 
 ### Patch Changes
 
@@ -40,7 +40,7 @@
 
 ### Minor Changes
 
-- 78593b9: Adds support for [Elmo Cloud](https://app.elmohq.com/).
+- 78593b9: Adds support for [AnswerEcho Cloud](https://app.answerecho.com/).
 
 ### Patch Changes
 
@@ -60,11 +60,11 @@
 - f87d2e2: An organization's brands, team, and plan each have their own settings page, and its name and URL can be changed there.
 - 3ba2e5a: The password reset pages now match the sign-in and sign-up layout.
 - 58ff775: Keep a brand's prompts editable when it already holds more than the prompt limit.
-- 1f46b62: Fix broken docs link in `elmo init` and the LLMs settings page.
+- 1f46b62: Fix broken docs link in `answerecho init` and the LLMs settings page.
 - 3358b9f: Fix a crash in the onboarding wizard and competitor/prompt editors on deployments served over plain HTTP, where `crypto.randomUUID` is unavailable.
 - 1c4d39c: Support "GitHub Flavored Markdown" on prompt detail pages. LLM responses now render tables, strikethroughs, and URL autolinks more correctly.
 - 41545b6: Authentication and organization entry pages now show descriptive, deployment-aware browser tab titles.
-- 3ba2e5a: The sign-in and sign-up pages now explain what Elmo does, which engines it tracks, and who already uses it — with self-hosted instances also shown what the managed cloud offers.
+- 3ba2e5a: The sign-in and sign-up pages now explain what AnswerEcho does, which engines it tracks, and who already uses it — with self-hosted instances also shown what the managed cloud offers.
 - 78593b9: Self-hosted deployments now show each tracked platform's estimated cost on the LLMs settings page, plus which providers to configure for the platforms they aren't tracking yet.
 - c596f61: Show brand and competitor icons across the dashboard.
 - Updated dependencies [1f32756]
@@ -281,7 +281,7 @@
 
 ### Patch Changes
 
-- 1e770ff: Publish multi-arch (`linux/amd64` + `linux/arm64`) Docker images for `elmohq/elmo-web` and `elmohq/elmo-worker`, so Apple Silicon and other arm64 hosts can pull them.
+- 1e770ff: Publish multi-arch (`linux/amd64` + `linux/arm64`) Docker images for `answerecho/answerecho-web` and `answerecho/answerecho-worker`, so Apple Silicon and other arm64 hosts can pull them.
 - 6ab2b42: Fix OG image generation: `og:image` is now an absolute URL and renders the current page's title/description. Adds `og:url`, `og:site_name`, `og:locale`, and `og:logo` to the document head.
   - @workspace/api-spec@0.2.7
   - @workspace/config@0.2.7
@@ -310,7 +310,7 @@
 ### Patch Changes
 
 - edf97d4: Add Mistral as a direct API provider. Set `MISTRAL_API_KEY` and target via `mistral:mistral-api:<model>[:online]`.
-- 7cba46d: License Elmo under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
+- 7cba46d: License AnswerEcho under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
 - 839b98b: REST-style brand management API: `GET/POST /api/v1/brands`, `GET/PATCH /api/v1/brands/{brandId}`, `POST /api/v1/tools/analyze`, and full CRUD for `/api/v1/competitors`. API-created brands skip onboarding — callers hit `tools/analyze` first if they want suggestions, then create brands with whatever they choose to keep.
 - 839b98b: Brand onboarding is now a single screen: paste a website and review the suggested products, competitors (with their own domains and aliases), additional brand domains, aliases, and tagged starter prompts before saving. Powered by whichever direct LLM API you've configured (OpenRouter, Anthropic, OpenAI, or Mistral) with web search.
 - Updated dependencies [7990382]
@@ -347,7 +347,7 @@
 - b635a99: Make default brand cadence configurable via `DEFAULT_DELAY_HOURS` env var. `brand.delayOverrideHours` still takes precedence. The default changed from the hard-coded 72h to 24h.
 - a62ef89: Restyle the demo login and add a preview to Storybook.
 - e9be023: Ensure icons/favicons are comprehensive for non-whitelabel deployments.
-- f3604e2: Replace the page-top demo-mode banner with a compact "Demo" pill next to the sidebar logo (with a tooltip explaining the read-only behavior), and move version / elmohq.com / GitHub links into the sidebar footer for every deployment mode except whitelabel. Also reads the better-auth `user.image` field so avatars actually render.
+- f3604e2: Replace the page-top demo-mode banner with a compact "Demo" pill next to the sidebar logo (with a tooltip explaining the read-only behavior), and move version / answerecho.com / GitHub links into the sidebar footer for every deployment mode except whitelabel. Also reads the better-auth `user.image` field so avatars actually render.
   - @workspace/api-spec@0.2.3
   - @workspace/config@0.2.3
   - @workspace/deployment@0.2.3

@@ -161,7 +161,7 @@
 
 ### Patch Changes
 
-- 7cba46d: License Elmo under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
+- 7cba46d: License AnswerEcho under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
 - Updated dependencies [edf97d4]
 - Updated dependencies [7cba46d]
   - @workspace/config@0.2.5

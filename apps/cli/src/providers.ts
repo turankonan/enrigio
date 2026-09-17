@@ -7,10 +7,10 @@ import { assertNotCancelled, link } from "./util.js";
 
 // The PartnerStack links forward `sid` to the signup, so referrals are attributable
 // per surface: `cli` here, `docs` and `blog` on the links in packages/docs.
-const CLORO_AFFILIATE = "https://affiliate.cloro.dev/elmo?sid=cli";
-const BRIGHTDATA_AFFILIATE = "https://get.brightdata.com/elmo?sid=cli";
+const CLORO_AFFILIATE = "https://affiliate.cloro.dev/answerecho?sid=cli";
+const BRIGHTDATA_AFFILIATE = "https://get.brightdata.com/answerecho?sid=cli";
 const OXYLABS_AFFILIATE = "https://oxylabs.go2cloud.org/aff_c?offer_id=7&aff_id=2263&url_id=32";
-const OLOSTEP_AFFILIATE = "https://olostep.com/?ref=elmo";
+const OLOSTEP_AFFILIATE = "https://olostep.com/?ref=answerecho";
 const DATAFORSEO_AFFILIATE = "https://dataforseo.com/?aff=184966";
 
 export type RecommendedScraper = "cloro" | "brightdata" | "oxylabs" | "olostep" | "dataforseo";
@@ -295,7 +295,7 @@ export async function finalizeScrapeTargets(
 	const deduped = dedupeTargets(targets);
 
 	if (!deduped) {
-		p.log.warn("No SCRAPE_TARGETS configured. Elmo will not run scheduled checks until you set them.");
+		p.log.warn("No SCRAPE_TARGETS configured. AnswerEcho will not run scheduled checks until you set them.");
 		p.log.info(`Reference: ${link(pc.cyan(PROVIDERS_DOCS_URL), PROVIDERS_DOCS_URL)}`);
 
 		const addManual = await p.confirm({

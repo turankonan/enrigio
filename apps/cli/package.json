@@ -1,5 +1,5 @@
 {
-	"name": "@elmohq/cli",
+	"name": "@answerecho/cli",
 	"version": "0.4.1",
 	"license": "MIT",
 	"keywords": [
@@ -20,7 +20,7 @@
 		"ai-visibility"
 	],
 	"bin": {
-		"elmo": "dist/index.js"
+		"answerecho": "dist/index.js"
 	},
 	"files": [
 		"dist",

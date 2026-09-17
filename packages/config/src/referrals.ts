@@ -3,16 +3,16 @@
  *
  * Each one carries a `ref` naming the surface it was clicked from, so the
  * marketing site can tell a self-hosted operator who arrived from the sign-in
- * page apart from one who arrived from `elmo init` — the two want different
+ * page apart from one who arrived from `answerecho init` — the two want different
  * things and convert at very different rates.
  */
 
-export const MARKETING_SITE_URL = "https://www.elmohq.com";
-export const CLOUD_APP_URL = "https://app.elmohq.com";
+export const MARKETING_SITE_URL = "https://www.answerecho.com";
+export const CLOUD_APP_URL = "https://app.answerecho.com";
 /** Where a demo is booked. Not on our domain, but ours, and tagged the same way. */
-const BOOK_DEMO_URL = "https://cal.com/jrhizor/elmo";
+const BOOK_DEMO_URL = "https://cal.com/jrhizor/answerecho";
 /** The read-only instance anyone can poke at without an account. */
-const DEMO_SITE_URL = "https://demo.elmohq.com";
+const DEMO_SITE_URL = "https://demo.answerecho.com";
 
 /**
  * Where a link back to us was clicked. A closed set rather than free-form

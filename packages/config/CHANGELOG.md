@@ -12,7 +12,7 @@ No changes in this release.
 
 ### Minor Changes
 
-- 78593b9: Adds support for [Elmo Cloud](https://app.elmohq.com/).
+- 78593b9: Adds support for [AnswerEcho Cloud](https://app.answerecho.com/).
 
 ### Patch Changes
 
@@ -20,7 +20,7 @@ No changes in this release.
 - f4f7ef2: Improve visibility chart accessibility for colorblind users. Your brand's lines are emphasized and you can click on an entry in the legend to isolate a competitor's line in the graph.
 - 78593b9: The account menu lists every organization (not just brands) you belong to.
 - f87d2e2: An organization's brands, team, and plan each have their own settings page, and its name and URL can be changed there.
-- 1f46b62: Fix broken docs link in `elmo init` and the LLMs settings page.
+- 1f46b62: Fix broken docs link in `answerecho init` and the LLMs settings page.
 - 78593b9: Self-hosted deployments now show each tracked platform's estimated cost on the LLMs settings page, plus which providers to configure for the platforms they aren't tracking yet.
 
 ## 0.2.19
@@ -56,7 +56,7 @@ No changes in this release.
 ### Patch Changes
 
 - edf97d4: Add Mistral as a direct API provider. Set `MISTRAL_API_KEY` and target via `mistral:mistral-api:<model>[:online]`.
-- 7cba46d: License Elmo under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
+- 7cba46d: License AnswerEcho under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
 
 ## 0.2.4
 

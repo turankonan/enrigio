@@ -101,8 +101,8 @@ describe("/api/v1 route conformance", () => {
 					method.toLowerCase()
 				];
 				documented[method] = {
-					scopes: [...((operation?.["x-elmo-scopes"] as string[] | undefined) ?? [])].sort(),
-					adminOnly: operation?.["x-elmo-admin-only"] === true,
+					scopes: [...((operation?.["x-answerecho-scopes"] as string[] | undefined) ?? [])].sort(),
+					adminOnly: operation?.["x-answerecho-admin-only"] === true,
 				};
 				enforced[method] = { scopes: [...meta.scopes].sort(), adminOnly: meta.adminOnly };
 			}
