@@ -17,9 +17,10 @@ import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import * as pgRead from "../src/lib/postgres-read";
 
-const db = drizzle(process.env.DATABASE_URL!);
+if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
+const db = drizzle(process.env.DATABASE_URL);
 
-const ITERATIONS = parseInt(process.argv.find((a) => a.startsWith("--iterations="))?.split("=")[1] || "5");
+const ITERATIONS = parseInt(process.argv.find((a) => a.startsWith("--iterations="))?.split("=")[1] || "5", 10);
 const WARMUP = 1;
 
 // ============================================================================
@@ -144,7 +145,7 @@ async function benchBrand(brandId: string, runCount: number, hasCitations: boole
 }
 
 async function main(): Promise<void> {
-	const NUM_BRANDS = parseInt(process.argv.find((a) => a.startsWith("--brands="))?.split("=")[1] || "5");
+	const NUM_BRANDS = parseInt(process.argv.find((a) => a.startsWith("--brands="))?.split("=")[1] || "5", 10);
 	console.log(`Benchmark: ${ITERATIONS} iterations + ${WARMUP} warmup, top ${NUM_BRANDS} brands\n`);
 
 	await db.execute(sql`SET statement_timeout = '30s'`);

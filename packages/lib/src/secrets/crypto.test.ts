@@ -188,8 +188,12 @@ describe("getKeyring", () => {
 	});
 
 	it("throws EncryptionKeyError for the wrong decoded length", () => {
-		expect(() => getKeyring({ ANSWERECHO_ENCRYPTION_KEY: randomBytes(16).toString("base64") })).toThrow(EncryptionKeyError);
-		expect(() => getKeyring({ ANSWERECHO_ENCRYPTION_KEY: randomBytes(64).toString("base64") })).toThrow(EncryptionKeyError);
+		expect(() => getKeyring({ ANSWERECHO_ENCRYPTION_KEY: randomBytes(16).toString("base64") })).toThrow(
+			EncryptionKeyError,
+		);
+		expect(() => getKeyring({ ANSWERECHO_ENCRYPTION_KEY: randomBytes(64).toString("base64") })).toThrow(
+			EncryptionKeyError,
+		);
 		expect(() =>
 			getKeyring({
 				ANSWERECHO_ENCRYPTION_KEY: randomBytes(32).toString("base64"),

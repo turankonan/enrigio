@@ -34,7 +34,14 @@ export function NavAppInfo() {
 				</Tooltip>
 				<Tooltip>
 					<TooltipTrigger
-						render={<a href="https://github.com/answerecho/answerecho" target="_blank" rel="noreferrer" className={linkClass} />}
+						render={
+							<a
+								href="https://github.com/answerecho/answerecho"
+								target="_blank"
+								rel="noreferrer"
+								className={linkClass}
+							/>
+						}
 					>
 						<IconBrandGithub className="size-4" />
 					</TooltipTrigger>

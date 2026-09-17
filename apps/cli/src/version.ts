@@ -9,7 +9,8 @@ export async function getPackageVersion(): Promise<string> {
 	const packagePath = path.resolve(selfDir, "..", "package.json");
 	const contents = await fs.readFile(packagePath, "utf8");
 	const json = JSON.parse(contents) as { version?: string };
-	return json.version!;
+	if (!json.version) throw new Error(`missing version in ${packagePath}`);
+	return json.version;
 }
 
 export async function fetchLatestCliVersion(): Promise<string | null> {

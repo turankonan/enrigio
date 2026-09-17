@@ -78,7 +78,9 @@ describe("ANSWERECHO_ENCRYPTION_KEY", () => {
 describe("requireEnvVars", () => {
 	it("reports every missing required env var at once", () => {
 		expect(() =>
-			requireEnvVars(["VITE_APP_NAME", "VITE_APP_ICON", "VITE_APP_URL"], { VITE_APP_URL: "https://app.answerecho.com" }),
+			requireEnvVars(["VITE_APP_NAME", "VITE_APP_ICON", "VITE_APP_URL"], {
+				VITE_APP_URL: "https://app.answerecho.com",
+			}),
 		).toThrow("Missing required environment variables: VITE_APP_NAME, VITE_APP_ICON");
 	});
 

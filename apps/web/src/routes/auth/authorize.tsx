@@ -89,7 +89,10 @@ function AuthorizePage() {
 	}
 
 	return (
-		<FullPageCard title="Connect to AnswerEcho" subtitle={`${label} is asking to read and manage your AnswerEcho data.`}>
+		<FullPageCard
+			title="Connect to AnswerEcho"
+			subtitle={`${label} is asking to read and manage your AnswerEcho data.`}
+		>
 			<div className="w-full space-y-4">
 				{error && (
 					<Alert variant="destructive">
@@ -119,8 +122,8 @@ function AuthorizePage() {
 				{client.loopbackOnly && (
 					<Alert>
 						<AlertDescription>
-							This client runs on your computer, so AnswerEcho can't tell which program is asking. Continue only if you just
-							started this from a client you trust.
+							This client runs on your computer, so AnswerEcho can't tell which program is asking. Continue only if you
+							just started this from a client you trust.
 						</AlertDescription>
 					</Alert>
 				)}

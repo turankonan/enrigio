@@ -72,7 +72,9 @@ export const SignInNeedsNoKey: Story = {
 		const canvas = within(canvasElement);
 		// Signing in is the path that works without issuing anything, so its
 		// snippet must not carry a key the reader has to go and fetch first.
-		const signIn = await canvas.findByText(`claude mcp add --transport http answerecho ${window.location.origin}/api/mcp`);
+		const signIn = await canvas.findByText(
+			`claude mcp add --transport http answerecho ${window.location.origin}/api/mcp`,
+		);
 		await expect(signIn).toBeVisible();
 		await expect(signIn).not.toHaveTextContent("Authorization");
 	},

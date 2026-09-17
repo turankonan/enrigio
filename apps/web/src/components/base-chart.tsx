@@ -334,7 +334,7 @@ export function BaseChart({
 									if (!active || !payload?.length) return null;
 
 									// Dashed extensions are visual continuity, not observed values.
-									const filteredPayload = payload.filter((item: any) => {
+									const filteredPayload = payload.filter((item) => {
 										const key = item.dataKey as string;
 										if (key.endsWith("_solid")) return false;
 										if (item.payload && isExtendedDataPoint(item.payload, key)) return false;
@@ -355,17 +355,18 @@ export function BaseChart({
 										<div className="border-border/50 bg-background grid min-w-[8rem] items-start gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl">
 											<div className="font-medium">{formattedDate}</div>
 											<div className="grid gap-1.5">
-												{filteredPayload.map((item: any) => {
-													const indicatorColor = chartConfig[item.dataKey as string]?.color;
+												{filteredPayload.map((item) => {
+													const itemKey = item.dataKey as string;
+													const indicatorColor = chartConfig[itemKey]?.color;
 													return (
-														<div key={item.dataKey} className="flex w-full items-center gap-2">
+														<div key={itemKey} className="flex w-full items-center gap-2">
 															<div
 																className="shrink-0 rounded-[2px] h-2.5 w-2.5"
 																style={{ backgroundColor: indicatorColor }}
 															/>
 															<div className="flex flex-1 justify-between gap-4 leading-none items-center">
 																<span className="text-muted-foreground">
-																	{chartConfig[item.dataKey as string]?.label || item.dataKey}
+																	{chartConfig[itemKey]?.label || itemKey}
 																</span>
 																<span className="text-foreground font-mono font-xs tabular-nums">{item.value}%</span>
 															</div>
@@ -402,14 +403,34 @@ export function BaseChart({
 									stroke={`var(--color-${key})`}
 									strokeWidth={strokeWidthFor(key)}
 									strokeOpacity={opacityFor(key)}
-									dot={({ cx, cy, payload, value }: any) => {
+									dot={({
+										cx,
+										cy,
+										payload,
+										value,
+									}: {
+										cx?: number;
+										cy?: number;
+										payload?: ChartDataPoint;
+										value?: unknown;
+									}) => {
 										// Return empty <g> element instead of null to satisfy Recharts types
 										if (!payload || isExtendedDataPoint(payload, key) || value === null || value === undefined) {
 											return <g key={`dot-empty-${key}-${cx}`} />;
 										}
 										return <circle key={`dot-${key}-${cx}`} cx={cx} cy={cy} {...dotProps(key, 3)} />;
 									}}
-									activeDot={({ cx, cy, payload, value }: any) => {
+									activeDot={({
+										cx,
+										cy,
+										payload,
+										value,
+									}: {
+										cx?: number;
+										cy?: number;
+										payload?: ChartDataPoint;
+										value?: unknown;
+									}) => {
 										// Return empty <g> element instead of null to satisfy Recharts types
 										if (!payload || isExtendedDataPoint(payload, key) || value === null || value === undefined) {
 											return <g key={`activedot-empty-${key}-${cx}`} />;
