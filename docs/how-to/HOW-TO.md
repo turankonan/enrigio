@@ -78,6 +78,26 @@ what you don't read.
 
 ---
 
+## The Rigosis case: what to do with these results
+
+The first run isn't a report card — it's a work list. Reading ours:
+
+| Finding | What it means | Action |
+|---|---|---|
+| "best it service management consultants in turkey" → **no brands found** | Nobody owns this answer yet. AI has no source that names anyone. | Create the citable content: a credible ITSM-in-Turkey guide on rigosis.com plus third-party coverage. First mover takes the recommendation slot. |
+| "opentext smax implementation partners turkey" → **65%** | Highest commercial intent, but Rigosis is missing from a third of answers. | Open **Citations** for this prompt, see which domains the engines trusted, and get Rigosis onto those exact sources (partner directory, roundups, case studies). |
+| "rigosis alternative" → **91%** | AI answers comparison questions about Rigosis — alongside someone. | Read the responses to see who's named as the alternative; those firms go into the competitor list. |
+| Brand prompts → **100%** | AI knows Rigosis when asked by name. | Maintenance only: keep company facts fresh and consistent across the sites AI cites. |
+| Share of Voice → **100%** | An artifact: zero competitors configured, so Rigosis owns a field of one. | Add real competitors in **Settings → Competitors** — then Share of Voice becomes the KPI to report. |
+
+Then the loop: act → let the daily runs re-measure → watch the per-prompt
+trend lines move. **Query Fan-Out** supplies the exact search phrasings the
+engines use internally (a content keyword list straight from the source), and
+**Opportunities** keeps a prioritized, refreshed version of this table
+automatically.
+
+---
+
 ### Operating notes (demo environment)
 
 - Free-tier Render sleeps after ~15 idle minutes; evaluations only process
