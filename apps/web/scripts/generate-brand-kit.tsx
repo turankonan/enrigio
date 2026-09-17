@@ -4,13 +4,13 @@
  *
  * Output: apps/web/answerecho-brand-kit.zip
  *
- *   Icons (square, "e" glyph):
+ *   Icons (square, the mark):
  *     answerecho-icon-{size}.png              Transparent background
  *     answerecho-icon-white-{size}.png        White background
  *     answerecho-icon-dark-{size}.png         Dark background
  *     answerecho-icon-maskable-{size}.png     Maskable/PWA (white bg, safe-zone padding)
  *
- *   Logos ("answerecho" wordmark, sm/md/lg × 3 backgrounds):
+ *   Logos ("AnswerEcho" wordmark, sm/md/lg × 3 backgrounds):
  *     answerecho-logo[-white|-dark]-{sm|md|lg}.png
  *
  *   OG images (1200×630):
@@ -27,7 +27,7 @@ import { createWriteStream, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { DEFAULT_APP_NAME } from "@workspace/config/constants";
+import { ANSWERECHO_BRAND_COLOR, ANSWERECHO_INK_COLOR, DEFAULT_APP_NAME } from "@workspace/config/constants";
 import { renderOgPng } from "@workspace/og/rasterize";
 import { OG_HEIGHT, OG_WIDTH, renderOgImage } from "@workspace/og/render";
 import { ZipArchive } from "archiver";
@@ -35,8 +35,9 @@ import { ZipArchive } from "archiver";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
-const BRAND_COLOR = "#2563eb";
-const SITE_URL = "https://www.answerecho.com";
+const BRAND_COLOR = ANSWERECHO_BRAND_COLOR;
+const INK = ANSWERECHO_INK_COLOR;
+const SITE_URL = "https://www.rigosis.com";
 const OUTPUT_ZIP = resolve(__dirname, "../answerecho-brand-kit.zip");
 
 // ---------------------------------------------------------------------------
@@ -49,10 +50,10 @@ function loadFont(path: string): Buffer {
 
 const fonts = [
 	{
-		name: "Titan One",
-		data: loadFont("@fontsource/titan-one/files/titan-one-latin-400-normal.woff2"),
+		name: "Ubuntu",
+		data: loadFont("@fontsource/ubuntu/files/ubuntu-latin-700-normal.woff2"),
 		style: "normal" as const,
-		weight: 400 as const,
+		weight: 700 as const,
 	},
 	{
 		name: "Geist Sans",
@@ -79,23 +80,35 @@ async function render(element: React.ReactElement, width: number, height: number
 }
 
 // ---------------------------------------------------------------------------
-// Icon — "e" glyph scaled to fill the canvas
+// Icon — the mark: ink "a" on the green rounded square
 // ---------------------------------------------------------------------------
 
-function Icon({ fill, bg, size }: { fill: string; bg?: string; size: number }) {
+function Icon({ bg, size }: { bg?: string; size: number }) {
 	return (
 		<div tw="flex items-center justify-center w-full h-full" style={{ backgroundColor: bg || "transparent" }}>
 			<div
 				style={{
-					fontFamily: "Titan One",
-					fontSize: size,
-					color: fill,
-					lineHeight: 1,
-					transform: "scale(1.4)",
-					marginTop: -Math.round(size * 0.28),
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					width: size,
+					height: size,
+					backgroundColor: BRAND_COLOR,
+					borderRadius: Math.round(size * 0.26),
 				}}
 			>
-				e
+				<div
+					style={{
+						fontFamily: "Ubuntu",
+						fontWeight: 700,
+						fontSize: Math.round(size * 0.65),
+						color: INK,
+						lineHeight: 1,
+						marginTop: -Math.round(size * 0.06),
+					}}
+				>
+					a
+				</div>
 			</div>
 		</div>
 	);
@@ -103,45 +116,41 @@ function Icon({ fill, bg, size }: { fill: string; bg?: string; size: number }) {
 
 function MaskableIcon({ size }: { size: number }) {
 	return (
-		<div tw="flex items-center justify-center w-full h-full bg-white">
+		<div tw="flex items-center justify-center w-full h-full" style={{ backgroundColor: BRAND_COLOR }}>
 			<div
 				style={{
-					fontFamily: "Titan One",
-					fontSize: Math.round(size * 0.94),
-					color: BRAND_COLOR,
+					fontFamily: "Ubuntu",
+					fontWeight: 700,
+					fontSize: Math.round(size * 0.52),
+					color: INK,
 					lineHeight: 1,
-					marginTop: -Math.round(size * 0.18),
+					marginTop: -Math.round(size * 0.05),
 				}}
 			>
-				e
+				a
 			</div>
 		</div>
 	);
 }
 
 // ---------------------------------------------------------------------------
-// Logo — "answerecho" wordmark with equal padding on all sides
+// Logo — "AnswerEcho" wordmark with equal padding on all sides
 // ---------------------------------------------------------------------------
 
 function Logo({ bg, fontSize }: { bg?: string; fontSize: number }) {
+	const onDark = bg === "#111827";
 	return (
 		<div tw="flex items-center justify-center w-full h-full" style={{ backgroundColor: bg || "transparent" }}>
-			<div
-				style={{
-					fontFamily: "Titan One",
-					fontSize,
-					color: BRAND_COLOR,
-					lineHeight: 1,
-				}}
-			>
-				answerecho
+			<div style={{ display: "flex", fontFamily: "Ubuntu", fontWeight: 700, fontSize, lineHeight: 1 }}>
+				<div style={{ color: onDark ? "#ffffff" : INK }}>Answer</div>
+				<div style={{ color: onDark ? "#4ade80" : "#277a33" }}>Echo</div>
 			</div>
 		</div>
 	);
 }
 
 // ---------------------------------------------------------------------------
-// PatternBanner — repeating "answerecho" wordmark at an angle, wrapping-paper style.
+// PatternBanner — repeating "AnswerEcho" wordmark at an angle, wrapping-paper style.
 // ---------------------------------------------------------------------------
 
 function PatternBanner({
@@ -183,14 +192,15 @@ function PatternBanner({
 			cells.push(
 				<div
 					style={{
-						fontFamily: "Titan One",
+						fontFamily: "Ubuntu",
+						fontWeight: 700,
 						fontSize,
 						color: colors[colorIdx],
 						lineHeight: 1,
 						marginRight: gap,
 					}}
 				>
-					answerecho
+					AnswerEcho
 				</div>,
 			);
 		}
@@ -238,7 +248,7 @@ async function addFile(name: string, data: Buffer | Promise<Buffer>) {
 
 console.log("Generating brand kit…\n");
 
-// Icons — always brand blue, bg varies
+// Icons — the mark, bg varies
 const iconVariants = [
 	{ suffix: "", bg: undefined },
 	{ suffix: "-white", bg: "#ffffff" },
@@ -251,7 +261,7 @@ for (const v of iconVariants) {
 	for (const size of iconSizes) {
 		await addFile(
 			`icons/answerecho-icon${v.suffix}-${size}.png`,
-			render(<Icon fill={BRAND_COLOR} bg={v.bg} size={size} />, size, size),
+			render(<Icon bg={v.bg} size={size} />, size, size),
 		);
 	}
 }
@@ -261,7 +271,7 @@ for (const size of [64, 128, 256, 512]) {
 	await addFile(`icons/answerecho-icon-maskable-${size}.png`, render(<MaskableIcon size={size} />, size, size));
 }
 
-// Logos — always brand blue text
+// Logos — two-tone wordmark, colors follow the background
 console.log("\nLogos:");
 const logoBgs = [
 	{ suffix: "", bg: undefined },
@@ -295,7 +305,7 @@ console.log("\nSocial Banners:");
 
 const sharedBannerStyle = {
 	bg: "#ffffff",
-	colors: ["#2563eb", "#f4d35e", "#ee964b", "#f95738", "#93c5fd", "#fbbf24"],
+	colors: ["#39b54a", "#277a33", "#1f7a3d", "#4ade80", "#a3e635", "#86efac"],
 	angle: 15,
 } as const;
 

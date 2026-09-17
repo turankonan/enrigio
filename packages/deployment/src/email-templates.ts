@@ -23,17 +23,18 @@ function escapeHtml(value: string): string {
 
 function wrapHtml(heading: string, sentence: string, url: string, cta = "Continue"): string {
 	return `
-		<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+		<div style="font-family: Ubuntu, 'Segoe UI', 'Trebuchet MS', sans-serif; max-width: 480px; margin: 0 auto; color: #32373c;">
 			<h1 style="font-size: 20px;">${heading}</h1>
 			<p>${sentence}</p>
 			<p>
-				<a href="${url}" style="display: inline-block; padding: 10px 20px; background-color: #111827; color: #ffffff; text-decoration: none; border-radius: 6px;">
+				<a href="${url}" style="display: inline-block; padding: 10px 20px; background-color: #277a33; color: #ffffff; text-decoration: none; border-radius: 6px;">
 					${cta}
 				</a>
 			</p>
 			<p style="color: #6b7280; font-size: 13px;">
 				If the button doesn't work, copy and paste this link into your browser: ${url}
 			</p>
+			<p style="color: #9ca3af; font-size: 12px;">AnswerEcho by Rigosis</p>
 		</div>
 	`.trim();
 }

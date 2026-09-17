@@ -12,11 +12,11 @@ function loadFont(spec: string): Buffer {
 }
 
 const fonts = [
-	{ name: "Titan One", data: loadFont("@fontsource/titan-one/files/titan-one-latin-400-normal.woff2"), weight: 400 },
+	{ name: "Ubuntu", data: loadFont("@fontsource/ubuntu/files/ubuntu-latin-700-normal.woff2"), weight: 700 },
 	{ name: "Geist Sans", data: loadFont("@fontsource/geist-sans/files/geist-sans-latin-400-normal.woff2"), weight: 400 },
 	{ name: "Geist Sans", data: loadFont("@fontsource/geist-sans/files/geist-sans-latin-500-normal.woff2"), weight: 500 },
 	{ name: "Geist Mono", data: loadFont("@fontsource/geist-mono/files/geist-mono-latin-400-normal.woff2"), weight: 400 },
-].map((font) => ({ ...font, style: "normal" as const, weight: font.weight as 400 | 500 }));
+].map((font) => ({ ...font, style: "normal" as const, weight: font.weight as 400 | 500 | 700 }));
 
 const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 

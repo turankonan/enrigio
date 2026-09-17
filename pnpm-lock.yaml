@@ -249,9 +249,6 @@ importers:
       '@fontsource/geist-sans':
         specifier: ^5.3.0
         version: 5.3.0
-      '@fontsource/titan-one':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@fontsource/ubuntu':
         specifier: ^5.3.0
         version: 5.3.0
@@ -1835,9 +1832,6 @@ packages:
 
   '@fontsource/geist-sans@5.3.0':
     resolution: {integrity: sha512-AmG7cE1AvE4NHROPaOl1sN+a02cB5xy6pA/ZV76HXqWTCsJTV2SCBc9DTFHfJqnVOODm7HhXIYtUIb75NP5QXQ==}
-
-  '@fontsource/titan-one@5.3.0':
-    resolution: {integrity: sha512-PpYfmhzzC3OVK+tQ2T5n5gx/+L6u+B0u//hu0/wqs0XBx45o8nPhFySl1/+NGYt92WE0MUuUVl0P2mF0/8xykw==}
 
   '@fontsource/ubuntu@5.3.0':
     resolution: {integrity: sha512-LsjJXgE430QLs8LKfn1RIFbbdGAiZBU1gao8ASa4Z2kGNGh7lMb7Rzx09v3bLLuuK+3XA/JSLgPWTAbLD6r1fg==}
@@ -10176,8 +10170,6 @@ snapshots:
   '@fontsource/geist-mono@5.3.0': {}
 
   '@fontsource/geist-sans@5.3.0': {}
-
-  '@fontsource/titan-one@5.3.0': {}
 
   '@fontsource/ubuntu@5.3.0': {}
 

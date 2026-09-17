@@ -3,7 +3,7 @@
  * brand identically — the brand in its blue, competitors from a fixed palette in
  * rank order, and the long tail in a neutral "others" grey.
  */
-export const BRAND_COLOR = "#2563eb";
+export const BRAND_COLOR = "#1f7a3d";
 export const OTHERS_COLOR = "#cbd5e1";
 export const COMPETITOR_PALETTE = ["#10b981", "#f59e0b", "#8b5cf6", "#ec4899", "#14b8a6", "#f97316"];
 

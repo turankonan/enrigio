@@ -1,4 +1,4 @@
-declare module "virtual:font/titan-one-400" {
+declare module "virtual:font/ubuntu-700" {
 	const data: Buffer;
 	export default data;
 }

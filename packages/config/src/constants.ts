@@ -39,7 +39,7 @@ export const ANSWERECHO_ACTION_COLOR = "#277a33";
 /**
  * Default chart colors for the AnswerEcho product.
  *
- * 11 base hues (Observable + Tableau, anchored to brand blue) expanded
+ * 11 base hues (Observable + Tableau, anchored to the brand green) expanded
  * into 55 colors across five lightness tiers: base → dark → light →
  * muted → deep. This keeps harmony (same hue families throughout) while
  * supporting charts with many series. Whitelabel deployments override
@@ -52,7 +52,7 @@ export const ANSWERECHO_ACTION_COLOR = "#277a33";
  */
 export const DEFAULT_CHART_COLORS = [
 	// Base
-	"#2563eb",
+	"#1f7a3d",
 	"#efb118",
 	"#ff8ab7",
 	"#9c6b4e",
@@ -64,7 +64,7 @@ export const DEFAULT_CHART_COLORS = [
 	"#ff725c",
 	"#38b2ac",
 	// Dark
-	"#0b43bc",
+	"#14582b",
 	"#bb8807",
 	"#fa478c",
 	"#714932",
@@ -76,7 +76,7 @@ export const DEFAULT_CHART_COLORS = [
 	"#f9381a",
 	"#22817c",
 	// Light
-	"#6d94e8",
+	"#5fae79",
 	"#ebc566",
 	"#f877a9",
 	"#b09382",
@@ -88,7 +88,7 @@ export const DEFAULT_CHART_COLORS = [
 	"#f88877",
 	"#6ec4c0",
 	// Muted
-	"#5178cd",
+	"#4e8a63",
 	"#d0aa49",
 	"#eb84ac",
 	"#967664",
@@ -100,7 +100,7 @@ export const DEFAULT_CHART_COLORS = [
 	"#ea8e80",
 	"#5f9b98",
 	// Deep
-	"#0e3486",
+	"#0d3b1e",
 	"#84620b",
 	"#f9156d",
 	"#493327",

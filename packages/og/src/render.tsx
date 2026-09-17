@@ -1,10 +1,10 @@
 /** @jsxRuntime automatic */
 // The pragma keeps this file rendering under tsx (the brand-kit script), which
 // compiles it outside any tsconfig that sets the automatic JSX runtime.
-import { ANSWERECHO_BRAND_COLOR, DEFAULT_APP_NAME } from "@workspace/config/constants";
+import { DEFAULT_APP_NAME } from "@workspace/config/constants";
 import type { ReactNode } from "react";
 
-export const ACCENT_COLORS = ["#2563eb", "#f4d35e", "#ee964b", "#f95738"];
+export const ACCENT_COLORS = ["#39b54a", "#4ade80", "#277a33", "#1f7a3d"];
 export const DEFAULT_TAGLINE = "AI Search Optimization";
 export const DEFAULT_DESCRIPTION = "Track and optimize your brand's visibility across AI models.";
 
@@ -12,20 +12,19 @@ export const OG_WIDTH = 1200;
 export const OG_HEIGHT = 630;
 
 const PADDING = 64;
-const GRID_CELL = 48;
 
-const ZINC = {
-	950: "#09090b",
-	700: "#3f3f46",
-	600: "#52525b",
-	500: "#71717a",
-	200: "#e4e4e7",
-} as const;
+/** Ink ground from the brand sheet; all card text is white or white-alpha. */
+const INK = "#32373c";
+const WHITE = "#ffffff";
+const WHITE_72 = "rgba(255,255,255,0.72)";
+const WHITE_55 = "rgba(255,255,255,0.55)";
+const WHITE_15 = "rgba(255,255,255,0.15)";
+const RING = "rgba(255,255,255,0.07)";
 
 // Only the faces in OG_FONTS exist.
 const SANS = "Geist Sans";
 const MONO = "Geist Mono";
-const WORDMARK = "Titan One";
+const WORDMARK = "Ubuntu";
 
 function parseHex(color: string): number | undefined {
 	const hex = color.trim().replace(/^#/, "");
@@ -52,16 +51,17 @@ export interface OgFrameOptions {
 }
 
 /**
- * The shared card chrome: white canvas, the faint fading grid the marketing site
- * uses behind its hero, a soft accent glow, a segmented brand bar along the top
- * edge, and a mono footer. Content is laid out in a column inside the padding.
+ * The shared card chrome: ink canvas, concentric echo rings radiating from the
+ * right edge, a soft accent glow, a segmented brand bar along the top edge,
+ * and a mono footer. Content is laid out in a column inside the padding.
  */
 export function OgFrame({ accentColors, footer, children }: OgFrameOptions) {
 	const accents = [...new Set(accentColors.map(parseHex).filter((rgb) => rgb !== undefined))];
-	const colors = accents.length > 0 ? accents.map((rgb) => withAlpha(rgb, 1)) : [ZINC[950]];
+	const colors = accents.length > 0 ? accents.map((rgb) => withAlpha(rgb, 1)) : [WHITE_15];
 	const glow = accents.length > 0 ? glowGradient(accents[0]) : undefined;
-	const gridLines = (extent: number) =>
-		Array.from({ length: Math.floor(extent / GRID_CELL) }, (_, i) => (i + 1) * GRID_CELL);
+	// The echo motif: rings spreading from a point past the right edge.
+	const RING_CENTER = { x: OG_WIDTH + 60, y: OG_HEIGHT / 2 };
+	const ringRadii = [140, 280, 420, 560, 700, 840];
 
 	return (
 		<div
@@ -72,49 +72,29 @@ export function OgFrame({ accentColors, footer, children }: OgFrameOptions) {
 				height: "100%",
 				position: "relative",
 				overflow: "hidden",
-				backgroundColor: "#ffffff",
+				backgroundColor: INK,
 				fontFamily: SANS,
-				color: ZINC[950],
+				color: WHITE,
 			}}
 		>
 			<div style={{ display: "flex", position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
-				{gridLines(OG_WIDTH).map((left) => (
+				{ringRadii.map((r) => (
 					<div
-						key={`v${left}`}
+						key={`ring${r}`}
 						style={{
 							position: "absolute",
-							top: 0,
-							left,
-							width: 1,
-							height: "100%",
-							backgroundColor: "rgba(9,9,11,0.06)",
-						}}
-					/>
-				))}
-				{gridLines(OG_HEIGHT).map((top) => (
-					<div
-						key={`h${top}`}
-						style={{
-							position: "absolute",
-							left: 0,
-							top,
-							width: "100%",
-							height: 1,
-							backgroundColor: "rgba(9,9,11,0.06)",
+							left: RING_CENTER.x - r,
+							top: RING_CENTER.y - r,
+							width: r * 2,
+							height: r * 2,
+							borderRadius: 9999,
+							borderWidth: 2,
+							borderStyle: "solid",
+							borderColor: RING,
 						}}
 					/>
 				))}
 			</div>
-			<div
-				style={{
-					position: "absolute",
-					top: 0,
-					left: 0,
-					width: "100%",
-					height: "100%",
-					backgroundImage: "linear-gradient(to bottom, rgba(255,255,255,0) 30%, rgba(255,255,255,1) 92%)",
-				}}
-			/>
 			{glow ? (
 				<div
 					style={{
@@ -147,7 +127,7 @@ export function OgFrame({ accentColors, footer, children }: OgFrameOptions) {
 				{children}
 				{footer ? (
 					<div style={{ display: "flex", alignItems: "center", marginTop: "auto" }}>
-						<div style={{ fontFamily: MONO, fontSize: 22, color: ZINC[500], letterSpacing: 0.5 }}>{footer}</div>
+						<div style={{ fontFamily: MONO, fontSize: 22, color: WHITE_55, letterSpacing: 0.5 }}>{footer}</div>
 					</div>
 				) : null}
 			</div>
@@ -164,7 +144,7 @@ export function OgLabel({ children }: { children: string }) {
 				fontFamily: MONO,
 				fontSize: 22,
 				letterSpacing: 0.5,
-				color: ZINC[700],
+				color: WHITE_72,
 				paddingTop: 10,
 				paddingBottom: 10,
 				paddingLeft: 20,
@@ -172,8 +152,8 @@ export function OgLabel({ children }: { children: string }) {
 				borderRadius: 999,
 				borderWidth: 1,
 				borderStyle: "solid",
-				borderColor: ZINC[200],
-				backgroundColor: "#ffffff",
+				borderColor: WHITE_15,
+				backgroundColor: "rgba(255,255,255,0.06)",
 			}}
 		>
 			{children}
@@ -194,8 +174,9 @@ export function OgHeader({ appName, iconDataUri, label }: OgHeaderOptions) {
 	return (
 		<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 60 }}>
 			{isAnswerEcho ? (
-				<div style={{ fontFamily: WORDMARK, fontSize: 60, lineHeight: 1, color: ANSWERECHO_BRAND_COLOR }}>
-					answerecho
+				// All-white wordmark on the ink ground, per the brand sheet.
+				<div style={{ fontFamily: WORDMARK, fontSize: 52, fontWeight: 700, lineHeight: 1, color: WHITE, letterSpacing: -1 }}>
+					AnswerEcho
 				</div>
 			) : (
 				<div style={{ display: "flex", alignItems: "center" }}>
@@ -208,7 +189,7 @@ export function OgHeader({ appName, iconDataUri, label }: OgHeaderOptions) {
 							style={{ marginRight: 20, objectFit: "contain", borderRadius: 12 }}
 						/>
 					) : null}
-					<div style={{ fontSize: 40, fontWeight: 500, letterSpacing: -0.5, color: ZINC[950] }}>{appName}</div>
+					<div style={{ fontSize: 40, fontWeight: 500, letterSpacing: -0.5, color: WHITE }}>{appName}</div>
 				</div>
 			)}
 			{label ? <OgLabel>{label}</OgLabel> : null}
@@ -273,7 +254,7 @@ export function renderOgImage({ appName, title, description, accentColors, iconD
 						fontWeight: 500,
 						lineHeight: 1.08,
 						letterSpacing: -fontSize * 0.03,
-						color: ZINC[950],
+						color: WHITE,
 						lineClamp: 3,
 						textWrap: "balance",
 					}}
@@ -286,7 +267,7 @@ export function renderOgImage({ appName, title, description, accentColors, iconD
 						maxWidth: 920,
 						fontSize: short ? 32 : 28,
 						lineHeight: 1.4,
-						color: ZINC[600],
+						color: WHITE_72,
 						lineClamp: short ? 3 : 2,
 						textWrap: "balance",
 					}}

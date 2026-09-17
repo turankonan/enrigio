@@ -129,7 +129,7 @@ function ShareOfVoicePage() {
 							<TrendChart
 								data={data.shareTimeSeries.map((p) => ({ date: p.date, value: p.share }))}
 								label="Share of Voice"
-								color="#2563eb"
+								color="#1f7a3d"
 								className="aspect-auto h-[180px] w-full"
 							/>
 						</CardContent>

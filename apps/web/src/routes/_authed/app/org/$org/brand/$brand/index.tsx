@@ -198,7 +198,7 @@ function TrendSection({
 						{loading ? (
 							<Skeleton className="h-full w-full" />
 						) : (
-							<TrendChart data={series} label={chartLabel} color="#2563eb" />
+							<TrendChart data={series} label={chartLabel} color="#1f7a3d" />
 						)}
 					</CardContent>
 				</Card>

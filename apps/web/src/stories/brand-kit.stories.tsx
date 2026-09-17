@@ -2,8 +2,8 @@
  * Brand Kit story — previews all AnswerEcho brand assets in one place.
  *
  * Sections:
- *  1. Logo — text logo ("answerecho" in Titan One) and whitelabel variant
- *  2. Icon — the "e" icon at various sizes (16, 32, 64, 128, 256)
+ *  1. Logo — text logo ("AnswerEcho" in Ubuntu) and whitelabel variant
+ *  2. Icon — the mark at various sizes (16, 32, 64, 128, 256)
  *  3. Maskable Icon — for adaptive/PWA contexts
  *  4. Color Palette — brand color, theme colors, and chart palette
  */
@@ -13,7 +13,7 @@ import { Logo } from "@/components/logo";
 import { type ClientConfig, setMockClientConfig } from "./_mocks/config-client";
 import { setMockRouteContext } from "./_mocks/tanstack-router";
 
-const BRAND_COLOR = "#2563eb";
+const BRAND_COLOR = "#39b54a";
 
 const answerechoConfig: ClientConfig = {
 	mode: "local",
@@ -200,11 +200,11 @@ export const AnswerEchoBrandKit = () => {
 			{/* Colors */}
 			<Section title="Brand Colors">
 				<div className="flex gap-6 flex-wrap">
-					<ColorSwatch color="#2563eb" label="Royal Blue" />
-					<ColorSwatch color="#faf0ca" label="Lemon Chiffon" />
-					<ColorSwatch color="#f4d35e" label="Royal Gold" />
-					<ColorSwatch color="#ee964b" label="Sandy Brown" />
-					<ColorSwatch color="#f95738" label="Tomato" />
+					<ColorSwatch color="#39b54a" label="Rigosis Green" />
+					<ColorSwatch color="#277a33" label="Action Green" />
+					<ColorSwatch color="#4ade80" label="Dark-Mode Green" />
+					<ColorSwatch color="#32373c" label="Ink" />
+					<ColorSwatch color="#1f7a3d" label="Chart Green" />
 				</div>
 			</Section>
 
