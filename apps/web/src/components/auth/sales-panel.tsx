@@ -32,7 +32,13 @@ const PITCH = {
 
 type SalesPanelVariant = "cloud" | "self-hosted";
 
-export function SalesPanel({ variant: _variant, source: _source }: { variant: SalesPanelVariant; source: ReferralSource }) {
+export function SalesPanel({
+	variant: _variant,
+	source: _source,
+}: {
+	variant: SalesPanelVariant;
+	source: ReferralSource;
+}) {
 	return (
 		<div className="flex flex-1 flex-col justify-between gap-8">
 			<h2 className="text-3xl font-semibold leading-[1.1] tracking-tight text-balance">{PITCH.headline}</h2>

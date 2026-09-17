@@ -365,9 +365,7 @@ export function BaseChart({
 																style={{ backgroundColor: indicatorColor }}
 															/>
 															<div className="flex flex-1 justify-between gap-4 leading-none items-center">
-																<span className="text-muted-foreground">
-																	{chartConfig[itemKey]?.label || itemKey}
-																</span>
+																<span className="text-muted-foreground">{chartConfig[itemKey]?.label || itemKey}</span>
 																<span className="text-foreground font-mono font-xs tabular-nums">{item.value}%</span>
 															</div>
 														</div>

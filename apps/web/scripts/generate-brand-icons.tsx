@@ -30,11 +30,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-	ANSWERECHO_BRAND_COLOR,
-	ANSWERECHO_BRAND_FONT,
-	ANSWERECHO_INK_COLOR,
-} from "@workspace/config/constants";
+import { ANSWERECHO_BRAND_COLOR, ANSWERECHO_BRAND_FONT, ANSWERECHO_INK_COLOR } from "@workspace/config/constants";
 import { renderOgPng } from "@workspace/og/rasterize";
 import pngToIco from "png-to-ico";
 
@@ -90,7 +86,15 @@ async function renderPng(element: React.ReactElement, size: number): Promise<Buf
 	return renderOgPng(element, { width: size, height: size, fonts });
 }
 
-function Mark({ size, rounded = true, glyphRatio = GLYPH_RATIO }: { size: number; rounded?: boolean; glyphRatio?: number }) {
+function Mark({
+	size,
+	rounded = true,
+	glyphRatio = GLYPH_RATIO,
+}: {
+	size: number;
+	rounded?: boolean;
+	glyphRatio?: number;
+}) {
 	return (
 		<div
 			tw="flex items-center justify-center w-full h-full"
@@ -139,8 +143,16 @@ const pngIcons = [
 	{ name: "answerecho-icon-192.png", element: <Mark size={192} />, size: 192 },
 	{ name: "answerecho-icon-512.png", element: <Mark size={512} />, size: 512 },
 	// Maskable: full-bleed square, smaller glyph so it survives circular crops.
-	{ name: "answerecho-icon-maskable-192.png", element: <Mark size={192} rounded={false} glyphRatio={GLYPH_RATIO * 0.8} />, size: 192 },
-	{ name: "answerecho-icon-maskable-512.png", element: <Mark size={512} rounded={false} glyphRatio={GLYPH_RATIO * 0.8} />, size: 512 },
+	{
+		name: "answerecho-icon-maskable-192.png",
+		element: <Mark size={192} rounded={false} glyphRatio={GLYPH_RATIO * 0.8} />,
+		size: 192,
+	},
+	{
+		name: "answerecho-icon-maskable-512.png",
+		element: <Mark size={512} rounded={false} glyphRatio={GLYPH_RATIO * 0.8} />,
+		size: 512,
+	},
 	// Apple touch icons must be opaque — iOS rounds the corners itself.
 	{ name: "apple-touch-icon.png", element: <Mark size={180} rounded={false} />, size: 180 },
 ];

@@ -259,10 +259,7 @@ const iconSizes = [16, 32, 64, 128, 256, 512];
 console.log("Icons:");
 for (const v of iconVariants) {
 	for (const size of iconSizes) {
-		await addFile(
-			`icons/answerecho-icon${v.suffix}-${size}.png`,
-			render(<Icon bg={v.bg} size={size} />, size, size),
-		);
+		await addFile(`icons/answerecho-icon${v.suffix}-${size}.png`, render(<Icon bg={v.bg} size={size} />, size, size));
 	}
 }
 

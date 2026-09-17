@@ -175,7 +175,16 @@ export function OgHeader({ appName, iconDataUri, label }: OgHeaderOptions) {
 		<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 60 }}>
 			{isAnswerEcho ? (
 				// All-white wordmark on the ink ground, per the brand sheet.
-				<div style={{ fontFamily: WORDMARK, fontSize: 52, fontWeight: 700, lineHeight: 1, color: WHITE, letterSpacing: -1 }}>
+				<div
+					style={{
+						fontFamily: WORDMARK,
+						fontSize: 52,
+						fontWeight: 700,
+						lineHeight: 1,
+						color: WHITE,
+						letterSpacing: -1,
+					}}
+				>
 					AnswerEcho
 				</div>
 			) : (
