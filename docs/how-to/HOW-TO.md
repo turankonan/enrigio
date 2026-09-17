@@ -96,6 +96,48 @@ engines use internally (a content keyword list straight from the source), and
 **Opportunities** keeps a prioritized, refreshed version of this table
 automatically.
 
+We executed the competitor step on the spot. Reading the stored "rigosis
+alternative" responses, GPT names **İnnova, KoçSistem, and Netaş** as the
+regional integrator alternatives — those three are now configured, so the
+next daily run produces the first honest Share of Voice.
+
+![Competitors](images/09-competitors.png)
+
+Two more findings from the raw answers, both presentation-worthy:
+
+- **Brand-entity confusion**: several ChatGPT answers couldn't disambiguate
+  "Rigosis" at all — some drifted to the drug rigosertib, others asked which
+  Rigosis was meant. AI knows the company exists but isn't *sure* of it.
+  Fix: strengthen entity signals (consistent naming across the web, a
+  Wikipedia/Wikidata presence, structured data on rigosis.com).
+- When engines do identify the company, they describe it accurately
+  (Istanbul-based, ITSM/ESM, OpenText SMAX, observability) and cite
+  rigosis.com directly — the site itself is already a trusted source.
+
+## What it costs
+
+Measured from this exact run — 5 prompts, one full daily cycle, 175
+evaluations across 7 engines:
+
+| Item | Cost |
+|---|---|
+| DataForSEO (125 scrape calls: ChatGPT, AI Overviews, AI Mode, Gemini, Perplexity) | **$0.58 actual** (billed against the account) |
+| Claude via Anthropic API (25 runs) | ~$0.50 (app estimate) |
+| GPT via OpenAI API (25 runs) | ~$0.25 (app estimate) |
+| Infrastructure (Render free + Neon free) | $0 |
+| One-off brand analysis at onboarding | a few cents |
+| **Total per daily cycle** | **≈ $1.40** |
+
+Rules of thumb for a customer:
+
+- **≈ $0.28 per prompt per day** with all 7 engines at 5 runs each —
+  **≈ $8.50/prompt/month** at daily cadence.
+- Cost scales linearly with prompts × engines: 20 prompts ≈ $170/month;
+  dropping to the 5 scraped engines only ≈ $3.50/prompt/month.
+- The LLM figures are the app's flat per-run estimates (`usage_events` table
+  tracks every call); metered API billing tends to come in at or under them.
+- DataForSEO's $1 free trial covered this entire demo with $0.42 to spare.
+
 ---
 
 ### Operating notes (demo environment)
