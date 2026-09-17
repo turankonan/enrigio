@@ -1,0 +1,172 @@
+- generic [ref=f14e2]:
+  - generic [ref=f14e5]:
+    - list [ref=f14e7]:
+      - listitem [ref=f14e8]:
+        - link "AnswerEcho" [ref=f14e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f14e12]:
+      - generic [ref=f14e13]:
+        - generic [ref=f14e14]: Pano
+        - list [ref=f14e15]:
+          - listitem [ref=f14e16]:
+            - link "Genel Bakış" [ref=f14e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f14e23]:
+            - link "Görünürlük" [ref=f14e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f14e30]:
+            - link "Yanıtlardaki Marka Payı" [ref=f14e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f14e37]:
+            - link "Sorgu Açılımı" [ref=f14e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f14e45]:
+            - link "Atıflar" [ref=f14e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f14e52]:
+            - link "Fırsatlar" [ref=f14e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f14e59]:
+        - generic [ref=f14e60]: Ayarlar
+        - list [ref=f14e61]:
+          - listitem [ref=f14e62]:
+            - link "Marka" [ref=f14e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f14e67]:
+            - link "Rakipler" [ref=f14e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f14e73]:
+            - link "Sorgular" [ref=f14e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f14e79]:
+            - link "Büyük Dil Modelleri" [ref=f14e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f14e85]:
+      - list [ref=f14e86]:
+        - listitem [ref=f14e87]:
+          - button "Hesap ve kuruluşlar" [ref=f14e88] [cursor=pointer]:
+            - generic [ref=f14e94]:
+              - generic [ref=f14e95]: Semi Hop
+              - generic [ref=f14e96]: semi.hop@rigosis.com
+      - generic [ref=f14e100]:
+        - generic [ref=f14e101]: v0.4.1
+        - link [ref=f14e103] [cursor=pointer]:
+          - /url: https://www.rigosis.com/
+  - main [ref=f14e108]:
+    - generic [ref=f14e110]:
+      - button "Toggle Sidebar" [ref=f14e111] [cursor=pointer]
+      - separator [ref=f14e113]
+      - navigation "breadcrumb" [ref=f14e114]:
+        - list [ref=f14e115]:
+          - listitem [ref=f14e116]:
+            - link "Marka Default" [ref=f14e117] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f14e118]: Marka
+              - text: Default
+          - listitem [aria-hidden] [ref=f14e119]
+          - listitem [ref=f14e122]:
+            - link "Marka Rigosis" [ref=f14e123] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f14e124]: Marka
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f14e125]
+          - listitem [ref=f14e128]:
+            - link "Sorgular" [disabled] [ref=f14e129]
+    - generic [ref=f14e133]:
+      - generic [ref=f14e135]:
+        - heading "Sorgular" [level=1] [ref=f14e136]
+        - paragraph [ref=f14e137]: Marka takibinde kullanılan anahtar sözcükleri ve sorguları ekleyin, düzenleyin veya kaldırın
+      - generic [ref=f14e138]:
+        - generic [ref=f14e139]:
+          - generic [ref=f14e140]:
+            - checkbox "Tüm sorguları seç" [ref=f14e141]
+            - checkbox [aria-hidden] [ref=f14e142]
+          - generic [ref=f14e143]: Sorgu Metni
+          - generic [ref=f14e147]: Sistem
+          - generic [ref=f14e151]: Etiketler
+          - generic [ref=f14e155]: Etkin
+        - generic [ref=f14e157]:
+          - generic [ref=f14e159]:
+            - generic [ref=f14e160]:
+              - checkbox "Sorguyu seç" [ref=f14e161]
+              - checkbox [aria-hidden] [ref=f14e162]
+            - textbox "Sorgu metnini girin..." [ref=f14e163]: best it service management consultants in turkey
+            - combobox [disabled] [ref=f14e165]:
+              - generic [ref=f14e166]: unbranded
+            - combobox [ref=f14e170] [cursor=pointer]:
+              - generic [ref=f14e171]:
+                - generic [ref=f14e172]:
+                  - generic [ref=f14e173]: itsm
+                  - button "Remove itsm" [ref=f14e174]
+                - generic [ref=f14e178]:
+                  - generic [ref=f14e179]: consulting
+                  - button "Remove consulting" [ref=f14e180]
+            - generic [ref=f14e184]:
+              - switch "Sorguyu devre dışı bırak" [checked] [ref=f14e185]
+              - checkbox [checked] [aria-hidden] [ref=f14e186]
+          - generic [ref=f14e188]:
+            - generic [ref=f14e189]:
+              - checkbox "Sorguyu seç" [ref=f14e190]
+              - checkbox [aria-hidden] [ref=f14e191]
+            - textbox "Sorgu metnini girin..." [ref=f14e192]: opentext smax implementation partners turkey
+            - combobox [disabled] [ref=f14e194]:
+              - generic [ref=f14e195]: unbranded
+            - combobox [ref=f14e199] [cursor=pointer]:
+              - generic [ref=f14e200]:
+                - generic [ref=f14e201]:
+                  - generic [ref=f14e202]: opentext
+                  - button "Remove opentext" [ref=f14e203]
+                - generic [ref=f14e207]:
+                  - generic [ref=f14e208]: itsm
+                  - button "Remove itsm" [ref=f14e209]
+            - generic [ref=f14e213]:
+              - switch "Sorguyu devre dışı bırak" [checked] [ref=f14e214]
+              - checkbox [checked] [aria-hidden] [ref=f14e215]
+          - generic [ref=f14e217]:
+            - generic [ref=f14e218]:
+              - checkbox "Sorguyu seç" [ref=f14e219]
+              - checkbox [aria-hidden] [ref=f14e220]
+            - textbox "Sorgu metnini girin..." [ref=f14e221]: rigosis alternative
+            - combobox [disabled] [ref=f14e223]:
+              - generic [ref=f14e224]: branded
+            - combobox [ref=f14e228] [cursor=pointer]:
+              - generic [ref=f14e230]:
+                - generic [ref=f14e231]: itsm
+                - button "Remove itsm" [ref=f14e232]
+            - generic [ref=f14e236]:
+              - switch "Sorguyu devre dışı bırak" [checked] [ref=f14e237]
+              - checkbox [checked] [aria-hidden] [ref=f14e238]
+          - generic [ref=f14e240]:
+            - generic [ref=f14e241]:
+              - checkbox "Sorguyu seç" [ref=f14e242]
+              - checkbox [aria-hidden] [ref=f14e243]
+            - textbox "Sorgu metnini girin..." [ref=f14e244]: rigosis itsm services
+            - combobox [disabled] [ref=f14e246]:
+              - generic [ref=f14e247]: branded
+            - combobox [ref=f14e251] [cursor=pointer]:
+              - generic [ref=f14e253]:
+                - generic [ref=f14e254]: itsm
+                - button "Remove itsm" [ref=f14e255]
+            - generic [ref=f14e259]:
+              - switch "Sorguyu devre dışı bırak" [checked] [ref=f14e260]
+              - checkbox [checked] [aria-hidden] [ref=f14e261]
+          - generic [ref=f14e263]:
+            - generic [ref=f14e264]:
+              - checkbox "Sorguyu seç" [ref=f14e265]
+              - checkbox [aria-hidden] [ref=f14e266]
+            - textbox "Sorgu metnini girin..." [ref=f14e267]: rigosis opentext partner
+            - combobox [disabled] [ref=f14e269]:
+              - generic [ref=f14e270]: branded
+            - combobox [ref=f14e274] [cursor=pointer]:
+              - generic [ref=f14e276]:
+                - generic [ref=f14e277]: opentext
+                - button "Remove opentext" [ref=f14e278]
+            - generic [ref=f14e282]:
+              - switch "Sorguyu devre dışı bırak" [checked] [ref=f14e283]
+              - checkbox [checked] [aria-hidden] [ref=f14e284]
+        - generic [ref=f14e285]:
+          - button "Sorgu Ekle" [ref=f14e286] [cursor=pointer]
+          - button "Birden Fazla Ekle" [ref=f14e287] [cursor=pointer]
+        - paragraph [ref=f14e288]:
+          - strong [ref=f14e289]: 5/100
+          - text: prompts configured

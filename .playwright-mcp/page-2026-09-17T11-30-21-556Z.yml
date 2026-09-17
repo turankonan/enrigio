@@ -1,0 +1,144 @@
+- generic [ref=f15e2]:
+  - generic [ref=f15e5]:
+    - list [ref=f15e7]:
+      - listitem [ref=f15e8]:
+        - link "AnswerEcho" [ref=f15e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f15e12]:
+      - generic [ref=f15e13]:
+        - generic [ref=f15e14]: Pano
+        - list [ref=f15e15]:
+          - listitem [ref=f15e16]:
+            - link "Genel Bakış" [ref=f15e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f15e23]:
+            - link "Görünürlük" [ref=f15e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f15e30]:
+            - link "Yanıtlardaki Marka Payı" [ref=f15e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f15e37]:
+            - link "Sorgu Açılımı" [ref=f15e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f15e45]:
+            - link "Atıflar" [ref=f15e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f15e52]:
+            - link "Fırsatlar" [ref=f15e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f15e59]:
+        - generic [ref=f15e60]: Ayarlar
+        - list [ref=f15e61]:
+          - listitem [ref=f15e62]:
+            - link "Marka" [ref=f15e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f15e67]:
+            - link "Rakipler" [ref=f15e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f15e73]:
+            - link "Sorgular" [ref=f15e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f15e79]:
+            - link "Büyük Dil Modelleri" [ref=f15e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f15e85]:
+      - list [ref=f15e86]:
+        - listitem [ref=f15e87]:
+          - button "Hesap ve kuruluşlar" [ref=f15e88] [cursor=pointer]:
+            - generic [ref=f15e94]:
+              - generic [ref=f15e95]: Semi Hop
+              - generic [ref=f15e96]: semi.hop@rigosis.com
+      - generic [ref=f15e100]:
+        - generic [ref=f15e101]: v0.4.1
+        - link [ref=f15e103] [cursor=pointer]:
+          - /url: https://www.rigosis.com/
+  - main [ref=f15e108]:
+    - generic [ref=f15e110]:
+      - button "Toggle Sidebar" [ref=f15e111] [cursor=pointer]
+      - separator [ref=f15e113]
+      - navigation "breadcrumb" [ref=f15e114]:
+        - list [ref=f15e115]:
+          - listitem [ref=f15e116]:
+            - link "Marka Default" [ref=f15e117] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f15e118]: Marka
+              - text: Default
+          - listitem [aria-hidden] [ref=f15e119]
+          - listitem [ref=f15e122]:
+            - link "Marka Rigosis" [ref=f15e123] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f15e124]: Marka
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f15e125]
+          - listitem [ref=f15e128]:
+            - link "Sorgu Açılımı" [disabled] [ref=f15e129]
+    - generic [ref=f15e133]:
+      - generic [ref=f15e134]:
+        - heading "Sorgu Açılımı" [level=1] [ref=f15e135]
+        - paragraph [ref=f15e139]: Yapay zekâ motorlarının sorgularınızı yanıtlarken yaptığı web aramaları.
+      - generic [ref=f15e142]:
+        - button "All models" [ref=f15e174] [cursor=pointer]
+        - button "Etiketler" [ref=f15e143] [cursor=pointer]
+        - button "Son 30 gün" [ref=f15e146] [cursor=pointer]
+      - generic [ref=f15e177]:
+        - generic [ref=f15e178]:
+          - generic [ref=f15e180]:
+            - generic [ref=f15e181]: Web Aramalı Sorgu Çalışmaları
+            - generic [ref=f15e186]: "170"
+          - generic [ref=f15e188]:
+            - generic [ref=f15e189]: Araması Bilinmeyen Sorgu Çalışmaları
+            - generic [ref=f15e194]: "137"
+          - generic [ref=f15e196]:
+            - generic [ref=f15e197]: Araması Bilinen Sorgu Çalışmaları
+            - generic [ref=f15e202]: "33"
+          - generic [ref=f15e204]:
+            - generic [ref=f15e205]: Ortalama Açılım
+            - generic [ref=f15e210]: "4.4"
+        - generic [ref=f15e211]:
+          - tablist [ref=f15e212]:
+            - tab "Sorgu Açılımı" [selected] [ref=f15e213] [cursor=pointer]
+            - tab "En Sık Aramalar" [ref=f15e214] [cursor=pointer]
+            - tab "Arama Sözcükleri" [ref=f15e215] [cursor=pointer]
+          - tabpanel "Sorgu Açılımı" [ref=f15e216]:
+            - generic [ref=f15e217]:
+              - generic [ref=f15e219]:
+                - generic [ref=f15e220]:
+                  - generic [ref=f15e221]: Sorgular
+                  - generic [ref=f15e226]: Her sorgunun tetiklediği web aramaları.
+                - textbox "Sorgularda ara..." [ref=f15e228]
+              - generic [ref=f15e229]:
+                - generic [ref=f15e230]:
+                  - generic [ref=f15e231]: Sorgu
+                  - button "Aramalar" [ref=f15e233] [cursor=pointer]
+                  - button "Ort./Sorgu Çalışması" [ref=f15e235] [cursor=pointer]
+                - generic [ref=f15e236]:
+                  - button "best it service management consultants in turkey 37 variations 42 3.8" [ref=f15e238] [cursor=pointer]:
+                    - generic [ref=f15e242]:
+                      - generic "best it service management consultants in turkey" [ref=f15e243]
+                      - generic [ref=f15e244]: 37 variations
+                    - generic [ref=f15e245]: "42"
+                    - generic [ref=f15e246]: "3.8"
+                  - button "rigosis alternative 32 variations 36 6" [ref=f15e248] [cursor=pointer]:
+                    - generic [ref=f15e252]:
+                      - generic "rigosis alternative" [ref=f15e253]
+                      - generic [ref=f15e254]: 32 variations
+                    - generic [ref=f15e255]: "36"
+                    - generic [ref=f15e256]: "6"
+                  - button "opentext smax implementation partners turkey 32 variations 32 4.6" [ref=f15e258] [cursor=pointer]:
+                    - generic [ref=f15e262]:
+                      - generic "opentext smax implementation partners turkey" [ref=f15e263]
+                      - generic [ref=f15e264]: 32 variations
+                    - generic [ref=f15e265]: "32"
+                    - generic [ref=f15e266]: "4.6"
+                  - button "rigosis opentext partner 20 variations 24 4.8" [ref=f15e268] [cursor=pointer]:
+                    - generic [ref=f15e272]:
+                      - generic "rigosis opentext partner" [ref=f15e273]
+                      - generic [ref=f15e274]: 20 variations
+                    - generic [ref=f15e275]: "24"
+                    - generic [ref=f15e276]: "4.8"
+                  - button "rigosis itsm services 10 variations 11 2.8" [ref=f15e278] [cursor=pointer]:
+                    - generic [ref=f15e282]:
+                      - generic "rigosis itsm services" [ref=f15e283]
+                      - generic [ref=f15e284]: 10 variations
+                    - generic [ref=f15e285]: "11"
+                    - generic [ref=f15e286]: "2.8"

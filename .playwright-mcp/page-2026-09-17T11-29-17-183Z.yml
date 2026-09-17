@@ -1,0 +1,134 @@
+- generic [active] [ref=f10e1]:
+  - generic [ref=f10e2]:
+    - generic [ref=f10e5]:
+      - list [ref=f10e7]:
+        - listitem [ref=f10e8]:
+          - link "AnswerEcho" [ref=f10e9] [cursor=pointer]:
+            - /url: /app
+      - generic [ref=f10e12]:
+        - generic [ref=f10e13]:
+          - generic [ref=f10e14]: Pano
+          - list [ref=f10e15]:
+            - listitem [ref=f10e16]:
+              - link "Genel Bakış" [ref=f10e17] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+            - listitem [ref=f10e23]:
+              - link "Görünürlük" [ref=f10e24] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/visibility
+            - listitem [ref=f10e30]:
+              - link "Yanıtlardaki Marka Payı" [ref=f10e31] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/share-of-voice
+            - listitem [ref=f10e37]:
+              - link "Sorgu Açılımı" [ref=f10e38] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/query-fan-out
+            - listitem [ref=f10e45]:
+              - link "Atıflar" [ref=f10e46] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/citations
+            - listitem [ref=f10e52]:
+              - link "Fırsatlar" [ref=f10e53] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/opportunities
+        - generic [ref=f10e59]:
+          - generic [ref=f10e60]: Ayarlar
+          - list [ref=f10e61]:
+            - listitem [ref=f10e62]:
+              - link "Marka" [ref=f10e63] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/brand
+            - listitem [ref=f10e67]:
+              - link "Rakipler" [ref=f10e68] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/competitors
+            - listitem [ref=f10e73]:
+              - link "Sorgular" [ref=f10e74] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/prompts
+            - listitem [ref=f10e79]:
+              - link "Büyük Dil Modelleri" [ref=f10e80] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/llms
+      - generic [ref=f10e85]:
+        - list [ref=f10e86]:
+          - listitem [ref=f10e87]:
+            - button "Hesap ve kuruluşlar" [ref=f10e88] [cursor=pointer]:
+              - generic [ref=f10e94]:
+                - generic [ref=f10e95]: Semi Hop
+                - generic [ref=f10e96]: semi.hop@rigosis.com
+        - generic [ref=f10e100]:
+          - generic [ref=f10e101]: v0.4.1
+          - link [ref=f10e103] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+    - main [ref=f10e108]:
+      - generic [ref=f10e110]:
+        - button "Toggle Sidebar" [ref=f10e111] [cursor=pointer]
+        - separator [ref=f10e113]
+        - navigation "breadcrumb" [ref=f10e114]:
+          - list [ref=f10e115]:
+            - listitem [ref=f10e116]:
+              - link "Marka Default" [ref=f10e117] [cursor=pointer]:
+                - /url: /app/org/default
+                - generic [ref=f10e118]: Marka
+                - text: Default
+            - listitem [aria-hidden] [ref=f10e119]
+            - listitem [ref=f10e122]:
+              - link "Marka Rigosis" [ref=f10e123] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+                - generic [ref=f10e124]: Marka
+                - text: Rigosis
+            - listitem [aria-hidden] [ref=f10e125]
+            - listitem [ref=f10e128]:
+              - link "Genel Bakış" [disabled] [ref=f10e129]
+      - generic [ref=f10e134]:
+        - generic [ref=f10e135]:
+          - generic [ref=f10e136]:
+            - heading "Yapay Zekâ Görünürlüğü" [level=2] [ref=f10e137]
+            - link "Görünürlüğü Görüntüle" [ref=f10e141] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - generic [ref=f10e142]:
+            - generic [ref=f10e143]: 73%
+            - generic [ref=f10e147]:
+              - generic [ref=f10e148]: Görünürlük Eğilimleri (30 gün)
+              - application [ref=f10e201]:
+                - generic [ref=f10e210]:
+                  - generic [ref=f10e211]:
+                    - generic [ref=f10e212]: Aug 18
+                    - generic [ref=f10e214]: Aug 21
+                    - generic [ref=f10e216]: Aug 24
+                    - generic [ref=f10e218]: Aug 27
+                    - generic [ref=f10e220]: Aug 30
+                    - generic [ref=f10e222]: Sep 2
+                    - generic [ref=f10e224]: Sep 5
+                    - generic [ref=f10e226]: Sep 8
+                    - generic [ref=f10e228]: Sep 11
+                    - generic [ref=f10e230]: Sep 14
+                    - generic [ref=f10e232]: Sep 17
+                  - generic [ref=f10e234]:
+                    - generic [ref=f10e235]: 25%
+                    - generic [ref=f10e237]: 75%
+        - generic [ref=f10e155]:
+          - generic [ref=f10e156]:
+            - heading "Yanıtlardaki Marka Payı" [level=2] [ref=f10e157]
+            - link "Yanıtlardaki Marka Payını Görüntüle" [ref=f10e162] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - generic [ref=f10e163]:
+            - generic [ref=f10e164]: 100%
+            - generic [ref=f10e168]:
+              - generic [ref=f10e169]: Yanıtlardaki Marka Payı Eğilimleri (30 gün)
+              - application [ref=f10e245]:
+                - generic [ref=f10e254]:
+                  - generic [ref=f10e255]:
+                    - generic [ref=f10e256]: Aug 18
+                    - generic [ref=f10e258]: Aug 21
+                    - generic [ref=f10e260]: Aug 24
+                    - generic [ref=f10e262]: Aug 27
+                    - generic [ref=f10e264]: Aug 30
+                    - generic [ref=f10e266]: Sep 2
+                    - generic [ref=f10e268]: Sep 5
+                    - generic [ref=f10e270]: Sep 8
+                    - generic [ref=f10e272]: Sep 11
+                    - generic [ref=f10e274]: Sep 14
+                    - generic [ref=f10e276]: Sep 17
+                  - generic [ref=f10e278]:
+                    - generic [ref=f10e279]: 35%
+                    - generic [ref=f10e281]: 105%
+        - generic [ref=f10e177]:
+          - generic [ref=f10e283]: 5 izlenen sorgu
+          - generic [ref=f10e289]: 170 değerlendirme (30 gün)
+          - generic [ref=f10e296]: ~1d çalıştırma sıklığı
+          - generic [ref=f10e304]: 4h ago son güncelleme
+  - generic [aria-hidden] [ref=f10e312]: 25%
