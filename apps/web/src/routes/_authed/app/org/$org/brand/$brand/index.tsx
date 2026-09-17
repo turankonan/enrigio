@@ -459,8 +459,8 @@ function DashboardPage() {
 					icon={IconEye}
 					title={t("dashboard.ai_visibility_title")}
 					linkTo="/app/org/$org/brand/$brand/visibility"
-					linkLabel="View Visibility"
-					chartTitle="Visibility Trends (30d)"
+					linkLabel={t("dashboard.view_visibility")}
+					chartTitle={t("dashboard.visibility_chart_title")}
 					chartLabel="AI Visibility (7d avg)"
 					// The tooltips quote live figures, so they stay off until those have loaded.
 					tooltip={loadingVisibility ? undefined : visibilityTooltipText(nonBrandedVisibility)}
@@ -476,8 +476,8 @@ function DashboardPage() {
 					icon={IconSpeakerphone}
 					title={t("dashboard.sov_title")}
 					linkTo="/app/org/$org/brand/$brand/share-of-voice"
-					linkLabel="View Share of Voice"
-					chartTitle="Share of Voice Trends (30d)"
+					linkLabel={t("dashboard.view_sov")}
+					chartTitle={t("dashboard.sov_chart_title")}
 					chartLabel="Share of Voice"
 					tooltip={loadingSov ? undefined : SOV_TOOLTIP}
 					value={lastValue(sovTimeSeries, "share")}

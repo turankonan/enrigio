@@ -161,6 +161,12 @@ market are Turkish.
 
 ![Turkish login](images/11-turkish-login.png)
 
+The dashboard is Turkish too — sidebar, headings, and stats:
+
+![Turkish org picker](images/12-turkish-org-picker.png)
+
+![Turkish dashboard](images/13-turkish-dashboard.png)
+
 ---
 
 ### Operating notes (demo environment)

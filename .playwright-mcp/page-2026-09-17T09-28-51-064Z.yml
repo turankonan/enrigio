@@ -1,0 +1,18 @@
+- generic [ref=f14e3]:
+  - link "Kuruluşlarınıza gidin" [ref=f14e5] [cursor=pointer]:
+    - /url: /app
+    - generic [ref=f14e6]: AnswerEcho
+  - generic [ref=f14e8]:
+    - generic [ref=f14e9]:
+      - generic [ref=f14e10]: Kuruluşlar ve Markalar
+      - paragraph [ref=f14e11]: Kuruluşları düzenleyin veya markalara gidin.
+    - separator [ref=f14e12]
+    - generic [ref=f14e15]:
+      - link "Default organization settings" [ref=f14e16] [cursor=pointer]:
+        - /url: /app/org/default/settings
+        - generic [ref=f14e17]: Default
+      - generic [ref=f14e26]:
+        - link "Rigosis" [ref=f14e27] [cursor=pointer]:
+          - /url: /app/org/default/brand/rigosis
+        - link "Yeni marka" [ref=f14e30] [cursor=pointer]:
+          - /url: /app/org/default/new
