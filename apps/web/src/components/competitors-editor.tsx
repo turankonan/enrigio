@@ -113,8 +113,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
 										/>
 										<TooltipContent className="max-w-xs text-xs font-normal">
-											The primary name used to detect this competitor in AI responses. Mention detection applies to{" "}
-											<strong>future</strong> prompt runs only.
+											{t("competitors-editor.name-tooltip")}
 										</TooltipContent>
 									</Tooltip>
 								</Label>
@@ -136,8 +135,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
 										/>
 										<TooltipContent className="max-w-xs text-xs font-normal">
-											All domains owned by this competitor. Citation categorization updates retroactively &mdash;
-											existing citations from these domains will immediately be classified as &quot;competitor&quot;.
+											{t("competitors-editor.domains-tooltip")}
 										</TooltipContent>
 									</Tooltip>
 								</Label>
@@ -160,8 +158,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
 										/>
 										<TooltipContent className="max-w-xs text-xs font-normal">
-											Alternative names for this competitor (sub-brands, product names, abbreviations). Used for mention
-											detection in <strong>future</strong> prompt runs only &mdash; does not apply retroactively.
+											{t("competitors-editor.aliases-tooltip")}
 										</TooltipContent>
 									</Tooltip>
 								</Label>
@@ -192,7 +189,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 
 			{competitors.length >= MAX_COMPETITORS && (
 				<p className="text-xs text-muted-foreground">
-					Maximum of {MAX_COMPETITORS} competitors allowed. Remove a competitor to add a new one.
+					{t("competitors-editor.max-competitors", { max: MAX_COMPETITORS })}
 				</p>
 			)}
 

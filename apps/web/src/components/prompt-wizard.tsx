@@ -264,8 +264,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 		return (
 			<div className="max-w-2xl mx-auto space-y-3">
 				<p className="text-sm text-muted-foreground">
-					We'll analyze <strong>{brand?.website}</strong> using web search to suggest competitors, additional
-					domains/aliases, and a starter set of AI prompts to track.
+					{t("prompt-wizard.analyze-intro", { website: brand?.website ?? "" })}
 				</p>
 				{error && (
 					<div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
@@ -381,7 +380,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 					</>
 				) : (
 					<>
-						<Rocket className="h-4 w-4" /> Start tracking ({previewCounts.totalNew} new prompts)
+						<Rocket className="h-4 w-4" /> {t("prompt-wizard.start-tracking", { count: previewCounts.totalNew })}
 					</>
 				)}
 			</Button>

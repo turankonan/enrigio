@@ -82,7 +82,7 @@ function DiscoveryPanel({
 			{error && <p className="text-destructive text-sm">{error}</p>}
 			{result && open.length === 0 && !error && (
 				<p className="text-muted-foreground text-sm">
-					No new competitors found in the last {result.answersScanned} answers.
+					{t("settings.competitors.none_found", { count: result.answersScanned })}
 				</p>
 			)}
 			{open.length > 0 && (

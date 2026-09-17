@@ -115,8 +115,7 @@ export function TrackDomainPopover({
 							<Tooltip>
 								<TooltipTrigger render={<IconInfoCircle className="h-3 w-3 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-xs font-normal">
-									Applies <strong>retroactively</strong> &mdash; all existing and future citations from this domain will
-									be classified as your brand.
+									{t("track-domain-popover.brand-retroactive-tooltip")}
 								</TooltipContent>
 							</Tooltip>
 						</div>
@@ -140,8 +139,7 @@ export function TrackDomainPopover({
 								<Tooltip>
 									<TooltipTrigger render={<IconInfoCircle className="h-3 w-3 text-muted-foreground cursor-help" />} />
 									<TooltipContent className="max-w-xs text-xs font-normal">
-										Applies <strong>retroactively</strong> &mdash; all existing and future citations from this domain
-										will be classified under the selected competitor.
+										{t("track-domain-popover.competitor-retroactive-tooltip")}
 									</TooltipContent>
 								</Tooltip>
 							</div>
