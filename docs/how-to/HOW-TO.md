@@ -150,6 +150,19 @@ Rules of thumb for a customer:
 
 ---
 
+## Turkish by default
+
+The demo ships with a Turkish UI (`VITE_LOCALE=tr`): all 1,055 interface
+strings have Turkish translations, applied in waves — sign-in/sign-up, the
+sidebar, and the login pitch are live; dashboard pages fall back to English
+until their wave lands. The scrapes ask the engines from Turkey too
+(`DATAFORSEO_LOCATION_CODE=2792`), so both the interface and the measured
+market are Turkish.
+
+![Turkish login](images/11-turkish-login.png)
+
+---
+
 ### Operating notes (demo environment)
 
 - Free-tier Render sleeps after ~15 idle minutes; evaluations only process
