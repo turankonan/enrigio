@@ -27,7 +27,7 @@ function OpportunitiesPage() {
 	const { brandId } = Route.useRouteContext();
 	const { data, isLoading, error } = useOpportunities(brandId);
 
-	const infoContent = "Recommendations based on your visibility and citation metrics. Refreshed weekly.";
+	const infoContent = t("opportunities.info");
 
 	let content: React.ReactNode;
 	if (isLoading) {
@@ -35,12 +35,7 @@ function OpportunitiesPage() {
 	} else if (error) {
 		content = <EmptyCard>{t("opportunities.generate_error")}</EmptyCard>;
 	} else if (!data || data.reason === "insufficient-data" || !data.report) {
-		content = (
-			<EmptyCard>
-				We need a bit more tracking data before we can recommend opportunities — check back once your prompts have run
-				for a few days.
-			</EmptyCard>
-		);
+		content = <EmptyCard>{t("opportunities.insufficient_data")}</EmptyCard>;
 	} else {
 		content = <OpportunitiesReport report={data.report} />;
 	}

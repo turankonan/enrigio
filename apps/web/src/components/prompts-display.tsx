@@ -119,8 +119,8 @@ function PromptsContent({ brandId }: { brandId: string | undefined }) {
 			}
 			totalCount={promptsSummary?.prompts?.length}
 			filteredCount={sortedPrompts.length}
-			noMatchesTitle="No prompts match your filters."
-			noMatchesDescription="Try adjusting your search or tag filters."
+			noMatchesTitle={t("prompts-display.no-matches-title")}
+			noMatchesDescription={t("prompts-display.no-matches-description")}
 			emptyState={
 				<div className="border-2 border-dashed border-muted rounded-lg min-h-48 flex items-center justify-center">
 					<div className="text-center py-8 text-muted-foreground">

@@ -197,10 +197,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 			)}
 
 			<p className="text-xs text-muted-foreground">
-				<strong>
-					{validCount}/{MAX_COMPETITORS}
-				</strong>{" "}
-				competitors configured
+				{t("competitors-editor.competitors-configured", { count: validCount, max: MAX_COMPETITORS })}
 			</p>
 		</div>
 	);

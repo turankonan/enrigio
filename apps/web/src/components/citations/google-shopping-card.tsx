@@ -7,6 +7,7 @@ import { BrandPromptLink } from "@/components/brand-prompt-link";
 import { attributionDotClass } from "@/components/citations/shared";
 import type { GoogleModuleData } from "@/components/citations/types";
 import { ListPagination, usePagedList } from "@/components/list-pagination";
+import { t } from "@/lib/i18n";
 
 const PRODUCTS_PAGE_SIZE = 10;
 
@@ -79,7 +80,7 @@ export function GoogleShoppingCard({ googleModule }: { googleModule: GoogleModul
 									[
 										["all", "All"],
 										["brand", "Yours"],
-										["competitor", "Competitors"],
+										["competitor", t("settings.competitors.crumb")],
 									] as const
 								).map(([key, label]) => (
 									<button

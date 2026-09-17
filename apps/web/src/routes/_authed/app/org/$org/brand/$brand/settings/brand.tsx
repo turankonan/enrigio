@@ -189,7 +189,7 @@ function BrandSettingsPage() {
 							value={additionalDomains}
 							onValueChange={setAdditionalDomains}
 							placeholder={t("settings.brand.add_domain_placeholder")}
-							searchPlaceholder="Add domain..."
+							searchPlaceholder={t("settings.brand.add_domain_placeholder")}
 							maxItems={10}
 							normalizeValue={(raw) => cleanAndValidateDomain(raw) ?? raw.trim()}
 							onValidate={validateDomain}
@@ -212,7 +212,7 @@ function BrandSettingsPage() {
 							value={aliases}
 							onValueChange={handleAliasesChange}
 							placeholder={t("settings.brand.add_alias_placeholder")}
-							searchPlaceholder="Add alias..."
+							searchPlaceholder={t("settings.brand.add_alias_placeholder")}
 							maxItems={10}
 						/>
 					</div>

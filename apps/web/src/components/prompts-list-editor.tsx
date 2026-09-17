@@ -384,7 +384,7 @@ function PromptRow({
 					onValueChange={(tags) => update(index, { tags })}
 					options={allTagOptions}
 					placeholder={t("prompts-list-editor.add-tag-placeholder")}
-					searchPlaceholder="Search or create tag..."
+					searchPlaceholder={t("prompts-list-editor.search-or-create-tag")}
 					normalizeValue={(raw) => raw.toLowerCase().trim()}
 				/>
 				{premium && (
@@ -419,7 +419,7 @@ function PromptRow({
 					onValueChange={(tags) => update(index, { tags })}
 					options={allTagOptions}
 					placeholder={t("prompts-list-editor.add-tag-placeholder")}
-					searchPlaceholder="Search or create tag..."
+					searchPlaceholder={t("prompts-list-editor.search-or-create-tag")}
 					normalizeValue={(raw) => raw.toLowerCase().trim()}
 				/>
 				{premium && (

@@ -1,0 +1,129 @@
+- generic [active] [ref=f4e1]:
+  - generic [ref=f4e2]:
+    - generic [ref=f4e5]:
+      - list [ref=f4e7]:
+        - listitem [ref=f4e8]:
+          - link "AnswerEcho" [ref=f4e9] [cursor=pointer]:
+            - /url: /app
+      - generic [ref=f4e12]:
+        - generic [ref=f4e13]:
+          - generic [ref=f4e14]: Pano
+          - list [ref=f4e15]:
+            - listitem [ref=f4e16]:
+              - link "Genel Bakış" [ref=f4e17] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+            - listitem [ref=f4e23]:
+              - link "Görünürlük" [ref=f4e24] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/visibility
+            - listitem [ref=f4e30]:
+              - link "Yanıtlardaki Marka Payı" [ref=f4e31] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/share-of-voice
+            - listitem [ref=f4e37]:
+              - link "Sorgu Açılımı" [ref=f4e38] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/query-fan-out
+            - listitem [ref=f4e45]:
+              - link "Atıflar" [ref=f4e46] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/citations
+            - listitem [ref=f4e52]:
+              - link "Fırsatlar" [ref=f4e53] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/opportunities
+        - generic [ref=f4e59]:
+          - generic [ref=f4e60]: Ayarlar
+          - list [ref=f4e61]:
+            - listitem [ref=f4e62]:
+              - link "Marka" [ref=f4e63] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/brand
+            - listitem [ref=f4e67]:
+              - link "Rakipler" [ref=f4e68] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/competitors
+            - listitem [ref=f4e73]:
+              - link "Sorgular" [ref=f4e74] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/prompts
+            - listitem [ref=f4e79]:
+              - link "Büyük Dil Modelleri" [ref=f4e80] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/llms
+      - generic [ref=f4e85]:
+        - list [ref=f4e86]:
+          - listitem [ref=f4e87]:
+            - button "Hesap ve kuruluşlar" [ref=f4e88] [cursor=pointer]:
+              - generic [ref=f4e94]:
+                - generic [ref=f4e95]: Semi Hop
+                - generic [ref=f4e96]: semi.hop@rigosis.com
+        - generic [ref=f4e100]:
+          - generic [ref=f4e101]: v0.4.1
+          - link [ref=f4e103] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+    - main [ref=f4e108]:
+      - generic [ref=f4e110]:
+        - button "Toggle Sidebar" [ref=f4e111] [cursor=pointer]
+        - separator [ref=f4e113]
+        - navigation "breadcrumb" [ref=f4e114]:
+          - list [ref=f4e115]:
+            - listitem [ref=f4e116]:
+              - link "Kuruluş Default" [ref=f4e117] [cursor=pointer]:
+                - /url: /app/org/default
+                - generic [ref=f4e118]: Kuruluş
+                - text: Default
+            - listitem [aria-hidden] [ref=f4e119]
+            - listitem [ref=f4e122]:
+              - link "Marka Rigosis" [ref=f4e123] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+                - generic [ref=f4e124]: Marka
+                - text: Rigosis
+            - listitem [aria-hidden] [ref=f4e125]
+            - listitem [ref=f4e128]:
+              - link "Yanıtlardaki Marka Payı" [disabled] [ref=f4e129]
+      - generic [ref=f4e133]:
+        - generic [ref=f4e134]:
+          - heading "Yanıtlardaki Marka Payı" [level=1] [ref=f4e135]
+          - paragraph [ref=f4e139]: Yapay zekâ motorlarının sizi rakiplerinize kıyasla ne sıklıkta andığı.
+        - generic [ref=f4e142]:
+          - button "All models" [ref=f4e157] [cursor=pointer]
+          - button "Etiketler" [ref=f4e143] [cursor=pointer]
+          - button "Son 30 gün" [ref=f4e146] [cursor=pointer]
+        - generic [ref=f4e149]:
+          - generic [ref=f4e160]:
+            - generic [ref=f4e161]:
+              - generic [ref=f4e162]: Yanıtlardaki Marka Payı
+              - generic [ref=f4e164]:
+                - generic [ref=f4e165]:
+                  - generic [ref=f4e166]: 100%
+                  - paragraph [ref=f4e167]: Rigosis across 170 runs.
+                - application [ref=f4e171]
+            - generic [ref=f4e178]:
+              - generic [ref=f4e179]: Yanıtlardaki Marka Payı Eğilimleri
+              - application [ref=f4e185]:
+                - generic [ref=f4e194]:
+                  - generic [ref=f4e195]:
+                    - generic [ref=f4e196]: Aug 18
+                    - generic [ref=f4e198]: Aug 24
+                    - generic [ref=f4e200]: Aug 30
+                    - generic [ref=f4e202]: Sep 5
+                    - generic [ref=f4e204]: Sep 11
+                    - generic [ref=f4e206]: Sep 17
+                  - generic [ref=f4e208]:
+                    - generic [ref=f4e209]: 0%
+                    - generic [ref=f4e211]: 35%
+                    - generic [ref=f4e213]: 70%
+                    - generic [ref=f4e215]: 105%
+          - generic [ref=f4e217]:
+            - generic [ref=f4e218]: Yanıtlardaki Marka Payı Sıralaması
+            - table [ref=f4e222]:
+              - rowgroup [ref=f4e223]:
+                - row [ref=f4e224]:
+                  - columnheader "#" [ref=f4e225]
+                  - columnheader "Marka" [ref=f4e226]
+                  - columnheader "Bahsetmeler" [ref=f4e227]
+                  - columnheader "Pay" [ref=f4e233]
+                  - columnheader "Sorgular" [ref=f4e239]
+              - rowgroup [ref=f4e245]:
+                - row [ref=f4e246]:
+                  - cell "1" [ref=f4e247]
+                  - cell "Rigosis Siz" [ref=f4e248]:
+                    - generic [ref=f4e249]:
+                      - text: Rigosis
+                      - generic [ref=f4e251]: Siz
+                  - cell "124" [ref=f4e252]
+                  - cell "100%" [ref=f4e253]
+                  - cell "4" [ref=f4e258]
+  - generic [aria-hidden] [ref=f4e259]: 0%

@@ -55,7 +55,7 @@ function lastValue<T>(series: T[], key: keyof T): number | null {
 }
 
 function formatRelativeTime(dateString: string | null): string {
-	if (!dateString) return "Never";
+	if (!dateString) return t("dashboard.time_never");
 
 	const date = new Date(dateString);
 	const now = new Date();
@@ -64,7 +64,7 @@ function formatRelativeTime(dateString: string | null): string {
 	const diffHours = Math.floor(diffMs / 3600000);
 	const diffDays = Math.floor(diffMs / 86400000);
 
-	if (diffMins < 1) return "Just now";
+	if (diffMins < 1) return t("dashboard.time_just_now");
 	if (diffMins < 60) return `${diffMins}m ago`;
 	if (diffHours < 24) return `${diffHours}h ago`;
 	if (diffDays < 7) return `${diffDays}d ago`;
@@ -260,7 +260,7 @@ function TrackingStats({
 							</ul>
 						</>
 					) : (
-						"Prompts monitored for AI visibility. No platforms are configured for this brand yet."
+						t("dashboard.prompts_tooltip_no_platforms")
 					)
 				}
 			/>
@@ -288,7 +288,7 @@ function TrackingStats({
 							</ul>
 						</>
 					) : (
-						"No platforms are configured for this brand yet."
+						t("dashboard.frequency_tooltip_no_platforms")
 					)
 				}
 			/>
@@ -314,10 +314,10 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 	const params = useBrandParams();
 	const hasEnabledPrompts = totalPrompts > 0;
 	const message = hasEnabledPrompts
-		? "You are ready to track your AI visibility. We're currently running the first evaluation against AI models. This usually takes a few minutes."
+		? t("dashboard.awaiting_message_ready")
 		: hasPrompts
 			? t("dashboard.awaiting_message_disabled")
-			: "Set up prompts to start tracking your AI visibility. Once configured, we'll evaluate them against AI models automatically.";
+			: t("dashboard.awaiting_message_none");
 
 	return (
 		<div className="flex flex-1 flex-col items-center justify-center p-8 max-w-xl mx-auto text-center">
@@ -361,10 +361,7 @@ function ResearchBrandData({ brandId, clientConfig }: { brandId: string; clientC
 		<div className="space-y-6 max-w-2xl p-4">
 			<div className="space-y-2">
 				<h2 className="text-2xl font-bold">{t("dashboard.research_title")}</h2>
-				<p className="text-muted-foreground text-balance">
-					We will analyze your website and find the best generative AI prompts to track. This process may take a couple
-					of minutes.
-				</p>
+				<p className="text-muted-foreground text-balance">{t("dashboard.research_description")}</p>
 			</div>
 			<PromptWizard
 				onComplete={() => {
@@ -461,10 +458,10 @@ function DashboardPage() {
 					linkTo="/app/org/$org/brand/$brand/visibility"
 					linkLabel={t("dashboard.view_visibility")}
 					chartTitle={t("dashboard.visibility_chart_title")}
-					chartLabel="AI Visibility (7d avg)"
+					chartLabel={t("dashboard.visibility_chart_label")}
 					// The tooltips quote live figures, so they stay off until those have loaded.
 					tooltip={loadingVisibility ? undefined : visibilityTooltipText(nonBrandedVisibility)}
-					// "Current" = the latest plotted point, so the hero number always
+					// t("plan-comparison.badge-current") = the latest plotted point, so the hero number always
 					// matches the right end of the chart beside it (rather than the
 					// whole-window average).
 					value={lastValue(visibilityTimeSeries, "overall")}
@@ -478,7 +475,7 @@ function DashboardPage() {
 					linkTo="/app/org/$org/brand/$brand/share-of-voice"
 					linkLabel={t("dashboard.view_sov")}
 					chartTitle={t("dashboard.sov_chart_title")}
-					chartLabel="Share of Voice"
+					chartLabel={t("dashboard.sov_title")}
 					tooltip={loadingSov ? undefined : SOV_TOOLTIP}
 					value={lastValue(sovTimeSeries, "share")}
 					series={sovTimeSeries.map((p) => ({ date: p.date, value: p.share }))}

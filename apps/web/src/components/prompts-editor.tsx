@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { type EditablePrompt, type PremiumAllowance, PromptsListEditor } from "@/components/prompts-list-editor";
 import { UnsavedChangesBar } from "@/components/unsaved-changes-bar";
 import { useInvalidatePromptsSummary } from "@/hooks/use-prompts-summary";
+import { t } from "@/lib/i18n";
 import { trackEvent } from "@/lib/posthog";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { updatePromptsFn } from "@/server/prompts";
@@ -54,7 +55,7 @@ function sameTags(a: string[], b: string[]) {
 
 /** How one row differs from its baseline, or null when it is unchanged.
  *  Clearing the text drops the prompt on save, so it counts as removed rather
- *  than edited; an untouched blank row from "Add Prompt" isn't a change yet. */
+ *  than edited; an untouched blank row from t("prompts-list-editor.add-prompt") isn't a change yet. */
 function classifyPrompt(
 	prompt: EditablePrompt,
 	prev: EditablePrompt | undefined,
@@ -152,7 +153,7 @@ export function PromptsEditor({ initialPrompts, brandId, pageTitle, pageDescript
 			invalidatePromptsSummary(brandId);
 		} catch (err) {
 			console.error("Error saving prompts:", err);
-			setError(writeError(err, "Failed to save prompts."));
+			setError(writeError(err, t("prompts-editor.failed-to-save")));
 		} finally {
 			setIsSaving(false);
 			saveInProgress.current = false;

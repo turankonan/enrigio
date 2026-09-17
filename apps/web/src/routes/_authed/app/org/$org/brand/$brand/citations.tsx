@@ -46,10 +46,7 @@ function CitationsPage() {
 
 	const infoContent = (
 		<>
-			<p className="mb-2">
-				Citations are the links and sources that AI models include in their responses when answering your prompts. They
-				show which websites the AI considers authoritative or relevant to your topics.
-			</p>
+			<p className="mb-2">{t("citations.info_what")}</p>
 			<p>
 				<strong>Competitor</strong> domains are only those you&apos;ve added to your{" "}
 				<Link to="/app/org/$org/brand/$brand/settings/competitors" params={brandParams} className="underline">
@@ -93,8 +90,8 @@ function CitationsPage() {
 					</Card>
 				}
 				totalCount={citationData?.totalCitations}
-				noMatchesTitle="No citations found for the selected filters."
-				noMatchesDescription="Try adjusting your filters or time period."
+				noMatchesTitle={t("citations.no_matches_title")}
+				noMatchesDescription={t("citations.no_matches_description")}
 				emptyState={
 					<Card>
 						<CardContent className="pt-6">

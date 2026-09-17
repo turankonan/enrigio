@@ -1,0 +1,96 @@
+- generic [ref=f1e2]:
+  - generic [ref=f1e5]:
+    - list [ref=f1e7]:
+      - listitem [ref=f1e8]:
+        - link "AnswerEcho" [ref=f1e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f1e12]:
+      - generic [ref=f1e13]:
+        - generic [ref=f1e14]: Pano
+        - list [ref=f1e15]:
+          - listitem [ref=f1e16]:
+            - link "Genel Bakış" [ref=f1e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f1e23]:
+            - link "Görünürlük" [ref=f1e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f1e30]:
+            - link "Yanıtlardaki Marka Payı" [ref=f1e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f1e37]:
+            - link "Sorgu Açılımı" [ref=f1e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f1e45]:
+            - link "Atıflar" [ref=f1e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f1e52]:
+            - link "Fırsatlar" [ref=f1e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f1e59]:
+        - generic [ref=f1e60]: Ayarlar
+        - list [ref=f1e61]:
+          - listitem [ref=f1e62]:
+            - link "Marka" [ref=f1e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f1e67]:
+            - link "Rakipler" [ref=f1e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f1e73]:
+            - link "Sorgular" [ref=f1e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f1e79]:
+            - link "Büyük Dil Modelleri" [ref=f1e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f1e85]:
+      - list [ref=f1e86]:
+        - listitem [ref=f1e87]:
+          - button "Hesap ve kuruluşlar" [ref=f1e88] [cursor=pointer]:
+            - generic [ref=f1e94]:
+              - generic [ref=f1e95]: Semi Hop
+              - generic [ref=f1e96]: semi.hop@rigosis.com
+      - generic [ref=f1e100]:
+        - generic [ref=f1e101]: v0.4.1
+        - link [ref=f1e103] [cursor=pointer]:
+          - /url: https://www.rigosis.com/
+  - main [ref=f1e108]:
+    - generic [ref=f1e110]:
+      - button "Toggle Sidebar" [ref=f1e111] [cursor=pointer]
+      - separator [ref=f1e113]
+      - navigation "breadcrumb" [ref=f1e114]:
+        - list [ref=f1e115]:
+          - listitem [ref=f1e116]:
+            - link "Organization Default" [ref=f1e117] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f1e118]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f1e119]
+          - listitem [ref=f1e122]:
+            - link "Brand Rigosis" [ref=f1e123] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f1e124]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f1e125]
+          - listitem [ref=f1e128]:
+            - link "Görünürlük" [disabled] [ref=f1e129]
+    - generic [ref=f1e133]:
+      - generic [ref=f1e134]:
+        - heading "Visibility" [level=1] [ref=f1e135]
+        - paragraph [ref=f1e139]: See how LLMs are evaluating prompts related to your brand.
+      - generic [ref=f1e141]:
+        - generic [ref=f1e142]:
+          - button "Etiketler" [ref=f1e143] [cursor=pointer]
+          - button "Son 30 gün" [ref=f1e146] [cursor=pointer]
+          - button "Sırala" [ref=f1e149] [cursor=pointer]
+        - group [ref=f1e152]:
+          - textbox "Search prompts..." [ref=f1e153]
+          - group [ref=f1e154]
+      - generic [ref=f1e169]:
+        - generic [ref=f1e170]:
+          - separator [ref=f1e174]
+          - separator [ref=f1e183]
+        - generic [ref=f1e189]:
+          - separator [ref=f1e193]
+          - separator [ref=f1e202]
+        - generic [ref=f1e208]:
+          - separator [ref=f1e212]
+          - separator [ref=f1e221]

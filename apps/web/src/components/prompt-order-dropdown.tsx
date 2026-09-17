@@ -34,7 +34,7 @@ export function PromptOrderDropdown() {
 			resetScroll: false,
 		});
 
-	// The button reads "Sort" in the default state and otherwise echoes the
+	// The button reads t("prompt-order-dropdown.sort") in the default state and otherwise echoes the
 	// chosen order's menu label (arrows and all).
 	const label =
 		selected === DEFAULT_PROMPT_ORDER

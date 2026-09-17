@@ -64,7 +64,7 @@ function NewBrandPage() {
 				navigate({ to: "/app/org/$org/brand/$brand", params: { ...organizationParams, brand: brandSlug } }),
 			);
 		} catch (err) {
-			setError(writeError(err, "Could not create the brand."));
+			setError(writeError(err, t("new_brand.create_error")));
 		} finally {
 			setIsLoading(false);
 		}
@@ -93,7 +93,7 @@ function NewBrandPage() {
 			setSelected(new Set(state.defaultSelected));
 			setStep("platforms");
 		} catch (err) {
-			setError(err instanceof Error ? err.message : "Could not read this organization's platforms.");
+			setError(err instanceof Error ? err.message : t("new_brand.platforms_read_error"));
 		} finally {
 			setIsLoading(false);
 		}
@@ -102,9 +102,7 @@ function NewBrandPage() {
 	if (blocked) {
 		return (
 			<FullPageCard
-				title={
-					blocked.code === "no-active-plan" ? t("new_brand.blocked_no_plan") : "You've used every brand on your plan"
-				}
+				title={blocked.code === "no-active-plan" ? t("new_brand.blocked_no_plan") : t("new_brand.blocked_limit")}
 				subtitle={blocked.message}
 				showBackButton
 			>

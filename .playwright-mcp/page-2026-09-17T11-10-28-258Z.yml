@@ -1,0 +1,531 @@
+- generic [active] [ref=f5e1]:
+  - generic [ref=f5e2]:
+    - generic [ref=f5e5]:
+      - list [ref=f5e7]:
+        - listitem [ref=f5e8]:
+          - link "AnswerEcho" [ref=f5e9] [cursor=pointer]:
+            - /url: /app
+      - generic [ref=f5e12]:
+        - generic [ref=f5e13]:
+          - generic [ref=f5e14]: Pano
+          - list [ref=f5e15]:
+            - listitem [ref=f5e16]:
+              - link "Genel Bakış" [ref=f5e17] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+            - listitem [ref=f5e23]:
+              - link "Görünürlük" [ref=f5e24] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/visibility
+            - listitem [ref=f5e30]:
+              - link "Yanıtlardaki Marka Payı" [ref=f5e31] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/share-of-voice
+            - listitem [ref=f5e37]:
+              - link "Sorgu Açılımı" [ref=f5e38] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/query-fan-out
+            - listitem [ref=f5e45]:
+              - link "Atıflar" [ref=f5e46] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/citations
+            - listitem [ref=f5e52]:
+              - link "Fırsatlar" [ref=f5e53] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/opportunities
+        - generic [ref=f5e59]:
+          - generic [ref=f5e60]: Ayarlar
+          - list [ref=f5e61]:
+            - listitem [ref=f5e62]:
+              - link "Marka" [ref=f5e63] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/brand
+            - listitem [ref=f5e67]:
+              - link "Rakipler" [ref=f5e68] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/competitors
+            - listitem [ref=f5e73]:
+              - link "Sorgular" [ref=f5e74] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/prompts
+            - listitem [ref=f5e79]:
+              - link "Büyük Dil Modelleri" [ref=f5e80] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/llms
+      - generic [ref=f5e85]:
+        - list [ref=f5e86]:
+          - listitem [ref=f5e87]:
+            - button "Hesap ve kuruluşlar" [ref=f5e88] [cursor=pointer]:
+              - generic [ref=f5e94]:
+                - generic [ref=f5e95]: Semi Hop
+                - generic [ref=f5e96]: semi.hop@rigosis.com
+        - generic [ref=f5e100]:
+          - generic [ref=f5e101]: v0.4.1
+          - link [ref=f5e103] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+    - main [ref=f5e108]:
+      - generic [ref=f5e110]:
+        - button "Toggle Sidebar" [ref=f5e111] [cursor=pointer]
+        - separator [ref=f5e113]
+        - navigation "breadcrumb" [ref=f5e114]:
+          - list [ref=f5e115]:
+            - listitem [ref=f5e116]:
+              - link "Kuruluş Default" [ref=f5e117] [cursor=pointer]:
+                - /url: /app/org/default
+                - generic [ref=f5e118]: Kuruluş
+                - text: Default
+            - listitem [aria-hidden] [ref=f5e119]
+            - listitem [ref=f5e122]:
+              - link "Marka Rigosis" [ref=f5e123] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+                - generic [ref=f5e124]: Marka
+                - text: Rigosis
+            - listitem [aria-hidden] [ref=f5e125]
+            - listitem [ref=f5e128]:
+              - link "Atıflar" [disabled] [ref=f5e129]
+      - generic [ref=f5e133]:
+        - generic [ref=f5e134]:
+          - heading "Atıflar" [level=1] [ref=f5e135]
+          - paragraph [ref=f5e139]: Büyük dil modellerinin sorgularınızı yanıtlarken hangi kaynaklara atıfta bulunduğunu görün.
+        - generic [ref=f5e142]:
+          - button "All models" [ref=f5e158] [cursor=pointer]
+          - button "Etiketler" [ref=f5e143] [cursor=pointer]
+          - button "Son 30 gün" [ref=f5e146] [cursor=pointer]
+        - generic [ref=f5e149]:
+          - generic [ref=f5e161]:
+            - generic [ref=f5e162]:
+              - generic [ref=f5e163]: Markanın Atıf Payı
+              - generic [ref=f5e168]: 25%
+            - generic [ref=f5e170]:
+              - generic [ref=f5e171]: Benzersiz Alan Adları
+              - generic [ref=f5e176]: "111"
+            - generic [ref=f5e178]:
+              - generic [ref=f5e179]: Toplam Atıf
+              - generic [ref=f5e184]: 1,221
+          - generic [ref=f5e186]:
+            - generic [ref=f5e187]: Atıf Kategorileri
+            - application [ref=f5e196]:
+              - generic [ref=f5e241]:
+                - generic [ref=f5e242]:
+                  - generic [ref=f5e243]: Aug 21
+                  - generic [ref=f5e245]: Aug 24
+                  - generic [ref=f5e247]: Aug 27
+                  - generic [ref=f5e249]: Aug 30
+                  - generic [ref=f5e251]: Sep 2
+                  - generic [ref=f5e253]: Sep 5
+                  - generic [ref=f5e255]: Sep 8
+                  - generic [ref=f5e257]: Sep 11
+                  - generic [ref=f5e259]: Sep 14
+                  - generic [ref=f5e261]: Sep 17
+                - generic [ref=f5e263]:
+                  - generic [ref=f5e264]: 0%
+                  - generic [ref=f5e266]: 25%
+                  - generic [ref=f5e268]: 50%
+                  - generic [ref=f5e270]: 75%
+                  - generic [ref=f5e272]: 100%
+          - generic [ref=f5e274]:
+            - generic [ref=f5e275]: Atıf Sayfası Türleri
+            - application [ref=f5e284]:
+              - generic [ref=f5e325]:
+                - generic [ref=f5e326]:
+                  - generic [ref=f5e327]: Aug 21
+                  - generic [ref=f5e329]: Aug 24
+                  - generic [ref=f5e331]: Aug 27
+                  - generic [ref=f5e333]: Aug 30
+                  - generic [ref=f5e335]: Sep 2
+                  - generic [ref=f5e337]: Sep 5
+                  - generic [ref=f5e339]: Sep 8
+                  - generic [ref=f5e341]: Sep 11
+                  - generic [ref=f5e343]: Sep 14
+                  - generic [ref=f5e345]: Sep 17
+                - generic [ref=f5e347]:
+                  - generic [ref=f5e348]: 0%
+                  - generic [ref=f5e350]: 25%
+                  - generic [ref=f5e352]: 50%
+                  - generic [ref=f5e354]: 75%
+                  - generic [ref=f5e356]: 100%
+          - generic [ref=f5e358]:
+            - generic [ref=f5e359]:
+              - generic [ref=f5e360]:
+                - generic [ref=f5e361]: Son Değişiklikler
+                - generic [ref=f5e365]: How AI citations have shifted over the past month
+              - separator [ref=f5e366]
+              - generic [ref=f5e367]:
+                - navigation "Sekmeler" [ref=f5e368]:
+                  - button "Yeni Sayfalar" [ref=f5e369] [cursor=pointer]
+                  - button "Artık Yer Almayan Sayfalar" [ref=f5e370] [cursor=pointer]
+                  - button "Başlık Değişiklikleri" [ref=f5e371] [cursor=pointer]
+                  - button "Yeni Alan Adları" [ref=f5e372] [cursor=pointer]
+                  - button "Artık Yer Almayan Alan Adları" [ref=f5e373] [cursor=pointer]
+                - generic [ref=f5e374]:
+                  - link "rigosis.com/en 0 → 54 citations across 3 prompts" [ref=f5e375] [cursor=pointer]:
+                    - /url: https://rigosis.com/en
+                    - generic [ref=f5e378]:
+                      - generic [ref=f5e379]: rigosis.com/en
+                      - paragraph [ref=f5e385]: 0 → 54 citations across 3 prompts
+                  - link "tr.linkedin.com/company/rigosis 0 → 26 citations across 3 prompts" [ref=f5e386] [cursor=pointer]:
+                    - /url: https://tr.linkedin.com/company/rigosis
+                    - generic [ref=f5e389]:
+                      - generic [ref=f5e390]: tr.linkedin.com/company/rigosis
+                      - paragraph [ref=f5e396]: 0 → 26 citations across 3 prompts
+                  - link "wise.tv/in-which-fields-does-rigosis-carry-out-projects 0 → 21 citations across 3 prompts" [ref=f5e397] [cursor=pointer]:
+                    - /url: https://wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                    - generic [ref=f5e400]:
+                      - generic [ref=f5e401]: wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                      - paragraph [ref=f5e407]: 0 → 21 citations across 3 prompts
+                  - link "opentext.com/partners/find-an-opentext-partner 0 → 21 citations across 2 prompts" [ref=f5e408] [cursor=pointer]:
+                    - /url: https://opentext.com/partners/find-an-opentext-partner
+                    - generic [ref=f5e411]:
+                      - generic [ref=f5e412]: opentext.com/partners/find-an-opentext-partner
+                      - paragraph [ref=f5e418]: 0 → 21 citations across 2 prompts
+                  - link "rigosis.com/en/opentext-smax-25-solution-day-istanbul 0 → 21 citations across 2 prompts" [ref=f5e419] [cursor=pointer]:
+                    - /url: https://rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                    - generic [ref=f5e422]:
+                      - generic [ref=f5e423]: rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                      - paragraph [ref=f5e429]: 0 → 21 citations across 2 prompts
+                  - link "opentext.com/partners/partner-directory 0 → 18 citations across 2 prompts" [ref=f5e430] [cursor=pointer]:
+                    - /url: https://opentext.com/partners/partner-directory
+                    - generic [ref=f5e433]:
+                      - generic [ref=f5e434]: opentext.com/partners/partner-directory
+                      - paragraph [ref=f5e440]: 0 → 18 citations across 2 prompts
+            - generic [ref=f5e441]:
+              - generic [ref=f5e442]:
+                - generic [ref=f5e443]: İçerik Boşlukları
+                - generic [ref=f5e447]: Prompts where competitors are cited but your brand isn't
+              - separator [ref=f5e448]
+              - link "best it service management consultants in turkey 4 competitors cited 14 times — your brand cited 0 times" [ref=f5e451] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/prompts/753a37cd-d618-4891-9b7e-a05ef9317541
+                - generic [ref=f5e455]:
+                  - generic [ref=f5e456]: best it service management consultants in turkey
+                  - paragraph [ref=f5e458]: 4 competitors cited 14 times — your brand cited 0 times
+          - generic [ref=f5e459]:
+            - generic [ref=f5e461]:
+              - generic [ref=f5e462]:
+                - generic [ref=f5e463]: En Çok Atıf Alan Alan Adları
+                - generic [ref=f5e467]: Büyük dil modellerinin sorgularınızı yanıtlarken en sık başvurduğu alan adları
+              - group [ref=f5e468]:
+                - textbox "Alan adlarında ara..." [ref=f5e469]
+                - group [ref=f5e470]
+            - separator [ref=f5e474]
+            - generic [ref=f5e475]:
+              - navigation "Sekmeler" [ref=f5e477]:
+                - button "Tüm Kaynaklar" [ref=f5e478] [cursor=pointer]
+                - button "Brand" [ref=f5e479] [cursor=pointer]
+                - button "Competitor" [ref=f5e480] [cursor=pointer]
+                - button "Editorial" [ref=f5e481] [cursor=pointer]
+                - button "Reviews" [ref=f5e482] [cursor=pointer]
+                - button "Ecommerce" [ref=f5e483] [cursor=pointer]
+                - button "Social" [ref=f5e484] [cursor=pointer]
+                - button "Developer" [ref=f5e485] [cursor=pointer]
+                - button "Reference" [ref=f5e486] [cursor=pointer]
+                - button "Institutional" [ref=f5e487] [cursor=pointer]
+                - button "Other" [ref=f5e488] [cursor=pointer]
+              - generic [ref=f5e489]:
+                - generic [ref=f5e491]:
+                  - generic [ref=f5e492]: rigosis.com
+                  - generic [ref=f5e495]: "303"
+                - generic [ref=f5e500]:
+                  - generic [ref=f5e501]:
+                    - generic [ref=f5e503]: opentext.com
+                    - button "Track opentext.com" [ref=f5e504] [cursor=pointer]
+                  - generic [ref=f5e506]: "157"
+                - generic [ref=f5e511]:
+                  - generic [ref=f5e512]: linkedin.com
+                  - generic [ref=f5e515]: "88"
+                - generic [ref=f5e520]:
+                  - generic [ref=f5e521]: clutch.co
+                  - generic [ref=f5e524]: "51"
+                - generic [ref=f5e529]:
+                  - generic [ref=f5e530]: tr.linkedin.com
+                  - generic [ref=f5e533]: "48"
+                - generic [ref=f5e538]:
+                  - generic [ref=f5e539]: techbehemoths.com
+                  - generic [ref=f5e542]: "32"
+                - generic [ref=f5e547]:
+                  - generic [ref=f5e548]:
+                    - generic [ref=f5e550]: wise.tv
+                    - button "Track wise.tv" [ref=f5e551] [cursor=pointer]
+                  - generic [ref=f5e553]: "26"
+                - generic [ref=f5e558]:
+                  - generic [ref=f5e559]: innovix.tr
+                  - generic [ref=f5e562]: "23"
+                - generic [ref=f5e567]:
+                  - generic [ref=f5e568]: konsalt.com.tr
+                  - generic [ref=f5e571]: "21"
+                - generic [ref=f5e576]:
+                  - generic [ref=f5e577]: g2.com
+                  - generic [ref=f5e580]: "20"
+              - generic [ref=f5e584]:
+                - generic [ref=f5e585]: 1–10 of 111
+                - generic [ref=f5e586]:
+                  - button "Önceki" [disabled] [ref=f5e587]
+                  - button "Sonraki" [ref=f5e588] [cursor=pointer]
+          - generic [ref=f5e589]:
+            - generic [ref=f5e591]:
+              - generic [ref=f5e592]:
+                - generic [ref=f5e593]: En Çok Atıf Alan URL'ler
+                - generic [ref=f5e597]:
+                  - text: Individual pages cited by LLMs — Rigosis accounts for
+                  - strong [ref=f5e598]: 25%
+                  - text: of all citations
+              - group [ref=f5e599]:
+                - textbox "URL'lerde ara..." [ref=f5e600]
+                - group [ref=f5e601]
+            - separator [ref=f5e605]
+            - generic [ref=f5e606]:
+              - navigation "Sekmeler" [ref=f5e607]:
+                - button "Tüm Kaynaklar" [ref=f5e608] [cursor=pointer]
+                - button "Brand" [ref=f5e609] [cursor=pointer]
+                - button "Competitor" [ref=f5e610] [cursor=pointer]
+                - button "Editorial" [ref=f5e611] [cursor=pointer]
+                - button "Reviews" [ref=f5e612] [cursor=pointer]
+                - button "Ecommerce" [ref=f5e613] [cursor=pointer]
+                - button "Social" [ref=f5e614] [cursor=pointer]
+                - button "Developer" [ref=f5e615] [cursor=pointer]
+                - button "Reference" [ref=f5e616] [cursor=pointer]
+                - button "Institutional" [ref=f5e617] [cursor=pointer]
+                - button "Other" [ref=f5e618] [cursor=pointer]
+              - generic [ref=f5e619]:
+                - button "Tüm Sayfa Türleri" [ref=f5e620] [cursor=pointer]
+                - button "Homepage" [ref=f5e621] [cursor=pointer]
+                - button "Article" [ref=f5e622] [cursor=pointer]
+                - button "Listicle" [ref=f5e623] [cursor=pointer]
+                - button "Guide" [ref=f5e624] [cursor=pointer]
+                - button "Comparison" [ref=f5e625] [cursor=pointer]
+                - button "Review" [ref=f5e626] [cursor=pointer]
+                - button "Forum" [ref=f5e627] [cursor=pointer]
+                - button "Video" [ref=f5e628] [cursor=pointer]
+                - button "Docs" [ref=f5e629] [cursor=pointer]
+                - button "Storefront" [ref=f5e630] [cursor=pointer]
+                - button "Info" [ref=f5e631] [cursor=pointer]
+                - button "Other" [ref=f5e632] [cursor=pointer]
+              - generic [ref=f5e633]:
+                - link "Brand YENİ Rigosis | Information Systems rigosis.com/en avg 1.5 54" [ref=f5e634] [cursor=pointer]:
+                  - /url: https://rigosis.com/en
+                  - generic [ref=f5e636]:
+                    - generic [ref=f5e637]:
+                      - generic [ref=f5e638]: Brand
+                      - generic [ref=f5e639]: YENİ
+                      - generic [ref=f5e640]: Rigosis | Information Systems
+                    - generic [ref=f5e641]: rigosis.com/en
+                  - generic [ref=f5e642]:
+                    - generic [ref=f5e643]: avg 1.5
+                    - generic [ref=f5e644]: "54"
+                - link "Social YENİ Rigosis Bilgi Sistemleri - LinkedIn tr.linkedin.com/company/rigosis avg 2.3 26" [ref=f5e649] [cursor=pointer]:
+                  - /url: https://tr.linkedin.com/company/rigosis
+                  - generic [ref=f5e651]:
+                    - generic [ref=f5e652]:
+                      - generic [ref=f5e653]: Social
+                      - generic [ref=f5e654]: YENİ
+                      - generic [ref=f5e655]: Rigosis Bilgi Sistemleri - LinkedIn
+                    - generic [ref=f5e656]: tr.linkedin.com/company/rigosis
+                  - generic [ref=f5e657]:
+                    - generic [ref=f5e658]: avg 2.3
+                    - generic [ref=f5e659]: "26"
+                - link "Other YENİ In Which Fields Does Rigosis Carry Out Projects? wise.tv/in-which-fields-does-rigosis-carry-out-projects avg 2.7 21" [ref=f5e664] [cursor=pointer]:
+                  - /url: https://wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                  - generic [ref=f5e666]:
+                    - generic [ref=f5e667]:
+                      - generic [ref=f5e668]: Other
+                      - generic [ref=f5e669]: YENİ
+                      - generic [ref=f5e670]: In Which Fields Does Rigosis Carry Out Projects?
+                    - generic [ref=f5e671]: wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                  - generic [ref=f5e672]:
+                    - generic [ref=f5e673]: avg 2.7
+                    - generic [ref=f5e674]: "21"
+                - link "Other YENİ OpenText Partner Program opentext.com/partners/find-an-opentext-partner avg 3.7 21" [ref=f5e679] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/find-an-opentext-partner
+                  - generic [ref=f5e681]:
+                    - generic [ref=f5e682]:
+                      - generic [ref=f5e683]: Other
+                      - generic [ref=f5e684]: YENİ
+                      - generic [ref=f5e685]: OpenText Partner Program
+                    - generic [ref=f5e686]: opentext.com/partners/find-an-opentext-partner
+                  - generic [ref=f5e687]:
+                    - generic [ref=f5e688]: avg 3.7
+                    - generic [ref=f5e689]: "21"
+                - link "Brand YENİ OpenText SMAX 25 Solution Day Istanbul - Rigosis rigosis.com/en/opentext-smax-25-solution-day-istanbul avg 3.7 21" [ref=f5e694] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                  - generic [ref=f5e696]:
+                    - generic [ref=f5e697]:
+                      - generic [ref=f5e698]: Brand
+                      - generic [ref=f5e699]: YENİ
+                      - generic [ref=f5e700]: OpenText SMAX 25 Solution Day Istanbul - Rigosis
+                    - generic [ref=f5e701]: rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                  - generic [ref=f5e702]:
+                    - generic [ref=f5e703]: avg 3.7
+                    - generic [ref=f5e704]: "21"
+                - link "Other YENİ Partner Directory | OpenText opentext.com/partners/partner-directory avg 4.3 18" [ref=f5e709] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/partner-directory
+                  - generic [ref=f5e711]:
+                    - generic [ref=f5e712]:
+                      - generic [ref=f5e713]: Other
+                      - generic [ref=f5e714]: YENİ
+                      - generic [ref=f5e715]: Partner Directory | OpenText
+                    - generic [ref=f5e716]: opentext.com/partners/partner-directory
+                  - generic [ref=f5e717]:
+                    - generic [ref=f5e718]: avg 4.3
+                    - generic [ref=f5e719]: "18"
+                - link "Brand YENİ BT Servis Yönetimi – Rigosis | Information Systems rigosis.com/en/bt-servis-yonetimi avg 1.0 15" [ref=f5e724] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/bt-servis-yonetimi
+                  - generic [ref=f5e726]:
+                    - generic [ref=f5e727]:
+                      - generic [ref=f5e728]: Brand
+                      - generic [ref=f5e729]: YENİ
+                      - generic [ref=f5e730]: BT Servis Yönetimi – Rigosis | Information Systems
+                    - generic [ref=f5e731]: rigosis.com/en/bt-servis-yonetimi
+                  - generic [ref=f5e732]:
+                    - generic [ref=f5e733]: avg 1.0
+                    - generic [ref=f5e734]: "15"
+                - link "Reviews YENİ Top ITSM Consulting Firms in Türkiye - Jul 2026 Rankings | Clutch.co clutch.co/tr/consulting/it-service-management avg 1.9 15" [ref=f5e739] [cursor=pointer]:
+                  - /url: https://clutch.co/tr/consulting/it-service-management
+                  - generic [ref=f5e741]:
+                    - generic [ref=f5e742]:
+                      - generic [ref=f5e743]: Reviews
+                      - generic [ref=f5e744]: YENİ
+                      - generic [ref=f5e745]: Top ITSM Consulting Firms in Türkiye - Jul 2026 Rankings | Clutch.co
+                    - generic [ref=f5e746]: clutch.co/tr/consulting/it-service-management
+                  - generic [ref=f5e747]:
+                    - generic [ref=f5e748]: avg 1.9
+                    - generic [ref=f5e749]: "15"
+                - 'link "Other YENİ AI-Enabled ITSM & ITIL success: Aydem Energy | OpenText opentext.com/customers/aydem-energy avg 0.9 14" [ref=f5e754] [cursor=pointer]':
+                  - /url: https://opentext.com/customers/aydem-energy
+                  - generic [ref=f5e756]:
+                    - generic [ref=f5e757]:
+                      - generic [ref=f5e758]: Other
+                      - generic [ref=f5e759]: YENİ
+                      - generic [ref=f5e760]: "AI-Enabled ITSM & ITIL success: Aydem Energy | OpenText"
+                    - generic [ref=f5e761]: opentext.com/customers/aydem-energy
+                  - generic [ref=f5e762]:
+                    - generic [ref=f5e763]: avg 0.9
+                    - generic [ref=f5e764]: "14"
+                - link "Other YENİ SOCAR Turkey | OpenText opentext.com/customers/socar-turkey avg 1.2 14" [ref=f5e769] [cursor=pointer]:
+                  - /url: https://opentext.com/customers/socar-turkey
+                  - generic [ref=f5e771]:
+                    - generic [ref=f5e772]:
+                      - generic [ref=f5e773]: Other
+                      - generic [ref=f5e774]: YENİ
+                      - generic [ref=f5e775]: SOCAR Turkey | OpenText
+                    - generic [ref=f5e776]: opentext.com/customers/socar-turkey
+                  - generic [ref=f5e777]:
+                    - generic [ref=f5e778]: avg 1.2
+                    - generic [ref=f5e779]: "14"
+                - link "Brand YENİ BT Servis Yönetimi – Rigosis | Information Systems rigosis.com/en/bt-servis-yonetimi avg 4.5 14" [ref=f5e784] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/bt-servis-yonetimi#
+                  - generic [ref=f5e786]:
+                    - generic [ref=f5e787]:
+                      - generic [ref=f5e788]: Brand
+                      - generic [ref=f5e789]: YENİ
+                      - generic [ref=f5e790]: BT Servis Yönetimi – Rigosis | Information Systems
+                    - generic [ref=f5e791]: rigosis.com/en/bt-servis-yonetimi
+                  - generic [ref=f5e792]:
+                    - generic [ref=f5e793]: avg 4.5
+                    - generic [ref=f5e794]: "14"
+                - link "Brand YENİ Platform Danışmanlığı ve Desteği – Rigosis | Information Systems rigosis.com/en/platform-danismanligi-ve-destegi avg 4.5 13" [ref=f5e799] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/platform-danismanligi-ve-destegi
+                  - generic [ref=f5e801]:
+                    - generic [ref=f5e802]:
+                      - generic [ref=f5e803]: Brand
+                      - generic [ref=f5e804]: YENİ
+                      - generic [ref=f5e805]: Platform Danışmanlığı ve Desteği – Rigosis | Information Systems
+                    - generic [ref=f5e806]: rigosis.com/en/platform-danismanligi-ve-destegi
+                  - generic [ref=f5e807]:
+                    - generic [ref=f5e808]: avg 4.5
+                    - generic [ref=f5e809]: "13"
+                - link "Reviews YENİ Top IT Outsourcing Companies in Turkey - Jul 2026 Rankings | Clutch.co clutch.co/tr/it-services avg 4.8 13" [ref=f5e814] [cursor=pointer]:
+                  - /url: https://clutch.co/tr/it-services
+                  - generic [ref=f5e816]:
+                    - generic [ref=f5e817]:
+                      - generic [ref=f5e818]: Reviews
+                      - generic [ref=f5e819]: YENİ
+                      - generic [ref=f5e820]: Top IT Outsourcing Companies in Turkey - Jul 2026 Rankings | Clutch.co
+                    - generic [ref=f5e821]: clutch.co/tr/it-services
+                  - generic [ref=f5e822]:
+                    - generic [ref=f5e823]: avg 4.8
+                    - generic [ref=f5e824]: "13"
+                - link "Competitor YENİ OpenText SMAX - Konsalt Bilgi Teknolojileri konsalt.com.tr/en/cozumler/opentext-smax avg 5.0 13" [ref=f5e829] [cursor=pointer]:
+                  - /url: https://konsalt.com.tr/en/cozumler/opentext-smax
+                  - generic [ref=f5e831]:
+                    - generic [ref=f5e832]:
+                      - generic [ref=f5e833]: Competitor
+                      - generic [ref=f5e834]: YENİ
+                      - generic [ref=f5e835]: OpenText SMAX - Konsalt Bilgi Teknolojileri
+                    - generic [ref=f5e836]: konsalt.com.tr/en/cozumler/opentext-smax
+                  - generic [ref=f5e837]:
+                    - generic [ref=f5e838]: avg 5.0
+                    - generic [ref=f5e839]: "13"
+                - link "Brand YENİ Rigosis | Information Systems rigosis.com/en avg 1.5 13" [ref=f5e844] [cursor=pointer]:
+                  - /url: https://rigosis.com/en#
+                  - generic [ref=f5e846]:
+                    - generic [ref=f5e847]:
+                      - generic [ref=f5e848]: Brand
+                      - generic [ref=f5e849]: YENİ
+                      - generic [ref=f5e850]: Rigosis | Information Systems
+                    - generic [ref=f5e851]: rigosis.com/en
+                  - generic [ref=f5e852]:
+                    - generic [ref=f5e853]: avg 1.5
+                    - generic [ref=f5e854]: "13"
+                - link "Social YENİ OpenText Partner's Post - LinkedIn linkedin.com/posts/opentextpartner_opentext-opentextpartner-partnership-activity... avg 1.7 11" [ref=f5e859] [cursor=pointer]:
+                  - /url: https://linkedin.com/posts/opentextpartner_opentext-opentextpartner-partnership-activity-7300206687544655872-AwLw
+                  - generic [ref=f5e861]:
+                    - generic [ref=f5e862]:
+                      - generic [ref=f5e863]: Social
+                      - generic [ref=f5e864]: YENİ
+                      - generic [ref=f5e865]: OpenText Partner's Post - LinkedIn
+                    - generic [ref=f5e866]: linkedin.com/posts/opentextpartner_opentext-opentextpartner-partnership-activity...
+                  - generic [ref=f5e867]:
+                    - generic [ref=f5e868]: avg 1.7
+                    - generic [ref=f5e869]: "11"
+                - link "Brand YENİ GoTo – Rigosis | Information Systems rigosis.com/en/goto avg 7.7 11" [ref=f5e874] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/goto
+                  - generic [ref=f5e876]:
+                    - generic [ref=f5e877]:
+                      - generic [ref=f5e878]: Brand
+                      - generic [ref=f5e879]: YENİ
+                      - generic [ref=f5e880]: GoTo – Rigosis | Information Systems
+                    - generic [ref=f5e881]: rigosis.com/en/goto
+                  - generic [ref=f5e882]:
+                    - generic [ref=f5e883]: avg 7.7
+                    - generic [ref=f5e884]: "11"
+                - link "Brand YENİ Rigosis rigosis.com/ avg 5.9 11" [ref=f5e889] [cursor=pointer]:
+                  - /url: https://rigosis.com/
+                  - generic [ref=f5e891]:
+                    - generic [ref=f5e892]:
+                      - generic [ref=f5e893]: Brand
+                      - generic [ref=f5e894]: YENİ
+                      - generic [ref=f5e895]: Rigosis
+                    - generic [ref=f5e896]: rigosis.com/
+                  - generic [ref=f5e897]:
+                    - generic [ref=f5e898]: avg 5.9
+                    - generic [ref=f5e899]: "11"
+                - link "Brand YENİ Rigosis | Information Systems – Rigosis | Information Systems rigosis.com/en?utm_source=chatgpt.com avg 0.7 10" [ref=f5e904] [cursor=pointer]:
+                  - /url: https://rigosis.com/en?utm_source=chatgpt.com
+                  - generic [ref=f5e906]:
+                    - generic [ref=f5e907]:
+                      - generic [ref=f5e908]: Brand
+                      - generic [ref=f5e909]: YENİ
+                      - generic [ref=f5e910]: Rigosis | Information Systems – Rigosis | Information Systems
+                    - generic [ref=f5e911]: rigosis.com/en?utm_source=chatgpt.com
+                  - generic [ref=f5e912]:
+                    - generic [ref=f5e913]: avg 0.7
+                    - generic [ref=f5e914]: "10"
+                - link "Other YENİ Find a Partner solution | OpenText opentext.com/partners/find-a-partner-solution avg 9.0 10" [ref=f5e919] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/find-a-partner-solution
+                  - generic [ref=f5e921]:
+                    - generic [ref=f5e922]:
+                      - generic [ref=f5e923]: Other
+                      - generic [ref=f5e924]: YENİ
+                      - generic [ref=f5e925]: Find a Partner solution | OpenText
+                    - generic [ref=f5e926]: opentext.com/partners/find-a-partner-solution
+                  - generic [ref=f5e927]:
+                    - generic [ref=f5e928]: avg 9.0
+                    - generic [ref=f5e929]: "10"
+              - generic [ref=f5e934]:
+                - generic [ref=f5e935]: 1–20 of 282
+                - generic [ref=f5e936]:
+                  - button "Önceki" [disabled] [ref=f5e937]
+                  - button "Sonraki" [ref=f5e938] [cursor=pointer]
+          - generic [ref=f5e939]:
+            - generic [ref=f5e940]:
+              - generic [ref=f5e941]: Reddit
+              - generic [ref=f5e945]: En çok atıf alan subreddit'ler; yapay zekâ modellerinin sorgularınızı yanıtlarken başvurduğu Reddit toplulukları
+            - separator [ref=f5e946]
+            - generic [ref=f5e950]:
+              - button "r/erectiledysfunction YENİ" [ref=f5e951] [cursor=pointer]:
+                - generic [ref=f5e954]: r/erectiledysfunction
+                - generic [ref=f5e955]: YENİ
+              - generic [ref=f5e956]:
+                - generic [ref=f5e957]: "5"
+                - link [ref=f5e958] [cursor=pointer]:
+                  - /url: https://reddit.com/r/erectiledysfunction
+  - generic [aria-hidden] [ref=f5e963]: 0%

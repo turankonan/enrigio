@@ -71,10 +71,7 @@ export function TopUrlsCard({
 							<Tooltip>
 								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-sm font-normal">
-									<p className="mb-2">
-										The specific pages most frequently cited by AI models. Filter by category to focus on brand,
-										competitor, or other sources.
-									</p>
+									<p className="mb-2">{t("top-urls-card.tooltip-pages")}</p>
 									<p>
 										<strong>Competitor</strong> domains are only those in your{" "}
 										<Link

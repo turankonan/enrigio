@@ -81,8 +81,8 @@ function PromptsSettingsPage() {
 		<PromptsEditor
 			initialPrompts={brandPrompts}
 			brandId={brandId}
-			pageTitle="Prompts"
-			pageDescription="Add, edit, or remove your brand tracking keywords and prompts"
+			pageTitle={t("query_fan_out.prompts_title")}
+			pageDescription={t("settings.prompts.page_description")}
 			premium={premium}
 		/>
 	);

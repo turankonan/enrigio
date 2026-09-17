@@ -63,10 +63,7 @@ function ShareOfVoicePage() {
 
 	const infoContent = (
 		<>
-			<p className="mb-2">
-				Share of voice is how often each brand is mentioned in the AI answers to your prompts. Mentions are counted per
-				run, so the brand and competitor figures use the same unit and are directly comparable.
-			</p>
+			<p className="mb-2">{t("share_of_voice.info_what")}</p>
 			<p>{t("share_of_voice.info_competitors")}</p>
 		</>
 	);

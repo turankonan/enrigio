@@ -512,10 +512,7 @@ function WebQueriesTab({
 					<CardHeader>
 						<CardTitle className="flex items-center gap-1.5 text-base">
 							{t("prompt_details.tab_fanout")}
-							<InfoTip>
-								Every distinct search engines ran while answering this prompt, with how many runs each engine issued it.
-								Your prompt's keywords are bolded.
-							</InfoTip>
+							<InfoTip>{t("prompt_details.fanout_tooltip")}</InfoTip>
 						</CardTitle>
 						<CardDescription>{data.uniqueQueries.toLocaleString()} distinct searches.</CardDescription>
 					</CardHeader>

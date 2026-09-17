@@ -53,7 +53,7 @@ const EditableTagsInput = memo(
 	({
 		items,
 		onValueChange,
-		placeholder = "Add item...",
+		placeholder = t("prompt-wizard.add-item-placeholder"),
 		maxItems = 10,
 	}: {
 		items: string[];
@@ -118,7 +118,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 	const { mutate: enqueueAnalysis, isSuccess: analysisEnqueued } = useMutation({
 		mutationFn: (vars: { brandId: string; website: string; brandName?: string }) => startAnalyzeBrandFn({ data: vars }),
 		onError: (err) => {
-			setError(writeError(err, "Analysis failed"));
+			setError(writeError(err, t("prompt-wizard.analysis-failed")));
 			setPhase("idle");
 		},
 	});
@@ -187,10 +187,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 	// Give up on a stuck analysis instead of polling forever.
 	useEffect(() => {
 		if (phase !== "analyzing") return;
-		const timer = window.setTimeout(
-			() => stopAnalyzing("Brand analysis timed out. Please try again."),
-			ANALYZE_TIMEOUT_MS,
-		);
+		const timer = window.setTimeout(() => stopAnalyzing(t("prompt-wizard.analysis-timed-out")), ANALYZE_TIMEOUT_MS);
 		return () => window.clearTimeout(timer);
 	}, [phase, stopAnalyzing]);
 
@@ -257,7 +254,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 
 			onComplete();
 		} catch (err) {
-			setSubmitError(writeError(err, "Failed to save"));
+			setSubmitError(writeError(err, t("prompt-wizard.failed-to-save")));
 		} finally {
 			setIsSaving(false);
 		}
@@ -361,10 +358,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 			<div className="space-y-3">
 				<div>
 					<h2 className="text-2xl font-bold">{t("query_fan_out.prompts_title")}</h2>
-					<p className="text-muted-foreground">
-						Pick which AI tracking prompts to start with. Untick any you don't want, edit tags, or add your own at the
-						bottom.
-					</p>
+					<p className="text-muted-foreground">{t("prompt-wizard.prompts-description")}</p>
 				</div>
 				<PromptsListEditor prompts={data.prompts} onChange={updatePrompts} showSystemTags={false} />
 			</div>

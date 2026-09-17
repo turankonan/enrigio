@@ -70,7 +70,7 @@ export default function FullPageCard({
 	children = undefined,
 	showBackButton = false,
 	backButtonHref = "/app",
-	backButtonText = "Go Back",
+	backButtonText = t("not_found.go_back"),
 	customBackButton,
 	className = "w-md",
 }: FullPageCardProps) {

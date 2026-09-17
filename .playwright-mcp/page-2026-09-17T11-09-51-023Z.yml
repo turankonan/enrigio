@@ -1,0 +1,279 @@
+- generic [active] [ref=f3e1]:
+  - generic [ref=f3e2]:
+    - generic [ref=f3e5]:
+      - list [ref=f3e7]:
+        - listitem [ref=f3e8]:
+          - link "AnswerEcho" [ref=f3e9] [cursor=pointer]:
+            - /url: /app
+      - generic [ref=f3e12]:
+        - generic [ref=f3e13]:
+          - generic [ref=f3e14]: Pano
+          - list [ref=f3e15]:
+            - listitem [ref=f3e16]:
+              - link "Genel Bakış" [ref=f3e17] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+            - listitem [ref=f3e23]:
+              - link "Görünürlük" [ref=f3e24] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/visibility
+            - listitem [ref=f3e30]:
+              - link "Yanıtlardaki Marka Payı" [ref=f3e31] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/share-of-voice
+            - listitem [ref=f3e37]:
+              - link "Sorgu Açılımı" [ref=f3e38] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/query-fan-out
+            - listitem [ref=f3e45]:
+              - link "Atıflar" [ref=f3e46] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/citations
+            - listitem [ref=f3e52]:
+              - link "Fırsatlar" [ref=f3e53] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/opportunities
+        - generic [ref=f3e59]:
+          - generic [ref=f3e60]: Ayarlar
+          - list [ref=f3e61]:
+            - listitem [ref=f3e62]:
+              - link "Marka" [ref=f3e63] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/brand
+            - listitem [ref=f3e67]:
+              - link "Rakipler" [ref=f3e68] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/competitors
+            - listitem [ref=f3e73]:
+              - link "Sorgular" [ref=f3e74] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/prompts
+            - listitem [ref=f3e79]:
+              - link "Büyük Dil Modelleri" [ref=f3e80] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/llms
+      - generic [ref=f3e85]:
+        - list [ref=f3e86]:
+          - listitem [ref=f3e87]:
+            - button "Hesap ve kuruluşlar" [ref=f3e88] [cursor=pointer]:
+              - generic [ref=f3e94]:
+                - generic [ref=f3e95]: Semi Hop
+                - generic [ref=f3e96]: semi.hop@rigosis.com
+        - generic [ref=f3e100]:
+          - generic [ref=f3e101]: v0.4.1
+          - link [ref=f3e103] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+    - main [ref=f3e108]:
+      - generic [ref=f3e110]:
+        - button "Toggle Sidebar" [ref=f3e111] [cursor=pointer]
+        - separator [ref=f3e113]
+        - navigation "breadcrumb" [ref=f3e114]:
+          - list [ref=f3e115]:
+            - listitem [ref=f3e116]:
+              - link "Kuruluş Default" [ref=f3e117] [cursor=pointer]:
+                - /url: /app/org/default
+                - generic [ref=f3e118]: Kuruluş
+                - text: Default
+            - listitem [aria-hidden] [ref=f3e119]
+            - listitem [ref=f3e122]:
+              - link "Marka Rigosis" [ref=f3e123] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+                - generic [ref=f3e124]: Marka
+                - text: Rigosis
+            - listitem [aria-hidden] [ref=f3e125]
+            - listitem [ref=f3e128]:
+              - link "Görünürlük" [disabled] [ref=f3e129]
+      - generic [ref=f3e133]:
+        - generic [ref=f3e134]:
+          - heading "Visibility" [level=1] [ref=f3e135]
+          - paragraph [ref=f3e139]: See how LLMs are evaluating prompts related to your brand.
+        - generic [ref=f3e140]:
+          - generic [ref=f3e141]:
+            - generic [ref=f3e142]:
+              - button "All models" [ref=f3e227] [cursor=pointer]
+              - button "Etiketler" [ref=f3e143] [cursor=pointer]
+              - button "Son 30 gün" [ref=f3e146] [cursor=pointer]
+              - button "Sırala" [ref=f3e149] [cursor=pointer]
+            - group [ref=f3e152]:
+              - textbox "Search prompts..." [ref=f3e153]
+              - group [ref=f3e154]
+          - generic [ref=f3e230]:
+            - generic [ref=f3e231]:
+              - generic [ref=f3e232]: 73% Görünürlük
+              - application [ref=f3e236]
+            - generic [ref=f3e245]:
+              - generic [ref=f3e246]: 5 sorgu
+              - generic [ref=f3e247]: 170 çalışma
+              - generic [ref=f3e248]: 1,221 atıf
+        - generic [ref=f3e250]:
+          - generic [ref=f3e253]:
+            - generic [ref=f3e254]:
+              - generic [ref=f3e255]: rigosis itsm services
+              - generic [ref=f3e256]: 100% Visibility
+            - separator [ref=f3e257]
+            - generic [ref=f3e260]:
+              - application [ref=f3e264]:
+                - generic [ref=f3e278]:
+                  - generic [ref=f3e279]:
+                    - generic [ref=f3e280]: Aug 19
+                    - generic [ref=f3e282]: Aug 21
+                    - generic [ref=f3e284]: Aug 23
+                    - generic [ref=f3e286]: Aug 25
+                    - generic [ref=f3e288]: Aug 27
+                    - generic [ref=f3e290]: Aug 29
+                    - generic [ref=f3e292]: Aug 31
+                    - generic [ref=f3e294]: Sep 2
+                    - generic [ref=f3e296]: Sep 4
+                    - generic [ref=f3e298]: Sep 6
+                    - generic [ref=f3e300]: Sep 8
+                    - generic [ref=f3e302]: Sep 10
+                    - generic [ref=f3e304]: Sep 12
+                    - generic [ref=f3e306]: Sep 14
+                    - generic [ref=f3e308]: Sep 17
+                  - generic [ref=f3e310]:
+                    - generic [ref=f3e311]: 0%
+                    - generic [ref=f3e313]: 20%
+                    - generic [ref=f3e315]: 40%
+                    - generic [ref=f3e317]: 60%
+                    - generic [ref=f3e319]: 80%
+                    - generic [ref=f3e321]: 100%
+              - toolbar "Chart series" [ref=f3e323]:
+                - button "Rigosis" [ref=f3e324] [cursor=pointer]
+                - button "İnnova (Innova)" [ref=f3e326] [cursor=pointer]
+                - button "Kafein Technology Solutions" [ref=f3e328] [cursor=pointer]
+                - button "KoçSistem" [ref=f3e330] [cursor=pointer]
+            - generic [ref=f3e332]:
+              - separator [ref=f3e333]
+              - generic [ref=f3e336]:
+                - link "Ayrıntıları Görüntüle" [ref=f3e337] [cursor=pointer]:
+                  - /url: /app/org/default/brand/rigosis/prompts/45d1c3b5-f430-4d4f-bf76-fe81555a11cb
+                - button "Dışa Aktar (PNG)" [ref=f3e339] [cursor=pointer]
+          - generic [ref=f3e343]:
+            - generic [ref=f3e344]:
+              - generic [ref=f3e345]: rigosis opentext partner
+              - generic [ref=f3e346]: 100% Visibility
+            - separator [ref=f3e347]
+            - generic [ref=f3e350]:
+              - application [ref=f3e354]:
+                - generic [ref=f3e368]:
+                  - generic [ref=f3e369]:
+                    - generic [ref=f3e370]: Aug 19
+                    - generic [ref=f3e372]: Aug 21
+                    - generic [ref=f3e374]: Aug 23
+                    - generic [ref=f3e376]: Aug 25
+                    - generic [ref=f3e378]: Aug 27
+                    - generic [ref=f3e380]: Aug 29
+                    - generic [ref=f3e382]: Aug 31
+                    - generic [ref=f3e384]: Sep 2
+                    - generic [ref=f3e386]: Sep 4
+                    - generic [ref=f3e388]: Sep 6
+                    - generic [ref=f3e390]: Sep 8
+                    - generic [ref=f3e392]: Sep 10
+                    - generic [ref=f3e394]: Sep 12
+                    - generic [ref=f3e396]: Sep 14
+                    - generic [ref=f3e398]: Sep 17
+                  - generic [ref=f3e400]:
+                    - generic [ref=f3e401]: 0%
+                    - generic [ref=f3e403]: 20%
+                    - generic [ref=f3e405]: 40%
+                    - generic [ref=f3e407]: 60%
+                    - generic [ref=f3e409]: 80%
+                    - generic [ref=f3e411]: 100%
+              - toolbar "Chart series" [ref=f3e413]:
+                - button "Rigosis" [ref=f3e414] [cursor=pointer]
+                - button "İnnova (Innova)" [ref=f3e416] [cursor=pointer]
+                - button "Kafein Technology Solutions" [ref=f3e418] [cursor=pointer]
+                - button "KoçSistem" [ref=f3e420] [cursor=pointer]
+            - generic [ref=f3e422]:
+              - separator [ref=f3e423]
+              - generic [ref=f3e426]:
+                - link "Ayrıntıları Görüntüle" [ref=f3e427] [cursor=pointer]:
+                  - /url: /app/org/default/brand/rigosis/prompts/00b19da4-f966-4849-a389-50759baced6f
+                - button "Dışa Aktar (PNG)" [ref=f3e429] [cursor=pointer]
+          - generic [ref=f3e433]:
+            - generic [ref=f3e434]:
+              - generic [ref=f3e435]: rigosis alternative
+              - generic [ref=f3e436]: 91% Visibility
+            - separator [ref=f3e437]
+            - generic [ref=f3e440]:
+              - application [ref=f3e444]:
+                - generic [ref=f3e458]:
+                  - generic [ref=f3e459]:
+                    - generic [ref=f3e460]: Aug 19
+                    - generic [ref=f3e462]: Aug 21
+                    - generic [ref=f3e464]: Aug 23
+                    - generic [ref=f3e466]: Aug 25
+                    - generic [ref=f3e468]: Aug 27
+                    - generic [ref=f3e470]: Aug 29
+                    - generic [ref=f3e472]: Aug 31
+                    - generic [ref=f3e474]: Sep 2
+                    - generic [ref=f3e476]: Sep 4
+                    - generic [ref=f3e478]: Sep 6
+                    - generic [ref=f3e480]: Sep 8
+                    - generic [ref=f3e482]: Sep 10
+                    - generic [ref=f3e484]: Sep 12
+                    - generic [ref=f3e486]: Sep 14
+                    - generic [ref=f3e488]: Sep 17
+                  - generic [ref=f3e490]:
+                    - generic [ref=f3e491]: 0%
+                    - generic [ref=f3e493]: 20%
+                    - generic [ref=f3e495]: 40%
+                    - generic [ref=f3e497]: 60%
+                    - generic [ref=f3e499]: 80%
+                    - generic [ref=f3e501]: 100%
+              - toolbar "Chart series" [ref=f3e503]:
+                - button "Rigosis" [ref=f3e504] [cursor=pointer]
+                - button "İnnova (Innova)" [ref=f3e506] [cursor=pointer]
+                - button "Kafein Technology Solutions" [ref=f3e508] [cursor=pointer]
+                - button "KoçSistem" [ref=f3e510] [cursor=pointer]
+            - generic [ref=f3e512]:
+              - separator [ref=f3e513]
+              - generic [ref=f3e516]:
+                - link "Ayrıntıları Görüntüle" [ref=f3e517] [cursor=pointer]:
+                  - /url: /app/org/default/brand/rigosis/prompts/1bdf1397-11fa-41ac-909c-d521d8791fcd
+                - button "Dışa Aktar (PNG)" [ref=f3e519] [cursor=pointer]
+          - generic [ref=f3e523]:
+            - generic [ref=f3e524]:
+              - generic [ref=f3e525]: opentext smax implementation partners turkey
+              - generic [ref=f3e526]: 65% Visibility
+            - separator [ref=f3e527]
+            - generic [ref=f3e530]:
+              - application [ref=f3e534]:
+                - generic [ref=f3e548]:
+                  - generic [ref=f3e549]:
+                    - generic [ref=f3e550]: Aug 19
+                    - generic [ref=f3e552]: Aug 21
+                    - generic [ref=f3e554]: Aug 23
+                    - generic [ref=f3e556]: Aug 25
+                    - generic [ref=f3e558]: Aug 27
+                    - generic [ref=f3e560]: Aug 29
+                    - generic [ref=f3e562]: Aug 31
+                    - generic [ref=f3e564]: Sep 2
+                    - generic [ref=f3e566]: Sep 4
+                    - generic [ref=f3e568]: Sep 6
+                    - generic [ref=f3e570]: Sep 8
+                    - generic [ref=f3e572]: Sep 10
+                    - generic [ref=f3e574]: Sep 12
+                    - generic [ref=f3e576]: Sep 14
+                    - generic [ref=f3e578]: Sep 17
+                  - generic [ref=f3e580]:
+                    - generic [ref=f3e581]: 0%
+                    - generic [ref=f3e583]: 15%
+                    - generic [ref=f3e585]: 30%
+                    - generic [ref=f3e587]: 45%
+                    - generic [ref=f3e589]: 60%
+                    - generic [ref=f3e591]: 75%
+              - toolbar "Chart series" [ref=f3e593]:
+                - button "Rigosis" [ref=f3e594] [cursor=pointer]
+                - button "İnnova (Innova)" [ref=f3e596] [cursor=pointer]
+                - button "Kafein Technology Solutions" [ref=f3e598] [cursor=pointer]
+                - button "KoçSistem" [ref=f3e600] [cursor=pointer]
+            - generic [ref=f3e602]:
+              - separator [ref=f3e603]
+              - generic [ref=f3e606]:
+                - link "Ayrıntıları Görüntüle" [ref=f3e607] [cursor=pointer]:
+                  - /url: /app/org/default/brand/rigosis/prompts/e574c430-2104-405e-965b-90ce54f101b0
+                - button "Dışa Aktar (PNG)" [ref=f3e609] [cursor=pointer]
+          - generic [ref=f3e613]:
+            - generic [ref=f3e614]: best it service management consultants in turkey
+            - separator [ref=f3e616]
+            - generic [ref=f3e619]:
+              - paragraph [ref=f3e633]: No brands found in responses
+              - paragraph [ref=f3e634]: Your brand and competitors weren't mentioned in the evaluated responses for this prompt.
+            - generic [ref=f3e635]:
+              - separator [ref=f3e636]
+              - generic [ref=f3e639]:
+                - link "Ayrıntıları Görüntüle" [ref=f3e640] [cursor=pointer]:
+                  - /url: /app/org/default/brand/rigosis/prompts/753a37cd-d618-4891-9b7e-a05ef9317541
+                - button "Dışa Aktar (PNG)" [ref=f3e642] [cursor=pointer]
+  - generic [aria-hidden] [ref=f3e644]: Aug 28

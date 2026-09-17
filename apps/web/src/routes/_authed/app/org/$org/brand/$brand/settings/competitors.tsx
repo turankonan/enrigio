@@ -178,7 +178,7 @@ function CompetitorsSettingsPage() {
 			queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
 			await refetchCompetitors();
 		} catch (err) {
-			setError(writeError(err, "Failed to save competitors."));
+			setError(writeError(err, t("settings.competitors.save_error")));
 		} finally {
 			setIsSaving(false);
 		}
@@ -194,10 +194,7 @@ function CompetitorsSettingsPage() {
 			<Alert variant="default" className="border-yellow-200 bg-yellow-50 text-yellow-800">
 				<AlertTriangle className="h-4 w-4 text-yellow-600" />
 				<AlertTitle>{t("settings.competitors.warning_title")}</AlertTitle>
-				<AlertDescription className="text-yellow-700">
-					Updating competitors will only apply to future prompt evaluations. Citation categorization updates
-					retroactively.
-				</AlertDescription>
+				<AlertDescription className="text-yellow-700">{t("settings.competitors.warning_body")}</AlertDescription>
 			</Alert>
 
 			<DiscoveryPanel

@@ -52,7 +52,7 @@ function OrganizationSettingsPage() {
 					: undefined,
 			);
 		} catch (err) {
-			setError(writeError(err, "Failed to save the organization."));
+			setError(writeError(err, t("settings.organization.save_error")));
 		} finally {
 			setSaving(false);
 		}

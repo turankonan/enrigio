@@ -30,8 +30,8 @@ function VisibilityPage() {
 
 	return (
 		<PromptsDisplay
-			pageTitle="Visibility"
-			pageDescription="See how LLMs are evaluating prompts related to your brand."
+			pageTitle={t("visibility.crumb")}
+			pageDescription={t("visibility.page_description")}
 			pageInfoContent={infoContent}
 		/>
 	);

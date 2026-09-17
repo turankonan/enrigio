@@ -55,7 +55,7 @@ export default function BrandOnboarding({ organizationSlug, brandId, brandName, 
 				}),
 			);
 		} catch (err) {
-			setError(writeError(err, "Could not create the brand."));
+			setError(writeError(err, t("new_brand.create_error")));
 		} finally {
 			setIsLoading(false);
 		}

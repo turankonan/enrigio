@@ -43,7 +43,7 @@ function NewOrganizationPage() {
 			const { slug } = await createOrganizationFn({ data: { name: trimmed } });
 			await organizationsChanged(() => navigate({ to: "/app/org/$org/settings", params: { org: slug } }));
 		} catch (err) {
-			setError(writeError(err, "Could not create the organization."));
+			setError(writeError(err, t("new_organization.create_error")));
 			setIsLoading(false);
 		}
 	}

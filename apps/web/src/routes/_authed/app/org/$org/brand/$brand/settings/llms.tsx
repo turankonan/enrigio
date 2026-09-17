@@ -52,10 +52,7 @@ function LlmsSettingsPage() {
 		<div className="max-w-6xl space-y-8">
 			<div>
 				<h1 className="text-3xl font-bold">{t("settings.llms.crumb")}</h1>
-				<p className="text-muted-foreground">
-					Your prompts are evaluated against these AI models to track how your brand appears across different types of
-					AI search.
-				</p>
+				<p className="text-muted-foreground">{t("settings.llms.subtitle")}</p>
 			</div>
 
 			{picker.editable ? <PlatformGroups picker={picker} /> : <TrackedPlatforms picker={picker} />}
@@ -147,7 +144,7 @@ function PlatformGroups({ picker }: { picker: ModelPickerState }) {
 			await updateEnabledModelsFn({ data: { brandId, models: [...selected] } });
 			await router.invalidate();
 		} catch (err) {
-			setError(writeError(err, "Could not save platform picks"));
+			setError(writeError(err, t("settings.llms.save_error")));
 		} finally {
 			setSaving(false);
 		}

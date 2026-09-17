@@ -1,6 +1,6 @@
 /**
  * Shared fan-out UI sections, used by the Query Fan-Out page and the prompt
- * details "Web Queries" tab: variation lines with prompt-keyword bolding and
+ * details t("prompt_details.tab_web_queries") tab: variation lines with prompt-keyword bolding and
  * run counts, a per-model variations breakdown, and the Query Words section
  * (term cloud + Added/Preserved/Dropped word changes).
  */

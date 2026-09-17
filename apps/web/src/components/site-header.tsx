@@ -24,7 +24,7 @@ function CrumbLabel({ crumb }: { crumb: Crumb }) {
 	return (
 		<>
 			<span className="mb-0.5 block text-[10px] font-medium uppercase leading-none tracking-wider text-muted-foreground/70">
-				{t(crumb.kind === "Organization" ? "app-sidebar.organization" : "app-sidebar.brand")}
+				{t(crumb.kind === t("settings.organization.head_title") ? "app-sidebar.organization" : "app-sidebar.brand")}
 			</span>
 			{crumb.label}
 		</>

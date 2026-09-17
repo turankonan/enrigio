@@ -61,25 +61,17 @@ function QueryFanoutPage() {
 		model: modelParam,
 	});
 
-	const infoContent = (
-		<p>
-			When an AI engine with web search capabilities responds to a prompt, it may choose to make a number of web
-			searches before creating its answer. These underlying web searches, or web queries, are only available for some
-			engines.
-		</p>
-	);
+	const infoContent = <p>{t("query_fan_out.info")}</p>;
 
 	let content: React.ReactNode;
 	if (isLoading && !data) {
 		content = <LoadingState />;
 	} else if (error && !data) {
-		content = <EmptyState message="Couldn't load query fan-out right now. Reload the page to try again." />;
+		content = <EmptyState message={t("query_fan_out.load_error")} />;
 	} else if (!data || data.totalRuns === 0) {
 		// totalRuns counts only web-search-enabled runs — a brand whose models all
 		// run without web search lands here even with plenty of runs.
-		content = (
-			<EmptyState message="No runs with web search enabled for the selected filters. Fan-out appears once your prompts have been run by an engine with web search." />
-		);
+		content = <EmptyState message={t("query_fan_out.no_search_runs")} />;
 	} else if (data.totalQueries === 0) {
 		// Runs happened but none exposed fan-out — still show the KPIs (run counts)
 		// above the explanation rather than hiding everything.
@@ -150,10 +142,7 @@ function StatCard({ label, value, tip }: { label: string; value: React.ReactNode
 function RunsTooltip({ breakdown }: { breakdown: FanoutData["byModel"] }) {
 	return (
 		<>
-			<p>
-				Prompt runs that produced at least one web search. Some engines do not expose web searches, so this number may
-				be lower than expected.
-			</p>
+			<p>{t("query_fan_out.tip_known_runs")}</p>
 			{breakdown.length > 0 && (
 				<div className="border-border/60 mt-2 space-y-0.5 border-t pt-2">
 					{breakdown.map((m) => (
@@ -175,10 +164,7 @@ function UnknownRunsTooltip({ byModel }: { byModel: FanoutData["byModel"] }) {
 		.sort((a, b) => b.unknown - a.unknown);
 	return (
 		<>
-			<p>
-				Search-enabled runs without known queries. The engine may have chosen not to search at all, searched with just
-				the prompt itself, or searched without revealing its queries.
-			</p>
+			<p>{t("query_fan_out.tip_unknown_runs")}</p>
 			{rows.length > 0 && (
 				<div className="border-border/60 mt-2 space-y-0.5 border-t pt-2">
 					{rows.map((m) => (
@@ -203,7 +189,7 @@ function StatRow({ data }: { data: FanoutData }) {
 			<StatCard
 				label={t("query_fan_out.stat_search_runs")}
 				value={data.totalRuns.toLocaleString()}
-				tip="How many times your prompts were run against engines configured with web search. An engine may still choose not to execute a search on a given run."
+				tip={t("query_fan_out.tip_search_runs")}
 			/>
 			<StatCard
 				label={t("query_fan_out.stat_unknown_queries")}
@@ -218,7 +204,7 @@ function StatRow({ data }: { data: FanoutData }) {
 			<StatCard
 				label={t("query_fan_out.stat_average_fanout")}
 				value={data.avgPerExecution.toLocaleString()}
-				tip="Average queries per run that had at least one web query."
+				tip={t("query_fan_out.tip_average")}
 			/>
 		</div>
 	);
@@ -433,10 +419,7 @@ function TopQueries({ data }: { data: FanoutData }) {
 			<CardHeader>
 				<CardTitle className="flex items-center gap-1.5 text-base">
 					{t("query_fan_out.tab_top_queries")}
-					<InfoTip>
-						The searches with the widest reach — sort by how many distinct prompts triggered them, or how many prompt
-						runs issued them. Expand a query to see the prompts behind it.
-					</InfoTip>
+					<InfoTip>{t("query_fan_out.top_queries_tooltip")}</InfoTip>
 				</CardTitle>
 				<CardDescription>{t("query_fan_out.top_queries_description")}</CardDescription>
 			</CardHeader>

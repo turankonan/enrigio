@@ -271,7 +271,7 @@ function TagsDropdown({ availableTags }: { availableTags: readonly string[] }) {
 // setState) to avoid flashing back when the URL echo races with typing.
 // ------------------------------------------------------------------
 
-function SearchInput({ placeholder = "Search prompts..." }: { placeholder?: string }) {
+function SearchInput({ placeholder = t("query_fan_out.search_prompts_placeholder") }: { placeholder?: string }) {
 	const urlValue = useSearch({ strict: false, select: (s) => s.q });
 	const setFilters = useFilterNavigate();
 	const value = urlValue ?? "";

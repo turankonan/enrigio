@@ -1,0 +1,87 @@
+- generic [ref=f2e2]:
+  - generic [ref=f2e5]:
+    - list [ref=f2e7]:
+      - listitem [ref=f2e8]:
+        - link "AnswerEcho" [ref=f2e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f2e12]:
+      - generic [ref=f2e13]:
+        - generic [ref=f2e14]: Pano
+        - list [ref=f2e15]:
+          - listitem [ref=f2e16]:
+            - link "Genel Bakış" [ref=f2e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f2e23]:
+            - link "Görünürlük" [ref=f2e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f2e30]:
+            - link "Yanıtlardaki Marka Payı" [ref=f2e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f2e37]:
+            - link "Sorgu Açılımı" [ref=f2e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f2e45]:
+            - link "Atıflar" [ref=f2e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f2e52]:
+            - link "Fırsatlar" [ref=f2e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f2e59]:
+        - generic [ref=f2e60]: Ayarlar
+        - list [ref=f2e61]:
+          - listitem [ref=f2e62]:
+            - link "Marka" [ref=f2e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f2e67]:
+            - link "Rakipler" [ref=f2e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f2e73]:
+            - link "Sorgular" [ref=f2e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f2e79]:
+            - link "Büyük Dil Modelleri" [ref=f2e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f2e85]:
+      - list [ref=f2e86]:
+        - listitem [ref=f2e87]:
+          - button "Hesap ve kuruluşlar" [ref=f2e88] [cursor=pointer]:
+            - generic [ref=f2e94]:
+              - generic [ref=f2e95]: Semi Hop
+              - generic [ref=f2e96]: semi.hop@rigosis.com
+      - generic [ref=f2e100]:
+        - generic [ref=f2e101]: v0.4.1
+        - link [ref=f2e103] [cursor=pointer]:
+          - /url: https://www.rigosis.com/
+  - main [ref=f2e108]:
+    - generic [ref=f2e110]:
+      - button "Toggle Sidebar" [ref=f2e111] [cursor=pointer]
+      - separator [ref=f2e113]
+      - navigation "breadcrumb" [ref=f2e114]:
+        - list [ref=f2e115]:
+          - listitem [ref=f2e116]:
+            - link "Kuruluş Default" [ref=f2e117] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f2e118]: Kuruluş
+              - text: Default
+          - listitem [aria-hidden] [ref=f2e119]
+          - listitem [ref=f2e122]:
+            - link "Marka Rigosis" [ref=f2e123] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f2e124]: Marka
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f2e125]
+          - listitem [ref=f2e128]:
+            - link "Genel Bakış" [disabled] [ref=f2e129]
+    - generic [ref=f2e134]:
+      - generic [ref=f2e135]:
+        - generic [ref=f2e136]:
+          - heading "Yapay Zekâ Görünürlüğü" [level=2] [ref=f2e137]
+          - link "Görünürlüğü Görüntüle" [ref=f2e141] [cursor=pointer]:
+            - /url: /app/org/default/brand/rigosis/visibility
+        - generic [ref=f2e142]: Görünürlük Eğilimleri (30 gün)
+      - generic [ref=f2e155]:
+        - generic [ref=f2e156]:
+          - heading "Yanıtlardaki Marka Payı" [level=2] [ref=f2e157]
+          - link "Yanıtlardaki Marka Payını Görüntüle" [ref=f2e162] [cursor=pointer]:
+            - /url: /app/org/default/brand/rigosis/share-of-voice
+        - generic [ref=f2e163]: Yanıtlardaki Marka Payı Eğilimleri (30 gün)

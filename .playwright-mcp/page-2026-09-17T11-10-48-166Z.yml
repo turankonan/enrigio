@@ -1,0 +1,77 @@
+- generic [ref=f7e2]:
+  - generic [ref=f7e5]:
+    - list [ref=f7e7]:
+      - listitem [ref=f7e8]:
+        - link "AnswerEcho" [ref=f7e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f7e12]:
+      - generic [ref=f7e13]:
+        - generic [ref=f7e14]: Pano
+        - list [ref=f7e15]:
+          - listitem [ref=f7e16]:
+            - link "Genel Bakış" [ref=f7e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f7e23]:
+            - link "Görünürlük" [ref=f7e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f7e30]:
+            - link "Yanıtlardaki Marka Payı" [ref=f7e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f7e37]:
+            - link "Sorgu Açılımı" [ref=f7e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f7e45]:
+            - link "Atıflar" [ref=f7e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f7e52]:
+            - link "Fırsatlar" [ref=f7e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f7e59]:
+        - generic [ref=f7e60]: Ayarlar
+        - list [ref=f7e61]:
+          - listitem [ref=f7e62]:
+            - link "Marka" [ref=f7e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f7e67]:
+            - link "Rakipler" [ref=f7e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f7e73]:
+            - link "Sorgular" [ref=f7e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f7e79]:
+            - link "Büyük Dil Modelleri" [ref=f7e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f7e85]:
+      - list [ref=f7e86]:
+        - listitem [ref=f7e87]:
+          - button "Hesap ve kuruluşlar" [ref=f7e88] [cursor=pointer]:
+            - generic [ref=f7e94]:
+              - generic [ref=f7e95]: Semi Hop
+              - generic [ref=f7e96]: semi.hop@rigosis.com
+      - generic [ref=f7e100]:
+        - generic [ref=f7e101]: v0.4.1
+        - link [ref=f7e103] [cursor=pointer]:
+          - /url: https://www.rigosis.com/
+  - main [ref=f7e108]:
+    - generic [ref=f7e110]:
+      - button "Toggle Sidebar" [ref=f7e111] [cursor=pointer]
+      - separator [ref=f7e113]
+      - navigation "breadcrumb" [ref=f7e114]:
+        - list [ref=f7e115]:
+          - listitem [ref=f7e116]:
+            - link "Kuruluş Default" [ref=f7e117] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f7e118]: Kuruluş
+              - text: Default
+          - listitem [aria-hidden] [ref=f7e119]
+          - listitem [ref=f7e122]:
+            - link "Marka Rigosis" [ref=f7e123] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f7e124]: Marka
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f7e125]
+          - listitem [ref=f7e128]:
+            - link "Rakipler" [disabled] [ref=f7e129]
+    - generic [ref=f7e133]:
+      - heading "Rakipler" [level=1] [ref=f7e134]
+      - paragraph [ref=f7e135]: Yükleniyor...

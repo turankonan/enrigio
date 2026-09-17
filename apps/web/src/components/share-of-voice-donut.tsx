@@ -1,6 +1,6 @@
 /**
  * Donut of share of voice: the brand plus its top competitors, with the long
- * tail bucketed into "Others". Sits beside the headline share number.
+ * tail bucketed into t("share-of-voice-donut.others"). Sits beside the headline share number.
  */
 
 import { ChartContainer } from "@workspace/ui/components/chart";
@@ -14,7 +14,7 @@ interface Slice {
 	name: string;
 	value: number;
 	color: string;
-	/** Absent on the "Others" bucket, which stands for no single brand. */
+	/** Absent on the t("share-of-voice-donut.others") bucket, which stands for no single brand. */
 	domain?: string;
 }
 
@@ -75,7 +75,7 @@ export function ShareOfVoiceDonut({
 						const s = payload[0].payload as Slice;
 						return (
 							<div className="flex items-center gap-1.5 rounded-md border bg-background px-2 py-1 text-xs shadow-md">
-								{s.name !== "Others" && <SiteIcon domain={s.domain} size="xs" />}
+								{s.name !== t("share-of-voice-donut.others") && <SiteIcon domain={s.domain} size="xs" />}
 								<span>
 									{s.name}: {Math.round((s.value / total) * 100)}%
 								</span>
