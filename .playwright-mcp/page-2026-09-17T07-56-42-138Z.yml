@@ -1,0 +1,91 @@
+- generic [ref=f11e2]:
+  - generic [ref=f11e5]:
+    - list [ref=f11e7]:
+      - listitem [ref=f11e8]:
+        - link "AnswerEcho" [ref=f11e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f11e12]:
+      - generic [ref=f11e13]:
+        - generic [ref=f11e14]: Dashboard
+        - list [ref=f11e15]:
+          - listitem [ref=f11e16]:
+            - link "Overview" [ref=f11e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f11e23]:
+            - link "Visibility" [ref=f11e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f11e30]:
+            - link "Share of Voice" [ref=f11e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f11e37]:
+            - link "Query Fan-Out" [ref=f11e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f11e45]:
+            - link "Citations" [ref=f11e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f11e52]:
+            - link "Opportunities" [ref=f11e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f11e59]:
+        - generic [ref=f11e60]: Settings
+        - list [ref=f11e61]:
+          - listitem [ref=f11e62]:
+            - link "Brand" [ref=f11e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f11e67]:
+            - link "Competitors" [ref=f11e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f11e73]:
+            - link "Prompts" [ref=f11e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f11e79]:
+            - link "LLMs" [ref=f11e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f11e85]:
+      - list [ref=f11e86]:
+        - listitem [ref=f11e87]:
+          - button "Account and organizations" [ref=f11e88] [cursor=pointer]:
+            - generic [ref=f11e94]:
+              - generic [ref=f11e95]: Semi Hop
+              - generic [ref=f11e96]: semi.hop@rigosis.com
+      - generic [ref=f11e100]:
+        - generic [ref=f11e101]: v0.4.1
+        - link [ref=f11e103] [cursor=pointer]:
+          - /url: https://www.rigosis.com/
+  - main [ref=f11e108]:
+    - generic [ref=f11e110]:
+      - button "Toggle Sidebar" [ref=f11e111] [cursor=pointer]
+      - separator [ref=f11e113]
+      - navigation "breadcrumb" [ref=f11e114]:
+        - list [ref=f11e115]:
+          - listitem [ref=f11e116]:
+            - link "Organization Default" [ref=f11e117] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f11e118]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f11e119]
+          - listitem [ref=f11e122]:
+            - link "Brand Rigosis" [ref=f11e123] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f11e124]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f11e125]
+          - listitem [ref=f11e128]:
+            - link "Competitors" [disabled] [ref=f11e129]
+    - generic [ref=f11e133]:
+      - generic [ref=f11e134]:
+        - heading "Competitors" [level=1] [ref=f11e135]
+        - paragraph [ref=f11e136]: Manage your competitive landscape for reputation tracking.
+      - alert [ref=f11e137]:
+        - generic [ref=f11e140]: Warning
+        - generic [ref=f11e141]: Updating competitors will only apply to future prompt evaluations. Citation categorization updates retroactively.
+      - generic [ref=f11e143]:
+        - generic [ref=f11e144]:
+          - heading "Discover from answers" [level=2] [ref=f11e145]
+          - paragraph [ref=f11e146]: Scan the AI answers already collected for this brand and suggest the competitors they mention.
+        - button "Discover competitors" [ref=f11e147] [cursor=pointer]
+      - generic [ref=f11e148]:
+        - button "Add Competitor" [ref=f11e149] [cursor=pointer]
+        - paragraph [ref=f11e150]:
+          - strong [ref=f11e151]: 0/500
+          - text: competitors configured

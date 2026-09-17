@@ -11,10 +11,22 @@ import { type Attempt, nonEmptyStrings } from "./scrape-shared";
 
 const MAX_PROMPT_CHARS = 500;
 
-// Country localization is intentionally not exposed via SCRAPE_TARGETS yet
-// because support differs by DataForSEO surface and underlying model.
-export const DFS_LOCATION_CODE = 2840;
-export const DFS_LANGUAGE_CODE = "en";
+// Country localization is intentionally not exposed via SCRAPE_TARGETS
+// because support differs by DataForSEO surface and underlying model; the
+// deployment-wide env override below is the supported knob. Defaults match
+// the historical behavior: United States, English.
+const DEFAULT_LOCATION_CODE = 2840;
+const DEFAULT_LANGUAGE_CODE = "en";
+
+/** DataForSEO location for all scrapes, e.g. 2840 = United States, 2792 = Turkey. */
+export function dfsLocationCode(): number {
+	const parsed = Number.parseInt(process.env.DATAFORSEO_LOCATION_CODE ?? "", 10);
+	return Number.isFinite(parsed) && parsed > 0 ? parsed : DEFAULT_LOCATION_CODE;
+}
+
+export function dfsLanguageCode(): string {
+	return process.env.DATAFORSEO_LANGUAGE_CODE?.trim() || DEFAULT_LANGUAGE_CODE;
+}
 
 export const isDataforseoConfigured = configuredWhen("DATAFORSEO_LOGIN", "DATAFORSEO_PASSWORD");
 

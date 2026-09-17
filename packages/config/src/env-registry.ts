@@ -133,6 +133,19 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
 		description: "DataForSEO account password.",
 	},
 	{
+		name: "DATAFORSEO_LOCATION_CODE",
+		scope: "server",
+		requiredBy: "optional",
+		description:
+			"DataForSEO location for all scrapes, as a numeric location code (default 2840 = United States; 2792 = Turkey). Answers reflect this market.",
+	},
+	{
+		name: "DATAFORSEO_LANGUAGE_CODE",
+		scope: "server",
+		requiredBy: "optional",
+		description: "DataForSEO language for all scrapes (default: en).",
+	},
+	{
 		name: "OPENAI_API_KEY",
 		scope: "server",
 		requiredBy: "dynamic-scrape-targets",

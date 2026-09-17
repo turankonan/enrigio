@@ -32,6 +32,8 @@ services:
         value: local
       - key: DISABLE_TELEMETRY
         value: "1"
+      - key: DATAFORSEO_LOCATION_CODE # Turkey — Rigosis' market
+        value: "2792"
       # DataForSEO scrapes the five surfaces; Claude/GPT tracked via direct APIs.
       # Drop entries here to cut provider cost; format: model:provider[:version][:online]
       - key: SCRAPE_TARGETS

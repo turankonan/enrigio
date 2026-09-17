@@ -371,3 +371,27 @@ describe("dataforseo provider", () => {
 		expect(rawUrl).toBe(realUrl);
 	});
 });
+
+describe("scrape localization", () => {
+	afterEach(() => vi.unstubAllEnvs());
+
+	it("defaults to United States / English", async () => {
+		const { dfsLocationCode, dfsLanguageCode } = await import("./dataforseo-shared");
+		expect(dfsLocationCode()).toBe(2840);
+		expect(dfsLanguageCode()).toBe("en");
+	});
+
+	it("honors the env overrides", async () => {
+		vi.stubEnv("DATAFORSEO_LOCATION_CODE", "2792");
+		vi.stubEnv("DATAFORSEO_LANGUAGE_CODE", "tr");
+		const { dfsLocationCode, dfsLanguageCode } = await import("./dataforseo-shared");
+		expect(dfsLocationCode()).toBe(2792);
+		expect(dfsLanguageCode()).toBe("tr");
+	});
+
+	it("falls back to the default on a malformed location code", async () => {
+		vi.stubEnv("DATAFORSEO_LOCATION_CODE", "turkey");
+		const { dfsLocationCode } = await import("./dataforseo-shared");
+		expect(dfsLocationCode()).toBe(2840);
+	});
+});

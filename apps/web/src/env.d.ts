@@ -59,6 +59,8 @@ declare global {
 			readonly ANSWERECHO_ENCRYPTION_KEY_OLD?: string;
 			readonly DATAFORSEO_LOGIN: string;
 			readonly DATAFORSEO_PASSWORD: string;
+			readonly DATAFORSEO_LOCATION_CODE?: string;
+			readonly DATAFORSEO_LANGUAGE_CODE?: string;
 			readonly BETTER_AUTH_SECRET?: string;
 			readonly AUTH0_DOMAIN?: string;
 			readonly AUTH0_AUDIENCE?: string;
