@@ -1,0 +1,48 @@
+# Free-tier demo blueprint: one Render web service running the web app and the
+# pg-boss worker in the same process tree, against a Neon Postgres DB.
+# Setup walkthrough: DEMO.md
+services:
+  - type: web
+    name: answerecho-demo
+    runtime: node
+    plan: free
+    region: frankfurt
+    # ponytail: migrations run in the build and APP_URL falls back to
+    # RENDER_EXTERNAL_URL; split into a paid pre-deploy step + fixed URL when
+    # this graduates beyond a demo.
+    buildCommand: >-
+      corepack enable && corepack prepare pnpm@12.4.1 --activate &&
+      pnpm install --frozen-lockfile &&
+      export APP_URL="${APP_URL:-$RENDER_EXTERNAL_URL}" VITE_APP_URL="${VITE_APP_URL:-$RENDER_EXTERNAL_URL}" &&
+      pnpm exec turbo run build --filter=@workspace/web &&
+      pnpm --dir packages/lib exec drizzle-kit migrate
+    # ponytail: worker rides in the web service because free tier has no
+    # background workers; move it to a Render worker service when paying.
+    startCommand: >-
+      export APP_URL="${APP_URL:-$RENDER_EXTERNAL_URL}" VITE_APP_URL="${VITE_APP_URL:-$RENDER_EXTERNAL_URL}" &&
+      (pnpm --filter @workspace/worker start &) &&
+      node apps/web/.output/server/index.mjs
+    healthCheckPath: /api/setup-status
+    envVars:
+      - key: NODE_VERSION
+        value: "24.11.0"
+      - key: DEPLOYMENT_MODE
+        value: local
+      - key: VITE_DEPLOYMENT_MODE
+        value: local
+      - key: DISABLE_TELEMETRY
+        value: "1"
+      - key: DATABASE_URL # Neon pooled connection string
+        sync: false
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: ANSWERECHO_ENCRYPTION_KEY # must be `openssl rand -base64 32`
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DATAFORSEO_LOGIN
+        sync: false
+      - key: DATAFORSEO_PASSWORD
+        sync: false
