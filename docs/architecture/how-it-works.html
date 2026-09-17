@@ -1,0 +1,805 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How AnswerEcho Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2f9e40; --green-brand: #39b54a; --blue: #2a78d6; --orange: #eb6834;
+    --amber: #d98600;
+    --plane: #f4f4f0; --surface: #ffffff; --surface-2: #fbfbf9;
+    --ink: #23282c; --ink-2: #52514e; --muted: #86857f;
+    --line: #e4e3dc; --line-strong: #cfceC6;
+    --shadow: 0 1px 2px rgba(35,40,44,.04), 0 8px 24px rgba(35,40,44,.06);
+    --track: #eeeeea;
+    --radius: 14px;
+    --maxw: 1080px;
+  }
+  :root[data-theme="dark"] {
+    --green: #30a03f; --green-brand: #39b54a; --blue: #3987e5; --orange: #d95926;
+    --amber: #e6a52a;
+    --plane: #0d0d0d; --surface: #171717; --surface-2: #1c1c1b;
+    --ink: #f3f3ee; --ink-2: #c3c2b7; --muted: #8f8e86;
+    --line: #2b2b29; --line-strong: #3a3a37;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+    --track: #262625;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --green: #30a03f; --blue: #3987e5; --orange: #d95926; --amber: #e6a52a;
+      --plane: #0d0d0d; --surface: #171717; --surface-2: #1c1c1b;
+      --ink: #f3f3ee; --ink-2: #c3c2b7; --muted: #8f8e86;
+      --line: #2b2b29; --line-strong: #3a3a37;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 30px rgba(0,0,0,.35);
+      --track: #262625;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--plane); color: var(--ink);
+    font-family: Ubuntu, system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.6; -webkit-font-smoothing: antialiased;
+    letter-spacing: .002em;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+  a { color: var(--green); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code, .mono { font-family: "Ubuntu Mono", ui-monospace, monospace; }
+
+  /* ---- top bar ---- */
+  header.top {
+    position: sticky; top: 0; z-index: 20;
+    background: color-mix(in srgb, var(--plane) 88%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  header.top .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -.01em; }
+  .logo .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--green-brand);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--green-brand) 22%, transparent); }
+  .logo small { font-weight: 400; color: var(--muted); }
+  .top nav { margin-left: auto; display: flex; align-items: center; gap: 20px; font-size: 14px; }
+  .top nav a { color: var(--ink-2); }
+  .toggle { cursor: pointer; border: 1px solid var(--line-strong); background: var(--surface);
+    color: var(--ink-2); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; }
+  .toggle:hover { color: var(--ink); }
+
+  /* ---- hero ---- */
+  .hero { padding: 72px 0 40px; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: -40% 40% auto -10%; height: 480px;
+    background: radial-gradient(ellipse 70% 70% at 25% 30%, color-mix(in srgb, var(--green-brand) 16%, transparent), transparent 70%);
+    filter: blur(20px); pointer-events: none; z-index: 0;
+  }
+  .hero .wrap { position: relative; z-index: 1; }
+  .eyebrow { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--green);
+    font-weight: 500; margin-bottom: 18px; }
+  h1 { font-size: clamp(34px, 5.4vw, 58px); line-height: 1.04; margin: 0 0 20px;
+    letter-spacing: -.025em; font-weight: 700; max-width: 16ch; }
+  h1 .hl { color: var(--green-brand); }
+  .lede { font-size: clamp(17px, 2vw, 20px); color: var(--ink-2); max-width: 60ch; margin: 0 0 26px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip { font-size: 13px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line-strong);
+    background: var(--surface); color: var(--ink-2); }
+  .chip b { color: var(--ink); font-weight: 500; }
+
+  /* ---- pipeline ---- */
+  section { padding: 46px 0; }
+  .sec-head { display: flex; align-items: baseline; gap: 14px; margin-bottom: 8px; }
+  .sec-num { font-family: "Ubuntu Mono", monospace; color: var(--green); font-size: 15px; font-weight: 500; }
+  h2 { font-size: clamp(24px, 3.2vw, 32px); margin: 0; letter-spacing: -.02em; font-weight: 700; }
+  .sec-sub { color: var(--ink-2); max-width: 66ch; margin: 6px 0 26px; }
+
+  .pipe { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  .pipe .node { background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 12px; text-align: center; box-shadow: var(--shadow); position: relative; }
+  .pipe .node .k { font-size: 22px; margin-bottom: 8px; display: block; }
+  .pipe .node .t { font-weight: 500; font-size: 14px; line-height: 1.3; }
+  .pipe .node .d { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .pipe .node:not(:last-child)::after {
+    content: "→"; position: absolute; right: -12px; top: 50%; transform: translateY(-50%);
+    color: var(--line-strong); font-size: 18px; z-index: 2; }
+  @media (max-width: 760px) {
+    .pipe { grid-template-columns: repeat(2, 1fr); gap: 22px 8px; }
+    .pipe .node:not(:last-child)::after { content: ""; }
+  }
+
+  /* ---- generic card grid ---- */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px; box-shadow: var(--shadow); }
+  .card h3 { margin: 0 0 8px; font-size: 16px; font-weight: 500; letter-spacing: -.01em; }
+  .card p { margin: 0; font-size: 14px; color: var(--ink-2); }
+  .card .step-badge { display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 8px; background: color-mix(in srgb, var(--green-brand) 14%, transparent);
+    color: var(--green); font-family: "Ubuntu Mono", monospace; font-weight: 500; margin-bottom: 12px; }
+
+  /* ---- funnel ---- */
+  .funnel { display: grid; grid-template-columns: 1fr auto 1fr auto auto; align-items: center; gap: 14px; }
+  .funnel .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px; box-shadow: var(--shadow); text-align: center; }
+  .funnel .big { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+  .funnel .lbl { font-size: 13px; color: var(--ink-2); margin-top: 6px; }
+  .funnel .arrow { color: var(--muted); font-size: 20px; text-align: center; }
+  .funnel .stage.accent .big { color: var(--green); }
+  @media (max-width: 760px) { .funnel { grid-template-columns: 1fr; } .funnel .arrow { transform: rotate(90deg); } }
+
+  .split { display: flex; gap: 10px; margin-top: 18px; height: 40px; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--line); }
+  .split .seg { display: flex; align-items: center; justify-content: center; font-size: 13px; color: #fff;
+    font-weight: 500; }
+  .split .seg.unbr { background: var(--blue); flex: 4; }
+  .split .seg.br { background: var(--orange); flex: 1; }
+
+  /* ---- fan-out ---- */
+  .fan { display: grid; grid-template-columns: 200px 1fr; gap: 30px; align-items: center; }
+  .fan .src { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+    box-shadow: var(--shadow); }
+  .fan .src .q { font-family: "Ubuntu Mono", monospace; font-size: 13px; color: var(--ink); background: var(--track);
+    border-radius: 8px; padding: 8px 10px; display: inline-block; margin-top: 8px; }
+  .fan .engines { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .eng { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px 12px; font-size: 14px; box-shadow: var(--shadow); }
+  .eng .tag { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .eng .tag.s { background: var(--blue); }
+  .eng .tag.d { background: var(--orange); }
+  .eng .via { margin-left: auto; font-size: 11px; color: var(--muted); }
+  .legend { display: flex; gap: 20px; font-size: 13px; color: var(--ink-2); margin-top: 16px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  @media (max-width: 640px) { .fan { grid-template-columns: 1fr; } }
+
+  .loopnote { margin-top: 18px; display: flex; align-items: center; gap: 12px; font-size: 14px;
+    color: var(--ink-2); background: var(--surface-2); border: 1px dashed var(--line-strong);
+    border-radius: 12px; padding: 14px 16px; }
+  .loopnote b { color: var(--ink); font-weight: 500; }
+
+  /* ---- mention example ---- */
+  .answer { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px;
+    box-shadow: var(--shadow); font-size: 15px; line-height: 1.7; color: var(--ink-2); }
+  mark.brand { background: color-mix(in srgb, var(--green-brand) 26%, transparent); color: var(--ink);
+    border-radius: 4px; padding: 0 4px; font-weight: 500; }
+  mark.comp { background: color-mix(in srgb, var(--orange) 24%, transparent); color: var(--ink);
+    border-radius: 4px; padding: 0 4px; font-weight: 500; }
+  .verdict { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 16px; font-size: 14px; }
+  .verdict div { display: flex; align-items: center; gap: 8px; }
+  .verdict .yes { color: var(--green); font-weight: 500; }
+
+  /* ---- charts ---- */
+  .figure { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px 26px; box-shadow: var(--shadow); }
+  .figure figcaption { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+  .figure .fnote { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .bar-row { display: grid; grid-template-columns: 260px 1fr 52px; align-items: center; gap: 14px;
+    margin-bottom: 12px; }
+  .bar-row .name { font-size: 13.5px; color: var(--ink-2); text-align: right; }
+  .bar-row .name.mono { font-family: "Ubuntu Mono", monospace; font-size: 12.5px; }
+  .track { background: var(--track); border-radius: 5px; height: 22px; position: relative; overflow: hidden; }
+  .bar { height: 100%; border-radius: 5px; background: var(--green);
+    animation: grow 1s cubic-bezier(.2,.7,.2,1) both; }
+  .track.empty { border: 1px dashed var(--amber);
+    background: repeating-linear-gradient(45deg, color-mix(in srgb, var(--amber) 20%, transparent) 0 6px, transparent 6px 12px); }
+  .val.op { color: var(--amber); }
+  .bar-row .val { font-size: 14px; font-weight: 500; font-variant-numeric: tabular-nums; text-align: right; }
+  .flag { display: inline-block; font-size: 11px; color: #fff; background: var(--amber); border-radius: 999px;
+    padding: 1px 8px; margin-left: 8px; vertical-align: middle; }
+  @keyframes grow { from { width: 0 !important; } }
+  @media (max-width: 640px) {
+    .bar-row { grid-template-columns: 1fr; gap: 4px; }
+    .bar-row .name { text-align: left; }
+  }
+
+  /* stat tiles */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px;
+    box-shadow: var(--shadow); }
+  .stat .num { font-size: 38px; font-weight: 700; letter-spacing: -.03em; line-height: 1; color: var(--ink); }
+  .stat .num.g { color: var(--green); }
+  .stat .cap { font-size: 13px; color: var(--ink-2); margin-top: 8px; }
+  .stat .cap b { color: var(--ink); font-weight: 500; }
+
+  .table { width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 4px; }
+  .table th, .table td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .table th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+  .table td.mode { font-family: "Ubuntu Mono", monospace; color: var(--green); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; align-items: start; }
+  @media (max-width: 820px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ---- api section ---- */
+  .api-note { background: var(--surface-2); border: 1px solid var(--line); border-left: 3px solid var(--blue);
+    border-radius: 10px; padding: 14px 16px; font-size: 13.5px; color: var(--ink-2); margin-bottom: 26px; }
+  .api-note b { color: var(--ink); font-weight: 500; }
+  .ep-table td.ep { font-family: "Ubuntu Mono", monospace; font-size: 12.5px; color: var(--ink); word-break: break-all; }
+  .ep-table td .m { color: var(--green); font-weight: 500; }
+  .ep-table td .how { color: var(--ink-2); font-size: 13px; }
+
+  .api-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-top: 18px; overflow: hidden; }
+  .api-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 16px 20px;
+    border-bottom: 1px solid var(--line); background: var(--surface-2); }
+  .api-head .badge { font-family: "Ubuntu Mono", monospace; font-size: 11px; font-weight: 500; color: #fff;
+    background: var(--green); border-radius: 6px; padding: 3px 8px; letter-spacing: .04em; }
+  .api-head .url { font-family: "Ubuntu Mono", monospace; font-size: 12.5px; color: var(--ink); word-break: break-all; flex: 1; min-width: 200px; }
+  .api-head .who { font-size: 12px; color: var(--muted); }
+  .api-body { display: grid; grid-template-columns: 1fr 1fr; gap: 0; }
+  .api-body .pane { padding: 16px 20px; }
+  .api-body .pane + .pane { border-left: 1px solid var(--line); }
+  .pane .plabel { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+    font-weight: 500; margin-bottom: 8px; }
+  .pane pre { margin: 0; font-family: "Ubuntu Mono", monospace; font-size: 12px; line-height: 1.55;
+    color: var(--ink); background: transparent; overflow-x: auto; white-space: pre; }
+  .pane pre .k { color: var(--blue); }
+  .pane pre .s { color: var(--green); }
+  .pane pre .c { color: var(--muted); font-style: italic; }
+  .reads { padding: 12px 20px; border-top: 1px dashed var(--line-strong); font-size: 13px; color: var(--ink-2);
+    background: var(--surface-2); }
+  .reads b { color: var(--green); font-weight: 500; }
+  .auth-line { font-family: "Ubuntu Mono", monospace; font-size: 12px; color: var(--ink-2); }
+  @media (max-width: 760px) {
+    .api-body { grid-template-columns: 1fr; }
+    .api-body .pane + .pane { border-left: none; border-top: 1px solid var(--line); }
+  }
+
+  footer { border-top: 1px solid var(--line); padding: 40px 0 70px; margin-top: 30px; color: var(--muted); font-size: 13px; }
+  footer .links { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+  footer .links a { color: var(--ink-2); }
+  .callout { border-left: 3px solid var(--green-brand); padding: 4px 0 4px 18px; color: var(--ink-2);
+    font-size: 15px; margin: 22px 0; }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <span class="logo"><span class="dot"></span>AnswerEcho <small>· by Rigosis</small></span>
+    <nav>
+      <a href="#prepare">Questions</a>
+      <a href="#track">Tracking</a>
+      <a href="#results">Results</a>
+      <a href="#apis">APIs</a>
+      <button class="toggle" id="themeToggle" aria-label="Toggle theme">◐ Theme</button>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div class="eyebrow">How the platform works · end to end</div>
+    <h1>Measuring how <span class="hl">AI answers</span> talk about your brand.</h1>
+    <p class="lede">
+      AnswerEcho asks the AI engines people actually use — ChatGPT, Gemini, Perplexity,
+      Google AI Overviews, Claude — the questions your customers ask, then measures how
+      often they mention you, who they mention instead, and which sources they trust.
+      Every day, automatically. Here's the whole machine, no code required.
+    </p>
+    <div class="chips">
+      <span class="chip">Worked example: <b>Rigosis</b> — ITSM consulting, Turkey</span>
+      <span class="chip"><b>7</b> answer engines</span>
+      <span class="chip"><b>1</b> URL in → a daily scorecard out</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">→</span><h2>The big picture</h2></div>
+    <p class="sec-sub">Six stages turn a single website into a daily measurement. You do the first two once; the rest repeats on its own.</p>
+    <div class="pipe">
+      <div class="node"><span class="k">🌐</span><div class="t">Add a brand</div><div class="d">just a URL</div></div>
+      <div class="node"><span class="k">🔍</span><div class="t">AI researches it</div><div class="d">writes questions</div></div>
+      <div class="node"><span class="k">✅</span><div class="t">You pick prompts</div><div class="d">keep the best</div></div>
+      <div class="node"><span class="k">🔁</span><div class="t">Daily runs</div><div class="d">ask every engine</div></div>
+      <div class="node"><span class="k">🔎</span><div class="t">Read answers</div><div class="d">find mentions</div></div>
+      <div class="node"><span class="k">📊</span><div class="t">Dashboard</div><div class="d">visibility & gaps</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="prepare">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">01</span><h2>The AI prepares the questions</h2></div>
+    <p class="sec-sub">
+      You never write the prompts yourself. You give AnswerEcho a website; it reads the page,
+      searches the web to verify what the company does, and proposes the search-style questions
+      real people would type. For <b>rigosis.com</b> it came back with <b>20 suggestions</b>
+      about ITSM consulting and OpenText SMAX partnerships. You keep the ones that matter.
+    </p>
+
+    <div class="funnel">
+      <div class="stage"><div class="big">1</div><div class="lbl">website read<br>(rigosis.com)</div></div>
+      <div class="arrow">→</div>
+      <div class="stage"><div class="big">20</div><div class="lbl">questions the AI<br>suggested</div></div>
+      <div class="arrow">→</div>
+      <div class="stage accent"><div class="big">5</div><div class="lbl">you chose to<br>track daily</div></div>
+    </div>
+
+    <div class="split" title="The AI is told most questions must be unbranded">
+      <div class="seg unbr">Mostly UNBRANDED — “best ITSM consultants in Turkey”</div>
+      <div class="seg br">3–5 branded</div>
+    </div>
+    <p class="sec-sub" style="margin-top:14px">
+      The trick is the mix. Most questions deliberately <b>don't</b> contain your name —
+      because the real test is whether AI recommends you <em>unprompted</em> when someone asks
+      about your category. A few branded ones ("rigosis alternative") check what AI says when
+      asked about you directly.
+    </p>
+
+    <div class="cards" style="margin-top:8px">
+      <div class="card"><h3>Reads the real site</h3><p>It pulls the actual page text (rendering JavaScript when needed) so the questions fit the real business, not a guess from the domain name.</p></div>
+      <div class="card"><h3>Verifies with web search</h3><p>The research model is allowed to search the web and is told: never invent — return nothing when unsure. Accuracy over confidence.</p></div>
+      <div class="card"><h3>Finds competitors too</h3><p>The same pass proposes competitors. If it's unsure it stays silent — later, a separate step discovers them from the answers themselves.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="track">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">02</span><h2>Every day, it asks every engine</h2></div>
+    <p class="sec-sub">
+      Once tracking starts, each question fans out to every AI engine you've enabled — and asks
+      each one several times, because AI answers vary. One Rigosis question became <b>~35 evaluations</b>
+      a day (7 engines × 5 runs). Nothing waits on you.
+    </p>
+
+    <div class="fan">
+      <div class="src">
+        <div style="font-size:13px;color:var(--muted)">one tracked question</div>
+        <span class="q">opentext smax implementation partners turkey</span>
+      </div>
+      <div class="engines">
+        <div class="eng"><span class="tag s"></span>ChatGPT<span class="via">scraped</span></div>
+        <div class="eng"><span class="tag s"></span>Google AI Overviews<span class="via">scraped</span></div>
+        <div class="eng"><span class="tag s"></span>Google AI Mode<span class="via">scraped</span></div>
+        <div class="eng"><span class="tag s"></span>Gemini<span class="via">scraped</span></div>
+        <div class="eng"><span class="tag s"></span>Perplexity<span class="via">scraped</span></div>
+        <div class="eng"><span class="tag d"></span>Claude<span class="via">direct API</span></div>
+        <div class="eng"><span class="tag d"></span>GPT<span class="via">direct API</span></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--blue)"></i> <b>Scraped</b>&nbsp;— the real consumer answer page people see (via a scraping service)</span>
+      <span><i style="background:var(--orange)"></i> <b>Direct API</b>&nbsp;— the model's own API</span>
+    </div>
+
+    <div class="loopnote">
+      🔁 <div><b>It reschedules itself.</b> Each run books its own next run (default: every 24&nbsp;h). A background safety-check every 5&nbsp;minutes re-queues anything that fell behind — so tracking keeps going with no cron to babysit.</div>
+    </div>
+  </div>
+</section>
+
+<section id="detect">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">03</span><h2>How it decides "you were mentioned"</h2></div>
+    <p class="sec-sub">
+      No magic. AnswerEcho reads each answer as plain text and checks whether your name, a nickname,
+      or your domain appears anywhere in it — and does the same for every competitor. Simple and
+      robust, because AI writes prose, not tidy labels.
+    </p>
+    <div class="answer">
+      “For ITSM and OpenText SMAX projects in Turkey, established implementation partners include
+      <mark class="brand">Rigosis</mark>, which specializes in service management and observability,
+      alongside firms such as <mark class="comp">Konsalt</mark> and <mark class="comp">Kafein</mark>.
+      <mark class="brand">Rigosis</mark> is based in Istanbul…”
+    </div>
+    <div class="verdict">
+      <div><span class="yes">✓ Brand mentioned</span> — the text contains “rigosis”</div>
+      <div>Competitors found: <b>Konsalt</b>, <b>Kafein</b></div>
+    </div>
+    <p class="callout">
+      This is why a good brand name matters: matching is a plain text search. "Rigosis" is easy;
+      a generic word would be noisy.
+    </p>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">04</span><h2>What the dashboard shows</h2></div>
+    <p class="sec-sub">
+      From the stored answers, two headline numbers and a per-question breakdown. Numbers below are
+      from Rigosis's first real run — 5 prompts, 170 evaluations across 7 engines.
+    </p>
+
+    <div class="stats" style="margin-bottom:26px">
+      <div class="stat"><div class="num g">73%</div><div class="cap"><b>AI Visibility</b><br>how often answers named Rigosis</div></div>
+      <div class="stat"><div class="num">100%</div><div class="cap"><b>Share of Voice*</b><br>Rigosis's slice of brand mentions</div></div>
+      <div class="stat"><div class="num">1,221</div><div class="cap"><b>Citations</b><br>sources the engines relied on</div></div>
+      <div class="stat"><div class="num">170</div><div class="cap"><b>Evaluations</b><br>in a single daily cycle</div></div>
+    </div>
+
+    <figure class="figure">
+      <figcaption>AI Visibility by question — Rigosis, first run</figcaption>
+      <div class="fnote">Share of answers (across all engines) that mentioned the brand. Every value is labelled.</div>
+      <div class="bar-row" title="rigosis opentext partner — 100%">
+        <div class="name mono">rigosis opentext partner</div>
+        <div class="track"><div class="bar" style="width:100%"></div></div>
+        <div class="val">100%</div>
+      </div>
+      <div class="bar-row" title="rigosis itsm services — 95%">
+        <div class="name mono">rigosis itsm services</div>
+        <div class="track"><div class="bar" style="width:95%"></div></div>
+        <div class="val">95%</div>
+      </div>
+      <div class="bar-row" title="rigosis alternative — 91%">
+        <div class="name mono">rigosis alternative</div>
+        <div class="track"><div class="bar" style="width:91%"></div></div>
+        <div class="val">91%</div>
+      </div>
+      <div class="bar-row" title="opentext smax implementation partners turkey — 65%">
+        <div class="name mono">opentext smax implementation partners turkey</div>
+        <div class="track"><div class="bar" style="width:65%"></div></div>
+        <div class="val">65%</div>
+      </div>
+      <div class="bar-row" title="best it service management consultants in turkey — 0%, no brands found">
+        <div class="name mono">best it service management consultants in turkey</div>
+        <div class="track empty"></div>
+        <div class="val op">0%</div>
+      </div>
+      <p class="fnote" style="margin:16px 0 0">
+        <span class="flag">Opportunity</span> The generic category question returned <b>no brands at all</b> —
+        nobody owns that answer yet. That gap is exactly what the product exists to surface: be the first
+        to create the content AI will cite.
+      </p>
+    </figure>
+
+    <p style="font-size:13px;color:var(--muted);margin-top:14px">
+      * Share of Voice is 100% only because <em>zero competitors were configured</em> at first — a field of one.
+      It becomes the real KPI once competitors are added.
+    </p>
+  </div>
+</section>
+
+<section id="act">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">05</span><h2>Turn results into a work list</h2></div>
+    <p class="sec-sub">The first run isn't a report card — it's a to-do list. Two features close the loop.</p>
+    <div class="grid2">
+      <div class="card">
+        <span class="step-badge">◎</span>
+        <h3>Discover competitors from answers</h3>
+        <p>AnswerEcho re-reads the stored answers and suggests every rival the engines named — each with
+        a quote as evidence. On the Rigosis data it surfaced <b>15 candidates</b> including Konsalt (28 runs)
+        and Kafein (9) that a manual read had missed. Five were configured, so the next run produced an
+        honest Share of Voice.</p>
+      </div>
+      <div class="card">
+        <span class="step-badge">↗</span>
+        <h3>Opportunities</h3>
+        <p>A prioritized, auto-refreshing version of the work list: which questions you're losing, which
+        sources to get cited on, where the quick wins are. Then the loop runs: act → the daily runs
+        re-measure → watch the trend lines move.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cost">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">06</span><h2>What it costs to run</h2></div>
+    <p class="sec-sub">Measured from the Rigosis run — 5 prompts, one full daily cycle across 7 engines. Cost is mostly the engine calls; infrastructure was free-tier.</p>
+    <div class="grid2">
+      <figure class="figure">
+        <figcaption>Cost of one daily cycle</figcaption>
+        <div class="fnote">≈ $1.40 total · scales linearly with prompts × engines.</div>
+        <div class="bar-row" title="DataForSEO scraping (125 calls) — $0.58">
+          <div class="name">Scraping 5 engines</div>
+          <div class="track"><div class="bar" style="width:100%"></div></div>
+          <div class="val">$0.58</div>
+        </div>
+        <div class="bar-row" title="Claude via Anthropic (25 runs) — $0.50">
+          <div class="name">Claude (direct)</div>
+          <div class="track"><div class="bar" style="width:86%"></div></div>
+          <div class="val">$0.50</div>
+        </div>
+        <div class="bar-row" title="GPT via OpenAI (25 runs) — $0.25">
+          <div class="name">GPT (direct)</div>
+          <div class="track"><div class="bar" style="width:43%"></div></div>
+          <div class="val">$0.25</div>
+        </div>
+      </figure>
+      <div class="card">
+        <h3>Rule of thumb</h3>
+        <p style="margin-bottom:12px">≈ <b>$0.28 per prompt per day</b> with all 7 engines at 5 runs each →
+        about <b>$8.50 / prompt / month</b> at daily cadence.</p>
+        <p style="margin-bottom:12px">20 prompts ≈ $170/month; dropping to the 5 scraped engines only ≈ $3.50 / prompt / month.</p>
+        <p>Every single call is logged for exact cost attribution, and a daily spend ceiling stops runaways automatically.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="modes">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">07</span><h2>How it's deployed</h2></div>
+    <p class="sec-sub">One codebase, four modes. The Rigosis demo runs in <span class="mono" style="color:var(--green)">demo</span> (read-only showcase).</p>
+    <div class="card" style="padding:6px 22px">
+      <table class="table">
+        <thead><tr><th>Mode</th><th>Sign-up</th><th>Billing</th><th>Best for</th></tr></thead>
+        <tbody>
+          <tr><td class="mode">local</td><td>one owner</td><td>off</td><td>self-hosting it yourself</td></tr>
+          <tr><td class="mode">demo</td><td>—</td><td>off</td><td>a read-only showcase (this Rigosis demo)</td></tr>
+          <tr><td class="mode">whitelabel</td><td>—</td><td>off</td><td>embedding it inside a partner product</td></tr>
+          <tr><td class="mode">cloud</td><td>self-serve</td><td>Stripe</td><td>the hosted SaaS with teams & plans</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="callout" style="margin-top:24px">
+      Under the hood: a dashboard app and a background worker share one PostgreSQL database — the app
+      drops jobs on a queue, the worker picks them up and calls the engines. Neither ever calls the
+      other directly. See the two architecture diagrams below for the full topology.
+    </p>
+  </div>
+</section>
+
+<section id="apis">
+  <div class="wrap">
+    <div class="sec-head"><span class="sec-num">08</span><h2>Under the hood — the real API calls</h2></div>
+    <p class="sec-sub">
+      For engineers: the exact endpoints AnswerEcho calls for each engine, with the request it sends for a
+      Rigosis prompt. Location code <b>2792 = Turkey</b> (the Rigosis market); language <code>tr</code>.
+    </p>
+    <div class="api-note">
+      <b>How to read these.</b> The endpoints and request bodies are exactly what the app sends (built in the
+      provider code). Response bodies are <b>trimmed to the fields AnswerEcho actually reads</b> — real responses
+      are much larger. These are representative of the Rigosis run, not literal captured wire logs (the demo
+      keeps no request logs).
+    </div>
+
+    <div class="card" style="padding:6px 22px">
+      <table class="table ep-table">
+        <thead><tr><th>Engine</th><th>How it's reached</th><th>Method &amp; endpoint</th></tr></thead>
+        <tbody>
+          <tr><td>ChatGPT</td><td class="how">DataForSEO · LLM Scraper</td><td class="ep"><span class="m">POST</span> api.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/live/advanced</td></tr>
+          <tr><td>Google AI Overviews</td><td class="how">DataForSEO · Organic SERP</td><td class="ep"><span class="m">POST</span> api.dataforseo.com/v3/serp/google/organic/live/advanced</td></tr>
+          <tr><td>Google AI Mode</td><td class="how">DataForSEO · SERP</td><td class="ep"><span class="m">POST</span> api.dataforseo.com/v3/serp/google/ai_mode/live/advanced</td></tr>
+          <tr><td>Gemini</td><td class="how">DataForSEO · LLM Scraper</td><td class="ep"><span class="m">POST</span> api.dataforseo.com/v3/ai_optimization/gemini/llm_scraper/live/advanced</td></tr>
+          <tr><td>Perplexity</td><td class="how">DataForSEO · LLM Responses</td><td class="ep"><span class="m">POST</span> api.dataforseo.com/v3/ai_optimization/perplexity/llm_responses/live</td></tr>
+          <tr><td>Claude</td><td class="how">Anthropic · direct API</td><td class="ep"><span class="m">POST</span> api.anthropic.com/v1/messages</td></tr>
+          <tr><td>GPT</td><td class="how">OpenAI · direct API</td><td class="ep"><span class="m">POST</span> api.openai.com/v1/responses</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 1. DataForSEO AI Overview -->
+    <div class="api-card">
+      <div class="api-head">
+        <span class="badge">POST</span>
+        <span class="url">https://api.dataforseo.com/v3/serp/google/organic/live/advanced</span>
+        <span class="who">Google AI Overviews · DataForSEO</span>
+      </div>
+      <div style="padding:10px 20px;border-bottom:1px solid var(--line)"><span class="auth-line">Authorization: Basic base64(DATAFORSEO_LOGIN:DATAFORSEO_PASSWORD)</span></div>
+      <div class="api-body">
+        <div class="pane">
+          <div class="plabel">Request body</div>
+<pre>[
+  {
+    "keyword": "opentext smax implementation partners turkey",
+    "location_code": 2792,        <span class="c">// Turkey</span>
+    "language_code": "tr",
+    "depth": 10,
+    "load_async_ai_overview": true <span class="c">// generate the AIO on demand</span>
+  }
+]</pre>
+        </div>
+        <div class="pane">
+          <div class="plabel">Response (trimmed)</div>
+<pre>{
+  "status_code": 20000,
+  "tasks": [{ "result": [{
+    "items": [{
+      "type": "ai_overview",
+      "markdown": "OpenText SMAX implementation
+        partners in Turkey include Rigosis,
+        Konsalt and Kafein…",
+      "references": [
+        { "url": "https://www.rigosis.com/…",
+          "title": "OpenText SMAX — Rigosis",
+          "domain": "rigosis.com" }
+      ]
+    }]
+  }]}]
+}</pre>
+        </div>
+      </div>
+      <div class="reads">AnswerEcho reads <code>items[].markdown</code> as the answer → it contains “rigosis” ⇒ <b>brand mentioned</b>. Each <code>references[]</code> entry becomes a citation row.</div>
+    </div>
+
+    <!-- 2. DataForSEO ChatGPT scraper -->
+    <div class="api-card">
+      <div class="api-head">
+        <span class="badge">POST</span>
+        <span class="url">https://api.dataforseo.com/v3/ai_optimization/chat_gpt/llm_scraper/live/advanced</span>
+        <span class="who">ChatGPT · DataForSEO LLM Scraper (drives real chatgpt.com)</span>
+      </div>
+      <div style="padding:10px 20px;border-bottom:1px solid var(--line)"><span class="auth-line">Authorization: Basic base64(DATAFORSEO_LOGIN:DATAFORSEO_PASSWORD)</span></div>
+      <div class="api-body">
+        <div class="pane">
+          <div class="plabel">Request body</div>
+<pre>[
+  {
+    "keyword": "opentext smax implementation partners turkey",
+    "location_code": 2792,
+    "language_code": "tr",
+    "force_web_search": true  <span class="c">// always browse, like a real user</span>
+  }
+]</pre>
+        </div>
+        <div class="pane">
+          <div class="plabel">Response (trimmed)</div>
+<pre>{
+  "tasks": [{ "result": [{
+    "model": "gpt-5.5",
+    "markdown": "Firms implementing OpenText SMAX
+      in Turkey include Rigosis (Istanbul),
+      Konsalt and Kafein…",
+    "fan_out_queries": [
+      "opentext smax partners turkey",
+      "itsm consulting istanbul" ],
+    "sources": [
+      { "url": "https://www.rigosis.com/",
+        "title": "Rigosis", "domain": "rigosis.com" }
+    ]
+  }]}]
+}</pre>
+        </div>
+      </div>
+      <div class="reads">Answer = <code>result.markdown</code> · the <b>Query Fan-Out</b> page is built from <code>fan_out_queries</code> · citations from <code>sources[]</code>.</div>
+    </div>
+
+    <!-- 3. Perplexity LLM Responses -->
+    <div class="api-card">
+      <div class="api-head">
+        <span class="badge">POST</span>
+        <span class="url">https://api.dataforseo.com/v3/ai_optimization/perplexity/llm_responses/live</span>
+        <span class="who">Perplexity · DataForSEO LLM Responses</span>
+      </div>
+      <div class="api-body">
+        <div class="pane">
+          <div class="plabel">Request body</div>
+<pre>[
+  {
+    "user_prompt": "opentext smax implementation partners turkey",
+    "model_name": "sonar",
+    "web_search": true
+  }
+]</pre>
+        </div>
+        <div class="pane">
+          <div class="plabel">Response (trimmed)</div>
+<pre>{
+  "tasks": [{ "result": [{
+    "model_name": "sonar",
+    "items": [{
+      "type": "message",
+      "sections": [{
+        "type": "text",
+        "text": "In Turkey, OpenText SMAX is
+          implemented by Rigosis, Konsalt and Kafein.",
+        "annotations": [
+          { "url": "https://www.rigosis.com/",
+            "title": "Rigosis" } ]
+      }]
+    }]
+  }]}]
+}</pre>
+        </div>
+      </div>
+      <div class="reads">Answer text is joined from <code>items[].sections[].text</code> (reasoning blocks skipped); citations from the section <code>annotations</code>.</div>
+    </div>
+
+    <!-- 4. Anthropic Claude -->
+    <div class="api-card">
+      <div class="api-head">
+        <span class="badge">POST</span>
+        <span class="url">https://api.anthropic.com/v1/messages</span>
+        <span class="who">Claude · Anthropic Messages API (direct)</span>
+      </div>
+      <div style="padding:10px 20px;border-bottom:1px solid var(--line)"><span class="auth-line">x-api-key: $ANTHROPIC_API_KEY&nbsp;&nbsp;·&nbsp;&nbsp;anthropic-version: 2023-06-01</span></div>
+      <div class="api-body">
+        <div class="pane">
+          <div class="plabel">Request body</div>
+<pre>{
+  "model": "claude-sonnet-5",
+  "max_tokens": 2048,
+  "messages": [
+    { "role": "user",
+      "content": "opentext smax implementation partners turkey" }
+  ],
+  "tools": [
+    { "type": "web_search_20250305",
+      "name": "web_search", "max_uses": 5 }
+  ]
+}</pre>
+        </div>
+        <div class="pane">
+          <div class="plabel">Response (trimmed)</div>
+<pre>{
+  "content": [
+    { "type": "server_tool_use", "name": "web_search",
+      "input": { "query": "OpenText SMAX partners Turkey" } },
+    { "type": "web_search_tool_result",
+      "content": [ { "url": "https://www.rigosis.com/",
+        "title": "Rigosis" } ] },
+    { "type": "text",
+      "text": "OpenText SMAX partners in Turkey include
+        Rigosis, Konsalt and Kafein." }
+  ],
+  "stop_reason": "end_turn"
+}</pre>
+        </div>
+      </div>
+      <div class="reads">Answer = the <code>text</code> blocks · web query = <code>server_tool_use.input.query</code> · citations = <code>web_search_tool_result</code> (page text is stripped before storing).</div>
+    </div>
+
+    <!-- 5. OpenAI GPT -->
+    <div class="api-card">
+      <div class="api-head">
+        <span class="badge">POST</span>
+        <span class="url">https://api.openai.com/v1/responses</span>
+        <span class="who">GPT · OpenAI Responses API (direct)</span>
+      </div>
+      <div style="padding:10px 20px;border-bottom:1px solid var(--line)"><span class="auth-line">Authorization: Bearer $OPENAI_API_KEY&nbsp;&nbsp;·&nbsp;&nbsp;built via the Vercel AI SDK</span></div>
+      <div class="api-body">
+        <div class="pane">
+          <div class="plabel">Request body</div>
+<pre>{
+  "model": "gpt-5-mini",
+  "input": "opentext smax implementation partners turkey",
+  "tools": [ { "type": "web_search" } ],
+  "tool_choice": "auto",
+  "max_output_tokens": 2048
+}</pre>
+        </div>
+        <div class="pane">
+          <div class="plabel">Response (trimmed)</div>
+<pre>{
+  "output": [
+    { "type": "message", "content": [
+      { "type": "output_text",
+        "text": "Partners implementing OpenText SMAX
+          in Turkey include Rigosis, Konsalt and Kafein.",
+        "annotations": [
+          { "type": "url_citation",
+            "url": "https://www.rigosis.com/",
+            "title": "Rigosis" } ]
+      }
+    ]}
+  ]
+}</pre>
+        </div>
+      </div>
+      <div class="reads">Answer = <code>output[].content[].output_text.text</code> · citations = the <code>url_citation</code> annotations.</div>
+    </div>
+
+    <p class="sec-sub" style="margin-top:22px">
+      Every one of these calls also writes a <code>usage_events</code> row (provider, model, estimated cost) — that's
+      how the ≈$1.40/day figure is tracked. Credentials for all providers resolve from an encrypted
+      <code>secrets</code> table first, then environment variables.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="links">
+      <a href="system-architecture.html">▸ System architecture diagram</a>
+      <a href="prompt-evaluation.html">▸ Prompt-evaluation sequence diagram</a>
+      <a href="end-to-end-with-rigosis.md">▸ Full technical write-up (with file references)</a>
+    </div>
+    A plain-language explainer of AnswerEcho by Rigosis. Numbers from the demo run captured 2026-09-17.
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeToggle');
+    var root = document.documentElement;
+    btn.addEventListener('click', function () {
+      var cur = root.getAttribute('data-theme');
+      var next = cur === 'dark' ? 'light'
+        : cur === 'light' ? 'dark'
+        : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'light' : 'dark');
+      root.setAttribute('data-theme', next);
+    });
+  })();
+</script>

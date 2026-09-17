@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "AnswerEcho — Prompt Evaluation & Citation Tracking",
+    "output": "prompt-evaluation.html",
+    "viewBox": [1060, 900],
+    "column_fit": "spread",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "dispatch", "label": "Dispatch", "focus": ["maint", "queue", "worker"], "note": "A due prompt becomes a single process-prompt job." },
+      { "id": "fan-out", "label": "Fan-out to engines", "focus": ["worker", "providers", "engine"], "note": "One prompt is run across many model+provider targets." },
+      { "id": "persist", "label": "Extract & store", "focus": ["worker", "db"], "note": "Mentions and citations are parsed and written, then the run reschedules itself." }
+    ]
+  },
+  "participants": [
+    { "id": "maint", "type": "backend", "label": "Scheduler", "sublabel": "schedule-maintenance cron" },
+    { "id": "queue", "type": "messagebus", "label": "pg-boss", "sublabel": "process-prompt" },
+    { "id": "worker", "type": "backend", "label": "Worker", "sublabel": "processPrompt()" },
+    { "id": "providers", "type": "backend", "label": "Provider Registry", "sublabel": "getProvider().run()" },
+    { "id": "engine", "type": "external", "label": "Answer Engine", "sublabel": "via scraper or API" },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Drizzle" }
+  ],
+  "segments": [
+    { "from": 150, "to": 250, "label": "Dispatch" },
+    { "from": 268, "to": 520, "label": "Fan-out to answer engines" },
+    { "from": 538, "to": 760, "label": "Extract · store · reschedule" }
+  ],
+  "messages": [
+    { "from": "maint", "to": "queue", "y": 180, "label": "queue due prompts · every 5 min", "variant": "emphasis" },
+    { "from": "queue", "to": "worker", "y": 224, "label": "deliver process-prompt {promptId}", "variant": "emphasis" },
+    { "from": "worker", "to": "db", "y": 288, "label": "load prompt · brand · competitors", "variant": "default" },
+    { "from": "db", "to": "worker", "y": 332, "label": "context + last run per target", "variant": "return", "note": "resolvePlanForPrompt → due targets; skip if org is over its daily ceiling" },
+    { "from": "worker", "to": "providers", "y": 396, "label": "run(model, prompt, {webSearch})", "variant": "emphasis", "note": "fan-out per target × replication, gathered with Promise.allSettled" },
+    { "from": "providers", "to": "engine", "y": 440, "label": "scrape surface / call model API", "variant": "default" },
+    { "from": "engine", "to": "providers", "y": 484, "label": "answer text + citations + web queries", "variant": "return" },
+    { "from": "providers", "to": "worker", "y": 528, "label": "ScrapeResult", "variant": "return" },
+    { "from": "worker", "to": "db", "y": 592, "label": "save prompt_run (brand & competitor mentions)", "variant": "emphasis", "note": "analyzeMentions(): match brand and competitor names/aliases in the answer text" },
+    { "from": "worker", "to": "db", "y": 636, "label": "save citations (url · domain · title)", "variant": "default" },
+    { "from": "worker", "to": "db", "y": 680, "label": "record usage_event (estimated cost)", "variant": "dashed" },
+    { "from": "worker", "to": "queue", "y": 736, "label": "reschedule next run @ cadence", "variant": "dashed" }
+  ],
+  "activations": [
+    { "participant": "queue", "from": 174, "to": 230, "type": "messagebus" },
+    { "participant": "worker", "from": 218, "to": 748, "type": "backend" },
+    { "participant": "db", "from": 282, "to": 338, "type": "database" },
+    { "participant": "providers", "from": 390, "to": 534, "type": "backend" },
+    { "participant": "engine", "from": 434, "to": 490, "type": "external" },
+    { "participant": "db", "from": 586, "to": 686, "type": "database" },
+    { "participant": "queue", "from": 730, "to": 748, "type": "messagebus" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Self-driving schedule", "items": ["Each run queues its own next run — process-prompt is not cron", "schedule-maintenance re-seeds anything overdue every 5 min", "retryLimit 0 so a paid fan-out is never re-run wholesale"] },
+    { "dot": "orange", "title": "Fan-out", "items": ["One prompt → many targets (model × provider × replication)", "Scraped consumer surfaces or direct model APIs", "Promise.allSettled isolates a single provider failure"] },
+    { "dot": "emerald", "title": "What gets stored", "items": ["prompt_runs with brand & competitor mention flags", "citations (url, domain, title, index)", "usage_events capture per-call cost for billing"] }
+  ]
+}

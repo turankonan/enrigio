@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "AnswerEcho — System Architecture",
+    "output": "system-architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      { "id": "product-surface", "label": "Product surface", "focus": ["users", "auth", "web", "db"], "note": "How the dashboard and public API read and write tenant data." },
+      { "id": "evaluation-engine", "label": "Evaluation engine", "focus": ["web", "queue", "worker", "db"], "note": "The web app enqueues jobs; the worker drains them and writes results." },
+      { "id": "answer-engine-coverage", "label": "Answer-engine coverage", "focus": ["worker", "engines", "modelapis"], "note": "Every tracked query reaches a real AI answer engine, scraped or via API." }
+    ]
+  },
+  "components": [
+    { "id": "users", "type": "external", "label": "Dashboard & Clients", "sublabel": "Browser · REST · MCP", "pos": [40, 90], "size": [160, 60] },
+    { "id": "auth", "type": "security", "label": "better-auth", "sublabel": "orgs · API keys · OAuth", "pos": [40, 300], "size": [150, 60] },
+    { "id": "billing", "type": "external", "label": "Stripe · Auth0", "sublabel": "billing · SSO", "pos": [40, 500], "size": [150, 60] },
+    { "id": "web", "type": "frontend", "label": "AnswerEcho Web", "sublabel": "TanStack Start :3000", "tag": "server fns + REST + MCP", "pos": [235, 300], "size": [150, 60] },
+    { "id": "queue", "type": "messagebus", "label": "pg-boss Queues", "sublabel": "process-prompt · reports", "pos": [430, 150], "size": [160, 60] },
+    { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Drizzle · RLS", "pos": [430, 470], "size": [160, 60] },
+    { "id": "worker", "type": "backend", "label": "Worker", "sublabel": "pg-boss consumer + cron", "tag": "Provider Registry", "pos": [640, 300], "size": [155, 60] },
+    { "id": "engines", "type": "external", "label": "AI Answer Engines", "sublabel": "scraped surfaces", "pos": [850, 150], "size": [165, 60] },
+    { "id": "modelapis", "type": "external", "label": "Model APIs", "sublabel": "direct calls", "pos": [850, 470], "size": [165, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "One PostgreSQL instance (app tables + pgboss schema)", "wraps": ["queue", "db"] },
+    { "kind": "region", "label": "External answer engines & model APIs", "wraps": ["engines", "modelapis"] }
+  ],
+  "connections": [
+    { "id": "users-web", "from": "users", "to": "web", "label": "HTTPS", "variant": "emphasis", "fromSide": "right", "toSide": "top" },
+    { "id": "auth-web", "from": "auth", "to": "web", "label": "session / API key", "variant": "security", "fromSide": "right", "toSide": "left", "labelDy": 54 },
+    { "id": "billing-web", "from": "billing", "to": "web", "label": "subscriptions · SSO", "variant": "dashed", "fromSide": "right", "toSide": "bottom" },
+    { "id": "web-db", "from": "web", "to": "db", "label": "Drizzle read/write" },
+    { "id": "web-queue", "from": "web", "to": "queue", "label": "enqueue jobs", "variant": "dashed" },
+    { "id": "queue-worker", "from": "queue", "to": "worker", "label": "deliver", "variant": "emphasis" },
+    { "id": "worker-db", "from": "worker", "to": "db", "label": "write runs · citations · usage" },
+    { "id": "worker-engines", "from": "worker", "to": "engines", "label": "scraped via DataForSEO", "fromSide": "right", "toSide": "left" },
+    { "id": "worker-modelapis", "from": "worker", "to": "modelapis", "label": "direct API", "fromSide": "right", "toSide": "left" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Product surface", "items": ["TanStack Start dashboard on :3000", "Reads via server functions + React Query", "Public REST v1, MCP, and OAuth endpoints"] },
+    { "dot": "emerald", "title": "Evaluation engine", "items": ["Web enqueues pg-boss jobs; worker consumes", "Provider Registry routes each call to a model + provider", "Per-prompt runs reschedule themselves on a cadence"] },
+    { "dot": "violet", "title": "Answer-engine coverage", "items": ["Scraped surfaces: ChatGPT, Gemini, Perplexity, Google AI Overviews", "Direct model APIs: OpenAI, Anthropic, Mistral, OpenRouter", "Reached via DataForSEO, Olostep, Bright Data and Oxylabs"] },
+    { "dot": "rose", "title": "Data & tenancy", "items": ["One Postgres holds app tables and the pgboss queue schema", "Drizzle with row-level security", "org → brand → prompt → run → citation; usage_events for billing"] }
+  ]
+}
