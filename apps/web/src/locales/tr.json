@@ -1053,5 +1053,6 @@
 	"sidebar.sidebar": "Kenar Çubuğu",
 	"sidebar.mobile-description": "Mobil kenar çubuğunu gösterir.",
 	"sidebar.toggle-sidebar": "Kenar Çubuğunu Aç/Kapat",
-	"spinner.loading": "Yükleniyor"
+	"spinner.loading": "Yükleniyor",
+	"organizations.create-first-brand": "İlk markanızı oluşturun"
 }

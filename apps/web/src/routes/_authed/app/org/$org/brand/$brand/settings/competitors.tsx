@@ -11,14 +11,15 @@ import { UnsavedChangesBar } from "@/components/unsaved-changes-bar";
 import { useBrand, useCompetitors } from "@/hooks/use-brands";
 import { citationKeys } from "@/hooks/use-citations";
 import { dashboardKeys } from "@/hooks/use-dashboard-summary";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { updateCompetitors } from "@/server/brands";
 import { discoverCompetitors } from "@/server/competitor-discovery";
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/settings/competitors")({
-	staticData: { crumb: "Competitors" },
-	head: pageHead({ description: "Manage your tracked competitors." }),
+	staticData: { crumb: t("settings.competitors.crumb") },
+	head: pageHead({ description: t("settings.competitors.head_description") }),
 	component: CompetitorsSettingsPage,
 });
 
@@ -70,10 +71,8 @@ function DiscoveryPanel({
 		<div className="space-y-3 rounded-lg border p-4">
 			<div className="flex flex-wrap items-center justify-between gap-2">
 				<div>
-					<h2 className="text-sm font-semibold">Discover from answers</h2>
-					<p className="text-muted-foreground text-sm">
-						Scan the AI answers already collected for this brand and suggest the competitors they mention.
-					</p>
+					<h2 className="text-sm font-semibold">{t("settings.competitors.discover_title")}</h2>
+					<p className="text-muted-foreground text-sm">{t("settings.competitors.discover_description")}</p>
 				</div>
 				<Button variant="outline" size="sm" onClick={discover} disabled={loading || disabled}>
 					<Sparkles className="size-4" />
@@ -100,7 +99,7 @@ function DiscoveryPanel({
 								{s.evidence && <p className="text-muted-foreground truncate text-xs">“{s.evidence}”</p>}
 							</div>
 							<Button variant="ghost" size="sm" onClick={() => onAdd(s)} disabled={disabled}>
-								Add
+								{t("settings.competitors.add")}
 							</Button>
 						</li>
 					))}
@@ -154,8 +153,8 @@ function CompetitorsSettingsPage() {
 	if (isLoading || competitorsLoading) {
 		return (
 			<div className="space-y-6">
-				<h1 className="text-3xl font-bold">Competitors</h1>
-				<p className="text-muted-foreground">Loading...</p>
+				<h1 className="text-3xl font-bold">{t("settings.competitors.crumb")}</h1>
+				<p className="text-muted-foreground">{t("settings.brand.loading")}</p>
 			</div>
 		);
 	}
@@ -163,8 +162,8 @@ function CompetitorsSettingsPage() {
 	if (!brand) {
 		return (
 			<div className="space-y-6">
-				<h1 className="text-3xl font-bold">Competitors</h1>
-				<p className="text-destructive">Brand not found</p>
+				<h1 className="text-3xl font-bold">{t("settings.competitors.crumb")}</h1>
+				<p className="text-destructive">{t("settings.brand.not_found")}</p>
 			</div>
 		);
 	}
@@ -188,13 +187,13 @@ function CompetitorsSettingsPage() {
 	return (
 		<div className="max-w-2xl space-y-6">
 			<div>
-				<h1 className="text-3xl font-bold">Competitors</h1>
-				<p className="text-muted-foreground">Manage your competitive landscape for reputation tracking.</p>
+				<h1 className="text-3xl font-bold">{t("settings.competitors.crumb")}</h1>
+				<p className="text-muted-foreground">{t("settings.competitors.subtitle")}</p>
 			</div>
 
 			<Alert variant="default" className="border-yellow-200 bg-yellow-50 text-yellow-800">
 				<AlertTriangle className="h-4 w-4 text-yellow-600" />
-				<AlertTitle>Warning</AlertTitle>
+				<AlertTitle>{t("settings.competitors.warning_title")}</AlertTitle>
 				<AlertDescription className="text-yellow-700">
 					Updating competitors will only apply to future prompt evaluations. Citation categorization updates
 					retroactively.

@@ -12,11 +12,12 @@ import { dashboardKeys } from "@/hooks/use-dashboard-summary";
 import { useListFilters } from "@/hooks/use-list-filters";
 import { useBrandParams } from "@/hooks/use-route-params";
 import { getDaysFromLookback } from "@/lib/chart-utils";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/citations")({
-	staticData: { crumb: "Citations" },
-	head: pageHead({ description: "See which sources LLMs cite in responses to your prompts." }),
+	staticData: { crumb: t("citations.crumb") },
+	head: pageHead({ description: t("citations.head_description") }),
 	component: CitationsPage,
 });
 
@@ -52,7 +53,7 @@ function CitationsPage() {
 			<p>
 				<strong>Competitor</strong> domains are only those you&apos;ve added to your{" "}
 				<Link to="/app/org/$org/brand/$brand/settings/competitors" params={brandParams} className="underline">
-					tracked competitors list
+					{t("top-urls-card.tracked-competitors-link")}
 				</Link>
 				. Other domains appear under their detected category (Google, Social Media, Institutional, or Other).
 			</p>
@@ -62,11 +63,7 @@ function CitationsPage() {
 	const showFullSkeleton = isLoading && !citationData;
 
 	return (
-		<PageHeader
-			title="Citations"
-			subtitle="See which sources LLMs cite when responding to your prompts."
-			infoContent={infoContent}
-		>
+		<PageHeader title={t("citations.crumb")} subtitle={t("citations.subtitle")} infoContent={infoContent}>
 			<FilteredListShell
 				filters={filters}
 				availableTags={citationData?.availableTags || []}
@@ -91,9 +88,7 @@ function CitationsPage() {
 				errorState={
 					<Card>
 						<CardContent className="pt-6">
-							<div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
-								Failed to load citation data. Please try again.
-							</div>
+							<div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">{t("citations.load_error")}</div>
 						</CardContent>
 					</Card>
 				}
@@ -103,9 +98,7 @@ function CitationsPage() {
 				emptyState={
 					<Card>
 						<CardContent className="pt-6">
-							<div className="text-muted-foreground text-center py-8">
-								No citations found. Citations are only available from prompts evaluated with web search enabled.
-							</div>
+							<div className="text-muted-foreground text-center py-8">{t("citations.empty")}</div>
 						</CardContent>
 					</Card>
 				}

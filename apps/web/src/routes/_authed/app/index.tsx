@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import FullPageCard from "@/components/full-page-card";
 import { OrganizationDirectory } from "@/components/organization-directory";
+import { t } from "@/lib/i18n";
 import { invalidateOrganizations, organizationsQuery } from "@/lib/organizations/queries";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 import { pageHead } from "@/lib/route-head";
@@ -29,7 +30,7 @@ export const Route = createFileRoute("/_authed/app/")({
 		}
 		return (await context.queryClient.ensureQueryData(organizationsQuery)).organizations;
 	},
-	head: pageHead({ title: "Organizations and Brands", description: "Modify organizations or navigate to brands." }),
+	head: pageHead({ title: t("organizations.title"), description: t("organizations.subtitle") }),
 	component: OrganizationPickerPage,
 });
 
@@ -38,14 +39,14 @@ function OrganizationPickerPage() {
 
 	if (organizations.length === 0) {
 		return (
-			<FullPageCard title="No organizations" subtitle="Your account isn't a member of an organization yet.">
-				<p className="text-center text-muted-foreground">Ask an admin to invite you, then reload this page.</p>
+			<FullPageCard title={t("organizations.empty_title")} subtitle={t("organizations.empty_subtitle")}>
+				<p className="text-center text-muted-foreground">{t("organizations.empty_hint")}</p>
 			</FullPageCard>
 		);
 	}
 
 	return (
-		<FullPageCard title="Organizations and Brands" subtitle="Modify organizations or navigate to brands.">
+		<FullPageCard title={t("organizations.title")} subtitle={t("organizations.subtitle")}>
 			<OrganizationDirectory organizations={organizations} />
 		</FullPageCard>
 	);

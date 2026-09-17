@@ -6,6 +6,7 @@
  */
 import { useState } from "react";
 import { BrandPromptLink } from "@/components/brand-prompt-link";
+import { t } from "@/lib/i18n";
 import type { CitedPage, OpportunitiesReport as OpportunitiesReportData, ReportPrompt } from "@/server/opportunities";
 
 const CATEGORY_META = [
@@ -104,7 +105,7 @@ function OpportunityCard({ o }: { o: Opportunity }) {
 				{open === "prompts" && (
 					<Panel>
 						{o.relatedPrompts.length === 0 ? (
-							<p className="px-1.5 py-1 text-xs text-muted-foreground">No specific prompts linked.</p>
+							<p className="px-1.5 py-1 text-xs text-muted-foreground">{t("opportunities-report.no-prompts-linked")}</p>
 						) : (
 							o.relatedPrompts.map((p) => <PromptLink key={p.text} prompt={p} />)
 						)}
@@ -113,7 +114,7 @@ function OpportunityCard({ o }: { o: Opportunity }) {
 				{open === "your" && (
 					<Panel>
 						{o.yourCitations.length === 0 ? (
-							<p className="px-1.5 py-1 text-xs text-muted-foreground">You're not cited for these prompts yet.</p>
+							<p className="px-1.5 py-1 text-xs text-muted-foreground">{t("opportunities-report.not-cited-yet")}</p>
 						) : (
 							o.yourCitations.map((c) => <CiteLink key={c.url} page={c} />)
 						)}
@@ -122,7 +123,9 @@ function OpportunityCard({ o }: { o: Opportunity }) {
 				{open === "comp" && (
 					<Panel>
 						{o.competitorCitations.length === 0 ? (
-							<p className="px-1.5 py-1 text-xs text-muted-foreground">No competitor pages cited for these prompts.</p>
+							<p className="px-1.5 py-1 text-xs text-muted-foreground">
+								{t("opportunities-report.no-competitor-pages")}
+							</p>
 						) : (
 							o.competitorCitations.map((c) => <CiteLink key={c.url} page={c} />)
 						)}
@@ -138,7 +141,7 @@ export function OpportunitiesReport({ report }: { report: OpportunitiesReportDat
 		<div className="space-y-8">
 			{report.summary.length > 0 && (
 				<section className="rounded-xl border border-border bg-muted/30 p-5">
-					<h2 className="text-sm font-semibold text-muted-foreground">Summary</h2>
+					<h2 className="text-sm font-semibold text-muted-foreground">{t("opportunities-report.summary")}</h2>
 					<div className="mt-2.5">
 						<BulletList items={report.summary} />
 					</div>
@@ -167,7 +170,7 @@ export function OpportunitiesReport({ report }: { report: OpportunitiesReportDat
 
 			{report.risks.length > 0 && (
 				<section className="space-y-3">
-					<h2 className="text-base font-semibold">Reality Check</h2>
+					<h2 className="text-base font-semibold">{t("opportunities-report.reality-check")}</h2>
 					<BulletList items={report.risks} />
 				</section>
 			)}

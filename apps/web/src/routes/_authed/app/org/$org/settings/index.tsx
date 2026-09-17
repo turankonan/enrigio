@@ -6,12 +6,16 @@ import { Label } from "@workspace/ui/components/label";
 import { useState } from "react";
 import { SlugField } from "@/components/slug-field";
 import { useOrganization, useOrganizationsChanged } from "@/hooks/use-organizations";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { updateOrganizationFn } from "@/server/organizations";
 
 export const Route = createFileRoute("/_authed/app/org/$org/settings/")({
-	head: pageHead({ title: "Organization", description: "The organization's name and URL." }),
+	head: pageHead({
+		title: t("settings.organization.head_title"),
+		description: t("settings.organization.head_description"),
+	}),
 	component: OrganizationSettingsPage,
 });
 
@@ -56,11 +60,11 @@ function OrganizationSettingsPage() {
 
 	return (
 		<div className="max-w-2xl space-y-6">
-			<h1 className="text-3xl font-bold">Organization</h1>
+			<h1 className="text-3xl font-bold">{t("settings.organization.head_title")}</h1>
 
 			<form onSubmit={handleSave} className="space-y-4">
 				<div className="space-y-2">
-					<Label htmlFor="organization-name">Organization Name</Label>
+					<Label htmlFor="organization-name">{t("new_organization.name_label")}</Label>
 					<Input
 						id="organization-name"
 						value={name}
@@ -72,7 +76,7 @@ function OrganizationSettingsPage() {
 
 				<SlugField
 					id="organization-slug"
-					label="Organization Slug"
+					label={t("settings.organization.slug_label")}
 					prefix={ORG_URL_PREFIX}
 					value={slug}
 					onChange={setSlug}

@@ -15,13 +15,14 @@ import { CopyButton } from "@/components/copy-button";
 import { DemoModeAlert } from "@/components/demo-mode-alert";
 import { useAppOrigin } from "@/hooks/use-app-origin";
 import { useBranding } from "@/hooks/use-deployment-features";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { listMcpToolsFn, type McpPageData } from "@/server/mcp";
 
 export const Route = createFileRoute("/_authed/app/org/$org/settings/mcp")({
 	loader: (): Promise<McpPageData> => listMcpToolsFn(),
-	staticData: { crumb: "MCP" },
-	head: pageHead({ description: "Connect an AI client to this deployment over MCP." }),
+	staticData: { crumb: t("settings.mcp.crumb") },
+	head: pageHead({ description: t("settings.mcp.head_description") }),
 	component: McpSettingsPage,
 });
 
@@ -161,14 +162,14 @@ function McpSettingsPage() {
 	return (
 		<div className="max-w-4xl space-y-8">
 			<header className="space-y-1">
-				<h1 className="text-3xl font-bold">MCP</h1>
+				<h1 className="text-3xl font-bold">{t("settings.mcp.crumb")}</h1>
 				<p className="max-w-2xl text-muted-foreground">Connect any chat bot to {appName}.</p>
 			</header>
 
-			<DemoModeAlert>MCP access is disabled in demo mode.</DemoModeAlert>
+			<DemoModeAlert>{t("settings.mcp.demo_disabled")}</DemoModeAlert>
 
 			<section className="space-y-3">
-				<h2 className="text-lg font-semibold">Endpoint</h2>
+				<h2 className="text-lg font-semibold">{t("settings.mcp.endpoint_title")}</h2>
 				<div className="flex min-w-0 items-stretch gap-2">
 					<code className="min-w-0 truncate rounded-md border bg-muted/40 px-3 py-1.5 font-mono text-sm">
 						{endpoint}
@@ -179,7 +180,7 @@ function McpSettingsPage() {
 			</section>
 
 			<section className="space-y-3">
-				<h2 className="text-lg font-semibold">Connect</h2>
+				<h2 className="text-lg font-semibold">{t("settings.mcp.connect_title")}</h2>
 				<Tabs defaultValue={clients[0].value}>
 					<TabsList>
 						{clients.map((client) => (
@@ -199,20 +200,16 @@ function McpSettingsPage() {
 
 			<section className="space-y-3">
 				<div className="space-y-1">
-					<h2 className="text-lg font-semibold">Tools</h2>
-					{readOnlyDeployment && (
-						<p className="text-sm text-muted-foreground">
-							This deployment is read-only, so the tools that write are withheld from every key.
-						</p>
-					)}
+					<h2 className="text-lg font-semibold">{t("settings.mcp.tools_title")}</h2>
+					{readOnlyDeployment && <p className="text-sm text-muted-foreground">{t("settings.mcp.read_only_note")}</p>}
 				</div>
 				<Card className="gap-0 overflow-hidden py-0">
 					<Table className="[&_td]:px-4 [&_th]:px-4">
 						<TableHeader>
 							<TableRow className="hover:bg-transparent">
-								<TableHead className="w-[22%]">Tool</TableHead>
-								<TableHead>What it does</TableHead>
-								<TableHead className="w-[24%]">Scope</TableHead>
+								<TableHead className="w-[22%]">{t("settings.mcp.col_tool")}</TableHead>
+								<TableHead>{t("settings.mcp.col_what_it_does")}</TableHead>
+								<TableHead className="w-[24%]">{t("settings.mcp.col_scope")}</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>

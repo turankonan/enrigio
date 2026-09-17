@@ -17,6 +17,7 @@ import {
 	type CitationPageType,
 	PAGE_TYPE_CONFIG,
 } from "@/lib/domain-categories";
+import { t } from "@/lib/i18n";
 
 export type { CitationData } from "@/components/citations/types";
 
@@ -115,8 +116,8 @@ function CitationTrendCharts({
 		<>
 			{sourceSeries.length > 0 && (
 				<TrendAreaChart
-					title="Citation Categories"
-					tooltip="Share of citations by source category over time, as a percentage of all citations each day. Smoothed to account for staggered prompt schedules; Google AI Mode search/shopping are excluded (see the Google Shopping section)."
+					title={t("citations-display.citation-categories-title")}
+					tooltip={t("citations-display.citation-categories-tooltip")}
 					data={sourceSeries as unknown as Array<Record<string, number | string>>}
 					keys={chartSourceCategories}
 					meta={CATEGORY_META}
@@ -125,8 +126,8 @@ function CitationTrendCharts({
 
 			{pageTypeSeries.length > 0 && (
 				<TrendAreaChart
-					title="Citation Page Types"
-					tooltip="Share of citations by page type over time — what kind of page each citation points to, inferred from the URL and title."
+					title={t("citations-display.citation-page-types-title")}
+					tooltip={t("citations-display.citation-page-types-tooltip")}
 					data={pageTypeSeries as unknown as Array<Record<string, number | string>>}
 					keys={chartPageTypes}
 					meta={PAGE_TYPE_META}

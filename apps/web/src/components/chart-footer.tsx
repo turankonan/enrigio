@@ -6,6 +6,7 @@ import { CardFooter } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Download } from "lucide-react";
 import { useCallback } from "react";
+import { t } from "@/lib/i18n";
 import type { LookbackPeriod } from "@/lib/lookback";
 import { getPromptWebQueryFn } from "@/server/prompts";
 import { HistoryButton } from "./history-button";
@@ -32,7 +33,7 @@ function DownloadButton({ onDownload, isDownloading }: { onDownload: () => void;
 			size="sm"
 			variant="secondary"
 			className="text-xs cursor-pointer h-6 flex items-center px-2"
-			title="Download chart as PNG"
+			title={t("chart-footer.download-chart-tooltip")}
 		>
 			<Download className="size-3 mr-0.5" />
 			<span className="text-xs font-normal">{isDownloading ? "Exporting..." : "Export (PNG)"}</span>

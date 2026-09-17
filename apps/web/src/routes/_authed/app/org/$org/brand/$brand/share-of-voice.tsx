@@ -20,12 +20,13 @@ import { useListFilters } from "@/hooks/use-list-filters";
 import { usePromptsSummary } from "@/hooks/use-prompts-summary";
 import { useShareOfVoice } from "@/hooks/use-share-of-voice";
 import { useSiteIcons } from "@/hooks/use-site-icons";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { shareOfVoiceColorMap } from "@/lib/share-of-voice-palette";
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/share-of-voice")({
-	staticData: { crumb: "Share of Voice" },
-	head: pageHead({ description: "See how often AI engines mention you versus your competitors." }),
+	staticData: { crumb: t("dashboard.sov_title") },
+	head: pageHead({ description: t("share_of_voice.head_description") }),
 	component: ShareOfVoicePage,
 });
 
@@ -66,7 +67,7 @@ function ShareOfVoicePage() {
 				Share of voice is how often each brand is mentioned in the AI answers to your prompts. Mentions are counted per
 				run, so the brand and competitor figures use the same unit and are directly comparable.
 			</p>
-			<p>Competitors are the ones you track in settings. Switch the model filter to compare engines.</p>
+			<p>{t("share_of_voice.info_competitors")}</p>
 		</>
 	);
 
@@ -91,9 +92,7 @@ function ShareOfVoicePage() {
 		content = (
 			<Card>
 				<CardContent className="pt-6">
-					<div className="text-muted-foreground text-center py-8">
-						No mention data yet for the selected filters. Mentions appear once your prompts have been run.
-					</div>
+					<div className="text-muted-foreground text-center py-8">{t("share_of_voice.empty")}</div>
 				</CardContent>
 			</Card>
 		);
@@ -105,7 +104,7 @@ function ShareOfVoicePage() {
 				<div className="grid gap-6 lg:grid-cols-2">
 					<Card>
 						<CardHeader>
-							<CardTitle>Share of Voice</CardTitle>
+							<CardTitle>{t("dashboard.sov_title")}</CardTitle>
 						</CardHeader>
 						<CardContent className="flex items-center justify-between gap-4">
 							<div>
@@ -123,12 +122,12 @@ function ShareOfVoicePage() {
 
 					<Card>
 						<CardHeader>
-							<CardTitle>Share of Voice Trends</CardTitle>
+							<CardTitle>{t("share_of_voice.trends_title")}</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<TrendChart
 								data={data.shareTimeSeries.map((p) => ({ date: p.date, value: p.share }))}
-								label="Share of Voice"
+								label={t("dashboard.sov_title")}
 								color="#1f7a3d"
 								className="aspect-auto h-[180px] w-full"
 							/>
@@ -138,22 +137,22 @@ function ShareOfVoicePage() {
 
 				<Card>
 					<CardHeader>
-						<CardTitle>Share of Voice Leaderboard</CardTitle>
+						<CardTitle>{t("share_of_voice.leaderboard_title")}</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<Table>
 							<TableHeader>
 								<TableRow>
 									<TableHead className="w-10">#</TableHead>
-									<TableHead>Brand</TableHead>
+									<TableHead>{t("settings.brand.crumb")}</TableHead>
 									<TableHead className="text-right">
-										<ColHead label="Mentions" tip={TIPS.mentions} right />
+										<ColHead label={t("prompt_details.tab_mentions")} tip={TIPS.mentions} right />
 									</TableHead>
 									<TableHead className="w-[34%]">
-										<ColHead label="Share" tip={TIPS.share} />
+										<ColHead label={t("share_of_voice.col_share")} tip={TIPS.share} />
 									</TableHead>
 									<TableHead className="text-right">
-										<ColHead label="Prompts" tip={TIPS.prompts} right />
+										<ColHead label={t("query_fan_out.prompts_title")} tip={TIPS.prompts} right />
 									</TableHead>
 								</TableRow>
 							</TableHeader>
@@ -167,7 +166,7 @@ function ShareOfVoicePage() {
 												{e.name}
 												{e.isBrand && (
 													<Badge variant="secondary" className="text-xs">
-														You
+														{t("share_of_voice.you_badge")}
 													</Badge>
 												)}
 											</span>
@@ -201,11 +200,7 @@ function ShareOfVoicePage() {
 	}
 
 	return (
-		<PageHeader
-			title="Share of Voice"
-			subtitle="How often AI engines mention you versus your competitors."
-			infoContent={infoContent}
-		>
+		<PageHeader title={t("dashboard.sov_title")} subtitle={t("share_of_voice.subtitle")} infoContent={infoContent}>
 			<FilterSection>
 				<FilterBar availableTags={availableTags} trackedTargets={trackedTargets} showSearch={false} showModelSelector />
 			</FilterSection>

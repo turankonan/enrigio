@@ -35,6 +35,7 @@ import { Inbox, ListPlus, Plus } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useOrganizationParams } from "@/hooks/use-route-params";
+import { t } from "@/lib/i18n";
 
 export interface EditablePrompt {
 	id?: string;
@@ -145,7 +146,8 @@ function PremiumModelsField({
 				})}
 				{atCapacity && (
 					<p className="px-2 pt-1 text-xs text-muted-foreground">
-						No premium pairings left. Untick one, or <BillingLink>buy more</BillingLink>.
+						No premium pairings left. Untick one, or <BillingLink>{t("prompts-list-editor.buy-more-link")}</BillingLink>
+						.
 					</p>
 				)}
 			</PopoverContent>
@@ -269,17 +271,17 @@ function ColumnHeader({
 				/>
 			</div>
 			<div className="flex items-center gap-1 min-w-0">
-				Prompt Text
+				{t("prompts-list-editor.column-prompt-text")}
 				<Tooltip>
 					<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 					<TooltipContent>
-						<p className="max-w-xs">The question or query that will be sent to AI models for evaluation.</p>
+						<p className="max-w-xs">{t("prompts-list-editor.prompt-text-tooltip")}</p>
 					</TooltipContent>
 				</Tooltip>
 			</div>
 			{showSystemTags && (
 				<div className="hidden md:flex items-center gap-1">
-					System
+					{t("prompts-list-editor.column-system")}
 					<Tooltip>
 						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent>
@@ -291,17 +293,17 @@ function ColumnHeader({
 				</div>
 			)}
 			<div className="flex items-center gap-1 min-w-0">
-				Tags
+				{t("filter-bar.tags")}
 				<Tooltip>
 					<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 					<TooltipContent>
-						<p className="max-w-xs">Custom labels to organize and filter prompts.</p>
+						<p className="max-w-xs">{t("prompts-list-editor.tags-tooltip")}</p>
 					</TooltipContent>
 				</Tooltip>
 			</div>
 			{premium && (
 				<div className="flex items-center justify-center gap-1">
-					Premium
+					{t("prompts-list-editor.column-premium")}
 					<Tooltip>
 						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent>
@@ -316,7 +318,7 @@ function ColumnHeader({
 				</div>
 			)}
 			<div className="flex justify-center">
-				<span className="sr-only">Enabled</span>
+				<span className="sr-only">{t("admin.enabled")}</span>
 			</div>
 		</div>
 	);
@@ -357,14 +359,14 @@ function PromptRow({
 				!prompt.enabled && "opacity-60",
 			)}
 		>
-			{changedKeys?.has(prompt._key) && <span className="sr-only">Has unsaved changes</span>}
+			{changedKeys?.has(prompt._key) && <span className="sr-only">{t("prompts-list-editor.has-unsaved-changes")}</span>}
 			{/* Mobile: stacked, no selection/bulk */}
 			<div className={`md:hidden flex flex-col gap-2 pb-3 ${index < total - 1 ? "border-b" : ""}`}>
 				<div className="flex items-start gap-2">
 					<Input
 						value={prompt.value}
 						onChange={(e) => update(index, { value: e.target.value })}
-						placeholder="Enter prompt text..."
+						placeholder={t("prompts-list-editor.enter-prompt-placeholder")}
 						className="min-w-0 flex-1"
 					/>
 					<div className="pt-2">
@@ -379,7 +381,7 @@ function PromptRow({
 					value={prompt.tags}
 					onValueChange={(tags) => update(index, { tags })}
 					options={allTagOptions}
-					placeholder="Add tag..."
+					placeholder={t("prompts-list-editor.add-tag-placeholder")}
 					searchPlaceholder="Search or create tag..."
 					normalizeValue={(raw) => raw.toLowerCase().trim()}
 				/>
@@ -397,12 +399,16 @@ function PromptRow({
 			{/* Desktop (md+): single-line grid */}
 			<div className={`hidden md:grid ${gridCols} gap-2 items-start`}>
 				<div className="flex justify-center pt-2">
-					<Checkbox checked={selected} onCheckedChange={onToggleSelect} aria-label="Select prompt" />
+					<Checkbox
+						checked={selected}
+						onCheckedChange={onToggleSelect}
+						aria-label={t("prompts-list-editor.select-prompt")}
+					/>
 				</div>
 				<Input
 					value={prompt.value}
 					onChange={(e) => update(index, { value: e.target.value })}
-					placeholder="Enter prompt text..."
+					placeholder={t("prompts-list-editor.enter-prompt-placeholder")}
 					className="min-w-0"
 				/>
 				{showSystemTags && <TagsInput value={prompt.systemTags} onValueChange={() => {}} disabled placeholder="—" />}
@@ -410,7 +416,7 @@ function PromptRow({
 					value={prompt.tags}
 					onValueChange={(tags) => update(index, { tags })}
 					options={allTagOptions}
-					placeholder="Add tag..."
+					placeholder={t("prompts-list-editor.add-tag-placeholder")}
 					searchPlaceholder="Search or create tag..."
 					normalizeValue={(raw) => raw.toLowerCase().trim()}
 				/>
@@ -442,9 +448,9 @@ function BulkPasteBox({ bulk }: { bulk: ReturnType<typeof useBulkPaste> }) {
 			<Textarea
 				value={bulk.bulkText}
 				onChange={(e) => bulk.setBulkText(e.target.value)}
-				placeholder="One prompt per line"
+				placeholder={t("prompts-list-editor.bulk-placeholder")}
 				rows={6}
-				aria-label="Prompts to add, one per line"
+				aria-label={t("prompts-list-editor.bulk-textarea-aria")}
 			/>
 			<div className="flex flex-wrap items-center gap-2">
 				<Button
@@ -457,7 +463,7 @@ function BulkPasteBox({ bulk }: { bulk: ReturnType<typeof useBulkPaste> }) {
 					{bulk.bulkPreview.added.length === 1 ? "Prompt" : "Prompts"}
 				</Button>
 				<Button variant="ghost" size="sm" type="button" onClick={bulk.closeBulk}>
-					Cancel
+					{t("settings.api_keys.cancel")}
 				</Button>
 				{bulk.bulkNotice && <span className="text-xs text-muted-foreground">{bulk.bulkNotice}</span>}
 			</div>
@@ -536,7 +542,7 @@ export function PromptsListEditor({
 							onClick={() => applyEnabledToSelection(true)}
 							className="cursor-pointer"
 						>
-							Enable
+							{t("prompts-list-editor.enable")}
 						</Button>
 						<Button
 							type="button"
@@ -545,10 +551,10 @@ export function PromptsListEditor({
 							onClick={() => applyEnabledToSelection(false)}
 							className="cursor-pointer"
 						>
-							Disable
+							{t("prompts-list-editor.disable")}
 						</Button>
 						<Button type="button" size="sm" variant="ghost" onClick={clearSelection} className="cursor-pointer">
-							Clear
+							{t("filter-bar.clear")}
 						</Button>
 					</div>
 				</div>
@@ -564,7 +570,7 @@ export function PromptsListEditor({
 					{premiumAtCapacity && (
 						<>
 							{" "}
-							Unassign one to free it up, or <BillingLink>buy more</BillingLink>.
+							Unassign one to free it up, or <BillingLink>{t("prompts-list-editor.buy-more-link")}</BillingLink>.
 						</>
 					)}
 				</p>
@@ -583,7 +589,7 @@ export function PromptsListEditor({
 				<div className="border-2 border-dashed border-muted rounded-lg min-h-48 flex items-center justify-center">
 					<div className="text-center py-8 text-muted-foreground">
 						<Inbox className="h-12 w-12 mx-auto mb-4 opacity-50" />
-						<p>No prompts yet.</p>
+						<p>{t("prompts-display.no-prompts-yet")}</p>
 					</div>
 				</div>
 			) : (
@@ -618,7 +624,7 @@ export function PromptsListEditor({
 							onClick={add}
 							className="flex items-center gap-2 cursor-pointer"
 						>
-							<Plus className="h-4 w-4" /> Add Prompt
+							<Plus className="h-4 w-4" /> {t("prompts-list-editor.add-prompt")}
 						</Button>
 					)}
 					<Button
@@ -628,7 +634,7 @@ export function PromptsListEditor({
 						onClick={() => bulk.setBulkOpen((open) => !open)}
 						className="flex items-center gap-2 cursor-pointer"
 					>
-						<ListPlus className="h-4 w-4" /> Add Multiple
+						<ListPlus className="h-4 w-4" /> {t("prompts-list-editor.add-multiple")}
 					</Button>
 				</div>
 			)}

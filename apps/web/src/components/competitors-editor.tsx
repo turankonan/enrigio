@@ -19,6 +19,7 @@ import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { SiteIcon } from "@/components/site-icon";
 import { cleanAndValidateDomain } from "@/lib/domain-categories";
+import { t } from "@/lib/i18n";
 
 export interface CompetitorEntry {
 	_key: string;
@@ -72,7 +73,9 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 							{competitor.name ? (
 								<span className="text-sm font-medium">{competitor.name}</span>
 							) : (
-								<span className="text-sm text-muted-foreground italic">Unnamed competitor</span>
+								<span className="text-sm text-muted-foreground italic">
+									{t("competitors-editor.unnamed-competitor")}
+								</span>
 							)}
 							{competitor.domains.some(Boolean) && (
 								<span className="text-xs text-muted-foreground ml-2">{competitor.domains.filter(Boolean)[0]}</span>
@@ -104,7 +107,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 						<div className="px-3 pb-3 pt-0 space-y-3 border-t bg-muted/30">
 							<div className="space-y-1.5 pt-3">
 								<Label className="text-xs font-medium flex items-center gap-1.5">
-									Name
+									{t("settings.api_keys.name_label")}
 									<Tooltip>
 										<TooltipTrigger
 											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
@@ -119,7 +122,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 									type="text"
 									value={competitor.name}
 									onChange={(e) => update(competitor._key, { name: e.target.value })}
-									placeholder="Competitor name"
+									placeholder={t("competitors-editor.name-placeholder")}
 									className="bg-background"
 									disabled={disabled}
 								/>
@@ -127,7 +130,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 
 							<div className="space-y-1.5">
 								<Label className="text-xs font-medium flex items-center gap-1.5">
-									Domains
+									{t("competitors-editor.domains")}
 									<Tooltip>
 										<TooltipTrigger
 											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
@@ -141,7 +144,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 								<TagsInput
 									value={competitor.domains.filter(Boolean)}
 									onValueChange={(values) => update(competitor._key, { domains: values })}
-									placeholder="Add domain..."
+									placeholder={t("settings.brand.add_domain_placeholder")}
 									maxItems={10}
 									normalizeValue={(raw) => cleanAndValidateDomain(raw) ?? raw.trim()}
 									pasteSplitter={/[\n,\t]+/}
@@ -151,7 +154,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 
 							<div className="space-y-1.5">
 								<Label className="text-xs font-medium flex items-center gap-1.5">
-									Aliases
+									{t("admin.tools.aliases")}
 									<Tooltip>
 										<TooltipTrigger
 											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
@@ -165,7 +168,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 								<TagsInput
 									value={competitor.aliases}
 									onValueChange={(values) => update(competitor._key, { aliases: values })}
-									placeholder="Add alias..."
+									placeholder={t("settings.brand.add_alias_placeholder")}
 									maxItems={10}
 								/>
 							</div>
@@ -183,7 +186,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 					className="flex items-center gap-2 cursor-pointer"
 					disabled={disabled}
 				>
-					<Plus className="h-4 w-4" /> Add Competitor
+					<Plus className="h-4 w-4" /> {t("competitors-editor.add-competitor")}
 				</Button>
 			)}
 

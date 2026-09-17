@@ -2,6 +2,7 @@ import { IconWorld } from "@tabler/icons-react";
 import { useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
+import { t } from "@/lib/i18n";
 
 export function NavAppInfo() {
 	const context = useRouteContext({ strict: false }) as { clientConfig?: ClientConfig };
@@ -23,7 +24,7 @@ export function NavAppInfo() {
 					>
 						<IconWorld className="size-4" />
 					</TooltipTrigger>
-					<TooltipContent>rigosis.com</TooltipContent>
+					<TooltipContent>{t("nav-app-info.website-tooltip")}</TooltipContent>
 				</Tooltip>
 			</div>
 		</div>

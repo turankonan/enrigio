@@ -8,6 +8,7 @@ import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
 import { PromptsEditor } from "@/components/prompts-editor";
 import { requireAuthSession, requireBrandAccess } from "@/lib/auth/helpers";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { getPremiumPoolFn } from "@/server/premium-tracking";
 
@@ -47,7 +48,7 @@ function PromptsSettingsSkeleton() {
 }
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/settings/prompts")({
-	staticData: { crumb: "Prompts" },
+	staticData: { crumb: t("query_fan_out.prompts_title") },
 	loader: async ({ context }) => {
 		const [brandPrompts, premiumPool] = await Promise.all([
 			getPromptsForEditing({ data: { brandId: context.brandId } }),
@@ -67,7 +68,7 @@ export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/setting
 				: undefined,
 		};
 	},
-	head: pageHead({ description: "Add, edit, or remove tracked prompts." }),
+	head: pageHead({ description: t("settings.prompts.head_description") }),
 	pendingComponent: PromptsSettingsSkeleton,
 	component: PromptsSettingsPage,
 });

@@ -17,6 +17,7 @@ import type { CitationData } from "@/components/citations/types";
 import { ListPagination, usePagedList } from "@/components/list-pagination";
 import { SiteIcon } from "@/components/site-icon";
 import { useBrandParams } from "@/hooks/use-route-params";
+import { t } from "@/lib/i18n";
 
 export function TopUrlsCard({
 	urls,
@@ -66,7 +67,7 @@ export function TopUrlsCard({
 				<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 					<div className="space-y-1 min-w-0">
 						<CardTitle className="flex items-center gap-1.5">
-							Top Cited URLs
+							{t("top-urls-card.title")}
 							<Tooltip>
 								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-sm font-normal">
@@ -81,7 +82,7 @@ export function TopUrlsCard({
 											params={brandParams}
 											className="underline"
 										>
-											tracked competitors list
+											{t("top-urls-card.tracked-competitors-link")}
 										</Link>
 										.
 									</p>
@@ -100,7 +101,7 @@ export function TopUrlsCard({
 					</div>
 					<InputGroup className="h-8 shrink-0 sm:w-48">
 						<InputGroupInput
-							placeholder="Search URLs..."
+							placeholder={t("top-urls-card.search-placeholder")}
 							value={urlSearch}
 							onChange={(e) => {
 								setUrlSearch(e.target.value);
@@ -168,7 +169,7 @@ export function TopUrlsCard({
 										</Badge>
 										{citation.isNew && (
 											<Badge className="text-[10px] px-1.5 py-0 h-[18px] border-0 shadow-none bg-green-100 text-green-700">
-												NEW
+												{t("reddit-card.badge-new")}
 											</Badge>
 										)}
 										<span className="text-sm font-medium truncate group-hover:underline">
@@ -186,9 +187,7 @@ export function TopUrlsCard({
 											<TooltipTrigger render={<span className="text-[11px] text-muted-foreground tabular-nums" />}>
 												avg {citation.avgPosition.toFixed(1)}
 											</TooltipTrigger>
-											<TooltipContent className="text-xs">
-												Average citation position (lower = cited earlier in the response)
-											</TooltipContent>
+											<TooltipContent className="text-xs">{t("top-urls-card.avg-position-tooltip")}</TooltipContent>
 										</Tooltip>
 									)}
 									<Tooltip>
@@ -197,9 +196,7 @@ export function TopUrlsCard({
 										>
 											{citation.count.toLocaleString()}
 										</TooltipTrigger>
-										<TooltipContent className="text-xs">
-											Total times this URL was cited across all prompt evaluations
-										</TooltipContent>
+										<TooltipContent className="text-xs">{t("top-urls-card.count-tooltip")}</TooltipContent>
 									</Tooltip>
 									<IconExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
 								</div>
@@ -207,7 +204,7 @@ export function TopUrlsCard({
 						);
 					})}
 					{filteredUrls.length === 0 && (
-						<p className="text-sm text-muted-foreground text-center pt-8 pb-4">No URLs match the current filters.</p>
+						<p className="text-sm text-muted-foreground text-center pt-8 pb-4">{t("top-urls-card.no-matches")}</p>
 					)}
 				</div>
 				<ListPagination page={page} pageSize={maxUrls} totalItems={totalItems} onPageChange={setPage} />

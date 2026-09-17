@@ -1,6 +1,7 @@
 import type { MissingEnvVar } from "@workspace/config/env";
 import type { DeploymentMode } from "@workspace/config/types";
 import FullPageCard from "@/components/full-page-card";
+import { t } from "@/lib/i18n";
 
 interface MissingEnvPageProps {
 	mode: DeploymentMode;
@@ -10,11 +11,14 @@ interface MissingEnvPageProps {
 export default function MissingEnvPage({ mode, missing }: MissingEnvPageProps) {
 	const sortedMissing = [...missing].sort((a, b) => a.label.localeCompare(b.label));
 
-	const localHint =
-		mode === "local" ? "Set these via the CLI." : "Set these in the deployment environment, then redeploy or restart.";
+	const localHint = mode === "local" ? t("missing-env-page.hint-local") : t("missing-env-page.hint-deployed");
 
 	return (
-		<FullPageCard title="Missing environment configuration" subtitle={`Deployment mode: ${mode}`} className="max-w-2xl">
+		<FullPageCard
+			title={t("missing-env-page.title")}
+			subtitle={t("missing-env-page.subtitle", { mode })}
+			className="max-w-2xl"
+		>
 			<div className="space-y-4 text-sm">
 				<p>{localHint}</p>
 				<ul className="space-y-3 rounded-md border bg-background p-4">

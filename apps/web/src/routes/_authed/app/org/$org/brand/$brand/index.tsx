@@ -22,6 +22,7 @@ import { useBrand } from "@/hooks/use-brands";
 import { useDashboardSummary } from "@/hooks/use-dashboard-summary";
 import { useBrandParams } from "@/hooks/use-route-params";
 import { useShareOfVoice } from "@/hooks/use-share-of-voice";
+import { t } from "@/lib/i18n";
 import { describeTargetSchedule, type TrackedTarget } from "@/lib/model-filter";
 import { setPersonProperties } from "@/lib/posthog";
 import { pageHead } from "@/lib/route-head";
@@ -85,8 +86,8 @@ function formatRunFrequency(hours: number): string {
 }
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/")({
-	staticData: { crumb: "Overview" },
-	head: pageHead({ description: "Dashboard overview of AI visibility and citations." }),
+	staticData: { crumb: t("dashboard.crumb") },
+	head: pageHead({ description: t("dashboard.head_description") }),
 	component: DashboardPage,
 });
 
@@ -246,12 +247,12 @@ function TrackingStats({
 		<div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
 			<StatWithTooltip
 				icon={IconList}
-				label="prompts tracked"
+				label={t("dashboard.stat_prompts_tracked")}
 				value={totalPrompts.toLocaleString()}
 				tooltip={
 					trackedTargets.length > 0 ? (
 						<>
-							<p>Prompts monitored for AI visibility, each evaluated on:</p>
+							<p>{t("dashboard.prompts_tooltip_intro")}</p>
 							<ul className="mt-1 space-y-0.5">
 								{trackedTargets.map((target) => (
 									<li key={target.value}>{labelForModelFilter(target.value)}</li>
@@ -265,13 +266,13 @@ function TrackingStats({
 			/>
 			<StatWithTooltip
 				icon={IconActivity}
-				label="evaluations (30d)"
+				label={t("dashboard.stat_evaluations_30d")}
 				value={totalRuns.toLocaleString()}
-				tooltip="Total number of times we have evaluated prompts against LLMs in the last 30 days. Each prompt is evaluated multiple times across different AI models."
+				tooltip={t("dashboard.evaluations_tooltip")}
 			/>
 			<StatWithTooltip
 				icon={IconClock}
-				label="run frequency"
+				label={t("dashboard.stat_run_frequency")}
 				value={formatRunFrequency(delayHours)}
 				tooltip={
 					trackedTargets.length > 0 ? (
@@ -279,7 +280,7 @@ function TrackingStats({
 							{/* One rate for the brand is a summary, not the truth: a
 							    grounded call samples far less often than a scraped one,
 							    and self-hosted repeats every sample. */}
-							<p>How often each platform is sampled:</p>
+							<p>{t("dashboard.frequency_tooltip_intro")}</p>
 							<ul className="mt-1 space-y-0.5">
 								{trackedTargets.map((target) => (
 									<li key={target.value}>{describeTargetSchedule(target)}</li>
@@ -293,7 +294,7 @@ function TrackingStats({
 			/>
 			<StatWithTooltip
 				icon={IconRefresh}
-				label="last updated"
+				label={t("dashboard.stat_last_updated")}
 				value={formatRelativeTime(lastUpdatedAt)}
 				tooltip={
 					lastUpdatedAt
@@ -330,7 +331,7 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 					<div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
 						<div className="flex items-center gap-2">
 							<IconList className="h-5 w-5 text-muted-foreground" />
-							<span className="text-sm">Prompts configured and enabled</span>
+							<span className="text-sm">{t("dashboard.prompts_configured_enabled")}</span>
 						</div>
 						<span className="font-semibold">{totalPrompts.toLocaleString()}</span>
 					</div>
@@ -344,11 +345,7 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 					<IconArrowRight className="h-4 w-4 ml-1" />
 				</Link>
 			</div>
-			{hasEnabledPrompts && (
-				<p className="text-xs text-muted-foreground mt-6">
-					Refresh this page in a few minutes to see your AI visibility data.
-				</p>
-			)}
+			{hasEnabledPrompts && <p className="text-xs text-muted-foreground mt-6">{t("dashboard.refresh_hint")}</p>}
 		</div>
 	);
 }
@@ -357,7 +354,7 @@ function ResearchBrandData({ brandId, clientConfig }: { brandId: string; clientC
 	return (
 		<div className="space-y-6 max-w-2xl p-4">
 			<div className="space-y-2">
-				<h2 className="text-2xl font-bold">Research Brand Data</h2>
+				<h2 className="text-2xl font-bold">{t("dashboard.research_title")}</h2>
 				<p className="text-muted-foreground text-balance">
 					We will analyze your website and find the best generative AI prompts to track. This process may take a couple
 					of minutes.
@@ -454,7 +451,7 @@ function DashboardPage() {
 			<div className="m-auto flex w-full max-w-[1600px] flex-col gap-3 p-4">
 				<TrendSection
 					icon={IconEye}
-					title="AI Visibility"
+					title={t("dashboard.ai_visibility_title")}
 					linkTo="/app/org/$org/brand/$brand/visibility"
 					linkLabel="View Visibility"
 					chartTitle="Visibility Trends (30d)"
@@ -471,7 +468,7 @@ function DashboardPage() {
 
 				<TrendSection
 					icon={IconSpeakerphone}
-					title="Share of Voice"
+					title={t("dashboard.sov_title")}
 					linkTo="/app/org/$org/brand/$brand/share-of-voice"
 					linkLabel="View Share of Voice"
 					chartTitle="Share of Voice Trends (30d)"

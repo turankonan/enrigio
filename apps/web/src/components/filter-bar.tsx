@@ -18,6 +18,7 @@ import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { MdSelectAll } from "react-icons/md";
 import { useBrand } from "@/hooks/use-brands";
 import { getDefaultLookbackPeriod } from "@/lib/chart-utils";
+import { t } from "@/lib/i18n";
 import { LOOKBACK_PERIODS, type LookbackPeriod } from "@/lib/lookback";
 
 export { ALL_MODELS_VALUE } from "@workspace/config/model-filter";
@@ -213,7 +214,7 @@ function TagsDropdown({ availableTags }: { availableTags: readonly string[] }) {
 				render={
 					<FilterTriggerButton
 						icon={<TagIcon className="size-3.5" />}
-						label="Tags"
+						label={t("filter-bar.tags")}
 						active={selected.length > 0}
 						badgeCount={selected.length > 0 ? selected.length : undefined}
 					/>
@@ -221,19 +222,19 @@ function TagsDropdown({ availableTags }: { availableTags: readonly string[] }) {
 			/>
 			<PopoverContent align="start" className="w-64 p-0" initialFocus={false}>
 				<div className="flex items-center justify-between px-3 h-10 border-b">
-					<span className="font-medium text-sm">Tags</span>
+					<span className="font-medium text-sm">{t("filter-bar.tags")}</span>
 					{selected.length > 0 && (
 						<button
 							type="button"
 							onClick={() => commit([])}
 							className="text-xs text-muted-foreground hover:text-foreground cursor-pointer"
 						>
-							Clear
+							{t("filter-bar.clear")}
 						</button>
 					)}
 				</div>
 				{availableTags.length === 0 ? (
-					<p className="text-sm text-muted-foreground py-6 text-center">No tags available</p>
+					<p className="text-sm text-muted-foreground py-6 text-center">{t("filter-bar.no-tags-available")}</p>
 				) : (
 					<div className="py-1 max-h-64 overflow-y-auto">
 						{availableTags.map((tag) => {
@@ -328,7 +329,12 @@ function SearchInput({ placeholder = "Search prompts..." }: { placeholder?: stri
 			</InputGroupAddon>
 			{local && (
 				<InputGroupAddon align="inline-end" className="pr-1.5">
-					<InputGroupButton size="icon-xs" onClick={clear} className="cursor-pointer" aria-label="Clear search">
+					<InputGroupButton
+						size="icon-xs"
+						onClick={clear}
+						className="cursor-pointer"
+						aria-label={t("filter-bar.clear-search")}
+					>
 						<X className="size-3.5" />
 					</InputGroupButton>
 				</InputGroupAddon>

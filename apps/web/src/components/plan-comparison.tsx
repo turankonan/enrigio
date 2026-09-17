@@ -12,6 +12,7 @@
  * minimum width and scrolls sideways rather than reflowing — a comparison
  * whose columns don't line up isn't one.
  */
+
 import { IconCheck, IconMinus } from "@tabler/icons-react";
 import {
 	PLAN_KEYS,
@@ -30,6 +31,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
 import type { ReactNode } from "react";
+import { t } from "@/lib/i18n";
 
 /** Label column plus one column per plan, shared by the cards and every row. */
 const GRID = "grid min-w-[52rem] grid-cols-[minmax(11rem,1.1fr)_repeat(4,minmax(0,1fr))]";
@@ -83,13 +85,13 @@ export function PlanComparison({
 
 			<div className="overflow-x-auto pb-2">
 				<div className={GRID}>
-					<SectionHeading>Limits</SectionHeading>
-					<Row label="Brands" cell={(plan) => plan.maxBrands} />
-					<Row label="Tracked prompts" cell={(plan) => plan.maxPrompts} />
-					<Row label="Platforms per brand" cell={(plan) => plan.platformPicks} />
-					<Row label="Sampling" cell={(plan) => `${plan.standardRunsPerDay}×/day`} />
-					<Row label="Seats" cell={() => "Unlimited"} />
-					<Row label="API access" cell={() => true} />
+					<SectionHeading>{t("plan-comparison.limits")}</SectionHeading>
+					<Row label={t("settings.api_keys.col_brands")} cell={(plan) => plan.maxBrands} />
+					<Row label={t("settings.billing.meter_tracked_prompts")} cell={(plan) => plan.maxPrompts} />
+					<Row label={t("plan-comparison.platforms-per-brand")} cell={(plan) => plan.platformPicks} />
+					<Row label={t("plan-comparison.sampling")} cell={(plan) => `${plan.standardRunsPerDay}×/day`} />
+					<Row label={t("plan-comparison.seats")} cell={() => "Unlimited"} />
+					<Row label={t("plan-comparison.api-access")} cell={() => true} />
 
 					<PlatformSection tier="scraped" />
 					<PlatformSection tier="api" />
@@ -101,11 +103,11 @@ export function PlanComparison({
 						</span>
 					</SectionHeading>
 					<Row
-						label="Included"
+						label={t("plan-comparison.included")}
 						cell={(plan) => (plan.premiumIncluded > 0 ? premiumPairings(plan.premiumIncluded) : false)}
 					/>
 					<Row
-						label="Buy more"
+						label={t("plan-comparison.buy-more")}
 						cell={(plan) => (plan.premiumAddonAvailable ? `$${PREMIUM_ADDON_MONTHLY_USD}/mo each` : false)}
 					/>
 					{platformTierMembers("premium").map((member) => (
@@ -150,7 +152,11 @@ function PlanHeaderCard({
 			<CardHeader className="px-4">
 				<CardTitle className="flex flex-wrap items-center justify-center gap-1.5 text-base">
 					{plan.name}
-					{active ? <Badge>Current</Badge> : highlighted ? <Badge variant="secondary">Popular</Badge> : null}
+					{active ? (
+						<Badge>{t("plan-comparison.badge-current")}</Badge>
+					) : highlighted ? (
+						<Badge variant="secondary">{t("plan-comparison.badge-popular")}</Badge>
+					) : null}
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="px-4">
@@ -232,9 +238,9 @@ function Row({ label, cell }: { label: ReactNode; cell: (plan: PlanDefinition) =
 				return (
 					<div key={key} className="flex items-center justify-center border-b px-3 py-2 text-center text-sm">
 						{value === true ? (
-							<IconCheck className="size-4 text-emerald-600" aria-label="Included" />
+							<IconCheck className="size-4 text-emerald-600" aria-label={t("plan-comparison.included")} />
 						) : value === false ? (
-							<IconMinus className="size-4 text-muted-foreground/40" aria-label="Not included" />
+							<IconMinus className="size-4 text-muted-foreground/40" aria-label={t("plan-comparison.not-included")} />
 						) : (
 							<span className="tabular-nums">{value}</span>
 						)}

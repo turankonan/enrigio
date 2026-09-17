@@ -5,6 +5,7 @@ import { Separator } from "@workspace/ui/components/separator";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/logo";
 import { useAuth } from "@/hooks/use-auth";
+import { t } from "@/lib/i18n";
 
 interface FullPageCardProps {
 	logoHref?: string;
@@ -81,7 +82,7 @@ export default function FullPageCard({
 			<div className={`mx-auto ${className}`}>
 				<div className="flex items-center justify-center space-x-3">
 					{markHref ? (
-						<Link to={markHref} aria-label="Go to your organizations">
+						<Link to={markHref} aria-label={t("full-page-card.go-to-organizations")}>
 							<Logo />
 						</Link>
 					) : (

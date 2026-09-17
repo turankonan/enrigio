@@ -14,11 +14,12 @@ import { Spinner } from "@workspace/ui/components/spinner";
 import { OpportunitiesReport } from "@/components/opportunities-report";
 import { PageHeader } from "@/components/page-header";
 import { useOpportunities } from "@/hooks/use-opportunities";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/opportunities")({
-	staticData: { crumb: "Opportunities" },
-	head: pageHead({ description: "AI-generated opportunities to earn more AI citations." }),
+	staticData: { crumb: t("opportunities.crumb") },
+	head: pageHead({ description: t("opportunities.head_description") }),
 	component: OpportunitiesPage,
 });
 
@@ -32,7 +33,7 @@ function OpportunitiesPage() {
 	if (isLoading) {
 		content = <LoadingState />;
 	} else if (error) {
-		content = <EmptyCard>Couldn't generate recommendations right now. Reload the page to try again.</EmptyCard>;
+		content = <EmptyCard>{t("opportunities.generate_error")}</EmptyCard>;
 	} else if (!data || data.reason === "insufficient-data" || !data.report) {
 		content = (
 			<EmptyCard>
@@ -45,11 +46,7 @@ function OpportunitiesPage() {
 	}
 
 	return (
-		<PageHeader
-			title="Opportunities"
-			subtitle="What to create, pitch, and seed to earn more AI citations — generated from your tracked answer data."
-			infoContent={infoContent}
-		>
+		<PageHeader title={t("opportunities.crumb")} subtitle={t("opportunities.subtitle")} infoContent={infoContent}>
 			<div className="space-y-6">
 				{data?.report && data.lastEvaluatedAt && <LastEvaluatedAt date={data.lastEvaluatedAt} />}
 				{content}
@@ -83,7 +80,7 @@ function LoadingState() {
 		<div className="space-y-6">
 			<div className="flex items-center gap-2 text-sm text-muted-foreground">
 				<Spinner />
-				Analyzing your citation landscape and drafting your opportunities…
+				{t("opportunities.analyzing")}
 			</div>
 			<div className="space-y-2">
 				<Skeleton className="h-6 w-2/3" />

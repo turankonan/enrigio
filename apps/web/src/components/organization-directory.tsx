@@ -4,6 +4,7 @@ import { buttonVariants } from "@workspace/ui/components/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { OrganizationRowIcon } from "@/components/organization-row-icon";
 import { useDeploymentFeatures } from "@/hooks/use-deployment-features";
+import { t } from "@/lib/i18n";
 import { organizationTree } from "@/lib/organizations/tree";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 
@@ -20,7 +21,7 @@ export function OrganizationDirectory({ organizations }: { organizations: Organi
 			{features?.canCreateOrganizations && (
 				<Link to="/app/new" className={buttonVariants({ variant: "outline", className: "w-full gap-1.5" })}>
 					<IconPlus className="size-4" />
-					New organization
+					{t("new_organization.crumb")}
 				</Link>
 			)}
 		</div>
@@ -42,7 +43,7 @@ function OrganizationBlock({ organization }: { organization: OrganizationSummary
 					</span>
 					<IconSettings className="size-4 shrink-0 text-muted-foreground" />
 				</TooltipTrigger>
-				<TooltipContent>Organization Settings</TooltipContent>
+				<TooltipContent>{t("organization-directory.organization-settings")}</TooltipContent>
 			</Tooltip>
 
 			{children.length > 0 && (

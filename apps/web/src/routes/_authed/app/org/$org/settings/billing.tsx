@@ -14,19 +14,20 @@ import { Progress } from "@workspace/ui/components/progress";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { type ReactNode, useState } from "react";
 import { PlanComparison } from "@/components/plan-comparison";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { type BillingState, getBillingStateFn, setPremiumAddonQuantityFn } from "@/server/billing";
 
 export const Route = createFileRoute("/_authed/app/org/$org/settings/billing")({
-	staticData: { crumb: "Billing" },
+	staticData: { crumb: t("settings.billing.crumb") },
 	loader: async ({ params, context }): Promise<BillingState> => {
 		if (!context.clientConfig?.features.billing) {
 			throw redirect({ to: "/app/org/$org", params: { org: params.org } });
 		}
 		return getBillingStateFn({ data: { organizationId: context.organization.id } });
 	},
-	head: pageHead({ description: "Manage your plan, usage, and billing." }),
+	head: pageHead({ description: t("settings.billing.head_description") }),
 	component: BillingSettingsPage,
 });
 
@@ -83,11 +84,11 @@ function BillingSettingsPage() {
 	// Wide enough for the four plan cards, which the paywall gives the same room.
 	return (
 		<div className="max-w-6xl space-y-6">
-			<h1 className="text-3xl font-bold">Billing</h1>
+			<h1 className="text-3xl font-bold">{t("settings.billing.crumb")}</h1>
 
 			{entitlements.standing === "grace" && (
 				<Alert variant="destructive">
-					<AlertTitle>Payment failed</AlertTitle>
+					<AlertTitle>{t("settings.billing.payment_failed_title")}</AlertTitle>
 					<AlertDescription>
 						We couldn't renew your subscription. Tracking continues for a few more days while Stripe retries — update
 						your card in the billing portal to avoid a pause.
@@ -96,7 +97,7 @@ function BillingSettingsPage() {
 			)}
 			{entitlements.standing === "paused" && (
 				<Alert variant="destructive">
-					<AlertTitle>Tracking paused</AlertTitle>
+					<AlertTitle>{t("settings.billing.paused_title")}</AlertTitle>
 					<AlertDescription>
 						Payment is more than a week overdue, so prompt tracking is paused. Your data stays readable; fix the payment
 						in the billing portal and tracking resumes automatically.
@@ -105,8 +106,8 @@ function BillingSettingsPage() {
 			)}
 			{entitlements.standing === "none" && (
 				<Alert variant="destructive">
-					<AlertTitle>No active subscription</AlertTitle>
-					<AlertDescription>Tracking is stopped until a plan is chosen.</AlertDescription>
+					<AlertTitle>{t("settings.billing.no_subscription_title")}</AlertTitle>
+					<AlertDescription>{t("settings.billing.no_subscription_body")}</AlertDescription>
 				</Alert>
 			)}
 			{state.subscription?.cancelAtPeriodEnd && entitlements.standing === "active" && (
@@ -124,7 +125,7 @@ function BillingSettingsPage() {
 			)}
 
 			<Section
-				title="Plans"
+				title={t("settings.billing.plans_title")}
 				description={
 					showPlanGrid
 						? "Switching takes effect immediately; Stripe prorates the difference."
@@ -179,7 +180,7 @@ function BillingSettingsPage() {
 				<p className="text-sm text-muted-foreground">
 					Need more brands, any other models, higher numbers of samples, SSO, white label, or custom limits?{" "}
 					<a className="underline" href="mailto:hello@answerecho.com?subject=AnswerEcho%20Cloud%20custom%20plan">
-						Talk to us about a custom plan
+						{t("settings.billing.custom_plan_link")}
 					</a>
 					.
 				</p>
@@ -187,7 +188,7 @@ function BillingSettingsPage() {
 
 			{state.premiumAddonAvailable && (
 				<Section
-					title="Extra premium"
+					title={t("settings.billing.extra_premium_title")}
 					description={`Beyond what your plan includes, at $${PREMIUM_ADDON_MONTHLY_USD} per pairing per month.`}
 				>
 					<PremiumAddonCard
@@ -200,7 +201,7 @@ function BillingSettingsPage() {
 			)}
 
 			{showMeters(entitlements) && (
-				<Section title="Usage" description="What your organization is using against its plan.">
+				<Section title={t("settings.billing.usage_title")} description={t("settings.billing.usage_description")}>
 					<UsageCard state={state} />
 				</Section>
 			)}
@@ -259,7 +260,7 @@ function BillingAction({
 	if (isCustomPlan) return null;
 	return (
 		<Button size="sm" onClick={onChoosePlan}>
-			Choose a plan
+			{t("settings.billing.choose_a_plan")}
 		</Button>
 	);
 }
@@ -340,7 +341,7 @@ function SubscriptionSummary({
 					/>
 				)}
 
-				{!isAdmin && <span className="text-muted-foreground">Only organization admins can change the plan.</span>}
+				{!isAdmin && <span className="text-muted-foreground">{t("settings.billing.admins_only")}</span>}
 			</div>
 		</div>
 	);
@@ -368,8 +369,16 @@ function UsageCard({ state }: { state: BillingState }) {
 	return (
 		<Card>
 			<CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				<UsageMeter label="Brands" used={state.usage.brands} limit={entitlements.maxBrands} />
-				<UsageMeter label="Tracked prompts" used={state.usage.enabledPrompts} limit={entitlements.maxPrompts} />
+				<UsageMeter
+					label={t("settings.api_keys.col_brands")}
+					used={state.usage.brands}
+					limit={entitlements.maxBrands}
+				/>
+				<UsageMeter
+					label={t("settings.billing.meter_tracked_prompts")}
+					used={state.usage.enabledPrompts}
+					limit={entitlements.maxPrompts}
+				/>
 				{entitlements.premiumPool > 0 && (
 					<UsageMeter
 						label={
@@ -451,7 +460,7 @@ function PremiumAddonCard({
 				)}
 				<div className="flex items-end gap-3">
 					<div className="space-y-1">
-						<Label htmlFor="premium-addon-quantity">Purchased pairings</Label>
+						<Label htmlFor="premium-addon-quantity">{t("settings.billing.purchased_pairings_label")}</Label>
 						<Input
 							id="premium-addon-quantity"
 							type="number"
@@ -468,7 +477,7 @@ function PremiumAddonCard({
 					</Button>
 				</div>
 				{!hasSubscription && (
-					<p className="text-sm text-muted-foreground">An active subscription is required to buy the add-on.</p>
+					<p className="text-sm text-muted-foreground">{t("settings.billing.addon_requires_subscription")}</p>
 				)}
 			</CardContent>
 		</Card>

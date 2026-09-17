@@ -11,6 +11,7 @@ import { CopyButton } from "@/components/copy-button";
 import { DemoModeAlert } from "@/components/demo-mode-alert";
 import { useAppOrigin } from "@/hooks/use-app-origin";
 import { useBranding } from "@/hooks/use-deployment-features";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 
 const OPENAPI_PATH = "/api/v1/openapi.json";
@@ -18,8 +19,8 @@ const OPENAPI_PATH = "/api/v1/openapi.json";
 const ApiReference = lazy(() => import("@/components/api-reference"));
 
 export const Route = createFileRoute("/_authed/app/org/$org/settings/api")({
-	staticData: { crumb: "API Docs" },
-	head: pageHead({ description: "Browse the REST API this deployment serves." }),
+	staticData: { crumb: t("settings.api.crumb") },
+	head: pageHead({ description: t("settings.api.head_description") }),
 	component: ApiSettingsPage,
 });
 
@@ -31,14 +32,14 @@ function ApiSettingsPage() {
 	return (
 		<div className="space-y-6">
 			<header className="space-y-1">
-				<h1 className="text-3xl font-bold">API Docs</h1>
+				<h1 className="text-3xl font-bold">{t("settings.api.crumb")}</h1>
 				<p className="max-w-2xl text-muted-foreground">Programmatic interface for {appName}.</p>
 			</header>
 
-			<DemoModeAlert>API access is disabled in demo mode.</DemoModeAlert>
+			<DemoModeAlert>{t("settings.api_keys.demo_disabled")}</DemoModeAlert>
 
 			<div className="flex flex-wrap items-center gap-2">
-				<span className="text-sm text-muted-foreground">Base URL</span>
+				<span className="text-sm text-muted-foreground">{t("settings.api.base_url")}</span>
 				<code className="rounded-md border bg-muted/40 px-2 py-1 font-mono text-sm">{baseUrl}</code>
 				<CopyButton value={baseUrl} />
 			</div>

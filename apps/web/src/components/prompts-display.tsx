@@ -20,6 +20,7 @@ import { useListFilters } from "@/hooks/use-list-filters";
 import { usePromptsSummary } from "@/hooks/use-prompts-summary";
 import { useBrandParams } from "@/hooks/use-route-params";
 import type { ChartSubject } from "@/lib/chart-utils";
+import { t } from "@/lib/i18n";
 import type { LookbackPeriod } from "@/lib/lookback";
 import { coercePromptOrder, orderPrompts } from "@/lib/prompt-order";
 import { skeletonRows } from "@/lib/skeleton-rows";
@@ -111,8 +112,8 @@ function PromptsContent({ brandId }: { brandId: string | undefined }) {
 			errorState={
 				<Card className="p-6">
 					<div className="text-center text-muted-foreground">
-						<p className="mb-2">Failed to load prompts data</p>
-						<p className="text-sm">Try refreshing the page</p>
+						<p className="mb-2">{t("prompts-display.failed-to-load")}</p>
+						<p className="text-sm">{t("prompts-display.try-refreshing")}</p>
 					</div>
 				</Card>
 			}
@@ -124,14 +125,14 @@ function PromptsContent({ brandId }: { brandId: string | undefined }) {
 				<div className="border-2 border-dashed border-muted rounded-lg min-h-48 flex items-center justify-center">
 					<div className="text-center py-8 text-muted-foreground">
 						<Inbox className="h-12 w-12 mx-auto mb-4 opacity-50" />
-						<p className="mb-4">No prompts yet.</p>
+						<p className="mb-4">{t("prompts-display.no-prompts-yet")}</p>
 						<Link
 							to="/app/org/$org/brand/$brand/settings/prompts"
 							params={brandParams}
 							className={cn(buttonVariants({ size: "sm" }), "h-7 flex cursor-pointer")}
 						>
 							<IconEditCircle />
-							<span>Edit</span>
+							<span>{t("prompts-display.edit")}</span>
 						</Link>
 					</div>
 				</div>

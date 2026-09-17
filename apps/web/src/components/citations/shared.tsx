@@ -5,6 +5,7 @@ import {
 	type CitationCategory,
 	PAGE_TYPE_CONFIG,
 } from "@/lib/domain-categories";
+import { t } from "@/lib/i18n";
 
 export const getCategoryLabel = (category: string) => CATEGORY_CONFIG[category as CitationCategory]?.label ?? category;
 
@@ -73,7 +74,10 @@ export function UnderlineTabs<T extends string>({
 	onSelect: (key: T) => void;
 }) {
 	return (
-		<nav className="-mb-px flex gap-4 overflow-x-auto border-b border-border" aria-label="Tabs">
+		<nav
+			className="-mb-px flex gap-4 overflow-x-auto border-b border-border"
+			aria-label={t("prompt_details.tabs_aria_label")}
+		>
 			{tabs.map(({ key, label }) => (
 				<button
 					key={key}

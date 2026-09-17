@@ -1053,5 +1053,6 @@
 	"sidebar.sidebar": "Sidebar",
 	"sidebar.mobile-description": "Displays the mobile sidebar.",
 	"sidebar.toggle-sidebar": "Toggle Sidebar",
-	"spinner.loading": "Loading"
+	"spinner.loading": "Loading",
+	"organizations.create-first-brand": "Create your first brand"
 }

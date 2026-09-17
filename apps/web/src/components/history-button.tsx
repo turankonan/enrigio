@@ -2,6 +2,7 @@ import { buttonVariants } from "@workspace/ui/components/button";
 import { cn } from "@workspace/ui/lib/utils";
 import { GoStack } from "react-icons/go";
 import { BrandPromptLink } from "@/components/brand-prompt-link";
+import { t } from "@/lib/i18n";
 import type { PromptDetailTab } from "@/lib/prompt-detail-tabs";
 
 interface HistoryButtonProps {
@@ -23,7 +24,7 @@ export function HistoryButton({ promptId, tab }: HistoryButtonProps) {
 			)}
 		>
 			<GoStack className="size-3 mr-0.5" />
-			<span className="text-xs font-normal">View Details</span>
+			<span className="text-xs font-normal">{t("history-button.view-details")}</span>
 		</BrandPromptLink>
 	);
 }

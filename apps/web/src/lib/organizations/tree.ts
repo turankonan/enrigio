@@ -1,5 +1,6 @@
 import type { LinkProps } from "@tanstack/react-router";
 import { brandLinkParams, orgLinkParams } from "@workspace/lib/app-urls";
+import { t } from "@/lib/i18n";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 
 interface RowBase {
@@ -35,7 +36,7 @@ export function organizationTree(organization: OrganizationSummary): Organizatio
 			kind: "new-brand",
 			key: "new-brand",
 			link: { to: "/app/org/$org/new", params },
-			label: organization.brands.length > 0 ? "New brand" : "Create your first brand",
+			label: organization.brands.length > 0 ? t("new_brand.crumb") : t("organizations.create-first-brand"),
 		});
 	} else if (needsSetup(organization)) {
 		children.push({

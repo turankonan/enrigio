@@ -22,6 +22,7 @@ import {
 	type WordChangeStat,
 	type WordChanges,
 } from "@/lib/fanout-analysis";
+import { t } from "@/lib/i18n";
 import { getModelDisplayName } from "@/lib/utils";
 
 const FANOUT_PURPLE = "#8b5cf6";
@@ -97,12 +98,15 @@ export function VariationLine({
 			{modelCounts?.length ? (
 				<span
 					className="text-muted-foreground shrink-0 text-right text-xs tabular-nums leading-6"
-					title="Times each engine ran this search"
+					title={t("fanout-sections.per-engine-run-count-tooltip")}
 				>
 					{modelCounts.map((mc) => `${mc.count.toLocaleString()}× ${getModelDisplayName(mc.model)}`).join(" · ")}
 				</span>
 			) : (
-				<span className="text-muted-foreground shrink-0 text-sm tabular-nums" title="Times engines ran this search">
+				<span
+					className="text-muted-foreground shrink-0 text-sm tabular-nums"
+					title={t("fanout-sections.run-count-tooltip")}
+				>
 					{variation.count.toLocaleString()}×
 				</span>
 			)}
@@ -124,7 +128,7 @@ export function VariationsList({
 	modelCounts?: Map<string, VariationModelCount[]>;
 }) {
 	if (variations.length === 0) {
-		return <div className="text-muted-foreground py-4 text-sm">No web queries for this selection.</div>;
+		return <div className="text-muted-foreground py-4 text-sm">{t("fanout-sections.no-web-queries")}</div>;
 	}
 	return (
 		<div className="space-y-2">
@@ -177,23 +181,23 @@ export function QueryWordsSection({ terms, wordChanges }: { terms: TermStat[]; w
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<div>
 							<CardTitle className="flex items-center gap-1.5 text-base">
-								Word Changes
+								{t("fanout-sections.word-changes")}
 								<InfoTip>{WORD_TAB_HELP[tab]}</InfoTip>
 							</CardTitle>
-							<CardDescription>How engines rewrite your prompt wording.</CardDescription>
+							<CardDescription>{t("fanout-sections.word-changes-description")}</CardDescription>
 						</div>
 						<div className="flex items-center gap-4">
 							<div className="flex items-center gap-2">
 								<Switch id="qf-hide-stop" checked={hideStop} onCheckedChange={setHideStop} />
 								<label htmlFor="qf-hide-stop" className="text-muted-foreground cursor-pointer text-sm">
-									Hide stop words
+									{t("fanout-sections.hide-stop-words")}
 								</label>
 							</div>
 							<Tabs value={tab} onValueChange={(v) => setTab(v as WordTab)}>
 								<TabsList>
-									<TabsTrigger value="added">Added</TabsTrigger>
-									<TabsTrigger value="preserved">Preserved</TabsTrigger>
-									<TabsTrigger value="dropped">Dropped</TabsTrigger>
+									<TabsTrigger value="added">{t("fanout-sections.tab-added")}</TabsTrigger>
+									<TabsTrigger value="preserved">{t("fanout-sections.tab-preserved")}</TabsTrigger>
+									<TabsTrigger value="dropped">{t("fanout-sections.tab-dropped")}</TabsTrigger>
 								</TabsList>
 							</Tabs>
 						</div>

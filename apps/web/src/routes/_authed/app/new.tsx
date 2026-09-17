@@ -5,20 +5,21 @@ import { Label } from "@workspace/ui/components/label";
 import { useState } from "react";
 import FullPageCard from "@/components/full-page-card";
 import { useOrganizationsChanged } from "@/hooks/use-organizations";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { createOrganizationFn } from "@/server/organizations";
 
 export const Route = createFileRoute("/_authed/app/new")({
-	staticData: { crumb: "New organization" },
+	staticData: { crumb: t("new_organization.crumb") },
 	beforeLoad: ({ context }) => {
 		if (!context.clientConfig?.features.canCreateOrganizations) {
 			throw redirect({ to: "/app" });
 		}
 	},
 	head: pageHead({
-		title: "New organization",
-		description: "Create an organization to hold its own brands, team, and plan.",
+		title: t("new_organization.crumb"),
+		description: t("new_organization.head_description"),
 	}),
 	component: NewOrganizationPage,
 });
@@ -48,19 +49,15 @@ function NewOrganizationPage() {
 	}
 
 	return (
-		<FullPageCard
-			title="Create an organization"
-			subtitle="An organization holds its own brands, team, and plan."
-			showBackButton
-		>
+		<FullPageCard title={t("new_organization.title")} subtitle={t("new_organization.subtitle")} showBackButton>
 			<form onSubmit={handleSubmit} className="space-y-4">
 				<div className="space-y-2">
-					<Label htmlFor="organization-name">Organization Name</Label>
+					<Label htmlFor="organization-name">{t("new_organization.name_label")}</Label>
 					<Input
 						id="organization-name"
 						value={name}
 						onChange={(e) => setName(e.target.value)}
-						placeholder="Acme"
+						placeholder={t("new_organization.name_placeholder")}
 						required
 						disabled={isLoading}
 					/>

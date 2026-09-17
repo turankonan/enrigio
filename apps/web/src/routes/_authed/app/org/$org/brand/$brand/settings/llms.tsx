@@ -25,6 +25,7 @@ import { type ReactNode, useState } from "react";
 import { formatUsd, PlatformList, PlatformPicker, projectSelectionCostUsd } from "@/components/platform-picker";
 import { UnsavedChangesBar } from "@/components/unsaved-changes-bar";
 import { useBrandParams, useOrganizationParams } from "@/hooks/use-route-params";
+import { t } from "@/lib/i18n";
 import { groupPlatformOptions, type PlatformGroup, platformGroupCopy } from "@/lib/platform-groups";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
@@ -32,7 +33,7 @@ import { getModelPickerStateFn, type ModelPickerState, updateEnabledModelsFn } f
 import { getPremiumPoolFn, type PremiumPool } from "@/server/premium-tracking";
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/settings/llms")({
-	staticData: { crumb: "LLMs" },
+	staticData: { crumb: t("settings.llms.crumb") },
 	loader: async ({ context }): Promise<{ picker: ModelPickerState; premium: PremiumPool }> => {
 		const [picker, premium] = await Promise.all([
 			getModelPickerStateFn({ data: { brandId: context.brandId } }),
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/setting
 		]);
 		return { picker, premium };
 	},
-	head: pageHead({ description: "Choose which AI models this brand is tracked against." }),
+	head: pageHead({ description: t("settings.llms.head_description") }),
 	component: LlmsSettingsPage,
 });
 
@@ -50,7 +51,7 @@ function LlmsSettingsPage() {
 	return (
 		<div className="max-w-6xl space-y-8">
 			<div>
-				<h1 className="text-3xl font-bold">LLMs</h1>
+				<h1 className="text-3xl font-bold">{t("settings.llms.crumb")}</h1>
 				<p className="text-muted-foreground">
 					Your prompts are evaluated against these AI models to track how your brand appears across different types of
 					AI search.
@@ -69,10 +70,10 @@ function NoPlatformsCard() {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Tracked platforms</CardTitle>
+				<CardTitle>{t("settings.llms.tracked_platforms_title")}</CardTitle>
 			</CardHeader>
 			<CardContent>
-				<p className="text-sm text-muted-foreground">This brand is not tracked on any platform yet.</p>
+				<p className="text-sm text-muted-foreground">{t("settings.llms.no_platforms")}</p>
 			</CardContent>
 		</Card>
 	);
@@ -197,7 +198,7 @@ function PlatformGroups({ picker }: { picker: ModelPickerState }) {
 
 			{selected.size === 0 && (
 				<Alert variant="destructive">
-					<AlertDescription>Pick at least one platform — a brand with none is not tracked.</AlertDescription>
+					<AlertDescription>{t("settings.llms.pick_at_least_one")}</AlertDescription>
 				</Alert>
 			)}
 			{overLimit && (
@@ -240,7 +241,7 @@ function UpgradePanel({ options }: { options: ModelPickerState["upgradeOptions"]
 	const organizationParams = useOrganizationParams();
 	return (
 		<div className="space-y-3 rounded-md border border-dashed p-4">
-			<p className="text-sm font-medium">Upgrade to track more platforms</p>
+			<p className="text-sm font-medium">{t("settings.llms.upgrade_title")}</p>
 			<div className="space-y-2.5">
 				{groupPlatformOptions(options).map((group) => (
 					<div key={group.id} className="space-y-1.5">
@@ -264,7 +265,7 @@ function UpgradePanel({ options }: { options: ModelPickerState["upgradeOptions"]
 				params={organizationParams}
 				className={buttonVariants({ variant: "outline", size: "sm" })}
 			>
-				Compare plans
+				{t("settings.llms.compare_plans")}
 				<IconArrowUpRight className="h-4 w-4" />
 			</Link>
 		</div>
@@ -319,14 +320,14 @@ function PremiumApiPool({ premium }: { premium: PremiumPool }) {
 						params={brandParams}
 						className={buttonVariants({ variant: "outline", size: "sm" })}
 					>
-						Choose prompts
+						{t("settings.llms.choose_prompts")}
 					</Link>
 					<Link
 						to="/app/org/$org/settings/billing"
 						params={organizationParams}
 						className={buttonVariants({ variant: "ghost", size: "sm" })}
 					>
-						Change how many
+						{t("settings.llms.change_how_many")}
 						<IconArrowUpRight className="h-4 w-4" />
 					</Link>
 				</div>
@@ -355,7 +356,7 @@ function AddPlatformsCard({ platforms }: { platforms: ModelPickerState["unconfig
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Track more platforms</CardTitle>
+				<CardTitle>{t("settings.llms.track_more_title")}</CardTitle>
 				<CardDescription>
 					Add these to <code className="font-mono text-xs">SCRAPE_TARGETS</code> to start tracking them. One account is
 					enough, but which kind you pick changes the data: a scraper reads the product a visitor uses, an API asks the
@@ -364,7 +365,7 @@ function AddPlatformsCard({ platforms }: { platforms: ModelPickerState["unconfig
 			</CardHeader>
 			<CardContent className="space-y-3">
 				<div className={`${PROVIDER_GRID} gap-y-2 border-b pb-2 text-xs font-medium text-muted-foreground`}>
-					<span>Platform</span>
+					<span>{t("settings.llms.col_platform")}</span>
 					{PROVIDER_COLUMNS.map((column) => (
 						<span key={column.access}>{column.header}</span>
 					))}
@@ -391,7 +392,7 @@ function AddPlatformsCard({ platforms }: { platforms: ModelPickerState["unconfig
 					rel="noopener noreferrer"
 					className={buttonVariants({ variant: "outline", size: "sm" })}
 				>
-					Provider setup guide
+					{t("settings.llms.provider_setup_guide")}
 					<IconExternalLink className="h-4 w-4" />
 				</a>
 			</CardContent>

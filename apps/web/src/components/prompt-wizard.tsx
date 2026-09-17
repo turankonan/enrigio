@@ -20,6 +20,7 @@ import { brandKeys, useBrand } from "@/hooks/use-brands";
 import { citationKeys } from "@/hooks/use-citations";
 import { dashboardKeys } from "@/hooks/use-dashboard-summary";
 import { promptsSummaryKeys } from "@/hooks/use-prompts-summary";
+import { t } from "@/lib/i18n";
 import { trackEvent } from "@/lib/posthog";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import {
@@ -283,17 +284,17 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 					>
 						{phase === "analyzing" ? (
 							<>
-								<Spinner /> Analyzing brand…
+								<Spinner /> {t("prompt-wizard.analyzing-brand")}
 							</>
 						) : (
 							<>
-								<Play className="h-4 w-4" /> Analyze brand
+								<Play className="h-4 w-4" /> {t("admin.tools.analyze-brand")}
 							</>
 						)}
 					</Button>
 					{phase === "analyzing" && (
 						<Button variant="outline" onClick={() => stopAnalyzing(null)} className="cursor-pointer">
-							Cancel
+							{t("settings.api_keys.cancel")}
 						</Button>
 					)}
 				</div>
@@ -304,17 +305,19 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 	return (
 		<div className="max-w-2xl mx-auto space-y-6">
 			<div className="space-y-2">
-				<h2 className="text-2xl font-bold">Brand details</h2>
-				<p className="text-muted-foreground">
-					Confirm the brand identity, additional domains, and aliases used for tracking.
-				</p>
+				<h2 className="text-2xl font-bold">{t("prompt-wizard.brand-details")}</h2>
+				<p className="text-muted-foreground">{t("prompt-wizard.brand-details-description")}</p>
 				<div className="space-y-3">
 					<div>
-						<p className="text-xs text-muted-foreground">Brand name</p>
-						<Input value={data.brandName} onChange={(e) => updateBrandName(e.target.value)} placeholder="Brand name" />
+						<p className="text-xs text-muted-foreground">{t("prompt-wizard.brand-name")}</p>
+						<Input
+							value={data.brandName}
+							onChange={(e) => updateBrandName(e.target.value)}
+							placeholder={t("prompt-wizard.brand-name")}
+						/>
 					</div>
 					<div>
-						<p className="text-xs text-muted-foreground">Website URL</p>
+						<p className="text-xs text-muted-foreground">{t("admin.tools.website-url")}</p>
 						<Input
 							type="url"
 							value={data.website}
@@ -323,20 +326,20 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 						/>
 					</div>
 					<div>
-						<p className="text-xs text-muted-foreground">Additional domains</p>
+						<p className="text-xs text-muted-foreground">{t("admin.tools.additional-domains")}</p>
 						<EditableTagsInput
 							items={data.additionalDomains}
 							onValueChange={updateAdditionalDomains}
-							placeholder="Add domain..."
+							placeholder={t("settings.brand.add_domain_placeholder")}
 							maxItems={10}
 						/>
 					</div>
 					<div>
-						<p className="text-xs text-muted-foreground">Aliases</p>
+						<p className="text-xs text-muted-foreground">{t("admin.tools.aliases")}</p>
 						<EditableTagsInput
 							items={data.aliases}
 							onValueChange={updateAliases}
-							placeholder="Add alias..."
+							placeholder={t("settings.brand.add_alias_placeholder")}
 							maxItems={10}
 						/>
 					</div>
@@ -347,8 +350,8 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 
 			<div className="space-y-3">
 				<div>
-					<h2 className="text-2xl font-bold">Competitors</h2>
-					<p className="text-muted-foreground">Companies you want tracked alongside your brand.</p>
+					<h2 className="text-2xl font-bold">{t("settings.competitors.crumb")}</h2>
+					<p className="text-muted-foreground">{t("prompt-wizard.competitors-description")}</p>
 				</div>
 				<CompetitorsEditor competitors={data.competitors} onChange={updateCompetitors} disabled={isSaving} />
 			</div>
@@ -357,7 +360,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 
 			<div className="space-y-3">
 				<div>
-					<h2 className="text-2xl font-bold">Prompts</h2>
+					<h2 className="text-2xl font-bold">{t("query_fan_out.prompts_title")}</h2>
 					<p className="text-muted-foreground">
 						Pick which AI tracking prompts to start with. Untick any you don't want, edit tags, or add your own at the
 						bottom.
@@ -380,7 +383,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 			>
 				{isSaving ? (
 					<>
-						<Spinner /> Saving…
+						<Spinner /> {t("prompt-wizard.saving")}
 					</>
 				) : (
 					<>

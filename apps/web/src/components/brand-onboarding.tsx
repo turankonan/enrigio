@@ -8,6 +8,7 @@ import FullPageCard from "@/components/full-page-card";
 import { PlatformSelectionStep } from "@/components/platform-selection-step";
 import { useOrganizationsChanged } from "@/hooks/use-organizations";
 import { validateWebsiteUrl } from "@/lib/brand-website";
+import { t } from "@/lib/i18n";
 import { trackEvent } from "@/lib/posthog";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { createBrandFn } from "@/server/brands";
@@ -78,7 +79,7 @@ export default function BrandOnboarding({ organizationSlug, brandId, brandName, 
 
 	if (step === "platforms" && platformState) {
 		return (
-			<FullPageCard title={`Setup ${brandName}`} subtitle="Choose which AI platforms to track">
+			<FullPageCard title={`Setup ${brandName}`} subtitle={t("new_brand.platforms_subtitle")}>
 				<PlatformSelectionStep
 					state={platformState}
 					selected={selected}
@@ -94,21 +95,25 @@ export default function BrandOnboarding({ organizationSlug, brandId, brandName, 
 	}
 
 	return (
-		<FullPageCard title={`Setup ${brandName}`} subtitle="Configure your brand to get started" showBackButton={true}>
+		<FullPageCard
+			title={`Setup ${brandName}`}
+			subtitle={t("brand-onboarding.configure-subtitle")}
+			showBackButton={true}
+		>
 			<form action={handleWebsiteSubmit} className="space-y-4">
 				<div className="space-y-2">
-					<Label htmlFor="website">Website</Label>
+					<Label htmlFor="website">{t("new_brand.website_label")}</Label>
 					<Input
 						id="website"
 						name="website"
 						type="text"
-						placeholder="example.com"
+						placeholder={t("new_brand.website_placeholder")}
 						required
 						disabled={isLoading}
 						value={website}
 						onChange={(e) => setWebsite(e.target.value)}
 					/>
-					<p className="text-xs text-muted-foreground">Enter your brand's website</p>
+					<p className="text-xs text-muted-foreground">{t("brand-onboarding.website-help")}</p>
 				</div>
 
 				{error && <p className="text-sm text-destructive">{error}</p>}

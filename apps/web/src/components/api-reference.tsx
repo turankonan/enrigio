@@ -9,6 +9,7 @@
  */
 import { ApiReferenceReact } from "@scalar/api-reference-react";
 import "@scalar/api-reference-react/style.css";
+import { t } from "@/lib/i18n";
 
 export default function ApiReference({ url, darkMode }: { url: string; darkMode: boolean }) {
 	return (
@@ -28,7 +29,7 @@ export default function ApiReference({ url, darkMode }: { url: string; darkMode:
 				withDefaultFonts: false,
 				// The spec already has a `Models` tag — the answer engines — so
 				// Scalar's schema section needs the other name.
-				modelsSectionLabel: "Schemas",
+				modelsSectionLabel: t("api-reference.schemas-section-label"),
 				// Scalar's stylesheet paints `body` in its own layer, which lands after
 				// ours and would repaint the page around the embed.
 				customCss: "@layer scalar-base { body { background-color: var(--background); } }",

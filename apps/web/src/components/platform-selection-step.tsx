@@ -1,6 +1,7 @@
 import { getModelMeta } from "@workspace/config/models";
 import { Button } from "@workspace/ui/components/button";
 import { PlatformPicker } from "@/components/platform-picker";
+import { t } from "@/lib/i18n";
 import type { OnboardingPlatformState } from "@/server/platform-picks";
 
 interface PlatformSelectionStepProps {
@@ -61,7 +62,7 @@ export function PlatformSelectionStep({
 
 			<div className="flex gap-2">
 				<Button type="button" variant="outline" onClick={onBack} disabled={disabled}>
-					Back
+					{t("platform-selection-step.back")}
 				</Button>
 				<Button type="button" className="flex-1" onClick={onSubmit} disabled={disabled || selected.size === 0}>
 					{submitLabel}

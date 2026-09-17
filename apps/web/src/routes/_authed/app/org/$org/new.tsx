@@ -8,6 +8,7 @@ import { PlatformSelectionStep } from "@/components/platform-selection-step";
 import { useOrganizationsChanged } from "@/hooks/use-organizations";
 import { useOrganizationParams } from "@/hooks/use-route-params";
 import { validateWebsiteUrl } from "@/lib/brand-website";
+import { t } from "@/lib/i18n";
 import { trackEvent } from "@/lib/posthog";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
@@ -15,7 +16,7 @@ import { createBrandInOrgFn } from "@/server/brands";
 import { getOnboardingPlatformStateFn, type OnboardingPlatformState } from "@/server/platform-picks";
 
 export const Route = createFileRoute("/_authed/app/org/$org/new")({
-	staticData: { crumb: "New brand" },
+	staticData: { crumb: t("new_brand.crumb") },
 	loader: ({ context }) => {
 		const { brandCreation, name, id } = context.organization;
 		if (brandCreation.kind === "not-offered") {
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/_authed/app/org/$org/new")({
 			blocked: brandCreation.kind === "denied" ? brandCreation : null,
 		};
 	},
-	head: pageHead({ description: "Start tracking a new brand in this organization." }),
+	head: pageHead({ description: t("new_brand.head_description") }),
 	component: NewBrandPage,
 });
 
@@ -112,7 +113,7 @@ function NewBrandPage() {
 					params={organizationParams}
 					className={buttonVariants({ className: "w-full" })}
 				>
-					Go to billing
+					{t("new_brand.go_to_billing")}
 				</Link>
 			</FullPageCard>
 		);
@@ -120,7 +121,7 @@ function NewBrandPage() {
 
 	if (step === "platforms" && platformState) {
 		return (
-			<FullPageCard title={`Create ${details.brandName}`} subtitle="Choose which AI platforms to track">
+			<FullPageCard title={`Create ${details.brandName}`} subtitle={t("new_brand.platforms_subtitle")}>
 				<PlatformSelectionStep
 					state={platformState}
 					selected={selected}
@@ -136,15 +137,19 @@ function NewBrandPage() {
 	}
 
 	return (
-		<FullPageCard title="Create a new brand" subtitle={`Start tracking a brand in ${organizationName}`} showBackButton>
+		<FullPageCard
+			title={t("new_brand.title")}
+			subtitle={`Start tracking a brand in ${organizationName}`}
+			showBackButton
+		>
 			<form action={handleDetailsSubmit} className="space-y-4">
 				<div className="space-y-2">
-					<Label htmlFor="brandName">Brand Name</Label>
+					<Label htmlFor="brandName">{t("new_brand.name_label")}</Label>
 					<Input
 						id="brandName"
 						name="brandName"
 						type="text"
-						placeholder="Acme"
+						placeholder={t("new_organization.name_placeholder")}
 						required
 						disabled={isLoading}
 						defaultValue={details.brandName}
@@ -152,12 +157,12 @@ function NewBrandPage() {
 				</div>
 
 				<div className="space-y-2">
-					<Label htmlFor="website">Website</Label>
+					<Label htmlFor="website">{t("new_brand.website_label")}</Label>
 					<Input
 						id="website"
 						name="website"
 						type="text"
-						placeholder="example.com"
+						placeholder={t("new_brand.website_placeholder")}
 						required
 						disabled={isLoading}
 						defaultValue={details.website}

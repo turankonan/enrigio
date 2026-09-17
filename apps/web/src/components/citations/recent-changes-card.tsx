@@ -12,6 +12,7 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { formatPeriodLabel, formatUrlForDisplay, UnderlineTabs } from "@/components/citations/shared";
 import type { CitationData } from "@/components/citations/types";
+import { t } from "@/lib/i18n";
 
 type WhatsChanged = NonNullable<CitationData["whatsChanged"]>;
 
@@ -125,7 +126,7 @@ export function RecentChangesCard({ whatsChanged, days }: { whatsChanged: WhatsC
 		<Card className="h-full flex flex-col">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-1.5">
-					Recent Changes
+					{t("recent-changes-card.title")}
 					<Tooltip>
 						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">

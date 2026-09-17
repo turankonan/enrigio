@@ -15,13 +15,14 @@ import { dashboardKeys } from "@/hooks/use-dashboard-summary";
 import { useOrganization, useOrganizationsChanged } from "@/hooks/use-organizations";
 import { useBrandParams } from "@/hooks/use-route-params";
 import { cleanAndValidateDomain } from "@/lib/domain-categories";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { updateBrandFn } from "@/server/brands";
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/settings/brand")({
-	staticData: { crumb: "Brand" },
-	head: pageHead({ title: "Brand Settings", description: "Manage your brand name and website." }),
+	staticData: { crumb: t("settings.brand.crumb") },
+	head: pageHead({ title: t("settings.brand.head_title"), description: t("settings.brand.head_description") }),
 	component: BrandSettingsPage,
 });
 
@@ -52,7 +53,7 @@ function BrandSettingsPage() {
 
 	const validateDomain = useCallback((val: string): true | string => {
 		const cleaned = cleanAndValidateDomain(val);
-		if (!cleaned) return `"${val}" is not a valid domain`;
+		if (!cleaned) return t("settings.brand.invalid_domain", { value: val });
 		return true;
 	}, []);
 	const handleAliasesChange = useCallback((values: string[]) => setAliases(values), []);
@@ -61,8 +62,8 @@ function BrandSettingsPage() {
 		return (
 			<div className="space-y-6">
 				<div>
-					<h1 className="text-3xl font-bold">Brand</h1>
-					<p className="text-muted-foreground">Loading...</p>
+					<h1 className="text-3xl font-bold">{t("settings.brand.crumb")}</h1>
+					<p className="text-muted-foreground">{t("settings.brand.loading")}</p>
 				</div>
 			</div>
 		);
@@ -72,8 +73,8 @@ function BrandSettingsPage() {
 		return (
 			<div className="space-y-6">
 				<div>
-					<h1 className="text-3xl font-bold">Brand</h1>
-					<p className="text-destructive">Brand not found</p>
+					<h1 className="text-3xl font-bold">{t("settings.brand.crumb")}</h1>
+					<p className="text-destructive">{t("settings.brand.not_found")}</p>
 				</div>
 			</div>
 		);
@@ -107,7 +108,7 @@ function BrandSettingsPage() {
 			queryClient.invalidateQueries({ queryKey: citationKeys.all });
 			queryClient.invalidateQueries({ queryKey: dashboardKeys.all });
 
-			setSuccess("Brand details updated successfully!");
+			setSuccess(t("settings.brand.update_success"));
 			await refetchBrand();
 			await organizationsChanged(
 				slugMoved
@@ -120,7 +121,7 @@ function BrandSettingsPage() {
 					: undefined,
 			);
 		} catch (err) {
-			setError(writeError(err, "Failed to save the brand."));
+			setError(writeError(err, t("settings.brand.save_error")));
 		} finally {
 			setIsSubmitting(false);
 		}
@@ -129,29 +130,29 @@ function BrandSettingsPage() {
 	return (
 		<div className="space-y-6 max-w-2xl">
 			<div>
-				<h1 className="text-3xl font-bold">Brand</h1>
-				<p className="text-muted-foreground">Manage your brand name and website</p>
+				<h1 className="text-3xl font-bold">{t("settings.brand.crumb")}</h1>
+				<p className="text-muted-foreground">{t("settings.brand.subtitle")}</p>
 			</div>
 
 			<form action={handleSubmit} className="space-y-6">
 				<div className="space-y-4">
 					<div className="space-y-2">
-						<Label htmlFor="name">Brand Name</Label>
+						<Label htmlFor="name">{t("new_brand.name_label")}</Label>
 						<Input
 							id="name"
 							name="name"
 							type="text"
-							placeholder="Brand Name"
+							placeholder={t("new_brand.name_label")}
 							defaultValue={brand.name}
 							required
 							disabled={isSubmitting}
 						/>
-						<p className="text-xs text-muted-foreground">Enter your brand&apos;s name</p>
+						<p className="text-xs text-muted-foreground">{t("settings.brand.name_hint")}</p>
 					</div>
 
 					<SlugField
 						id="brand-slug"
-						label="Brand Slug"
+						label={t("settings.brand.slug_label")}
 						prefix={brandSlugPrefix(organization)}
 						value={slug}
 						onChange={setSlug}
@@ -159,22 +160,22 @@ function BrandSettingsPage() {
 					/>
 
 					<div className="space-y-2">
-						<Label htmlFor="website">Website</Label>
+						<Label htmlFor="website">{t("new_brand.website_label")}</Label>
 						<Input
 							id="website"
 							name="website"
 							type="text"
-							placeholder="example.com"
+							placeholder={t("new_brand.website_placeholder")}
 							defaultValue={brand.website}
 							required
 							disabled={isSubmitting}
 						/>
-						<p className="text-xs text-muted-foreground">Your brand&apos;s primary website</p>
+						<p className="text-xs text-muted-foreground">{t("settings.brand.website_hint")}</p>
 					</div>
 
 					<div className="space-y-2">
 						<Label className="flex items-center gap-1.5">
-							Additional Domains
+							{t("settings.brand.additional_domains_label")}
 							<Tooltip>
 								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-xs font-normal">
@@ -187,7 +188,7 @@ function BrandSettingsPage() {
 						<TagsInput
 							value={additionalDomains}
 							onValueChange={setAdditionalDomains}
-							placeholder="Add domain..."
+							placeholder={t("settings.brand.add_domain_placeholder")}
 							searchPlaceholder="Add domain..."
 							maxItems={10}
 							normalizeValue={(raw) => cleanAndValidateDomain(raw) ?? raw.trim()}
@@ -197,7 +198,7 @@ function BrandSettingsPage() {
 
 					<div className="space-y-2">
 						<Label className="flex items-center gap-1.5">
-							Brand Aliases
+							{t("settings.brand.aliases_label")}
 							<Tooltip>
 								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-xs font-normal">
@@ -210,7 +211,7 @@ function BrandSettingsPage() {
 						<TagsInput
 							value={aliases}
 							onValueChange={handleAliasesChange}
-							placeholder="Add alias..."
+							placeholder={t("settings.brand.add_alias_placeholder")}
 							searchPlaceholder="Add alias..."
 							maxItems={10}
 						/>

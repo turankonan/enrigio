@@ -2,6 +2,7 @@ import { IconInfoCircle } from "@tabler/icons-react";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
+import { t } from "@/lib/i18n";
 
 interface VisibilityTimeSeriesPoint {
 	date: string;
@@ -83,7 +84,7 @@ export function VisibilityBar({
 			{/* Left side: visibility + chart + info */}
 			<div className="flex items-center gap-2 min-w-0 shrink-0">
 				<span className={`text-base sm:text-lg font-semibold whitespace-nowrap ${colors.text}`}>
-					{currentVisibility}% <span className="font-normal">Visibility</span>
+					{currentVisibility}% <span className="font-normal">{t("visibility.crumb")}</span>
 				</span>
 
 				{showChart && (
@@ -120,13 +121,13 @@ export function VisibilityBar({
 			{/* Right side: stats */}
 			<div className={`flex items-center gap-x-3 text-xs sm:text-sm ${colors.muted}`}>
 				<span>
-					<span className="font-medium">{totalPrompts.toLocaleString()}</span> prompts
+					<span className="font-medium">{totalPrompts.toLocaleString()}</span> {t("admin.workflows.prompts-unit")}
 				</span>
 				<span>
-					<span className="font-medium">{totalRuns.toLocaleString()}</span> runs
+					<span className="font-medium">{totalRuns.toLocaleString()}</span> {t("visibility-bar.runs")}
 				</span>
 				<span>
-					<span className="font-medium">{totalCitations.toLocaleString()}</span> citations
+					<span className="font-medium">{totalCitations.toLocaleString()}</span> {t("visibility-bar.citations")}
 				</span>
 			</div>
 		</div>
@@ -152,7 +153,7 @@ export function VisibilityBarSkeleton() {
 export function VisibilityBarEmpty() {
 	return (
 		<div className="flex items-center min-h-10 px-3 py-2 rounded-lg border border-border/60 bg-muted/20">
-			<span className="text-sm text-muted-foreground">No visibility data for the selected time range and filters.</span>
+			<span className="text-sm text-muted-foreground">{t("visibility-bar.empty")}</span>
 		</div>
 	);
 }

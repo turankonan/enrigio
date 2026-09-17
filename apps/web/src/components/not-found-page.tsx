@@ -2,10 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import FullPageCard from "@/components/full-page-card";
 import { OrganizationDirectory } from "@/components/organization-directory";
+import { t } from "@/lib/i18n";
 import { organizationsQuery } from "@/lib/organizations/queries";
 
-const TITLE = "404 Not Found";
-const SUBTITLE = "That page doesn't exist or moved.";
+const TITLE = t("not-found-page.title");
+const SUBTITLE = t("not-found-page.subtitle");
 
 export function NotFoundPage() {
 	const { data, isLoading } = useQuery(organizationsQuery);

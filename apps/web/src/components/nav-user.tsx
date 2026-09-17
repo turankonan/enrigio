@@ -29,6 +29,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useBrandId } from "@/hooks/use-brand-id";
 import { useBranding, useDeploymentFeatures } from "@/hooks/use-deployment-features";
 import { useOrganizations } from "@/hooks/use-organizations";
+import { t } from "@/lib/i18n";
 import { organizationTree } from "@/lib/organizations/tree";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 import { resetPostHog } from "@/lib/posthog";
@@ -114,7 +115,7 @@ export function NavUser({
 									<>
 										<DropdownMenuItem render={<Link to="/app/new" onClick={close} />} className="cursor-pointer">
 											<IconPlus />
-											New organization
+											{t("new_organization.crumb")}
 										</DropdownMenuItem>
 										<DropdownMenuSeparator />
 									</>
@@ -125,7 +126,9 @@ export function NavUser({
 						{adminItems.length > 0 && (
 							<>
 								<DropdownMenuGroup>
-									<DropdownMenuLabel className="text-muted-foreground text-xs">Admin</DropdownMenuLabel>
+									<DropdownMenuLabel className="text-muted-foreground text-xs">
+										{t("settings.members.role_admin")}
+									</DropdownMenuLabel>
 									{adminItems.map((item) => (
 										<DropdownMenuItem
 											key={item.title}
@@ -169,7 +172,7 @@ export function NavUser({
 							}}
 						>
 							<IconLogout />
-							Log out
+							{t("nav-user.log-out")}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -187,7 +190,7 @@ function OrganizationSwitcher({ onNavigate }: { onNavigate: () => void }) {
 			<>
 				<DropdownMenuItem render={<Link to="/app" onClick={onNavigate} />} className="cursor-pointer">
 					<IconStatusChange />
-					Switch Brand
+					{t("nav-user.switch-brand")}
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 			</>
@@ -207,7 +210,7 @@ function OrganizationSwitcher({ onNavigate }: { onNavigate: () => void }) {
 
 			{isLoading && (
 				<DropdownMenuItem disabled>
-					<span className="text-muted-foreground">Loading organizations…</span>
+					<span className="text-muted-foreground">{t("nav-user.loading-organizations")}</span>
 				</DropdownMenuItem>
 			)}
 			{error && (

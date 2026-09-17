@@ -1,6 +1,7 @@
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { Button } from "@workspace/ui/components/button";
 import { useEffect, useState } from "react";
+import { t } from "@/lib/i18n";
 
 /** Omit `label` for an icon-only button. */
 export function CopyButton({ value, label, className }: { value: string; label?: string; className?: string }) {
@@ -24,7 +25,15 @@ export function CopyButton({ value, label, className }: { value: string; label?:
 			}}
 		>
 			{copied ? <IconCheck className="size-4" /> : <IconCopy className="size-4" />}
-			{label ? copied ? "Copied" : label : <span className="sr-only">{copied ? "Copied" : "Copy"}</span>}
+			{label ? (
+				copied ? (
+					t("copy-button.copied")
+				) : (
+					label
+				)
+			) : (
+				<span className="sr-only">{copied ? t("copy-button.copied") : t("copy-button.copy")}</span>
+			)}
 		</Button>
 	);
 }

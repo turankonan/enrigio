@@ -17,6 +17,7 @@ import { useListFilters } from "@/hooks/use-list-filters";
 import { usePromptsSummary } from "@/hooks/use-prompts-summary";
 import { useQueryFanout } from "@/hooks/use-query-fanout";
 import { type PromptFanoutStat, promptKeywords, type TopQueryStat } from "@/lib/fanout-analysis";
+import { t } from "@/lib/i18n";
 import { pageHead } from "@/lib/route-head";
 import { getModelDisplayName } from "@/lib/utils";
 
@@ -25,12 +26,12 @@ const FANOUT_TABS = ["fanout", "top-queries", "words"] as const;
 type FanoutTab = (typeof FANOUT_TABS)[number];
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/query-fan-out")({
-	staticData: { crumb: "Query Fan-Out" },
+	staticData: { crumb: t("query_fan_out.crumb") },
 	validateSearch: (search: Record<string, unknown>): { tab?: FanoutTab } => ({
 		tab: FANOUT_TABS.includes(search.tab as FanoutTab) ? (search.tab as FanoutTab) : undefined,
 	}),
 	head: pageHead({
-		description: "See the web searches AI engines run when answering your prompts, and how they rewrite your wording.",
+		description: t("query_fan_out.head_description"),
 	}),
 	component: QueryFanoutPage,
 });
@@ -97,9 +98,9 @@ function QueryFanoutPage() {
 					<StatRow data={data} />
 					<Tabs value={tab} onValueChange={(v) => setTab(v as FanoutTab)} className="gap-4">
 						<TabsList>
-							<TabsTrigger value="fanout">Prompt Fan-Out</TabsTrigger>
-							<TabsTrigger value="top-queries">Top Queries</TabsTrigger>
-							<TabsTrigger value="words">Query Words</TabsTrigger>
+							<TabsTrigger value="fanout">{t("prompt_details.tab_fanout")}</TabsTrigger>
+							<TabsTrigger value="top-queries">{t("query_fan_out.tab_top_queries")}</TabsTrigger>
+							<TabsTrigger value="words">{t("prompt_details.tab_query_words")}</TabsTrigger>
 						</TabsList>
 						<TabsContent value="fanout">
 							<Prompts prompts={data.byPrompt} />
@@ -117,11 +118,7 @@ function QueryFanoutPage() {
 	}
 
 	return (
-		<PageHeader
-			title="Query Fan-Out"
-			subtitle="The web searches AI engines run when answering your prompts."
-			infoContent={infoContent}
-		>
+		<PageHeader title={t("query_fan_out.crumb")} subtitle={t("query_fan_out.subtitle")} infoContent={infoContent}>
 			<FilterSection>
 				<FilterBar availableTags={availableTags} trackedTargets={trackedTargets} showSearch={false} showModelSelector />
 			</FilterSection>
@@ -204,22 +201,22 @@ function StatRow({ data }: { data: FanoutData }) {
 	return (
 		<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 			<StatCard
-				label="Search Prompt Runs"
+				label={t("query_fan_out.stat_search_runs")}
 				value={data.totalRuns.toLocaleString()}
 				tip="How many times your prompts were run against engines configured with web search. An engine may still choose not to execute a search on a given run."
 			/>
 			<StatCard
-				label="Prompt Runs w/ Unknown Queries"
+				label={t("query_fan_out.stat_unknown_queries")}
 				value={(data.totalRuns - data.fanoutRuns).toLocaleString()}
 				tip={<UnknownRunsTooltip byModel={data.byModel} />}
 			/>
 			<StatCard
-				label="Prompt Runs w/ Known Queries"
+				label={t("query_fan_out.stat_known_queries")}
 				value={data.fanoutRuns.toLocaleString()}
 				tip={<RunsTooltip breakdown={breakdown} />}
 			/>
 			<StatCard
-				label="Average Fan-Out"
+				label={t("query_fan_out.stat_average_fanout")}
 				value={data.avgPerExecution.toLocaleString()}
 				tip="Average queries per run that had at least one web query."
 			/>
@@ -328,20 +325,20 @@ function Prompts({ prompts }: { prompts: PromptFanoutStat[] }) {
 				<div className="flex items-center justify-between gap-4">
 					<div>
 						<CardTitle className="flex items-center gap-1.5 text-base">
-							Prompts
+							{t("query_fan_out.prompts_title")}
 							<InfoTip>
 								Each prompt's fan-out: how many searches it generates (Queries) and how many per run that searched
 								(Avg/Prompt Run). Expand a prompt to see the searches, with your prompt's keywords bolded.
 							</InfoTip>
 						</CardTitle>
-						<CardDescription>The web searches each prompt triggers.</CardDescription>
+						<CardDescription>{t("query_fan_out.prompts_description")}</CardDescription>
 					</div>
 					<div className="relative w-64 shrink-0">
 						<IconSearch className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2" />
 						<Input
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
-							placeholder="Search prompts..."
+							placeholder={t("query_fan_out.search_prompts_placeholder")}
 							className="h-8 pl-8 text-sm"
 						/>
 					</div>
@@ -350,12 +347,12 @@ function Prompts({ prompts }: { prompts: PromptFanoutStat[] }) {
 			<CardContent>
 				<div className={cn(GRID, "text-muted-foreground/80 border-b py-2 text-[11px] font-medium")}>
 					<span />
-					<span className="uppercase tracking-wide">Prompt</span>
+					<span className="uppercase tracking-wide">{t("query_fan_out.col_prompt")}</span>
 					<span className="text-right">
-						<SortHead k="queries" label="Queries" sort={sort} setSort={setSort} />
+						<SortHead k="queries" label={t("query_fan_out.col_queries")} sort={sort} setSort={setSort} />
 					</span>
 					<span className="text-right">
-						<SortHead k="avg" label="Avg/Prompt Run" sort={sort} setSort={setSort} />
+						<SortHead k="avg" label={t("query_fan_out.col_avg_per_run")} sort={sort} setSort={setSort} />
 					</span>
 				</div>
 				<div className="divide-border divide-y">
@@ -401,7 +398,7 @@ function Prompts({ prompts }: { prompts: PromptFanoutStat[] }) {
 						);
 					})}
 					{rows.length === 0 && (
-						<div className="text-muted-foreground py-6 text-center text-sm">No prompts match your search.</div>
+						<div className="text-muted-foreground py-6 text-center text-sm">{t("query_fan_out.no_prompts_match")}</div>
 					)}
 				</div>
 			</CardContent>
@@ -435,23 +432,23 @@ function TopQueries({ data }: { data: FanoutData }) {
 		<Card className="gap-4">
 			<CardHeader>
 				<CardTitle className="flex items-center gap-1.5 text-base">
-					Top Queries
+					{t("query_fan_out.tab_top_queries")}
 					<InfoTip>
 						The searches with the widest reach — sort by how many distinct prompts triggered them, or how many prompt
 						runs issued them. Expand a query to see the prompts behind it.
 					</InfoTip>
 				</CardTitle>
-				<CardDescription>The searches that recur across your prompts.</CardDescription>
+				<CardDescription>{t("query_fan_out.top_queries_description")}</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<div className={cn(TOP_GRID, "text-muted-foreground/80 border-b py-2 text-[11px] font-medium")}>
 					<span />
-					<span className="uppercase tracking-wide">Query</span>
+					<span className="uppercase tracking-wide">{t("query_fan_out.col_query")}</span>
 					<span className="text-right">
-						<SortHead k="prompts" label="Prompts" sort={sort} setSort={setSort} />
+						<SortHead k="prompts" label={t("query_fan_out.prompts_title")} sort={sort} setSort={setSort} />
 					</span>
 					<span className="text-right">
-						<SortHead k="runs" label="Prompt Runs" sort={sort} setSort={setSort} />
+						<SortHead k="runs" label={t("query_fan_out.col_prompt_runs")} sort={sort} setSort={setSort} />
 					</span>
 				</div>
 				<div className="divide-border divide-y">
@@ -487,7 +484,7 @@ function TopQueries({ data }: { data: FanoutData }) {
 												</BrandPromptLink>
 												<span
 													className="text-muted-foreground shrink-0 text-sm tabular-nums"
-													title="Runs of this prompt that issued the search"
+													title={t("query_fan_out.runs_issued_title")}
 												>
 													{p.runs.toLocaleString()}×
 												</span>
@@ -499,7 +496,9 @@ function TopQueries({ data }: { data: FanoutData }) {
 						);
 					})}
 					{rows.length === 0 && (
-						<div className="text-muted-foreground py-6 text-center text-sm">No queries for this period.</div>
+						<div className="text-muted-foreground py-6 text-center text-sm">
+							{t("query_fan_out.no_queries_for_period")}
+						</div>
 					)}
 				</div>
 			</CardContent>

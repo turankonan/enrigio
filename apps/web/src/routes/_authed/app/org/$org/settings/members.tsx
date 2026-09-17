@@ -6,20 +6,21 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { useState } from "react";
+import { t } from "@/lib/i18n";
 import { trackEvent } from "@/lib/posthog";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { cancelInvitationFn, inviteTeamMemberFn, listTeamFn, removeTeamMemberFn, type TeamData } from "@/server/team";
 
 export const Route = createFileRoute("/_authed/app/org/$org/settings/members")({
-	staticData: { crumb: "Team" },
+	staticData: { crumb: t("settings.members.crumb") },
 	beforeLoad: ({ context }) => {
 		if (context.clientConfig && !context.clientConfig.features.teamInvites) {
 			throw notFound();
 		}
 	},
 	loader: ({ context }): Promise<TeamData> => listTeamFn({ data: { organizationId: context.organization.id } }),
-	head: pageHead({ description: "Invite teammates and manage team members." }),
+	head: pageHead({ description: t("settings.members.head_description") }),
 	component: TeamSettingsPage,
 });
 
@@ -72,7 +73,7 @@ function TeamSettingsPage() {
 
 	return (
 		<div className="space-y-6">
-			<h1 className="text-3xl font-bold">Team</h1>
+			<h1 className="text-3xl font-bold">{t("settings.members.crumb")}</h1>
 
 			{error && (
 				<Alert variant="destructive">
@@ -82,11 +83,11 @@ function TeamSettingsPage() {
 
 			<form onSubmit={handleInvite} className="flex flex-wrap items-end gap-3">
 				<div className="flex flex-col gap-2">
-					<Label htmlFor="invite-email">Email</Label>
+					<Label htmlFor="invite-email">{t("settings.members.email_label")}</Label>
 					<Input
 						id="invite-email"
 						type="email"
-						placeholder="teammate@example.com"
+						placeholder={t("settings.members.email_placeholder")}
 						value={inviteEmail}
 						onChange={(e) => setInviteEmail(e.target.value)}
 						required
@@ -94,7 +95,7 @@ function TeamSettingsPage() {
 					/>
 				</div>
 				<div className="flex flex-col gap-2">
-					<Label htmlFor="invite-role">Role</Label>
+					<Label htmlFor="invite-role">{t("settings.members.role_label")}</Label>
 					<Select
 						items={{ member: "Member", admin: "Admin" }}
 						value={inviteRole}
@@ -104,8 +105,8 @@ function TeamSettingsPage() {
 							<SelectValue />
 						</SelectTrigger>
 						<SelectContent>
-							<SelectItem value="member">Member</SelectItem>
-							<SelectItem value="admin">Admin</SelectItem>
+							<SelectItem value="member">{t("settings.members.role_member")}</SelectItem>
+							<SelectItem value="admin">{t("settings.members.role_admin")}</SelectItem>
 						</SelectContent>
 					</Select>
 				</div>
@@ -115,7 +116,7 @@ function TeamSettingsPage() {
 			</form>
 
 			<div className="space-y-3">
-				<h2 className="text-lg font-semibold">Members</h2>
+				<h2 className="text-lg font-semibold">{t("settings.members.members_title")}</h2>
 				<div className="divide-y rounded-md border">
 					{members.map((m) => (
 						<div key={m.id} className="flex items-center justify-between gap-3 p-3">
@@ -127,7 +128,7 @@ function TeamSettingsPage() {
 								<Badge variant="secondary">{m.role}</Badge>
 								{m.userId !== currentUserId && (
 									<Button type="button" variant="outline" size="sm" onClick={() => handleRemove(m.id)}>
-										Remove
+										{t("settings.members.remove")}
 									</Button>
 								)}
 							</div>
@@ -138,7 +139,7 @@ function TeamSettingsPage() {
 
 			{invitations.length > 0 && (
 				<div className="space-y-3">
-					<h2 className="text-lg font-semibold">Pending invitations</h2>
+					<h2 className="text-lg font-semibold">{t("settings.members.pending_invitations")}</h2>
 					<div className="divide-y rounded-md border">
 						{invitations.map((inv) => (
 							<div key={inv.id} className="flex items-center justify-between gap-3 p-3">
@@ -151,7 +152,7 @@ function TeamSettingsPage() {
 								<div className="flex shrink-0 items-center gap-3">
 									<Badge variant="secondary">{inv.role ?? "member"}</Badge>
 									<Button type="button" variant="outline" size="sm" onClick={() => handleCancel(inv.id)}>
-										Cancel
+										{t("settings.api_keys.cancel")}
 									</Button>
 								</div>
 							</div>
