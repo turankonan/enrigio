@@ -372,7 +372,10 @@ function Prompts({ prompts }: { prompts: PromptFanoutStat[] }) {
 										))}
 										{p.uniqueQueries > p.variations.length && (
 											<div className="text-muted-foreground text-xs">
-												Top {p.variations.length} of {p.uniqueQueries.toLocaleString()} variations shown
+												{t("query_fan_out.top_variations_shown", {
+													shown: p.variations.length,
+													total: p.uniqueQueries.toLocaleString(),
+												})}
 											</div>
 										)}
 										<div className="pt-1">

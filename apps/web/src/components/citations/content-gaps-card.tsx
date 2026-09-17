@@ -22,13 +22,10 @@ export function ContentGapsCard({
 					{t("reports.render.content-gaps")}
 					<Tooltip>
 						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
-						<TooltipContent className="max-w-xs text-sm font-normal">
-							Prompts where competitors are cited but your brand isn&apos;t — opportunities to improve your citation
-							presence.
-						</TooltipContent>
+						<TooltipContent className="max-w-xs text-sm font-normal">{t("content-gaps-card.tooltip")}</TooltipContent>
 					</Tooltip>
 				</CardTitle>
-				<CardDescription>Prompts where competitors are cited but your brand isn&apos;t</CardDescription>
+				<CardDescription>{t("content-gaps-card.description")}</CardDescription>
 			</CardHeader>
 			<Separator />
 			<CardContent className="flex-1 flex flex-col">

@@ -1035,7 +1035,7 @@
 	"unsaved-changes-bar.stay-on-page": "Sayfada kal",
 	"unsaved-changes-bar.leave-without-saving": "Kaydetmeden ayrıl",
 	"visibility-bar.percent-visibility": "%{percent} Görünürlük",
-	"visibility-bar.tooltip": "Aşağıda gösterilen {count} sorgu{plural} için yapay zekâ görünürlüğü. Seçili filtrelerin zaman aralığında markanızdan bahseden yapay zekâ yanıtlarının yüzdesi olarak hesaplanır.",
+	"visibility-bar.tooltip": "Aşağıda gösterilen {count} sorgu için yapay zekâ görünürlüğü. Seçili filtrelerin zaman aralığında markanızdan bahseden yapay zekâ yanıtlarının yüzdesi olarak hesaplanır.",
 	"visibility-bar.prompts": "sorgu",
 	"visibility-bar.runs": "çalışma",
 	"visibility-bar.citations": "atıf",
@@ -1054,5 +1054,10 @@
 	"sidebar.mobile-description": "Mobil kenar çubuğunu gösterir.",
 	"sidebar.toggle-sidebar": "Kenar Çubuğunu Aç/Kapat",
 	"spinner.loading": "Yükleniyor",
-	"organizations.create-first-brand": "İlk markanızı oluşturun"
+	"organizations.create-first-brand": "İlk markanızı oluşturun",
+	"google-shopping-card.title": "Google Shopping",
+	"google-shopping-card.tooltip": "Google AI Mode’un sorgularınıza yanıt verirken gösterdiği ürün kartları. Her birinin yanındaki sayı, o kartın sonuçlarda kaç kez göründüğünü belirtir (benzersiz ürün değil, kart gösterimi). Yukarıdaki atıf dağılımından ayrı tutulur.",
+	"google-shopping-card.search-queries": "Arama sorguları",
+	"content-gaps-card.tooltip": "Rakiplerin atıf aldığı ancak markanızın almadığı sorgular — atıf varlığınızı artırma fırsatları.",
+	"content-gaps-card.description": "Rakiplerin atıf aldığı ancak markanızın almadığı sorgular"
 }

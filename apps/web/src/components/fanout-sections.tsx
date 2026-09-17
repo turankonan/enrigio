@@ -137,7 +137,7 @@ export function VariationsList({
 			))}
 			{totalUnique !== undefined && totalUnique > variations.length && (
 				<div className="text-muted-foreground text-xs">
-					Top {variations.length} of {totalUnique.toLocaleString()} variations shown
+					{t("fanout-sections.top-variations-shown", { shown: variations.length, total: totalUnique.toLocaleString() })}
 				</div>
 			)}
 		</div>

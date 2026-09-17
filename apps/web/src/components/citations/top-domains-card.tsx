@@ -56,8 +56,7 @@ export function TopDomainsCard({
 							<Tooltip>
 								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-sm font-normal">
-									The most frequently cited domains across all prompt evaluations. Each domain is colored by its
-									category (brand, competitor, etc.).
+									{t("top-domains-card.tooltip")}
 								</TooltipContent>
 							</Tooltip>
 						</CardTitle>

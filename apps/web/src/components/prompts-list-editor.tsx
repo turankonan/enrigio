@@ -285,9 +285,7 @@ function ColumnHeader({
 					<Tooltip>
 						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent>
-							<p className="max-w-xs">
-								Auto-generated tags like &quot;branded&quot; or &quot;unbranded&quot; based on prompt content.
-							</p>
+							<p className="max-w-xs">{t("prompts-list-editor.system-tooltip")}</p>
 						</TooltipContent>
 					</Tooltip>
 				</div>

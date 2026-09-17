@@ -51,13 +51,11 @@ export function GoogleShoppingCard({ googleModule }: { googleModule: GoogleModul
 		<Card>
 			<CardHeader>
 				<CardTitle className="flex items-center gap-1.5">
-					Google Shopping
+					{t("google-shopping-card.title")}
 					<Tooltip>
 						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">
-							Product cards Google AI Mode showed when answering your prompts. The number next to each is how many times
-							that card appeared across results (card inclusions, not unique products). Kept separate from the citation
-							mix above.
+							{t("google-shopping-card.tooltip")}
 						</TooltipContent>
 					</Tooltip>
 				</CardTitle>
@@ -136,7 +134,7 @@ export function GoogleShoppingCard({ googleModule }: { googleModule: GoogleModul
 
 				{googleModule.search.queries.length > 0 && (
 					<div>
-						<h4 className="text-sm font-medium mb-2">Search queries</h4>
+						<h4 className="text-sm font-medium mb-2">{t("google-shopping-card.search-queries")}</h4>
 						<div className="divide-y divide-border/50">
 							{(showAllQueries ? googleModule.search.queries : googleModule.search.queries.slice(0, 5)).map((q) => {
 								const isExpanded = expandedQuery === q.query;

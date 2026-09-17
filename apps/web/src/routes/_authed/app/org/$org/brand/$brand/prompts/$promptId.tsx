@@ -432,7 +432,7 @@ function MentionsTab({
 								</Link>{" "}
 								are shown here.
 							</p>
-							<p className="mt-2">If a competitor isn&apos;t showing up, add them to your list.</p>
+							<p className="mt-2">{t("prompt_details.mentions_tooltip_add")}</p>
 						</TooltipContent>
 					</Tooltip>
 				</CardTitle>
