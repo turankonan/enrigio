@@ -15,7 +15,6 @@ import MissingEnvPage from "@/components/missing-env-page";
 import { NotFoundPage } from "@/components/not-found-page";
 import queryDevtools from "@/integrations/tanstack-query/devtools";
 import { rootConfigQuery } from "@/lib/config/queries";
-import { initCrisp } from "@/lib/crisp";
 import { initPostHog } from "@/lib/posthog";
 import type { PublicClientConfig } from "@/server/config";
 import appCss from "../styles.css?url";
@@ -148,11 +147,6 @@ function RootComponent() {
 		const key = clientConfig?.analytics?.posthogKey;
 		if (key) initPostHog(key);
 	}, [clientConfig?.analytics?.posthogKey]);
-
-	useEffect(() => {
-		if (!clientConfig) return;
-		initCrisp(clientConfig.analytics?.crispWebsiteId, clientConfig.mode);
-	}, [clientConfig]);
 
 	const clarityQueueScript = `window.clarity=window.clarity||function(){(window.clarity.q=window.clarity.q||[]).push(arguments)};`;
 

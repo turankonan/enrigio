@@ -2,7 +2,7 @@
  * Server functions for providing deployment configuration to the client.
  */
 import { createServerFn } from "@tanstack/react-start";
-import { CRISP_WEBSITE_ID } from "@workspace/config/constants";
+
 import { getDeploymentModeFromEnv, getEnvValidationState } from "@workspace/config/env";
 import type { ClientConfig } from "@workspace/config/types";
 import { getDeployment } from "@workspace/deployment";
@@ -29,12 +29,6 @@ function resolvePosthogKey(): string | undefined {
 	return process.env.VITE_POSTHOG_KEY ?? POSTHOG_PUBLIC_KEY;
 }
 
-export function resolveCrispWebsiteId(): string | undefined {
-	const mode = getDeploymentModeFromEnv();
-	if (mode !== "cloud" && mode !== "demo") return undefined;
-	return CRISP_WEBSITE_ID;
-}
-
 export const getClientConfig = createServerFn({ method: "GET" }).handler(async (): Promise<PublicClientConfig> => {
 	const deployment = getDeployment();
 
@@ -55,7 +49,6 @@ export const getClientConfig = createServerFn({ method: "GET" }).handler(async (
 			plausibleDomain: process.env.VITE_PLAUSIBLE_DOMAIN,
 			clarityProjectId: process.env.VITE_CLARITY_PROJECT_ID,
 			posthogKey: resolvePosthogKey(),
-			crispWebsiteId: resolveCrispWebsiteId(),
 		},
 		defaultDelayHours: getDefaultDelayHours(),
 		canRegister,

@@ -3,6 +3,8 @@ import { useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 
+const REPO_URL = "https://github.com/SemiHop/elmo";
+
 export function NavAppInfo() {
 	const context = useRouteContext({ strict: false }) as { clientConfig?: ClientConfig };
 	const mode = context.clientConfig?.mode;
@@ -15,34 +17,18 @@ export function NavAppInfo() {
 
 	return (
 		<div className="mx-2 mt-1 flex items-center gap-2 border-t border-sidebar-border/60 px-1 pt-2">
-			<a
-				href={`https://github.com/answerecho/answerecho/releases/tag/v${__APP_VERSION__}`}
-				target="_blank"
-				rel="noreferrer"
-				className="flex-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-			>
-				v{__APP_VERSION__}
-			</a>
+			<span className="flex-1 text-xs font-medium text-muted-foreground">v{__APP_VERSION__}</span>
 			<div className="flex items-center gap-1">
 				<Tooltip>
 					<TooltipTrigger
-						render={<a href="https://www.answerecho.com/" target="_blank" className={linkClass} rel="noopener" />}
+						render={<a href="https://www.rigosis.com/" target="_blank" className={linkClass} rel="noopener" />}
 					>
 						<IconWorld className="size-4" />
 					</TooltipTrigger>
-					<TooltipContent>answerecho.com</TooltipContent>
+					<TooltipContent>rigosis.com</TooltipContent>
 				</Tooltip>
 				<Tooltip>
-					<TooltipTrigger
-						render={
-							<a
-								href="https://github.com/answerecho/answerecho"
-								target="_blank"
-								rel="noreferrer"
-								className={linkClass}
-							/>
-						}
-					>
+					<TooltipTrigger render={<a href={REPO_URL} target="_blank" rel="noreferrer" className={linkClass} />}>
 						<IconBrandGithub className="size-4" />
 					</TooltipTrigger>
 					<TooltipContent>View on GitHub</TooltipContent>

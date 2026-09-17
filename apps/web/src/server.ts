@@ -18,15 +18,14 @@ const strictTransportSecurity =
 const SECURITY_HEADERS: Record<string, string> = {
 	"Content-Security-Policy": [
 		"default-src 'self'",
-		"script-src 'self' 'unsafe-inline' https://*.clarity.ms https://var.answerecho.com https://*.crisp.chat",
-		"style-src 'self' 'unsafe-inline' https://*.crisp.chat",
+		"script-src 'self' 'unsafe-inline' https://*.clarity.ms https://var.answerecho.com",
+		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data: https: https://c.bing.com",
-		"font-src 'self' data: https://*.crisp.chat",
-		"media-src 'self' https://*.crisp.chat",
-		// The chatbox runs its background work in a blob worker.
-		"worker-src 'self' blob: https://*.crisp.chat",
-		"frame-src 'self' https://*.crisp.chat",
-		"connect-src 'self' https://var.answerecho.com https://*.sentry.io https://*.clarity.ms https://c.bing.com https://*.crisp.chat wss://*.relay.crisp.chat wss://*.relay.rescue.crisp.chat",
+		"font-src 'self' data:",
+		"media-src 'self'",
+		"worker-src 'self' blob:",
+		"frame-src 'self'",
+		"connect-src 'self' https://var.answerecho.com https://*.sentry.io https://*.clarity.ms https://c.bing.com",
 		"object-src 'none'",
 		"frame-ancestors 'none'",
 		"base-uri 'self'",

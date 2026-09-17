@@ -16,7 +16,6 @@ import { AppShell, PageContent } from "@/components/app-shell";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { useShellScope } from "@/hooks/use-shell-scope";
-import { identifyCrispUser } from "@/lib/crisp";
 import { identifyUser, setPersonProperties } from "@/lib/posthog";
 import { viewerQuery } from "@/lib/viewer/queries";
 
@@ -57,7 +56,6 @@ function AuthedLayout() {
 		setPersonProperties({
 			deployment_mode: context.clientConfig?.mode,
 		});
-		identifyCrispUser({ id: user.id, email: user.email, name: user.name });
 	}, [context.session?.user, context.clientConfig?.mode]);
 
 	return <Shell />;

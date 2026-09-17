@@ -48,7 +48,6 @@ export interface AnalyticsConfig {
 	clarityProjectId?: string;
 	posthogKey?: string;
 	/** Only set on deployments we operate (cloud and demo). */
-	crispWebsiteId?: string;
 }
 
 export interface BrandingConfig {
