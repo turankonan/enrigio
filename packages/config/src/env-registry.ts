@@ -283,6 +283,13 @@ export const ENV_REGISTRY: EnvVarSpec[] = [
 		description: "Client-visible copy of DEPLOYMENT_MODE.",
 	},
 	{
+		name: "VITE_LOCALE",
+		scope: "client",
+		requiredBy: "optional",
+		description:
+			"UI language: 'tr' for Turkish, anything else (or unset) renders English. Baked into the client bundle at build time.",
+	},
+	{
 		name: "VITE_APP_NAME",
 		scope: "client",
 		requiredBy: ["whitelabel"],

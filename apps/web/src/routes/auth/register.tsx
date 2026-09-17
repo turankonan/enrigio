@@ -18,6 +18,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { useState } from "react";
 import { z } from "zod";
+import { t } from "@/lib/i18n";
 import { AuthSplitLayout } from "@/components/auth/auth-split-layout";
 import { SalesFooterLinks, SalesPanel } from "@/components/auth/sales-panel";
 import FullPageCard from "@/components/full-page-card";
@@ -37,7 +38,10 @@ export const Route = createFileRoute("/auth/register")({
 	head: ({ match }) => {
 		const appName = getAppName(match);
 		return {
-			meta: [{ title: buildTitle("Sign up", { appName }) }, { name: "description", content: "Create an account." }],
+			meta: [
+				{ title: buildTitle(t("auth.register.title"), { appName }) },
+				{ name: "description", content: t("auth.register.description") },
+			],
 		};
 	},
 	component: RegisterPage,
@@ -100,7 +104,7 @@ export function RegisterForm({
 			});
 
 			if (result.error) {
-				setError(result.error.message ?? "Registration failed");
+				setError(result.error.message ?? t("auth.register.failed"));
 				setLoading(false);
 				return;
 			}
@@ -113,7 +117,7 @@ export function RegisterForm({
 
 			navigate({ to: returnTo ?? "/app" });
 		} catch {
-			setError("Something went wrong. Please try again.");
+			setError(t("auth.login.generic-error"));
 			setLoading(false);
 		}
 	}
@@ -129,13 +133,16 @@ export function RegisterForm({
 
 	if (pendingVerification) {
 		return (
-			<FullPageCard title="Check your email" subtitle={`We sent a verification link to ${email}`}>
+			<FullPageCard
+				title={t("auth.register.check-your-email")}
+				subtitle={t("auth.register.verification-sent", { email })}
+			>
 				<div className="space-y-4 w-full">
 					<p className="text-sm text-muted-foreground text-center">
 						Click the link in the email to verify your address and get started. The link expires, so verify soon.
 					</p>
 					<Button type="button" variant="outline" className="w-full" onClick={handleResend} disabled={resending}>
-						{resending ? "Sending..." : "Resend verification email"}
+						{resending ? t("auth.register.sending") : t("auth.register.resend-verification")}
 					</Button>
 				</div>
 			</FullPageCard>
@@ -144,11 +151,11 @@ export function RegisterForm({
 
 	return (
 		<AuthSplitLayout
-			title={isCloud ? "Start tracking your AI visibility" : "Create your admin account"}
+			title={isCloud ? t("auth.register.title-cloud") : t("auth.register.title-self-hosted")}
 			subtitle={
 				isCloud
 					? `Plans start at $${CLOUD_ENTRY_PRICE_USD}/mo. Cancel any time.`
-					: "This is the owner account for your self-hosted instance."
+					: t("auth.register.subtitle-self-hosted")
 			}
 			pitch={<SalesPanel variant={isCloud ? "cloud" : "self-hosted"} source={source} />}
 			footer={<SalesFooterLinks source={source} />}
@@ -178,11 +185,11 @@ export function RegisterForm({
 					</Alert>
 				)}
 				<div className="space-y-2">
-					<Label htmlFor="name">Name</Label>
+					<Label htmlFor="name">{t("auth.register.name-label")}</Label>
 					<Input
 						id="name"
 						type="text"
-						placeholder="Your name"
+						placeholder={t("auth.register.name-placeholder")}
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						required
@@ -191,11 +198,11 @@ export function RegisterForm({
 					/>
 				</div>
 				<div className="space-y-2">
-					<Label htmlFor="email">Email</Label>
+					<Label htmlFor="email">{t("auth.login.email-label")}</Label>
 					<Input
 						id="email"
 						type="email"
-						placeholder="you@example.com"
+						placeholder={t("auth.login.email-placeholder")}
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						required
@@ -203,11 +210,11 @@ export function RegisterForm({
 					/>
 				</div>
 				<div className="space-y-2">
-					<Label htmlFor="password">Password</Label>
+					<Label htmlFor="password">{t("auth.login.password-label")}</Label>
 					<Input
 						id="password"
 						type="password"
-						placeholder="Create a password"
+						placeholder={t("auth.register.password-placeholder")}
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						required
@@ -216,12 +223,12 @@ export function RegisterForm({
 					/>
 				</div>
 				<Button type="submit" className="w-full" disabled={loading}>
-					{loading ? "Creating account..." : "Create account"}
+					{loading ? t("auth.register.creating-account") : t("auth.register.create-account")}
 				</Button>
 			</form>
 			{hasUsers && (
 				<p className="text-sm text-muted-foreground pt-4">
-					Already have an account?{" "}
+					{t("auth.register.already-have-account")}{" "}
 					<Link
 						to="/auth/login"
 						search={{ ...(returnTo ? { returnTo } : {}), ...(incomingRef ? { ref: incomingRef } : {}) }}

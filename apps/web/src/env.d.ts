@@ -8,6 +8,7 @@ interface ImportMetaEnv {
 	readonly VITE_DEPLOYMENT_MODE: string;
 
 	// Branding (whitelabel only - local/demo use server-side defaults)
+	readonly VITE_LOCALE?: string;
 	readonly VITE_APP_NAME?: string;
 	readonly VITE_APP_ICON?: string;
 	readonly VITE_APP_URL?: string;

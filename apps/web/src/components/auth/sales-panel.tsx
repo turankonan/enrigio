@@ -14,6 +14,7 @@ import { platformTierMembers } from "@workspace/config/plans";
 import type { ReferralSource } from "@workspace/config/referrals";
 import { ModelIcon } from "@workspace/ui/brand/model-icon";
 import type { ReactNode } from "react";
+import { t } from "@/lib/i18n";
 
 /** Everything AnswerEcho reaches, named — the coverage claim is the product. */
 const ENGINES = [...platformTierMembers("scraped"), ...platformTierMembers("api")];
@@ -21,12 +22,12 @@ const ENGINES = [...platformTierMembers("scraped"), ...platformTierMembers("api"
 const DOCS_URL = "https://www.rigosis.com/answerecho/docs";
 
 const PITCH = {
-	headline: "See how AI answers talk about your brand.",
+	headline: t("sales-panel.headline"),
 	bullets: [
-		"Track your AI visibility on any model",
-		"Benchmark against your competitors",
-		"Analyze citations to find opportunities",
-		"Unlimited prompts, brands, and seats",
+		t("sales-panel.bullet-track-visibility"),
+		t("sales-panel.bullet-benchmark"),
+		t("sales-panel.bullet-analyze-citations"),
+		t("sales-panel.bullet-unlimited"),
 	],
 };
 
@@ -61,7 +62,9 @@ export function SalesPanel({
 function EngineStrip() {
 	return (
 		<div>
-			<p className="font-mono text-[10px] uppercase leading-none tracking-[0.2em] text-muted-foreground">Tracking</p>
+			<p className="font-mono text-[10px] uppercase leading-none tracking-[0.2em] text-muted-foreground">
+				{t("sales-panel.tracking")}
+			</p>
 			<ul className="mt-3 flex flex-wrap gap-1.5">
 				{ENGINES.map((engine) => (
 					<li
@@ -82,10 +85,10 @@ export function SalesFooterLinks({ source: _source }: { source: ReferralSource }
 	return (
 		<div className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-muted-foreground">
 			<a href={DOCS_URL} className="hover:text-foreground">
-				Docs
+				{t("sales-panel.docs")}
 			</a>
 			<p>
-				AnswerEcho <span className="opacity-60">by Rigosis</span>
+				AnswerEcho <span className="opacity-60">{t("sales-panel.by-rigosis")}</span>
 			</p>
 		</div>
 	);

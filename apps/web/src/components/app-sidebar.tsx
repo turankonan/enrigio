@@ -31,6 +31,7 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@workspace/ui/components/sidebar";
+import { t } from "@/lib/i18n";
 import { DemoModePill } from "@/components/demo-mode-pill";
 import { Logo } from "@/components/logo";
 import { NavAppInfo } from "@/components/nav-app-info";
@@ -47,27 +48,44 @@ export type AppSidebarProps = ShellScope;
 function organizationGroups(organization: OrganizationSummary, features?: FeaturesConfig): NavGroup[] {
 	const params = orgLinkParams(organization);
 	const items: NavItem[] = [
-		{ title: "Organization", link: { to: "/app/org/$org/settings", params }, icon: IconBriefcase, exact: true },
-		{ title: "Brands", link: { to: "/app/org/$org/settings/brands", params }, icon: IconBuildings },
+		{
+			title: t("app-sidebar.organization"),
+			link: { to: "/app/org/$org/settings", params },
+			icon: IconBriefcase,
+			exact: true,
+		},
+		{ title: t("app-sidebar.brands"), link: { to: "/app/org/$org/settings/brands", params }, icon: IconBuildings },
 	];
 
 	if (features?.teamInvites) {
-		items.push({ title: "Team", link: { to: "/app/org/$org/settings/members", params }, icon: IconUsers });
+		items.push({
+			title: t("app-sidebar.team"),
+			link: { to: "/app/org/$org/settings/members", params },
+			icon: IconUsers,
+		});
 	}
 
 	if (features?.billing) {
-		items.push({ title: "Billing", link: { to: "/app/org/$org/settings/billing", params }, icon: IconCreditCard });
+		items.push({
+			title: t("app-sidebar.billing"),
+			link: { to: "/app/org/$org/settings/billing", params },
+			icon: IconCreditCard,
+		});
 	}
 
-	items.push({ title: "API Keys", link: { to: "/app/org/$org/settings/api-keys", params }, icon: IconKey });
+	items.push({
+		title: t("app-sidebar.api-keys"),
+		link: { to: "/app/org/$org/settings/api-keys", params },
+		icon: IconKey,
+	});
 
 	return [
 		{ label: "Organization Settings", items },
 		{
 			label: "Docs",
 			items: [
-				{ title: "API", link: { to: "/app/org/$org/settings/api", params }, icon: IconCode },
-				{ title: "MCP", link: { to: "/app/org/$org/settings/mcp", params }, icon: IconPlugConnected },
+				{ title: t("app-sidebar.api"), link: { to: "/app/org/$org/settings/api", params }, icon: IconCode },
+				{ title: t("app-sidebar.mcp"), link: { to: "/app/org/$org/settings/mcp", params }, icon: IconPlugConnected },
 			],
 		},
 	];
@@ -76,41 +94,70 @@ function organizationGroups(organization: OrganizationSummary, features?: Featur
 function brandGroups(organization: OrganizationSummary, brand: BrandWithPrompts): NavGroup[] {
 	const params = brandLinkParams(organization, brand);
 	const dashboard: NavItem[] = [
-		{ title: "Overview", link: { to: "/app/org/$org/brand/$brand", params }, icon: IconDashboard, exact: true },
+		{
+			title: t("app-sidebar.overview"),
+			link: { to: "/app/org/$org/brand/$brand", params },
+			icon: IconDashboard,
+			exact: true,
+		},
 	];
 
 	if (brand.onboarded) {
 		dashboard.push(
-			{ title: "Visibility", link: { to: "/app/org/$org/brand/$brand/visibility", params }, icon: IconChartBar },
 			{
-				title: "Share of Voice",
+				title: t("app-sidebar.visibility"),
+				link: { to: "/app/org/$org/brand/$brand/visibility", params },
+				icon: IconChartBar,
+			},
+			{
+				title: t("app-sidebar.share-of-voice"),
 				link: { to: "/app/org/$org/brand/$brand/share-of-voice", params },
 				icon: IconSpeakerphone,
 			},
-			{ title: "Query Fan-Out", link: { to: "/app/org/$org/brand/$brand/query-fan-out", params }, icon: IconSitemap },
-			{ title: "Citations", link: { to: "/app/org/$org/brand/$brand/citations", params }, icon: IconLink },
-			{ title: "Opportunities", link: { to: "/app/org/$org/brand/$brand/opportunities", params }, icon: IconTarget },
+			{
+				title: t("app-sidebar.query-fan-out"),
+				link: { to: "/app/org/$org/brand/$brand/query-fan-out", params },
+				icon: IconSitemap,
+			},
+			{
+				title: t("app-sidebar.citations"),
+				link: { to: "/app/org/$org/brand/$brand/citations", params },
+				icon: IconLink,
+			},
+			{
+				title: t("app-sidebar.opportunities"),
+				link: { to: "/app/org/$org/brand/$brand/opportunities", params },
+				icon: IconTarget,
+			},
 		);
 	}
 
-	const groups: NavGroup[] = [{ label: "Dashboard", items: dashboard }];
+	const groups: NavGroup[] = [{ label: t("app-sidebar.dashboard"), items: dashboard }];
 
 	if (brand.onboarded) {
 		groups.push({
-			label: "Settings",
+			label: t("app-sidebar.settings"),
 			items: [
-				{ title: "Brand", link: { to: "/app/org/$org/brand/$brand/settings/brand", params }, icon: IconBuilding },
 				{
-					title: "Competitors",
+					title: t("app-sidebar.brand"),
+					link: { to: "/app/org/$org/brand/$brand/settings/brand", params },
+					icon: IconBuilding,
+				},
+				{
+					title: t("app-sidebar.competitors"),
 					link: { to: "/app/org/$org/brand/$brand/settings/competitors", params },
 					icon: IconBuildings,
 				},
 				{
-					title: "Prompts",
+					title: t("app-sidebar.prompts"),
 					link: { to: "/app/org/$org/brand/$brand/settings/prompts", params },
 					icon: IconListDetails,
 				},
-				{ title: "LLMs", link: { to: "/app/org/$org/brand/$brand/settings/llms", params }, icon: IconCpu },
+				{
+					title: t("app-sidebar.llms"),
+					link: { to: "/app/org/$org/brand/$brand/settings/llms", params },
+					icon: IconCpu,
+				},
 			],
 		});
 	}

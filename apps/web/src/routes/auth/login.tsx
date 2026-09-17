@@ -19,6 +19,7 @@ import { Label } from "@workspace/ui/components/label";
 import { Separator } from "@workspace/ui/components/separator";
 import { useEffect, useState } from "react";
 import { z } from "zod";
+import { t } from "@/lib/i18n";
 import { AuthSplitLayout } from "@/components/auth/auth-split-layout";
 import { SalesFooterLinks, SalesPanel } from "@/components/auth/sales-panel";
 import FullPageCard from "@/components/full-page-card";
@@ -54,8 +55,8 @@ export const Route = createFileRoute("/auth/login")({
 		const appName = getAppName(match);
 		return {
 			meta: [
-				{ title: buildTitle("Sign in", { appName }) },
-				{ name: "description", content: "Sign in to your account." },
+				{ title: buildTitle(t("auth.login.title"), { appName }) },
+				{ name: "description", content: t("auth.login.description") },
 			],
 		};
 	},
@@ -107,12 +108,12 @@ export function SSOLogin({ destination = "/app" }: { destination?: string }) {
 			.then((result) => {
 				if (cancelled) return;
 				if (result.error) {
-					setError(result.error.message ?? "Failed to start sign-in");
+					setError(result.error.message ?? t("auth.login.sso-failed"));
 				}
 			})
 			.catch(() => {
 				if (!cancelled) {
-					setError("Something went wrong. Please try again.");
+					setError(t("auth.login.generic-error"));
 				}
 			});
 
@@ -123,20 +124,20 @@ export function SSOLogin({ destination = "/app" }: { destination?: string }) {
 
 	if (error) {
 		return (
-			<FullPageCard title="Sign in">
+			<FullPageCard title={t("auth.login.title")}>
 				<div className="w-full space-y-4">
 					<Alert variant="destructive">
 						<AlertDescription>{error}</AlertDescription>
 					</Alert>
 					<Button className="w-full" onClick={() => window.location.reload()}>
-						Try Again
+						{t("auth.login.try-again")}
 					</Button>
 				</div>
 			</FullPageCard>
 		);
 	}
 
-	return <FullPageCard title="Signing in..." subtitle="Redirecting to your identity provider" />;
+	return <FullPageCard title={t("auth.login.signing-in")} subtitle={t("auth.login.sso-redirecting")} />;
 }
 
 export function DemoLogin({ destination = "/app" }: { destination?: string }) {
@@ -151,19 +152,19 @@ export function DemoLogin({ destination = "/app" }: { destination?: string }) {
 		try {
 			const result = await authClient.signIn.email({ email: "demo@answerecho.com", password: "demo" });
 			if (result.error) {
-				setError(result.error.message ?? "Invalid email or password");
+				setError(result.error.message ?? t("auth.login.invalid-credentials"));
 				setLoading(false);
 				return;
 			}
 			window.location.href = destination;
 		} catch {
-			setError("Something went wrong. Please try again.");
+			setError(t("auth.login.generic-error"));
 			setLoading(false);
 		}
 	}
 
 	return (
-		<FullPageCard title="Sign in">
+		<FullPageCard title={t("auth.login.title")}>
 			<form onSubmit={handleSubmit} className="space-y-4 w-full">
 				<DemoCredentialsCallout />
 				{error && (
@@ -172,7 +173,7 @@ export function DemoLogin({ destination = "/app" }: { destination?: string }) {
 					</Alert>
 				)}
 				<Button type="submit" className="w-full" disabled={loading}>
-					{loading ? "Signing in..." : "Sign in"}
+					{loading ? t("auth.login.signing-in") : t("auth.login.title")}
 				</Button>
 			</form>
 		</FullPageCard>
@@ -216,14 +217,14 @@ export function EmailPasswordLogin({
 				if ((result.error as { error?: string }).error === "invalid_signature") {
 					// Through the router, so `destination` is recomputed.
 					navigate({ to: "/auth/login", search: {}, replace: true });
-					setError("That connection request expired. Sign in again, then start the connection from your MCP client.");
+					setError(t("auth.login.connection-expired"));
 					setLoading(false);
 					return;
 				}
 				if (isCloud && result.error.status === 403) {
-					setError("Please verify your email first — we just sent you a new verification link.");
+					setError(t("auth.login.verify-email-first"));
 				} else {
-					setError(result.error.message ?? "Invalid email or password");
+					setError(result.error.message ?? t("auth.login.invalid-credentials"));
 				}
 				setLoading(false);
 				return;
@@ -231,15 +232,15 @@ export function EmailPasswordLogin({
 
 			window.location.href = destination;
 		} catch {
-			setError("Something went wrong. Please try again.");
+			setError(t("auth.login.generic-error"));
 			setLoading(false);
 		}
 	}
 
 	return (
 		<AuthSplitLayout
-			title="Welcome back"
-			subtitle={isCloud ? "Check in on your AI visibility." : "Sign in to your AnswerEcho instance."}
+			title={t("auth.login.welcome-back")}
+			subtitle={isCloud ? t("auth.login.subtitle-cloud") : t("auth.login.subtitle-self-hosted")}
 			pitch={<SalesPanel variant={isCloud ? "cloud" : "self-hosted"} source={source} />}
 			footer={<SalesFooterLinks source={source} />}
 		>
@@ -252,11 +253,11 @@ export function EmailPasswordLogin({
 						onClick={() => authClient.signIn.social({ provider: "google", callbackURL: destination })}
 					>
 						<IconBrandGoogle className="size-4" />
-						Continue with Google
+						{t("auth.login.continue-with-google")}
 					</Button>
 					<div className="flex items-center gap-3">
 						<Separator className="flex-1" />
-						<span className="text-xs text-muted-foreground">or</span>
+						<span className="text-xs text-muted-foreground">{t("auth.login.or")}</span>
 						<Separator className="flex-1" />
 					</div>
 				</div>
@@ -268,11 +269,11 @@ export function EmailPasswordLogin({
 					</Alert>
 				)}
 				<div className="space-y-2">
-					<Label htmlFor="email">Email</Label>
+					<Label htmlFor="email">{t("auth.login.email-label")}</Label>
 					<Input
 						id="email"
 						type="email"
-						placeholder="you@example.com"
+						placeholder={t("auth.login.email-placeholder")}
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						required
@@ -282,17 +283,17 @@ export function EmailPasswordLogin({
 				</div>
 				<div className="space-y-2">
 					<div className="flex items-center justify-between">
-						<Label htmlFor="password">Password</Label>
+						<Label htmlFor="password">{t("auth.login.password-label")}</Label>
 						{isCloud && (
 							<Link to="/auth/forgot-password" className="text-xs text-primary hover:underline">
-								Forgot password?
+								{t("auth.login.forgot-password-link")}
 							</Link>
 						)}
 					</div>
 					<Input
 						id="password"
 						type="password"
-						placeholder="Password"
+						placeholder={t("auth.login.password-label")}
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						required
@@ -300,18 +301,18 @@ export function EmailPasswordLogin({
 					/>
 				</div>
 				<Button type="submit" className="w-full" disabled={loading}>
-					{loading ? "Signing in..." : "Sign in"}
+					{loading ? t("auth.login.signing-in") : t("auth.login.title")}
 				</Button>
 			</form>
 			{canRegister && (
 				<p className="text-sm text-muted-foreground pt-4">
-					Don't have an account?{" "}
+					{t("auth.login.no-account")}{" "}
 					<Link
 						to="/auth/register"
 						search={{ ...(returnTo ? { returnTo } : {}), ...(incomingRef ? { ref: incomingRef } : {}) }}
 						className="text-primary hover:underline font-medium"
 					>
-						Create one
+						{t("auth.login.create-one")}
 					</Link>
 				</p>
 			)}
@@ -324,7 +325,7 @@ function DemoCredentialsCallout() {
 		<div className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
 			<IconInfoCircle className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
 			<div className="space-y-2">
-				<p className="font-medium text-amber-900 dark:text-amber-100">Demo Account</p>
+				<p className="font-medium text-amber-900 dark:text-amber-100">{t("auth.login.demo-account")}</p>
 				<dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-amber-900/90 dark:text-amber-100/80">
 					<div className="flex items-center gap-1.5">
 						<dt className="opacity-70">Email</dt>
