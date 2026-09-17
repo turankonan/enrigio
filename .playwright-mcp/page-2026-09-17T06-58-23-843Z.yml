@@ -1,0 +1,372 @@
+- generic [ref=f2e130]:
+  - generic [ref=f2e133]:
+    - list [ref=f2e135]:
+      - listitem [ref=f2e136]:
+        - link "AnswerEcho" [ref=f2e137] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f2e141]:
+      - generic [ref=f2e142]: Dashboard
+      - list [ref=f2e143]:
+        - listitem [ref=f2e144]:
+          - link "Overview" [ref=f2e145] [cursor=pointer]:
+            - /url: /app/org/default/brand/rigosis
+    - generic [ref=f2e151]:
+      - list [ref=f2e152]:
+        - listitem [ref=f2e153]:
+          - button "Account and organizations" [ref=f2e154] [cursor=pointer]:
+            - generic [ref=f2e160]:
+              - generic [ref=f2e161]: Semi Hop
+              - generic [ref=f2e162]: semi.hop@rigosis.com
+      - generic [ref=f2e166]:
+        - generic [ref=f2e167]: v0.4.1
+        - generic [ref=f2e168]:
+          - link [ref=f2e169] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+          - link [ref=f2e174] [cursor=pointer]:
+            - /url: https://github.com/SemiHop/elmo
+  - main [ref=f2e177]:
+    - generic [ref=f2e179]:
+      - button "Toggle Sidebar" [ref=f2e180] [cursor=pointer]
+      - separator [ref=f2e182]
+      - navigation "breadcrumb" [ref=f2e183]:
+        - list [ref=f2e184]:
+          - listitem [ref=f2e185]:
+            - link "Organization Default" [ref=f2e186] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f2e187]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f2e188]
+          - listitem [ref=f2e191]:
+            - link "Brand Rigosis" [ref=f2e192] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f2e193]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f2e194]
+          - listitem [ref=f2e197]:
+            - link "Overview" [disabled] [ref=f2e198]
+    - generic [ref=f2e202]:
+      - generic [ref=f2e203]:
+        - heading "Research Brand Data" [level=2] [ref=f2e204]
+        - paragraph [ref=f2e205]: We will analyze your website and find the best generative AI prompts to track. This process may take a couple of minutes.
+      - generic [ref=f2e206]:
+        - generic [ref=f2e212]:
+          - heading "Brand details" [level=2] [ref=f2e213]
+          - paragraph [ref=f2e214]: Confirm the brand identity, additional domains, and aliases used for tracking.
+          - generic [ref=f2e215]:
+            - generic [ref=f2e216]:
+              - paragraph [ref=f2e217]: Brand name
+              - textbox "Brand name" [ref=f2e218]: Rigosis
+            - generic [ref=f2e219]:
+              - paragraph [ref=f2e220]: Website URL
+              - textbox "https://example.com" [ref=f2e221]: https://rigosis.com/
+            - generic [ref=f2e222]:
+              - paragraph [ref=f2e223]: Additional domains
+              - generic [ref=f2e224]:
+                - combobox [ref=f2e226] [cursor=pointer]:
+                  - generic [ref=f2e227]: Add domain...
+                - paragraph [ref=f2e229]:
+                  - strong [ref=f2e230]: 0/10
+                  - text: items entered.
+            - generic [ref=f2e231]:
+              - paragraph [ref=f2e232]: Aliases
+              - generic [ref=f2e233]:
+                - combobox [ref=f2e235] [cursor=pointer]:
+                  - generic [ref=f2e236]: Add alias...
+                - paragraph [ref=f2e238]:
+                  - strong [ref=f2e239]: 0/10
+                  - text: items entered.
+        - separator [ref=f2e240]
+        - generic [ref=f2e209]:
+          - generic [ref=f2e241]:
+            - heading "Competitors" [level=2] [ref=f2e242]
+            - paragraph [ref=f2e243]: Companies you want tracked alongside your brand.
+          - generic [ref=f2e244]:
+            - button "Add Competitor" [ref=f2e245] [cursor=pointer]
+            - paragraph [ref=f2e246]:
+              - strong [ref=f2e247]: 0/500
+              - text: competitors configured
+        - separator [ref=f2e248]
+        - generic [ref=f2e249]:
+          - generic [ref=f2e250]:
+            - heading "Prompts" [level=2] [ref=f2e251]
+            - paragraph [ref=f2e252]: Pick which AI tracking prompts to start with. Untick any you don't want, edit tags, or add your own at the bottom.
+          - generic [ref=f2e253]:
+            - generic [ref=f2e254]:
+              - generic [ref=f2e255]:
+                - checkbox "Select all prompts" [ref=f2e256]
+                - checkbox [aria-hidden] [ref=f2e257]
+              - generic [ref=f2e258]: Prompt Text
+              - generic [ref=f2e262]: Tags
+              - generic [ref=f2e266]: Enabled
+            - generic [ref=f2e268]:
+              - generic [ref=f2e270]:
+                - generic [ref=f2e271]:
+                  - checkbox "Select prompt" [ref=f2e272]
+                  - checkbox [aria-hidden] [ref=f2e273]
+                - textbox "Enter prompt text..." [ref=f2e274]: best it service management consultants in turkey
+                - combobox [ref=f2e276] [cursor=pointer]:
+                  - generic [ref=f2e277]:
+                    - generic [ref=f2e278]:
+                      - generic [ref=f2e279]: itsm
+                      - button "Remove itsm" [ref=f2e280]
+                    - generic [ref=f2e284]:
+                      - generic [ref=f2e285]: consulting
+                      - button "Remove consulting" [ref=f2e286]
+                - generic [ref=f2e290]:
+                  - switch "Disable prompt" [checked] [ref=f2e291]
+                  - checkbox [checked] [aria-hidden] [ref=f2e292]
+              - generic [ref=f2e294]:
+                - generic [ref=f2e295]:
+                  - checkbox "Select prompt" [ref=f2e296]
+                  - checkbox [aria-hidden] [ref=f2e297]
+                - textbox "Enter prompt text..." [ref=f2e298]: opentext smax implementation partners turkey
+                - combobox [ref=f2e300] [cursor=pointer]:
+                  - generic [ref=f2e301]:
+                    - generic [ref=f2e302]:
+                      - generic [ref=f2e303]: opentext
+                      - button "Remove opentext" [ref=f2e304]
+                    - generic [ref=f2e308]:
+                      - generic [ref=f2e309]: itsm
+                      - button "Remove itsm" [ref=f2e310]
+                - generic [ref=f2e314]:
+                  - switch "Disable prompt" [checked] [ref=f2e315]
+                  - checkbox [checked] [aria-hidden] [ref=f2e316]
+              - generic [ref=f2e318]:
+                - generic [ref=f2e319]:
+                  - checkbox "Select prompt" [ref=f2e320]
+                  - checkbox [aria-hidden] [ref=f2e321]
+                - textbox "Enter prompt text..." [ref=f2e322]: itom vs itsm differences
+                - combobox [ref=f2e324] [cursor=pointer]:
+                  - generic [ref=f2e326]:
+                    - generic [ref=f2e327]: itsm
+                    - button "Remove itsm" [ref=f2e328]
+                - generic [ref=f2e332]:
+                  - switch "Enable prompt" [ref=f2e671]
+                  - checkbox [aria-hidden] [ref=f2e334]
+              - generic [ref=f2e336]:
+                - generic [ref=f2e337]:
+                  - checkbox "Select prompt" [ref=f2e338]
+                  - checkbox [aria-hidden] [ref=f2e339]
+                - textbox "Enter prompt text..." [ref=f2e340]: managed it support providers for banks
+                - combobox [ref=f2e342] [cursor=pointer]:
+                  - generic [ref=f2e344]:
+                    - generic [ref=f2e345]: consulting
+                    - button "Remove consulting" [ref=f2e346]
+                - generic [ref=f2e350]:
+                  - switch "Enable prompt" [ref=f2e673]
+                  - checkbox [aria-hidden] [ref=f2e352]
+              - generic [ref=f2e354]:
+                - generic [ref=f2e355]:
+                  - checkbox "Select prompt" [ref=f2e356]
+                  - checkbox [aria-hidden] [ref=f2e357]
+                - textbox "Enter prompt text..." [ref=f2e358]: enterprise it automation rpa vendors
+                - combobox [ref=f2e360] [cursor=pointer]:
+                  - generic [ref=f2e362]:
+                    - generic [ref=f2e363]: devops
+                    - button "Remove devops" [ref=f2e364]
+                - generic [ref=f2e368]:
+                  - switch "Enable prompt" [active] [ref=f2e675]
+                  - checkbox [aria-hidden] [ref=f2e370]
+              - generic [ref=f2e372]:
+                - generic [ref=f2e373]:
+                  - checkbox "Select prompt" [ref=f2e374]
+                  - checkbox [aria-hidden] [ref=f2e375]
+                - textbox "Enter prompt text..." [ref=f2e376]: apm tools and consultants turkey
+                - combobox [ref=f2e378] [cursor=pointer]:
+                  - generic [ref=f2e380]:
+                    - generic [ref=f2e381]: devops
+                    - button "Remove devops" [ref=f2e382]
+                - generic [ref=f2e386]:
+                  - switch "Disable prompt" [checked] [ref=f2e387]
+                  - checkbox [checked] [aria-hidden] [ref=f2e388]
+              - generic [ref=f2e390]:
+                - generic [ref=f2e391]:
+                  - checkbox "Select prompt" [ref=f2e392]
+                  - checkbox [aria-hidden] [ref=f2e393]
+                - textbox "Enter prompt text..." [ref=f2e394]: it service management training providers
+                - combobox [ref=f2e396] [cursor=pointer]:
+                  - generic [ref=f2e397]:
+                    - generic [ref=f2e398]:
+                      - generic [ref=f2e399]: itsm
+                      - button "Remove itsm" [ref=f2e400]
+                    - generic [ref=f2e404]:
+                      - generic [ref=f2e405]: consulting
+                      - button "Remove consulting" [ref=f2e406]
+                - generic [ref=f2e410]:
+                  - switch "Disable prompt" [checked] [ref=f2e411]
+                  - checkbox [checked] [aria-hidden] [ref=f2e412]
+              - generic [ref=f2e414]:
+                - generic [ref=f2e415]:
+                  - checkbox "Select prompt" [ref=f2e416]
+                  - checkbox [aria-hidden] [ref=f2e417]
+                - textbox "Enter prompt text..." [ref=f2e418]: where to buy it service management software
+                - combobox [ref=f2e420] [cursor=pointer]:
+                  - generic [ref=f2e422]:
+                    - generic [ref=f2e423]: itsm
+                    - button "Remove itsm" [ref=f2e424]
+                - generic [ref=f2e428]:
+                  - switch "Disable prompt" [checked] [ref=f2e429]
+                  - checkbox [checked] [aria-hidden] [ref=f2e430]
+              - generic [ref=f2e432]:
+                - generic [ref=f2e433]:
+                  - checkbox "Select prompt" [ref=f2e434]
+                  - checkbox [aria-hidden] [ref=f2e435]
+                - textbox "Enter prompt text..." [ref=f2e436]: it outsourcing companies for public sector turkey
+                - combobox [ref=f2e438] [cursor=pointer]:
+                  - generic [ref=f2e440]:
+                    - generic [ref=f2e441]: consulting
+                    - button "Remove consulting" [ref=f2e442]
+                - generic [ref=f2e446]:
+                  - switch "Disable prompt" [checked] [ref=f2e447]
+                  - checkbox [checked] [aria-hidden] [ref=f2e448]
+              - generic [ref=f2e450]:
+                - generic [ref=f2e451]:
+                  - checkbox "Select prompt" [ref=f2e452]
+                  - checkbox [aria-hidden] [ref=f2e453]
+                - textbox "Enter prompt text..." [ref=f2e454]: sustainable it project management vendors
+                - combobox [ref=f2e456] [cursor=pointer]:
+                  - generic [ref=f2e458]:
+                    - generic [ref=f2e459]: consulting
+                    - button "Remove consulting" [ref=f2e460]
+                - generic [ref=f2e464]:
+                  - switch "Disable prompt" [checked] [ref=f2e465]
+                  - checkbox [checked] [aria-hidden] [ref=f2e466]
+              - generic [ref=f2e468]:
+                - generic [ref=f2e469]:
+                  - checkbox "Select prompt" [ref=f2e470]
+                  - checkbox [aria-hidden] [ref=f2e471]
+                - textbox "Enter prompt text..." [ref=f2e472]: opentext smax partners europe
+                - combobox [ref=f2e474] [cursor=pointer]:
+                  - generic [ref=f2e475]:
+                    - generic [ref=f2e476]:
+                      - generic [ref=f2e477]: opentext
+                      - button "Remove opentext" [ref=f2e478]
+                    - generic [ref=f2e482]:
+                      - generic [ref=f2e483]: itsm
+                      - button "Remove itsm" [ref=f2e484]
+                - generic [ref=f2e488]:
+                  - switch "Disable prompt" [checked] [ref=f2e489]
+                  - checkbox [checked] [aria-hidden] [ref=f2e490]
+              - generic [ref=f2e492]:
+                - generic [ref=f2e493]:
+                  - checkbox "Select prompt" [ref=f2e494]
+                  - checkbox [aria-hidden] [ref=f2e495]
+                - textbox "Enter prompt text..." [ref=f2e496]: security and devops consultancy firms
+                - combobox [ref=f2e498] [cursor=pointer]:
+                  - generic [ref=f2e499]:
+                    - generic [ref=f2e500]:
+                      - generic [ref=f2e501]: security
+                      - button "Remove security" [ref=f2e502]
+                    - generic [ref=f2e506]:
+                      - generic [ref=f2e507]: devops
+                      - button "Remove devops" [ref=f2e508]
+                - generic [ref=f2e512]:
+                  - switch "Disable prompt" [checked] [ref=f2e513]
+                  - checkbox [checked] [aria-hidden] [ref=f2e514]
+              - generic [ref=f2e516]:
+                - generic [ref=f2e517]:
+                  - checkbox "Select prompt" [ref=f2e518]
+                  - checkbox [aria-hidden] [ref=f2e519]
+                - textbox "Enter prompt text..." [ref=f2e520]: it automation and process automation providers
+                - combobox [ref=f2e522] [cursor=pointer]:
+                  - generic [ref=f2e524]:
+                    - generic [ref=f2e525]: devops
+                    - button "Remove devops" [ref=f2e526]
+                - generic [ref=f2e530]:
+                  - switch "Disable prompt" [checked] [ref=f2e531]
+                  - checkbox [checked] [aria-hidden] [ref=f2e532]
+              - generic [ref=f2e534]:
+                - generic [ref=f2e535]:
+                  - checkbox "Select prompt" [ref=f2e536]
+                  - checkbox [aria-hidden] [ref=f2e537]
+                - textbox "Enter prompt text..." [ref=f2e538]: best companies for it support continuity services
+                - combobox [ref=f2e540] [cursor=pointer]:
+                  - generic [ref=f2e541]:
+                    - generic [ref=f2e542]:
+                      - generic [ref=f2e543]: consulting
+                      - button "Remove consulting" [ref=f2e544]
+                    - generic [ref=f2e548]:
+                      - generic [ref=f2e549]: itsm
+                      - button "Remove itsm" [ref=f2e550]
+                - generic [ref=f2e554]:
+                  - switch "Disable prompt" [checked] [ref=f2e555]
+                  - checkbox [checked] [aria-hidden] [ref=f2e556]
+              - generic [ref=f2e558]:
+                - generic [ref=f2e559]:
+                  - checkbox "Select prompt" [ref=f2e560]
+                  - checkbox [aria-hidden] [ref=f2e561]
+                - textbox "Enter prompt text..." [ref=f2e562]: it service management case studies turkey
+                - combobox [ref=f2e564] [cursor=pointer]:
+                  - generic [ref=f2e566]:
+                    - generic [ref=f2e567]: itsm
+                    - button "Remove itsm" [ref=f2e568]
+                - generic [ref=f2e572]:
+                  - switch "Disable prompt" [checked] [ref=f2e573]
+                  - checkbox [checked] [aria-hidden] [ref=f2e574]
+              - generic [ref=f2e576]:
+                - generic [ref=f2e577]:
+                  - checkbox "Select prompt" [ref=f2e578]
+                  - checkbox [aria-hidden] [ref=f2e579]
+                - textbox "Enter prompt text..." [ref=f2e580]: rigosis alternative
+                - combobox [ref=f2e582] [cursor=pointer]:
+                  - generic [ref=f2e584]:
+                    - generic [ref=f2e585]: itsm
+                    - button "Remove itsm" [ref=f2e586]
+                - generic [ref=f2e590]:
+                  - switch "Disable prompt" [checked] [ref=f2e591]
+                  - checkbox [checked] [aria-hidden] [ref=f2e592]
+              - generic [ref=f2e594]:
+                - generic [ref=f2e595]:
+                  - checkbox "Select prompt" [ref=f2e596]
+                  - checkbox [aria-hidden] [ref=f2e597]
+                - textbox "Enter prompt text..." [ref=f2e598]: is rigosis worth it
+                - combobox [ref=f2e600] [cursor=pointer]:
+                  - generic [ref=f2e602]:
+                    - generic [ref=f2e603]: consulting
+                    - button "Remove consulting" [ref=f2e604]
+                - generic [ref=f2e608]:
+                  - switch "Disable prompt" [checked] [ref=f2e609]
+                  - checkbox [checked] [aria-hidden] [ref=f2e610]
+              - generic [ref=f2e612]:
+                - generic [ref=f2e613]:
+                  - checkbox "Select prompt" [ref=f2e614]
+                  - checkbox [aria-hidden] [ref=f2e615]
+                - textbox "Enter prompt text..." [ref=f2e616]: rigosis opentext partner
+                - combobox [ref=f2e618] [cursor=pointer]:
+                  - generic [ref=f2e620]:
+                    - generic [ref=f2e621]: opentext
+                    - button "Remove opentext" [ref=f2e622]
+                - generic [ref=f2e626]:
+                  - switch "Disable prompt" [checked] [ref=f2e627]
+                  - checkbox [checked] [aria-hidden] [ref=f2e628]
+              - generic [ref=f2e630]:
+                - generic [ref=f2e631]:
+                  - checkbox "Select prompt" [ref=f2e632]
+                  - checkbox [aria-hidden] [ref=f2e633]
+                - textbox "Enter prompt text..." [ref=f2e634]: rigosis itsm services
+                - combobox [ref=f2e636] [cursor=pointer]:
+                  - generic [ref=f2e638]:
+                    - generic [ref=f2e639]: itsm
+                    - button "Remove itsm" [ref=f2e640]
+                - generic [ref=f2e644]:
+                  - switch "Disable prompt" [checked] [ref=f2e645]
+                  - checkbox [checked] [aria-hidden] [ref=f2e646]
+              - generic [ref=f2e648]:
+                - generic [ref=f2e649]:
+                  - checkbox "Select prompt" [ref=f2e650]
+                  - checkbox [aria-hidden] [ref=f2e651]
+                - textbox "Enter prompt text..." [ref=f2e652]: consultants for it operations management (itom)
+                - combobox [ref=f2e654] [cursor=pointer]:
+                  - generic [ref=f2e656]:
+                    - generic [ref=f2e657]: itsm
+                    - button "Remove itsm" [ref=f2e658]
+                - generic [ref=f2e662]:
+                  - switch "Disable prompt" [checked] [ref=f2e663]
+                  - checkbox [checked] [aria-hidden] [ref=f2e664]
+            - generic [ref=f2e665]:
+              - button "Add Prompt" [ref=f2e666] [cursor=pointer]
+              - button "Add Multiple" [ref=f2e667] [cursor=pointer]
+            - paragraph [ref=f2e668]:
+              - strong [ref=f2e669]: 17/100
+              - text: prompts configured
+        - button "Start tracking (17 new prompts)" [ref=f2e676] [cursor=pointer]

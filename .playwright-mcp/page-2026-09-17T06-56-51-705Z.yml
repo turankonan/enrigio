@@ -1,0 +1,60 @@
+- generic [ref=f2e130]:
+  - generic [ref=f2e133]:
+    - list [ref=f2e135]:
+      - listitem [ref=f2e136]:
+        - link "AnswerEcho" [ref=f2e137] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f2e141]:
+      - generic [ref=f2e142]: Dashboard
+      - list [ref=f2e143]:
+        - listitem [ref=f2e144]:
+          - link "Overview" [ref=f2e145] [cursor=pointer]:
+            - /url: /app/org/default/brand/rigosis
+    - generic [ref=f2e151]:
+      - list [ref=f2e152]:
+        - listitem [ref=f2e153]:
+          - button "Account and organizations" [ref=f2e154] [cursor=pointer]:
+            - generic [ref=f2e160]:
+              - generic [ref=f2e161]: Semi Hop
+              - generic [ref=f2e162]: semi.hop@rigosis.com
+      - generic [ref=f2e166]:
+        - generic [ref=f2e167]: v0.4.1
+        - generic [ref=f2e168]:
+          - link [ref=f2e169] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+          - link [ref=f2e174] [cursor=pointer]:
+            - /url: https://github.com/SemiHop/elmo
+  - main [ref=f2e177]:
+    - generic [ref=f2e179]:
+      - button "Toggle Sidebar" [ref=f2e180] [cursor=pointer]
+      - separator [ref=f2e182]
+      - navigation "breadcrumb" [ref=f2e183]:
+        - list [ref=f2e184]:
+          - listitem [ref=f2e185]:
+            - link "Organization Default" [ref=f2e186] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f2e187]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f2e188]
+          - listitem [ref=f2e191]:
+            - link "Brand Rigosis" [ref=f2e192] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f2e193]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f2e194]
+          - listitem [ref=f2e197]:
+            - link "Overview" [disabled] [ref=f2e198]
+    - generic [ref=f2e202]:
+      - generic [ref=f2e203]:
+        - heading "Research Brand Data" [level=2] [ref=f2e204]
+        - paragraph [ref=f2e205]: We will analyze your website and find the best generative AI prompts to track. This process may take a couple of minutes.
+      - generic [ref=f2e206]:
+        - paragraph [ref=f2e207]:
+          - text: We'll analyze
+          - strong [ref=f2e208]: https://rigosis.com/
+          - text: using web search to suggest competitors, additional domains/aliases, and a starter set of AI prompts to track.
+        - generic [ref=f2e209]:
+          - button "Loading Analyzing brand…" [disabled]:
+            - status "Loading"
+            - text: Analyzing brand…
+          - button "Cancel" [ref=f2e211] [cursor=pointer]

@@ -1,0 +1,49 @@
+- generic [ref=f1e2]:
+  - generic [ref=f1e4]:
+    - generic [ref=f1e5]: AnswerEcho
+    - generic [ref=f1e8]:
+      - heading "Create your admin account" [level=1] [ref=f1e9]
+      - paragraph [ref=f1e10]: This is the owner account for your self-hosted instance.
+      - generic [ref=f1e12]:
+        - generic [ref=f1e13]:
+          - generic [ref=f1e14]: Name
+          - textbox "Name" [active] [ref=f1e15]:
+            - /placeholder: Your name
+        - generic [ref=f1e16]:
+          - generic [ref=f1e17]: Email
+          - textbox "Email" [ref=f1e18]:
+            - /placeholder: you@example.com
+        - generic [ref=f1e19]:
+          - generic [ref=f1e20]: Password
+          - textbox "Password" [ref=f1e21]:
+            - /placeholder: Create a password
+        - button "Create account" [ref=f1e22] [cursor=pointer]
+    - generic [ref=f1e23]:
+      - link "Docs" [ref=f1e24] [cursor=pointer]:
+        - /url: https://www.rigosis.com/answerecho/docs
+      - paragraph [ref=f1e25]: AnswerEcho by Rigosis
+  - complementary [ref=f1e26]:
+    - generic [ref=f1e28]:
+      - heading "See how AI answers talk about your brand." [level=2] [ref=f1e29]
+      - list [ref=f1e30]:
+        - listitem [ref=f1e31]:
+          - generic [ref=f1e34]: Track your AI visibility on any model
+        - listitem [ref=f1e35]:
+          - generic [ref=f1e38]: Benchmark against your competitors
+        - listitem [ref=f1e39]:
+          - generic [ref=f1e42]: Analyze citations to find opportunities
+        - listitem [ref=f1e43]:
+          - generic [ref=f1e46]: Unlimited prompts, brands, and seats
+      - generic [ref=f1e47]:
+        - paragraph [ref=f1e48]: Tracking
+        - list [ref=f1e49]:
+          - listitem [ref=f1e50]: ChatGPT
+          - listitem [ref=f1e53]: Google AI Mode
+          - listitem [ref=f1e56]: Google AI Overview
+          - listitem [ref=f1e59]: Copilot
+          - listitem [ref=f1e62]: Perplexity
+          - listitem [ref=f1e65]: Gemini
+          - listitem [ref=f1e68]: Qwen
+          - listitem [ref=f1e71]: DeepSeek
+          - listitem [ref=f1e74]: Mistral
+          - listitem [ref=f1e77]: Claude

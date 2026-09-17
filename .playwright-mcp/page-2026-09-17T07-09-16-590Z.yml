@@ -1,0 +1,90 @@
+- generic [ref=f4e2]:
+  - generic [ref=f4e5]:
+    - list [ref=f4e7]:
+      - listitem [ref=f4e8]:
+        - link "AnswerEcho" [ref=f4e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f4e12]:
+      - generic [ref=f4e13]:
+        - generic [ref=f4e14]: Dashboard
+        - list [ref=f4e15]:
+          - listitem [ref=f4e16]:
+            - link "Overview" [ref=f4e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f4e23]:
+            - link "Visibility" [ref=f4e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f4e30]:
+            - link "Share of Voice" [ref=f4e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f4e37]:
+            - link "Query Fan-Out" [ref=f4e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f4e45]:
+            - link "Citations" [ref=f4e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f4e52]:
+            - link "Opportunities" [ref=f4e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f4e59]:
+        - generic [ref=f4e60]: Settings
+        - list [ref=f4e61]:
+          - listitem [ref=f4e62]:
+            - link "Brand" [ref=f4e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f4e67]:
+            - link "Competitors" [ref=f4e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f4e73]:
+            - link "Prompts" [ref=f4e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f4e79]:
+            - link "LLMs" [ref=f4e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f4e85]:
+      - list [ref=f4e86]:
+        - listitem [ref=f4e87]:
+          - button "Account and organizations" [ref=f4e88] [cursor=pointer]:
+            - generic [ref=f4e94]:
+              - generic [ref=f4e95]: Semi Hop
+              - generic [ref=f4e96]: semi.hop@rigosis.com
+      - generic [ref=f4e100]:
+        - generic [ref=f4e101]: v0.4.1
+        - generic [ref=f4e102]:
+          - link [ref=f4e103] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+          - link [ref=f4e108] [cursor=pointer]:
+            - /url: https://github.com/SemiHop/elmo
+  - main [ref=f4e111]:
+    - generic [ref=f4e113]:
+      - button "Toggle Sidebar" [ref=f4e114] [cursor=pointer]
+      - separator [ref=f4e116]
+      - navigation "breadcrumb" [ref=f4e117]:
+        - list [ref=f4e118]:
+          - listitem [ref=f4e119]:
+            - link "Organization Default" [ref=f4e120] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f4e121]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f4e122]
+          - listitem [ref=f4e125]:
+            - link "Brand Rigosis" [ref=f4e126] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f4e127]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f4e128]
+          - listitem [ref=f4e131]:
+            - link "Overview" [disabled] [ref=f4e132]
+    - generic [ref=f4e137]:
+      - generic [ref=f4e138]:
+        - generic [ref=f4e139]:
+          - heading "AI Visibility" [level=2] [ref=f4e140]
+          - link "View Visibility" [ref=f4e144] [cursor=pointer]:
+            - /url: /app/org/default/brand/rigosis/visibility
+        - generic [ref=f4e145]: Visibility Trends (30d)
+      - generic [ref=f4e158]:
+        - generic [ref=f4e159]:
+          - heading "Share of Voice" [level=2] [ref=f4e160]
+          - link "View Share of Voice" [ref=f4e165] [cursor=pointer]:
+            - /url: /app/org/default/brand/rigosis/share-of-voice
+        - generic [ref=f4e166]: Share of Voice Trends (30d)

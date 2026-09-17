@@ -1,0 +1,77 @@
+- generic [ref=f10e2]:
+  - generic [ref=f10e5]:
+    - list [ref=f10e7]:
+      - listitem [ref=f10e8]:
+        - link "AnswerEcho" [ref=f10e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f10e12]:
+      - generic [ref=f10e13]:
+        - generic [ref=f10e14]: Dashboard
+        - list [ref=f10e15]:
+          - listitem [ref=f10e16]:
+            - link "Overview" [ref=f10e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f10e23]:
+            - link "Visibility" [ref=f10e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f10e30]:
+            - link "Share of Voice" [ref=f10e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f10e37]:
+            - link "Query Fan-Out" [ref=f10e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f10e45]:
+            - link "Citations" [ref=f10e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f10e52]:
+            - link "Opportunities" [ref=f10e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f10e59]:
+        - generic [ref=f10e60]: Settings
+        - list [ref=f10e61]:
+          - listitem [ref=f10e62]:
+            - link "Brand" [ref=f10e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f10e67]:
+            - link "Competitors" [ref=f10e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f10e73]:
+            - link "Prompts" [ref=f10e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f10e79]:
+            - link "LLMs" [ref=f10e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f10e85]:
+      - list [ref=f10e86]:
+        - listitem [ref=f10e87]:
+          - button "Account and organizations" [ref=f10e88] [cursor=pointer]:
+            - generic [ref=f10e94]:
+              - generic [ref=f10e95]: Semi Hop
+              - generic [ref=f10e96]: semi.hop@rigosis.com
+      - generic [ref=f10e100]:
+        - generic [ref=f10e101]: v0.4.1
+        - link [ref=f10e103] [cursor=pointer]:
+          - /url: https://www.rigosis.com/
+  - main [ref=f10e108]:
+    - generic [ref=f10e110]:
+      - button "Toggle Sidebar" [ref=f10e111] [cursor=pointer]
+      - separator [ref=f10e113]
+      - navigation "breadcrumb" [ref=f10e114]:
+        - list [ref=f10e115]:
+          - listitem [ref=f10e116]:
+            - link "Organization Default" [ref=f10e117] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f10e118]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f10e119]
+          - listitem [ref=f10e122]:
+            - link "Brand Rigosis" [ref=f10e123] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f10e124]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f10e125]
+          - listitem [ref=f10e128]:
+            - link "Competitors" [disabled] [ref=f10e129]
+    - generic [ref=f10e133]:
+      - heading "Competitors" [level=1] [ref=f10e134]
+      - paragraph [ref=f10e135]: Loading...

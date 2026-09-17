@@ -1,0 +1,175 @@
+- generic [ref=f8e2]:
+  - generic [ref=f8e5]:
+    - list [ref=f8e7]:
+      - listitem [ref=f8e8]:
+        - link "AnswerEcho" [ref=f8e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f8e12]:
+      - generic [ref=f8e13]:
+        - generic [ref=f8e14]: Dashboard
+        - list [ref=f8e15]:
+          - listitem [ref=f8e16]:
+            - link "Overview" [ref=f8e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f8e23]:
+            - link "Visibility" [ref=f8e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f8e30]:
+            - link "Share of Voice" [ref=f8e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f8e37]:
+            - link "Query Fan-Out" [ref=f8e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f8e45]:
+            - link "Citations" [ref=f8e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f8e52]:
+            - link "Opportunities" [ref=f8e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f8e59]:
+        - generic [ref=f8e60]: Settings
+        - list [ref=f8e61]:
+          - listitem [ref=f8e62]:
+            - link "Brand" [ref=f8e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f8e67]:
+            - link "Competitors" [ref=f8e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f8e73]:
+            - link "Prompts" [ref=f8e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f8e79]:
+            - link "LLMs" [ref=f8e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f8e85]:
+      - list [ref=f8e86]:
+        - listitem [ref=f8e87]:
+          - button "Account and organizations" [ref=f8e88] [cursor=pointer]:
+            - generic [ref=f8e94]:
+              - generic [ref=f8e95]: Semi Hop
+              - generic [ref=f8e96]: semi.hop@rigosis.com
+      - generic [ref=f8e100]:
+        - generic [ref=f8e101]: v0.4.1
+        - generic [ref=f8e102]:
+          - link [ref=f8e103] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+          - link [ref=f8e108] [cursor=pointer]:
+            - /url: https://github.com/SemiHop/elmo
+  - main [ref=f8e111]:
+    - generic [ref=f8e113]:
+      - button "Toggle Sidebar" [ref=f8e114] [cursor=pointer]
+      - separator [ref=f8e116]
+      - navigation "breadcrumb" [ref=f8e117]:
+        - list [ref=f8e118]:
+          - listitem [ref=f8e119]:
+            - link "Organization Default" [ref=f8e120] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f8e121]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f8e122]
+          - listitem [ref=f8e125]:
+            - link "Brand Rigosis" [ref=f8e126] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f8e127]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f8e128]
+          - listitem [ref=f8e131]:
+            - link "Prompts" [disabled] [ref=f8e132]
+    - generic [ref=f8e136]:
+      - generic [ref=f8e138]:
+        - heading "Prompts" [level=1] [ref=f8e139]
+        - paragraph [ref=f8e140]: Add, edit, or remove your brand tracking keywords and prompts
+      - generic [ref=f8e141]:
+        - generic [ref=f8e142]:
+          - generic [ref=f8e143]:
+            - checkbox "Select all prompts" [ref=f8e144]
+            - checkbox [aria-hidden] [ref=f8e145]
+          - generic [ref=f8e146]: Prompt Text
+          - generic [ref=f8e150]: System
+          - generic [ref=f8e154]: Tags
+          - generic [ref=f8e158]: Enabled
+        - generic [ref=f8e160]:
+          - generic [ref=f8e162]:
+            - generic [ref=f8e163]:
+              - checkbox "Select prompt" [ref=f8e164]
+              - checkbox [aria-hidden] [ref=f8e165]
+            - textbox "Enter prompt text..." [ref=f8e166]: best it service management consultants in turkey
+            - combobox [disabled] [ref=f8e168]:
+              - generic [ref=f8e169]: unbranded
+            - combobox [ref=f8e173] [cursor=pointer]:
+              - generic [ref=f8e174]:
+                - generic [ref=f8e175]:
+                  - generic [ref=f8e176]: itsm
+                  - button "Remove itsm" [ref=f8e177]
+                - generic [ref=f8e181]:
+                  - generic [ref=f8e182]: consulting
+                  - button "Remove consulting" [ref=f8e183]
+            - generic [ref=f8e187]:
+              - switch "Disable prompt" [checked] [ref=f8e188]
+              - checkbox [checked] [aria-hidden] [ref=f8e189]
+          - generic [ref=f8e191]:
+            - generic [ref=f8e192]:
+              - checkbox "Select prompt" [ref=f8e193]
+              - checkbox [aria-hidden] [ref=f8e194]
+            - textbox "Enter prompt text..." [ref=f8e195]: opentext smax implementation partners turkey
+            - combobox [disabled] [ref=f8e197]:
+              - generic [ref=f8e198]: unbranded
+            - combobox [ref=f8e202] [cursor=pointer]:
+              - generic [ref=f8e203]:
+                - generic [ref=f8e204]:
+                  - generic [ref=f8e205]: opentext
+                  - button "Remove opentext" [ref=f8e206]
+                - generic [ref=f8e210]:
+                  - generic [ref=f8e211]: itsm
+                  - button "Remove itsm" [ref=f8e212]
+            - generic [ref=f8e216]:
+              - switch "Disable prompt" [checked] [ref=f8e217]
+              - checkbox [checked] [aria-hidden] [ref=f8e218]
+          - generic [ref=f8e220]:
+            - generic [ref=f8e221]:
+              - checkbox "Select prompt" [ref=f8e222]
+              - checkbox [aria-hidden] [ref=f8e223]
+            - textbox "Enter prompt text..." [ref=f8e224]: rigosis alternative
+            - combobox [disabled] [ref=f8e226]:
+              - generic [ref=f8e227]: branded
+            - combobox [ref=f8e231] [cursor=pointer]:
+              - generic [ref=f8e233]:
+                - generic [ref=f8e234]: itsm
+                - button "Remove itsm" [ref=f8e235]
+            - generic [ref=f8e239]:
+              - switch "Disable prompt" [checked] [ref=f8e240]
+              - checkbox [checked] [aria-hidden] [ref=f8e241]
+          - generic [ref=f8e243]:
+            - generic [ref=f8e244]:
+              - checkbox "Select prompt" [ref=f8e245]
+              - checkbox [aria-hidden] [ref=f8e246]
+            - textbox "Enter prompt text..." [ref=f8e247]: rigosis itsm services
+            - combobox [disabled] [ref=f8e249]:
+              - generic [ref=f8e250]: branded
+            - combobox [ref=f8e254] [cursor=pointer]:
+              - generic [ref=f8e256]:
+                - generic [ref=f8e257]: itsm
+                - button "Remove itsm" [ref=f8e258]
+            - generic [ref=f8e262]:
+              - switch "Disable prompt" [checked] [ref=f8e263]
+              - checkbox [checked] [aria-hidden] [ref=f8e264]
+          - generic [ref=f8e266]:
+            - generic [ref=f8e267]:
+              - checkbox "Select prompt" [ref=f8e268]
+              - checkbox [aria-hidden] [ref=f8e269]
+            - textbox "Enter prompt text..." [ref=f8e270]: rigosis opentext partner
+            - combobox [disabled] [ref=f8e272]:
+              - generic [ref=f8e273]: branded
+            - combobox [ref=f8e277] [cursor=pointer]:
+              - generic [ref=f8e279]:
+                - generic [ref=f8e280]: opentext
+                - button "Remove opentext" [ref=f8e281]
+            - generic [ref=f8e285]:
+              - switch "Disable prompt" [checked] [ref=f8e286]
+              - checkbox [checked] [aria-hidden] [ref=f8e287]
+        - generic [ref=f8e288]:
+          - button "Add Prompt" [ref=f8e289] [cursor=pointer]
+          - button "Add Multiple" [ref=f8e290] [cursor=pointer]
+        - paragraph [ref=f8e291]:
+          - strong [ref=f8e292]: 5/100
+          - text: prompts configured

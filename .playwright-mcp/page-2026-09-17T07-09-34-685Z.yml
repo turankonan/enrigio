@@ -1,0 +1,99 @@
+- generic [ref=f5e2]:
+  - generic [ref=f5e5]:
+    - list [ref=f5e7]:
+      - listitem [ref=f5e8]:
+        - link "AnswerEcho" [ref=f5e9] [cursor=pointer]:
+          - /url: /app
+    - generic [ref=f5e12]:
+      - generic [ref=f5e13]:
+        - generic [ref=f5e14]: Dashboard
+        - list [ref=f5e15]:
+          - listitem [ref=f5e16]:
+            - link "Overview" [ref=f5e17] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+          - listitem [ref=f5e23]:
+            - link "Visibility" [ref=f5e24] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/visibility
+          - listitem [ref=f5e30]:
+            - link "Share of Voice" [ref=f5e31] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/share-of-voice
+          - listitem [ref=f5e37]:
+            - link "Query Fan-Out" [ref=f5e38] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/query-fan-out
+          - listitem [ref=f5e45]:
+            - link "Citations" [ref=f5e46] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/citations
+          - listitem [ref=f5e52]:
+            - link "Opportunities" [ref=f5e53] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/opportunities
+      - generic [ref=f5e59]:
+        - generic [ref=f5e60]: Settings
+        - list [ref=f5e61]:
+          - listitem [ref=f5e62]:
+            - link "Brand" [ref=f5e63] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/brand
+          - listitem [ref=f5e67]:
+            - link "Competitors" [ref=f5e68] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/competitors
+          - listitem [ref=f5e73]:
+            - link "Prompts" [ref=f5e74] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/prompts
+          - listitem [ref=f5e79]:
+            - link "LLMs" [ref=f5e80] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis/settings/llms
+    - generic [ref=f5e85]:
+      - list [ref=f5e86]:
+        - listitem [ref=f5e87]:
+          - button "Account and organizations" [ref=f5e88] [cursor=pointer]:
+            - generic [ref=f5e94]:
+              - generic [ref=f5e95]: Semi Hop
+              - generic [ref=f5e96]: semi.hop@rigosis.com
+      - generic [ref=f5e100]:
+        - generic [ref=f5e101]: v0.4.1
+        - generic [ref=f5e102]:
+          - link [ref=f5e103] [cursor=pointer]:
+            - /url: https://www.rigosis.com/
+          - link [ref=f5e108] [cursor=pointer]:
+            - /url: https://github.com/SemiHop/elmo
+  - main [ref=f5e111]:
+    - generic [ref=f5e113]:
+      - button "Toggle Sidebar" [ref=f5e114] [cursor=pointer]
+      - separator [ref=f5e116]
+      - navigation "breadcrumb" [ref=f5e117]:
+        - list [ref=f5e118]:
+          - listitem [ref=f5e119]:
+            - link "Organization Default" [ref=f5e120] [cursor=pointer]:
+              - /url: /app/org/default
+              - generic [ref=f5e121]: Organization
+              - text: Default
+          - listitem [aria-hidden] [ref=f5e122]
+          - listitem [ref=f5e125]:
+            - link "Brand Rigosis" [ref=f5e126] [cursor=pointer]:
+              - /url: /app/org/default/brand/rigosis
+              - generic [ref=f5e127]: Brand
+              - text: Rigosis
+          - listitem [aria-hidden] [ref=f5e128]
+          - listitem [ref=f5e131]:
+            - link "Visibility" [disabled] [ref=f5e132]
+    - generic [ref=f5e136]:
+      - generic [ref=f5e137]:
+        - heading "Visibility" [level=1] [ref=f5e138]
+        - paragraph [ref=f5e142]: See how LLMs are evaluating prompts related to your brand.
+      - generic [ref=f5e144]:
+        - generic [ref=f5e145]:
+          - button "Tags" [ref=f5e146] [cursor=pointer]
+          - button "Last 30 days" [ref=f5e149] [cursor=pointer]
+          - button "Sort" [ref=f5e152] [cursor=pointer]
+        - group [ref=f5e155]:
+          - textbox "Search prompts..." [ref=f5e156]
+          - group [ref=f5e157]
+      - generic [ref=f5e172]:
+        - generic [ref=f5e173]:
+          - separator [ref=f5e177]
+          - separator [ref=f5e186]
+        - generic [ref=f5e192]:
+          - separator [ref=f5e196]
+          - separator [ref=f5e205]
+        - generic [ref=f5e211]:
+          - separator [ref=f5e215]
+          - separator [ref=f5e224]

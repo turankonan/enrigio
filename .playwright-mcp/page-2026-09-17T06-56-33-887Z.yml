@@ -1,0 +1,21 @@
+- generic [ref=f2e109]:
+  - link "Go to your organizations" [ref=f2e111] [cursor=pointer]:
+    - /url: /app
+    - generic [ref=f2e112]: AnswerEcho
+  - generic [ref=f2e114]:
+    - generic [ref=f2e115]:
+      - generic [ref=f2e116]: Create a new brand
+      - paragraph [ref=f2e117]: Start tracking a brand in Default
+    - separator [ref=f2e118]
+    - generic [ref=f2e120]:
+      - generic [ref=f2e121]:
+        - generic [ref=f2e122]: Brand Name
+        - textbox "Brand Name" [ref=f2e123]:
+          - /placeholder: Acme
+      - generic [ref=f2e124]:
+        - generic [ref=f2e125]: Website
+        - textbox "Website" [ref=f2e126]:
+          - /placeholder: example.com
+      - button "Continue" [ref=f2e127] [cursor=pointer]
+  - link "Go Back" [ref=f2e129] [cursor=pointer]:
+    - /url: /app

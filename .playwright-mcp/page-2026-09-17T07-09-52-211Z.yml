@@ -1,0 +1,533 @@
+- generic [active] [ref=f6e1]:
+  - generic [ref=f6e2]:
+    - generic [ref=f6e5]:
+      - list [ref=f6e7]:
+        - listitem [ref=f6e8]:
+          - link "AnswerEcho" [ref=f6e9] [cursor=pointer]:
+            - /url: /app
+      - generic [ref=f6e12]:
+        - generic [ref=f6e13]:
+          - generic [ref=f6e14]: Dashboard
+          - list [ref=f6e15]:
+            - listitem [ref=f6e16]:
+              - link "Overview" [ref=f6e17] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+            - listitem [ref=f6e23]:
+              - link "Visibility" [ref=f6e24] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/visibility
+            - listitem [ref=f6e30]:
+              - link "Share of Voice" [ref=f6e31] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/share-of-voice
+            - listitem [ref=f6e37]:
+              - link "Query Fan-Out" [ref=f6e38] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/query-fan-out
+            - listitem [ref=f6e45]:
+              - link "Citations" [ref=f6e46] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/citations
+            - listitem [ref=f6e52]:
+              - link "Opportunities" [ref=f6e53] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/opportunities
+        - generic [ref=f6e59]:
+          - generic [ref=f6e60]: Settings
+          - list [ref=f6e61]:
+            - listitem [ref=f6e62]:
+              - link "Brand" [ref=f6e63] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/brand
+            - listitem [ref=f6e67]:
+              - link "Competitors" [ref=f6e68] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/competitors
+            - listitem [ref=f6e73]:
+              - link "Prompts" [ref=f6e74] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/prompts
+            - listitem [ref=f6e79]:
+              - link "LLMs" [ref=f6e80] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis/settings/llms
+      - generic [ref=f6e85]:
+        - list [ref=f6e86]:
+          - listitem [ref=f6e87]:
+            - button "Account and organizations" [ref=f6e88] [cursor=pointer]:
+              - generic [ref=f6e94]:
+                - generic [ref=f6e95]: Semi Hop
+                - generic [ref=f6e96]: semi.hop@rigosis.com
+        - generic [ref=f6e100]:
+          - generic [ref=f6e101]: v0.4.1
+          - generic [ref=f6e102]:
+            - link [ref=f6e103] [cursor=pointer]:
+              - /url: https://www.rigosis.com/
+            - link [ref=f6e108] [cursor=pointer]:
+              - /url: https://github.com/SemiHop/elmo
+    - main [ref=f6e111]:
+      - generic [ref=f6e113]:
+        - button "Toggle Sidebar" [ref=f6e114] [cursor=pointer]
+        - separator [ref=f6e116]
+        - navigation "breadcrumb" [ref=f6e117]:
+          - list [ref=f6e118]:
+            - listitem [ref=f6e119]:
+              - link "Organization Default" [ref=f6e120] [cursor=pointer]:
+                - /url: /app/org/default
+                - generic [ref=f6e121]: Organization
+                - text: Default
+            - listitem [aria-hidden] [ref=f6e122]
+            - listitem [ref=f6e125]:
+              - link "Brand Rigosis" [ref=f6e126] [cursor=pointer]:
+                - /url: /app/org/default/brand/rigosis
+                - generic [ref=f6e127]: Brand
+                - text: Rigosis
+            - listitem [aria-hidden] [ref=f6e128]
+            - listitem [ref=f6e131]:
+              - link "Citations" [disabled] [ref=f6e132]
+      - generic [ref=f6e136]:
+        - generic [ref=f6e137]:
+          - heading "Citations" [level=1] [ref=f6e138]
+          - paragraph [ref=f6e142]: See which sources LLMs cite when responding to your prompts.
+        - generic [ref=f6e145]:
+          - button "All models" [ref=f6e161] [cursor=pointer]
+          - button "Tags" [ref=f6e146] [cursor=pointer]
+          - button "Last 30 days" [ref=f6e149] [cursor=pointer]
+        - generic [ref=f6e152]:
+          - generic [ref=f6e164]:
+            - generic [ref=f6e165]:
+              - generic [ref=f6e166]: Brand Citation Share
+              - generic [ref=f6e171]: 25%
+            - generic [ref=f6e173]:
+              - generic [ref=f6e174]: Unique Domains
+              - generic [ref=f6e179]: "111"
+            - generic [ref=f6e181]:
+              - generic [ref=f6e182]: Total Citations
+              - generic [ref=f6e187]: 1,221
+          - generic [ref=f6e189]:
+            - generic [ref=f6e190]: Citation Categories
+            - application [ref=f6e199]:
+              - generic [ref=f6e240]:
+                - generic [ref=f6e241]:
+                  - generic [ref=f6e242]: Aug 20
+                  - generic [ref=f6e244]: Aug 22
+                  - generic [ref=f6e246]: Aug 24
+                  - generic [ref=f6e248]: Aug 26
+                  - generic [ref=f6e250]: Aug 28
+                  - generic [ref=f6e252]: Aug 30
+                  - generic [ref=f6e254]: Sep 1
+                  - generic [ref=f6e256]: Sep 3
+                  - generic [ref=f6e258]: Sep 5
+                  - generic [ref=f6e260]: Sep 7
+                  - generic [ref=f6e262]: Sep 9
+                  - generic [ref=f6e264]: Sep 11
+                  - generic [ref=f6e266]: Sep 13
+                  - generic [ref=f6e268]: Sep 15
+                  - generic [ref=f6e270]: Sep 17
+                - generic [ref=f6e272]:
+                  - generic [ref=f6e273]: 0%
+                  - generic [ref=f6e275]: 25%
+                  - generic [ref=f6e277]: 50%
+                  - generic [ref=f6e279]: 75%
+                  - generic [ref=f6e281]: 100%
+          - generic [ref=f6e283]:
+            - generic [ref=f6e284]: Citation Page Types
+            - application [ref=f6e293]:
+              - generic [ref=f6e334]:
+                - generic [ref=f6e335]:
+                  - generic [ref=f6e336]: Aug 20
+                  - generic [ref=f6e338]: Aug 22
+                  - generic [ref=f6e340]: Aug 24
+                  - generic [ref=f6e342]: Aug 26
+                  - generic [ref=f6e344]: Aug 28
+                  - generic [ref=f6e346]: Aug 30
+                  - generic [ref=f6e348]: Sep 1
+                  - generic [ref=f6e350]: Sep 3
+                  - generic [ref=f6e352]: Sep 5
+                  - generic [ref=f6e354]: Sep 7
+                  - generic [ref=f6e356]: Sep 9
+                  - generic [ref=f6e358]: Sep 11
+                  - generic [ref=f6e360]: Sep 13
+                  - generic [ref=f6e362]: Sep 15
+                  - generic [ref=f6e364]: Sep 17
+                - generic [ref=f6e366]:
+                  - generic [ref=f6e367]: 0%
+                  - generic [ref=f6e369]: 25%
+                  - generic [ref=f6e371]: 50%
+                  - generic [ref=f6e373]: 75%
+                  - generic [ref=f6e375]: 100%
+          - generic [ref=f6e378]:
+            - generic [ref=f6e379]:
+              - generic [ref=f6e380]: Recent Changes
+              - generic [ref=f6e384]: How AI citations have shifted over the past month
+            - separator [ref=f6e385]
+            - generic [ref=f6e386]:
+              - navigation "Tabs" [ref=f6e387]:
+                - button "New Pages" [ref=f6e388] [cursor=pointer]
+                - button "Dropped Pages" [ref=f6e389] [cursor=pointer]
+                - button "Title Changes" [ref=f6e390] [cursor=pointer]
+                - button "New Domains" [ref=f6e391] [cursor=pointer]
+                - button "Dropped Domains" [ref=f6e392] [cursor=pointer]
+              - generic [ref=f6e393]:
+                - link "rigosis.com/en 0 → 54 citations across 3 prompts" [ref=f6e394] [cursor=pointer]:
+                  - /url: https://rigosis.com/en
+                  - generic [ref=f6e397]:
+                    - generic [ref=f6e398]: rigosis.com/en
+                    - paragraph [ref=f6e404]: 0 → 54 citations across 3 prompts
+                - link "tr.linkedin.com/company/rigosis 0 → 26 citations across 3 prompts" [ref=f6e405] [cursor=pointer]:
+                  - /url: https://tr.linkedin.com/company/rigosis
+                  - generic [ref=f6e408]:
+                    - generic [ref=f6e409]: tr.linkedin.com/company/rigosis
+                    - paragraph [ref=f6e415]: 0 → 26 citations across 3 prompts
+                - link "wise.tv/in-which-fields-does-rigosis-carry-out-projects 0 → 21 citations across 3 prompts" [ref=f6e416] [cursor=pointer]:
+                  - /url: https://wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                  - generic [ref=f6e419]:
+                    - generic [ref=f6e420]: wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                    - paragraph [ref=f6e426]: 0 → 21 citations across 3 prompts
+                - link "opentext.com/partners/find-an-opentext-partner 0 → 21 citations across 2 prompts" [ref=f6e427] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/find-an-opentext-partner
+                  - generic [ref=f6e430]:
+                    - generic [ref=f6e431]: opentext.com/partners/find-an-opentext-partner
+                    - paragraph [ref=f6e437]: 0 → 21 citations across 2 prompts
+                - link "rigosis.com/en/opentext-smax-25-solution-day-istanbul 0 → 21 citations across 2 prompts" [ref=f6e438] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                  - generic [ref=f6e441]:
+                    - generic [ref=f6e442]: rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                    - paragraph [ref=f6e448]: 0 → 21 citations across 2 prompts
+                - link "opentext.com/partners/partner-directory 0 → 18 citations across 2 prompts" [ref=f6e449] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/partner-directory
+                  - generic [ref=f6e452]:
+                    - generic [ref=f6e453]: opentext.com/partners/partner-directory
+                    - paragraph [ref=f6e459]: 0 → 18 citations across 2 prompts
+          - generic [ref=f6e460]:
+            - generic [ref=f6e462]:
+              - generic [ref=f6e463]:
+                - generic [ref=f6e464]: Top Cited Domains
+                - generic [ref=f6e468]: Which domains LLMs reference most when responding to your prompts
+              - group [ref=f6e469]:
+                - textbox "Search domains..." [ref=f6e470]
+                - group [ref=f6e471]
+            - separator [ref=f6e475]
+            - generic [ref=f6e476]:
+              - navigation "Tabs" [ref=f6e478]:
+                - button "All Sources" [ref=f6e479] [cursor=pointer]
+                - button "Brand" [ref=f6e480] [cursor=pointer]
+                - button "Editorial" [ref=f6e481] [cursor=pointer]
+                - button "Reviews" [ref=f6e482] [cursor=pointer]
+                - button "Ecommerce" [ref=f6e483] [cursor=pointer]
+                - button "Social" [ref=f6e484] [cursor=pointer]
+                - button "Developer" [ref=f6e485] [cursor=pointer]
+                - button "Reference" [ref=f6e486] [cursor=pointer]
+                - button "Institutional" [ref=f6e487] [cursor=pointer]
+                - button "Other" [ref=f6e488] [cursor=pointer]
+              - generic [ref=f6e489]:
+                - generic [ref=f6e491]:
+                  - generic [ref=f6e492]: rigosis.com
+                  - generic [ref=f6e495]: "303"
+                - generic [ref=f6e500]:
+                  - generic [ref=f6e501]:
+                    - generic [ref=f6e503]: opentext.com
+                    - button "Track opentext.com" [ref=f6e504] [cursor=pointer]
+                  - generic [ref=f6e506]: "157"
+                - generic [ref=f6e511]:
+                  - generic [ref=f6e512]: linkedin.com
+                  - generic [ref=f6e515]: "88"
+                - generic [ref=f6e520]:
+                  - generic [ref=f6e521]: clutch.co
+                  - generic [ref=f6e524]: "51"
+                - generic [ref=f6e529]:
+                  - generic [ref=f6e530]: tr.linkedin.com
+                  - generic [ref=f6e533]: "48"
+                - generic [ref=f6e538]:
+                  - generic [ref=f6e539]: techbehemoths.com
+                  - generic [ref=f6e542]: "32"
+                - generic [ref=f6e547]:
+                  - generic [ref=f6e548]:
+                    - generic [ref=f6e550]: wise.tv
+                    - button "Track wise.tv" [ref=f6e551] [cursor=pointer]
+                  - generic [ref=f6e553]: "26"
+                - generic [ref=f6e558]:
+                  - generic [ref=f6e559]: innovix.tr
+                  - generic [ref=f6e562]: "23"
+                - generic [ref=f6e567]:
+                  - generic [ref=f6e568]:
+                    - generic [ref=f6e570]: konsalt.com.tr
+                    - button "Track konsalt.com.tr" [ref=f6e571] [cursor=pointer]
+                  - generic [ref=f6e573]: "21"
+                - generic [ref=f6e578]:
+                  - generic [ref=f6e579]: g2.com
+                  - generic [ref=f6e582]: "20"
+              - generic [ref=f6e586]:
+                - generic [ref=f6e587]: 1–10 of 111
+                - generic [ref=f6e588]:
+                  - button "Previous" [disabled] [ref=f6e589]
+                  - button "Next" [ref=f6e590] [cursor=pointer]
+          - generic [ref=f6e591]:
+            - generic [ref=f6e593]:
+              - generic [ref=f6e594]:
+                - generic [ref=f6e595]: Top Cited URLs
+                - generic [ref=f6e599]:
+                  - text: Individual pages cited by LLMs — Rigosis accounts for
+                  - strong [ref=f6e600]: 25%
+                  - text: of all citations
+              - group [ref=f6e601]:
+                - textbox "Search URLs..." [ref=f6e602]
+                - group [ref=f6e603]
+            - separator [ref=f6e607]
+            - generic [ref=f6e608]:
+              - navigation "Tabs" [ref=f6e609]:
+                - button "All Sources" [ref=f6e610] [cursor=pointer]
+                - button "Brand" [ref=f6e611] [cursor=pointer]
+                - button "Editorial" [ref=f6e612] [cursor=pointer]
+                - button "Reviews" [ref=f6e613] [cursor=pointer]
+                - button "Ecommerce" [ref=f6e614] [cursor=pointer]
+                - button "Social" [ref=f6e615] [cursor=pointer]
+                - button "Developer" [ref=f6e616] [cursor=pointer]
+                - button "Reference" [ref=f6e617] [cursor=pointer]
+                - button "Institutional" [ref=f6e618] [cursor=pointer]
+                - button "Other" [ref=f6e619] [cursor=pointer]
+              - generic [ref=f6e620]:
+                - button "All Page Types" [ref=f6e621] [cursor=pointer]
+                - button "Homepage" [ref=f6e622] [cursor=pointer]
+                - button "Article" [ref=f6e623] [cursor=pointer]
+                - button "Listicle" [ref=f6e624] [cursor=pointer]
+                - button "Guide" [ref=f6e625] [cursor=pointer]
+                - button "Comparison" [ref=f6e626] [cursor=pointer]
+                - button "Review" [ref=f6e627] [cursor=pointer]
+                - button "Forum" [ref=f6e628] [cursor=pointer]
+                - button "Video" [ref=f6e629] [cursor=pointer]
+                - button "Docs" [ref=f6e630] [cursor=pointer]
+                - button "Storefront" [ref=f6e631] [cursor=pointer]
+                - button "Info" [ref=f6e632] [cursor=pointer]
+                - button "Other" [ref=f6e633] [cursor=pointer]
+              - generic [ref=f6e634]:
+                - link "Brand NEW Rigosis | Information Systems rigosis.com/en avg 1.5 54" [ref=f6e635] [cursor=pointer]:
+                  - /url: https://rigosis.com/en
+                  - generic [ref=f6e637]:
+                    - generic [ref=f6e638]:
+                      - generic [ref=f6e639]: Brand
+                      - generic [ref=f6e640]: NEW
+                      - generic [ref=f6e641]: Rigosis | Information Systems
+                    - generic [ref=f6e642]: rigosis.com/en
+                  - generic [ref=f6e643]:
+                    - generic [ref=f6e644]: avg 1.5
+                    - generic [ref=f6e645]: "54"
+                - link "Social NEW Rigosis Bilgi Sistemleri - LinkedIn tr.linkedin.com/company/rigosis avg 2.3 26" [ref=f6e650] [cursor=pointer]:
+                  - /url: https://tr.linkedin.com/company/rigosis
+                  - generic [ref=f6e652]:
+                    - generic [ref=f6e653]:
+                      - generic [ref=f6e654]: Social
+                      - generic [ref=f6e655]: NEW
+                      - generic [ref=f6e656]: Rigosis Bilgi Sistemleri - LinkedIn
+                    - generic [ref=f6e657]: tr.linkedin.com/company/rigosis
+                  - generic [ref=f6e658]:
+                    - generic [ref=f6e659]: avg 2.3
+                    - generic [ref=f6e660]: "26"
+                - link "Other NEW In Which Fields Does Rigosis Carry Out Projects? wise.tv/in-which-fields-does-rigosis-carry-out-projects avg 2.7 21" [ref=f6e665] [cursor=pointer]:
+                  - /url: https://wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                  - generic [ref=f6e667]:
+                    - generic [ref=f6e668]:
+                      - generic [ref=f6e669]: Other
+                      - generic [ref=f6e670]: NEW
+                      - generic [ref=f6e671]: In Which Fields Does Rigosis Carry Out Projects?
+                    - generic [ref=f6e672]: wise.tv/in-which-fields-does-rigosis-carry-out-projects
+                  - generic [ref=f6e673]:
+                    - generic [ref=f6e674]: avg 2.7
+                    - generic [ref=f6e675]: "21"
+                - link "Other NEW OpenText Partner Program opentext.com/partners/find-an-opentext-partner avg 3.7 21" [ref=f6e680] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/find-an-opentext-partner
+                  - generic [ref=f6e682]:
+                    - generic [ref=f6e683]:
+                      - generic [ref=f6e684]: Other
+                      - generic [ref=f6e685]: NEW
+                      - generic [ref=f6e686]: OpenText Partner Program
+                    - generic [ref=f6e687]: opentext.com/partners/find-an-opentext-partner
+                  - generic [ref=f6e688]:
+                    - generic [ref=f6e689]: avg 3.7
+                    - generic [ref=f6e690]: "21"
+                - link "Brand NEW OpenText SMAX 25 Solution Day Istanbul - Rigosis rigosis.com/en/opentext-smax-25-solution-day-istanbul avg 3.7 21" [ref=f6e695] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                  - generic [ref=f6e697]:
+                    - generic [ref=f6e698]:
+                      - generic [ref=f6e699]: Brand
+                      - generic [ref=f6e700]: NEW
+                      - generic [ref=f6e701]: OpenText SMAX 25 Solution Day Istanbul - Rigosis
+                    - generic [ref=f6e702]: rigosis.com/en/opentext-smax-25-solution-day-istanbul
+                  - generic [ref=f6e703]:
+                    - generic [ref=f6e704]: avg 3.7
+                    - generic [ref=f6e705]: "21"
+                - link "Other NEW Partner Directory | OpenText opentext.com/partners/partner-directory avg 4.3 18" [ref=f6e710] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/partner-directory
+                  - generic [ref=f6e712]:
+                    - generic [ref=f6e713]:
+                      - generic [ref=f6e714]: Other
+                      - generic [ref=f6e715]: NEW
+                      - generic [ref=f6e716]: Partner Directory | OpenText
+                    - generic [ref=f6e717]: opentext.com/partners/partner-directory
+                  - generic [ref=f6e718]:
+                    - generic [ref=f6e719]: avg 4.3
+                    - generic [ref=f6e720]: "18"
+                - link "Brand NEW BT Servis Yönetimi – Rigosis | Information Systems rigosis.com/en/bt-servis-yonetimi avg 1.0 15" [ref=f6e725] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/bt-servis-yonetimi
+                  - generic [ref=f6e727]:
+                    - generic [ref=f6e728]:
+                      - generic [ref=f6e729]: Brand
+                      - generic [ref=f6e730]: NEW
+                      - generic [ref=f6e731]: BT Servis Yönetimi – Rigosis | Information Systems
+                    - generic [ref=f6e732]: rigosis.com/en/bt-servis-yonetimi
+                  - generic [ref=f6e733]:
+                    - generic [ref=f6e734]: avg 1.0
+                    - generic [ref=f6e735]: "15"
+                - link "Reviews NEW Top ITSM Consulting Firms in Türkiye - Jul 2026 Rankings | Clutch.co clutch.co/tr/consulting/it-service-management avg 1.9 15" [ref=f6e740] [cursor=pointer]:
+                  - /url: https://clutch.co/tr/consulting/it-service-management
+                  - generic [ref=f6e742]:
+                    - generic [ref=f6e743]:
+                      - generic [ref=f6e744]: Reviews
+                      - generic [ref=f6e745]: NEW
+                      - generic [ref=f6e746]: Top ITSM Consulting Firms in Türkiye - Jul 2026 Rankings | Clutch.co
+                    - generic [ref=f6e747]: clutch.co/tr/consulting/it-service-management
+                  - generic [ref=f6e748]:
+                    - generic [ref=f6e749]: avg 1.9
+                    - generic [ref=f6e750]: "15"
+                - 'link "Other NEW AI-Enabled ITSM & ITIL success: Aydem Energy | OpenText opentext.com/customers/aydem-energy avg 0.9 14" [ref=f6e755] [cursor=pointer]':
+                  - /url: https://opentext.com/customers/aydem-energy
+                  - generic [ref=f6e757]:
+                    - generic [ref=f6e758]:
+                      - generic [ref=f6e759]: Other
+                      - generic [ref=f6e760]: NEW
+                      - generic [ref=f6e761]: "AI-Enabled ITSM & ITIL success: Aydem Energy | OpenText"
+                    - generic [ref=f6e762]: opentext.com/customers/aydem-energy
+                  - generic [ref=f6e763]:
+                    - generic [ref=f6e764]: avg 0.9
+                    - generic [ref=f6e765]: "14"
+                - link "Other NEW SOCAR Turkey | OpenText opentext.com/customers/socar-turkey avg 1.2 14" [ref=f6e770] [cursor=pointer]:
+                  - /url: https://opentext.com/customers/socar-turkey
+                  - generic [ref=f6e772]:
+                    - generic [ref=f6e773]:
+                      - generic [ref=f6e774]: Other
+                      - generic [ref=f6e775]: NEW
+                      - generic [ref=f6e776]: SOCAR Turkey | OpenText
+                    - generic [ref=f6e777]: opentext.com/customers/socar-turkey
+                  - generic [ref=f6e778]:
+                    - generic [ref=f6e779]: avg 1.2
+                    - generic [ref=f6e780]: "14"
+                - link "Brand NEW BT Servis Yönetimi – Rigosis | Information Systems rigosis.com/en/bt-servis-yonetimi avg 4.5 14" [ref=f6e785] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/bt-servis-yonetimi#
+                  - generic [ref=f6e787]:
+                    - generic [ref=f6e788]:
+                      - generic [ref=f6e789]: Brand
+                      - generic [ref=f6e790]: NEW
+                      - generic [ref=f6e791]: BT Servis Yönetimi – Rigosis | Information Systems
+                    - generic [ref=f6e792]: rigosis.com/en/bt-servis-yonetimi
+                  - generic [ref=f6e793]:
+                    - generic [ref=f6e794]: avg 4.5
+                    - generic [ref=f6e795]: "14"
+                - link "Brand NEW Platform Danışmanlığı ve Desteği – Rigosis | Information Systems rigosis.com/en/platform-danismanligi-ve-destegi avg 4.5 13" [ref=f6e800] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/platform-danismanligi-ve-destegi
+                  - generic [ref=f6e802]:
+                    - generic [ref=f6e803]:
+                      - generic [ref=f6e804]: Brand
+                      - generic [ref=f6e805]: NEW
+                      - generic [ref=f6e806]: Platform Danışmanlığı ve Desteği – Rigosis | Information Systems
+                    - generic [ref=f6e807]: rigosis.com/en/platform-danismanligi-ve-destegi
+                  - generic [ref=f6e808]:
+                    - generic [ref=f6e809]: avg 4.5
+                    - generic [ref=f6e810]: "13"
+                - link "Reviews NEW Top IT Outsourcing Companies in Turkey - Jul 2026 Rankings | Clutch.co clutch.co/tr/it-services avg 4.8 13" [ref=f6e815] [cursor=pointer]:
+                  - /url: https://clutch.co/tr/it-services
+                  - generic [ref=f6e817]:
+                    - generic [ref=f6e818]:
+                      - generic [ref=f6e819]: Reviews
+                      - generic [ref=f6e820]: NEW
+                      - generic [ref=f6e821]: Top IT Outsourcing Companies in Turkey - Jul 2026 Rankings | Clutch.co
+                    - generic [ref=f6e822]: clutch.co/tr/it-services
+                  - generic [ref=f6e823]:
+                    - generic [ref=f6e824]: avg 4.8
+                    - generic [ref=f6e825]: "13"
+                - link "Other NEW OpenText SMAX - Konsalt Bilgi Teknolojileri konsalt.com.tr/en/cozumler/opentext-smax avg 5.0 13" [ref=f6e830] [cursor=pointer]:
+                  - /url: https://konsalt.com.tr/en/cozumler/opentext-smax
+                  - generic [ref=f6e832]:
+                    - generic [ref=f6e833]:
+                      - generic [ref=f6e834]: Other
+                      - generic [ref=f6e835]: NEW
+                      - generic [ref=f6e836]: OpenText SMAX - Konsalt Bilgi Teknolojileri
+                    - generic [ref=f6e837]: konsalt.com.tr/en/cozumler/opentext-smax
+                  - generic [ref=f6e838]:
+                    - generic [ref=f6e839]: avg 5.0
+                    - generic [ref=f6e840]: "13"
+                - link "Brand NEW Rigosis | Information Systems rigosis.com/en avg 1.5 13" [ref=f6e845] [cursor=pointer]:
+                  - /url: https://rigosis.com/en#
+                  - generic [ref=f6e847]:
+                    - generic [ref=f6e848]:
+                      - generic [ref=f6e849]: Brand
+                      - generic [ref=f6e850]: NEW
+                      - generic [ref=f6e851]: Rigosis | Information Systems
+                    - generic [ref=f6e852]: rigosis.com/en
+                  - generic [ref=f6e853]:
+                    - generic [ref=f6e854]: avg 1.5
+                    - generic [ref=f6e855]: "13"
+                - link "Social NEW OpenText Partner's Post - LinkedIn linkedin.com/posts/opentextpartner_opentext-opentextpartner-partnership-activity... avg 1.7 11" [ref=f6e860] [cursor=pointer]:
+                  - /url: https://linkedin.com/posts/opentextpartner_opentext-opentextpartner-partnership-activity-7300206687544655872-AwLw
+                  - generic [ref=f6e862]:
+                    - generic [ref=f6e863]:
+                      - generic [ref=f6e864]: Social
+                      - generic [ref=f6e865]: NEW
+                      - generic [ref=f6e866]: OpenText Partner's Post - LinkedIn
+                    - generic [ref=f6e867]: linkedin.com/posts/opentextpartner_opentext-opentextpartner-partnership-activity...
+                  - generic [ref=f6e868]:
+                    - generic [ref=f6e869]: avg 1.7
+                    - generic [ref=f6e870]: "11"
+                - link "Brand NEW GoTo – Rigosis | Information Systems rigosis.com/en/goto avg 7.7 11" [ref=f6e875] [cursor=pointer]:
+                  - /url: https://rigosis.com/en/goto
+                  - generic [ref=f6e877]:
+                    - generic [ref=f6e878]:
+                      - generic [ref=f6e879]: Brand
+                      - generic [ref=f6e880]: NEW
+                      - generic [ref=f6e881]: GoTo – Rigosis | Information Systems
+                    - generic [ref=f6e882]: rigosis.com/en/goto
+                  - generic [ref=f6e883]:
+                    - generic [ref=f6e884]: avg 7.7
+                    - generic [ref=f6e885]: "11"
+                - link "Brand NEW Rigosis rigosis.com/ avg 5.9 11" [ref=f6e890] [cursor=pointer]:
+                  - /url: https://rigosis.com/
+                  - generic [ref=f6e892]:
+                    - generic [ref=f6e893]:
+                      - generic [ref=f6e894]: Brand
+                      - generic [ref=f6e895]: NEW
+                      - generic [ref=f6e896]: Rigosis
+                    - generic [ref=f6e897]: rigosis.com/
+                  - generic [ref=f6e898]:
+                    - generic [ref=f6e899]: avg 5.9
+                    - generic [ref=f6e900]: "11"
+                - link "Brand NEW Rigosis | Information Systems – Rigosis | Information Systems rigosis.com/en?utm_source=chatgpt.com avg 0.7 10" [ref=f6e905] [cursor=pointer]:
+                  - /url: https://rigosis.com/en?utm_source=chatgpt.com
+                  - generic [ref=f6e907]:
+                    - generic [ref=f6e908]:
+                      - generic [ref=f6e909]: Brand
+                      - generic [ref=f6e910]: NEW
+                      - generic [ref=f6e911]: Rigosis | Information Systems – Rigosis | Information Systems
+                    - generic [ref=f6e912]: rigosis.com/en?utm_source=chatgpt.com
+                  - generic [ref=f6e913]:
+                    - generic [ref=f6e914]: avg 0.7
+                    - generic [ref=f6e915]: "10"
+                - link "Other NEW Find a Partner solution | OpenText opentext.com/partners/find-a-partner-solution avg 9.0 10" [ref=f6e920] [cursor=pointer]:
+                  - /url: https://opentext.com/partners/find-a-partner-solution
+                  - generic [ref=f6e922]:
+                    - generic [ref=f6e923]:
+                      - generic [ref=f6e924]: Other
+                      - generic [ref=f6e925]: NEW
+                      - generic [ref=f6e926]: Find a Partner solution | OpenText
+                    - generic [ref=f6e927]: opentext.com/partners/find-a-partner-solution
+                  - generic [ref=f6e928]:
+                    - generic [ref=f6e929]: avg 9.0
+                    - generic [ref=f6e930]: "10"
+              - generic [ref=f6e935]:
+                - generic [ref=f6e936]: 1–20 of 282
+                - generic [ref=f6e937]:
+                  - button "Previous" [disabled] [ref=f6e938]
+                  - button "Next" [ref=f6e939] [cursor=pointer]
+          - generic [ref=f6e940]:
+            - generic [ref=f6e941]:
+              - generic [ref=f6e942]: Reddit
+              - generic [ref=f6e946]: Top cited subreddits — which Reddit communities AI models reference when answering your prompts
+            - separator [ref=f6e947]
+            - generic [ref=f6e951]:
+              - button "r/erectiledysfunction NEW" [ref=f6e952] [cursor=pointer]:
+                - generic [ref=f6e955]: r/erectiledysfunction
+                - generic [ref=f6e956]: NEW
+              - generic [ref=f6e957]:
+                - generic [ref=f6e958]: "5"
+                - link [ref=f6e959] [cursor=pointer]:
+                  - /url: https://reddit.com/r/erectiledysfunction
+  - generic [aria-hidden] [ref=f6e964]: Aug 31
