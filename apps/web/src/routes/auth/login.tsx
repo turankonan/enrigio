@@ -80,7 +80,8 @@ function LoginPage() {
 	}
 
 	if (mode === "local" && !hasUsers) {
-		window.location.href = "/auth/register";
+		// Render-time redirect must not touch window during SSR; the client pass does it.
+		if (typeof window !== "undefined") window.location.href = "/auth/register";
 		return null;
 	}
 
