@@ -31,7 +31,6 @@ import {
 	SidebarMenuItem,
 	useSidebar,
 } from "@workspace/ui/components/sidebar";
-import { t } from "@/lib/i18n";
 import { DemoModePill } from "@/components/demo-mode-pill";
 import { Logo } from "@/components/logo";
 import { NavAppInfo } from "@/components/nav-app-info";
@@ -40,6 +39,7 @@ import { NavUser } from "@/components/nav-user";
 import { useDeploymentFeatures } from "@/hooks/use-deployment-features";
 import { useViewer } from "@/hooks/use-route-context";
 import { adminNavItems } from "@/lib/admin-nav";
+import { t } from "@/lib/i18n";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 import type { ShellScope } from "@/lib/shell-scope";
 
