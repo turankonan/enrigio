@@ -15,8 +15,13 @@ Neon hosts Postgres. Blueprint: `render.yaml`.
    - `DATABASE_URL` — the Neon pooled string
    - `ANSWERECHO_ENCRYPTION_KEY` — output of `openssl rand -base64 32`
    - `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` — real keys (evaluations need them)
-   - `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` — real if you want Google AI
-     Overviews tracking, otherwise placeholders
+   - `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` — required: DataForSEO is the
+     demo's scraper for ChatGPT, Google AI Overviews/AI Mode, Gemini, and
+     Perplexity (see `SCRAPE_TARGETS` in `render.yaml`). Sign up free at
+     [app.dataforseo.com/register](https://app.dataforseo.com/register) — no
+     card, $1 trial credit (hundreds of queries); the credentials are on the
+     dashboard's API Access page. Top-ups later are $50 minimum,
+     pay-as-you-go.
 3. Deploy. Migrations run at the end of the build (`drizzle-kit migrate`
    against Neon), so the first build both provisions the schema and ships the
    app.

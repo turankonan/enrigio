@@ -32,6 +32,10 @@ services:
         value: local
       - key: DISABLE_TELEMETRY
         value: "1"
+      # DataForSEO scrapes the five surfaces; Claude/GPT tracked via direct APIs.
+      # Drop entries here to cut provider cost; format: model:provider[:version][:online]
+      - key: SCRAPE_TARGETS
+        value: chatgpt:dataforseo:online,google-ai-overview:dataforseo:online,google-ai-mode:dataforseo:online,gemini:dataforseo:online,perplexity:dataforseo:online,claude:anthropic-api:claude-sonnet-5:online,chatgpt:openai-api:gpt-5-mini:online
       - key: DATABASE_URL # Neon pooled connection string
         sync: false
       - key: BETTER_AUTH_SECRET
