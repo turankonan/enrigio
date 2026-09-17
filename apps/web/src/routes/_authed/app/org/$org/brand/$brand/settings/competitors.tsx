@@ -59,7 +59,7 @@ function DiscoveryPanel({
 		try {
 			setResult(await discoverCompetitors({ data: { brandId } }));
 		} catch {
-			setError("Discovery failed. Check that an LLM API key is configured and try again.");
+			setError(t("settings.competitors.discovery_error"));
 		} finally {
 			setLoading(false);
 		}
@@ -76,7 +76,7 @@ function DiscoveryPanel({
 				</div>
 				<Button variant="outline" size="sm" onClick={discover} disabled={loading || disabled}>
 					<Sparkles className="size-4" />
-					{loading ? "Scanning answers…" : "Discover competitors"}
+					{loading ? t("settings.competitors.scanning") : t("settings.competitors.discover_button")}
 				</Button>
 			</div>
 			{error && <p className="text-destructive text-sm">{error}</p>}

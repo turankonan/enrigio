@@ -12,23 +12,23 @@ import type { CitedPage, OpportunitiesReport as OpportunitiesReportData, ReportP
 const CATEGORY_META = [
 	{
 		key: "creation",
-		label: "Creation",
+		label: t("opportunities-report.category-creation"),
 		desc: "Net-new content to publish or earn — comparisons, guides, and 'best of' angles for topics you're absent on.",
 	},
 	{
 		key: "existing-content",
-		label: "Existing Content",
-		desc: "Pages already getting cited that are slipping, or could win the mention with a refresh.",
+		label: t("opportunities-report.category-existing-content"),
+		desc: t("opportunities-report.category-existing-content-desc"),
 	},
 	{
 		key: "outreach",
-		label: "Outreach",
-		desc: "Earn placements on the third-party review sites and editorial roundups assistants cite.",
+		label: t("opportunities-report.category-outreach"),
+		desc: t("opportunities-report.category-outreach-desc"),
 	},
 	{
 		key: "social",
-		label: "Social",
-		desc: "Show up in the community conversations — Reddit, YouTube, forums — assistants pull from.",
+		label: t("opportunities-report.category-social"),
+		desc: t("opportunities-report.category-social-desc"),
 	},
 ] as const;
 
@@ -78,9 +78,9 @@ function Panel({ children }: { children: React.ReactNode }) {
 function OpportunityCard({ o }: { o: Opportunity }) {
 	const [open, setOpen] = useState<Tab | null>(null);
 	const tabs: { key: Tab; label: string; count: number }[] = [
-		{ key: "prompts", label: "Prompts", count: o.relatedPrompts.length },
-		{ key: "your", label: "Your citations", count: o.yourCitations.length },
-		{ key: "comp", label: "Competitor citations", count: o.competitorCitations.length },
+		{ key: "prompts", label: t("query_fan_out.prompts_title"), count: o.relatedPrompts.length },
+		{ key: "your", label: t("opportunities-report.tab-your-citations"), count: o.yourCitations.length },
+		{ key: "comp", label: t("opportunities-report.tab-competitor-citations"), count: o.competitorCitations.length },
 	];
 	return (
 		<div className="rounded-xl border border-border p-4">

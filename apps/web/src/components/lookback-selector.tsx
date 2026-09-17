@@ -3,15 +3,16 @@ import { useMemo } from "react";
 import { useBrand } from "@/hooks/use-brands";
 import { coerceLookback, useFilterNavigate } from "@/hooks/use-list-filters";
 import { getDefaultLookbackPeriod } from "@/lib/chart-utils";
+import { t } from "@/lib/i18n";
 import { LOOKBACK_PERIODS, type LookbackPeriod } from "@/lib/lookback";
 
 const LOOKBACK_LABELS: Record<LookbackPeriod, string> = {
-	"1w": "1w",
-	"1m": "1mo",
-	"3m": "3mo",
-	"6m": "6mo",
-	"1y": "1yr",
-	all: "all",
+	"1w": t("lookback-selector.1w"),
+	"1m": t("lookback-selector.1mo"),
+	"3m": t("lookback-selector.3mo"),
+	"6m": t("lookback-selector.6mo"),
+	"1y": t("lookback-selector.1yr"),
+	all: t("lookback-selector.all"),
 };
 
 interface LookbackSelectorProps {

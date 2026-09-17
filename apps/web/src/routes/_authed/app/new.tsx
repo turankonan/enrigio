@@ -66,7 +66,7 @@ function NewOrganizationPage() {
 				{error && <p className="text-sm text-destructive">{error}</p>}
 
 				<Button type="submit" className="w-full" disabled={isLoading || trimmed.length === 0}>
-					{isLoading ? "Creating..." : "Create organization"}
+					{isLoading ? t("new_organization.creating") : t("new_organization.submit")}
 				</Button>
 			</form>
 		</FullPageCard>

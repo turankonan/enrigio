@@ -6,6 +6,7 @@
 import { ChartContainer } from "@workspace/ui/components/chart";
 import { Cell, Pie, PieChart, Tooltip } from "recharts";
 import { SiteIcon } from "@/components/site-icon";
+import { t } from "@/lib/i18n";
 import { BRAND_COLOR, OTHERS_COLOR, COMPETITOR_PALETTE as PALETTE } from "@/lib/share-of-voice-palette";
 import type { ShareOfVoiceEntry } from "@/server/analysis";
 
@@ -47,7 +48,7 @@ export function ShareOfVoiceDonut({
 			othersValue += e.mentions;
 		}
 	}
-	if (othersValue > 0) slices.push({ name: "Others", value: othersValue, color: OTHERS_COLOR });
+	if (othersValue > 0) slices.push({ name: t("share-of-voice-donut.others"), value: othersValue, color: OTHERS_COLOR });
 
 	const total = slices.reduce((s, x) => s + x.value, 0);
 	if (total === 0) return null;

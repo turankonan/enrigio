@@ -41,7 +41,7 @@ export function TrackDomainPopover({
 
 	const handleError = (e: unknown) => {
 		setSaving(false);
-		setError("Something went wrong. Please try again.");
+		setError(t("auth.login.generic-error"));
 		Sentry.captureException(e);
 	};
 

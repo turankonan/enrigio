@@ -73,7 +73,7 @@ const EditableTagsInput = memo(
 				<strong>
 					{items.length}/{maxItems}
 				</strong>{" "}
-				{items.length >= maxItems ? "items added. Remove an item to add a new one." : "items entered."}
+				{items.length >= maxItems ? t("prompt-wizard.items-added-max") : t("prompt-wizard.items-entered")}
 			</p>
 		</div>
 	),

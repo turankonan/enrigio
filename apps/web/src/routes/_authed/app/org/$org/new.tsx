@@ -103,7 +103,7 @@ function NewBrandPage() {
 		return (
 			<FullPageCard
 				title={
-					blocked.code === "no-active-plan" ? "This organization has no plan" : "You've used every brand on your plan"
+					blocked.code === "no-active-plan" ? t("new_brand.blocked_no_plan") : "You've used every brand on your plan"
 				}
 				subtitle={blocked.message}
 				showBackButton
@@ -130,7 +130,7 @@ function NewBrandPage() {
 					error={error}
 					onBack={() => setStep("details")}
 					onSubmit={() => createBrand(details.brandName, details.website, [...selected])}
-					submitLabel={isLoading ? "Creating..." : "Create brand"}
+					submitLabel={isLoading ? t("new_organization.creating") : t("new_brand.submit")}
 				/>
 			</FullPageCard>
 		);
@@ -172,7 +172,7 @@ function NewBrandPage() {
 				{error && <p className="text-sm text-destructive">{error}</p>}
 
 				<Button type="submit" className="w-full" disabled={isLoading}>
-					{isLoading ? "Creating..." : "Continue"}
+					{isLoading ? t("new_organization.creating") : t("new_brand.continue")}
 				</Button>
 			</form>
 		</FullPageCard>

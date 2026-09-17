@@ -42,12 +42,12 @@ function iconForModel(model: string, className = "size-3.5") {
 }
 
 const LOOKBACK_LABELS: Record<LookbackPeriod, string> = {
-	"1w": "Last 7 days",
-	"1m": "Last 30 days",
-	"3m": "Last 3 months",
-	"6m": "Last 6 months",
-	"1y": "Last 12 months",
-	all: "All time",
+	"1w": t("filter-bar.lookback-last-7-days"),
+	"1m": t("filter-bar.lookback-last-30-days"),
+	"3m": t("filter-bar.lookback-last-3-months"),
+	"6m": t("filter-bar.lookback-last-6-months"),
+	"1y": t("filter-bar.lookback-last-12-months"),
+	all: t("filter-bar.lookback-all-time"),
 };
 
 // ------------------------------------------------------------------

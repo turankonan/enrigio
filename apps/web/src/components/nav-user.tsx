@@ -66,7 +66,7 @@ export function NavUser({
 						render={
 							<SidebarMenuButton
 								size="lg"
-								aria-label={showOrganizations ? "Account and organizations" : "Account"}
+								aria-label={showOrganizations ? t("nav-user.account-and-organizations") : t("nav-user.account")}
 								className="data-popup-open:bg-sidebar-accent data-popup-open:text-sidebar-accent-foreground cursor-pointer"
 							/>
 						}
@@ -79,7 +79,7 @@ export function NavUser({
 						</Avatar>
 						<div className="grid flex-1 text-left text-sm leading-tight">
 							<span className="truncate font-medium">{user.name}</span>
-							<span className="truncate text-xs">{isNameEmailSame ? "Your Account" : user.email}</span>
+							<span className="truncate text-xs">{isNameEmailSame ? t("nav-user.your-account") : user.email}</span>
 						</div>
 						<IconSelector className="ml-auto size-4" />
 					</DropdownMenuTrigger>
@@ -101,7 +101,9 @@ export function NavUser({
 									</Avatar>
 									<div className="grid flex-1 text-left text-sm leading-tight">
 										<span className="truncate font-medium">{user.name}</span>
-										<span className="truncate text-xs">{isNameEmailSame ? "Your Account" : user.email}</span>
+										<span className="truncate text-xs">
+											{isNameEmailSame ? t("nav-user.your-account") : user.email}
+										</span>
 									</div>
 								</div>
 							</DropdownMenuLabel>
@@ -222,7 +224,7 @@ function OrganizationSwitcher({ onNavigate }: { onNavigate: () => void }) {
 					}}
 				>
 					<IconRefresh className={isFetching ? "animate-spin" : undefined} />
-					{isFetching ? "Retrying…" : "Couldn't load your organizations — retry"}
+					{isFetching ? t("nav-user.retrying") : "Couldn't load your organizations — retry"}
 				</DropdownMenuItem>
 			)}
 		</>

@@ -152,8 +152,8 @@ type WordTab = "added" | "preserved" | "dropped";
 
 const WORD_TAB_HELP: Record<WordTab, string> = {
 	added: "Words engines add that weren't in your prompt — the intent they layer on (e.g. “best”, “2026”, “vs”).",
-	preserved: "Words from your prompt engines keep in their searches.",
-	dropped: "Words from your prompt engines leave out of their searches.",
+	preserved: t("fanout-sections.word-tab-help-preserved"),
+	dropped: t("fanout-sections.word-tab-help-dropped"),
 };
 
 export function QueryWordsSection({ terms, wordChanges }: { terms: TermStat[]; wordChanges: WordChanges }) {
@@ -209,7 +209,7 @@ export function QueryWordsSection({ terms, wordChanges }: { terms: TermStat[]; w
 						<ProgressBarChart items={items} defaultColor={FANOUT_PURPLE} />
 					) : (
 						<div className="text-muted-foreground py-6 text-center text-sm">
-							No {tab} words{hideStop ? " (try showing stop words)" : ""}.
+							No {tab} words{hideStop ? t("fanout-sections.no-words-stop-hint") : ""}.
 						</div>
 					)}
 				</CardContent>

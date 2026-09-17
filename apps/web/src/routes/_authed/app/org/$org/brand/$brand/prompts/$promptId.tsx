@@ -61,10 +61,10 @@ function runsPage(data: PromptRunsData) {
 }
 
 const TABS: { key: PromptDetailTab; label: string }[] = [
-	{ key: "mentions", label: "Mentions" },
-	{ key: "web-queries", label: "Web Queries" },
-	{ key: "citations", label: "Citations" },
-	{ key: "responses", label: "LLM Responses" },
+	{ key: "mentions", label: t("prompt_details.tab_mentions") },
+	{ key: "web-queries", label: t("prompt_details.tab_web_queries") },
+	{ key: "citations", label: t("citations.crumb") },
+	{ key: "responses", label: t("prompt_details.tab_responses") },
 ];
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/prompts/$promptId")({

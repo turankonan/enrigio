@@ -64,14 +64,14 @@ function useCitationSections(citationData: CitationData) {
 
 	const urlSourceTabs = useMemo<{ key: string; label: string }[]>(
 		() => [
-			{ key: "all", label: "All Sources" },
+			{ key: "all", label: t("citations-display.all-sources") },
 			...chartSourceCategories.map((c) => ({ key: c as string, label: CATEGORY_CONFIG[c].label })),
 		],
 		[chartSourceCategories],
 	);
 	const urlPageTypeTabs = useMemo<{ key: string; label: string }[]>(
 		() => [
-			{ key: "all", label: "All Page Types" },
+			{ key: "all", label: t("citations-display.all-page-types") },
 			...chartPageTypes.map((p) => ({ key: p as string, label: PAGE_TYPE_CONFIG[p].label })),
 		],
 		[chartPageTypes],

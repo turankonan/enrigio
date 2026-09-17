@@ -92,7 +92,7 @@ function PremiumModelsField({
 	onChange: (models: string[]) => void;
 	showLabel?: boolean;
 }) {
-	const summary = selected.length === 0 ? "None" : selected.map(premiumModelLabel).join(", ");
+	const summary = selected.length === 0 ? t("prompt_details.none") : selected.map(premiumModelLabel).join(", ");
 
 	return (
 		<Popover>
@@ -109,7 +109,7 @@ function PremiumModelsField({
 				}
 			>
 				{selected.length === 0 ? (
-					<span className="text-muted-foreground">{showLabel ? "Premium: none" : "—"}</span>
+					<span className="text-muted-foreground">{showLabel ? t("prompts-list-editor.premium-none-label") : "—"}</span>
 				) : (
 					<>
 						{selected.map((model) => (
@@ -209,7 +209,7 @@ function useBulkPaste(filledValues: string[], onAdd: (values: string[]) => void)
 		bulkNotice: bulkText.trim().length > 0 ? describeSkipped(bulkPreview.skipped) : null,
 		bulkError:
 			overCapacity > 0
-				? `This paste is ${overCapacity} prompt${overCapacity === 1 ? "" : "s"} over the ${MAX_PROMPTS} limit. Remove ${overCapacity === 1 ? "a line" : "some lines"} to continue.`
+				? `This paste is ${overCapacity} prompt${overCapacity === 1 ? "" : "s"} over the ${MAX_PROMPTS} limit. Remove ${overCapacity === 1 ? t("prompts-list-editor.bulk-remove-a-line") : t("prompts-list-editor.bulk-remove-some-lines")} to continue.`
 				: null,
 		closeBulk,
 		addBulk: () => {
@@ -267,7 +267,7 @@ function ColumnHeader({
 					checked={allSelected}
 					onCheckedChange={onToggleSelectAll}
 					disabled={disabled}
-					aria-label={allSelected ? "Deselect all prompts" : "Select all prompts"}
+					aria-label={allSelected ? t("prompts-list-editor.deselect-all") : t("prompts-list-editor.select-all")}
 				/>
 			</div>
 			<div className="flex items-center gap-1 min-w-0">
@@ -373,7 +373,9 @@ function PromptRow({
 						<Switch
 							checked={prompt.enabled}
 							onCheckedChange={(checked) => update(index, { enabled: checked })}
-							aria-label={prompt.enabled ? "Disable prompt" : "Enable prompt"}
+							aria-label={
+								prompt.enabled ? t("prompts-list-editor.disable-prompt") : t("prompts-list-editor.enable-prompt")
+							}
 						/>
 					</div>
 				</div>
@@ -434,7 +436,9 @@ function PromptRow({
 					<Switch
 						checked={prompt.enabled}
 						onCheckedChange={(checked) => update(index, { enabled: checked })}
-						aria-label={prompt.enabled ? "Disable prompt" : "Enable prompt"}
+						aria-label={
+							prompt.enabled ? t("prompts-list-editor.disable-prompt") : t("prompts-list-editor.enable-prompt")
+						}
 					/>
 				</div>
 			</div>
@@ -460,7 +464,7 @@ function BulkPasteBox({ bulk }: { bulk: ReturnType<typeof useBulkPaste> }) {
 					disabled={bulk.bulkPreview.added.length === 0 || bulk.bulkError !== null}
 				>
 					Add {bulk.bulkPreview.added.length > 0 ? `${bulk.bulkPreview.added.length} ` : ""}
-					{bulk.bulkPreview.added.length === 1 ? "Prompt" : "Prompts"}
+					{bulk.bulkPreview.added.length === 1 ? t("query_fan_out.col_prompt") : t("query_fan_out.prompts_title")}
 				</Button>
 				<Button variant="ghost" size="sm" type="button" onClick={bulk.closeBulk}>
 					{t("settings.api_keys.cancel")}

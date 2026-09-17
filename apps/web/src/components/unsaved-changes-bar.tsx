@@ -108,7 +108,8 @@ export function UnsavedChangesBar({ isDirty, isSaving, summary, error, onSave, o
 					<DialogHeader>
 						<DialogTitle>{t("unsaved-changes-bar.discard-title")}</DialogTitle>
 						<DialogDescription>
-							{summary ? `${summary} will be reverted.` : "Your changes will be reverted."} This can&apos;t be undone.
+							{summary ? `${summary} will be reverted.` : t("unsaved-changes-bar.changes-reverted")} This can&apos;t be
+							undone.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>
@@ -134,8 +135,8 @@ export function UnsavedChangesBar({ isDirty, isSaving, summary, error, onSave, o
 					<DialogHeader>
 						<DialogTitle>{t("unsaved-changes-bar.leave-title")}</DialogTitle>
 						<DialogDescription>
-							{summary ? `You have unsaved changes (${summary}).` : "You have unsaved changes."} They&apos;ll be lost if
-							you leave this page.
+							{summary ? `You have unsaved changes (${summary}).` : t("unsaved-changes-bar.unsaved-plain")} They&apos;ll
+							be lost if you leave this page.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter>

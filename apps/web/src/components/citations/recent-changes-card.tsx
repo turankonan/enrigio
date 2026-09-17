@@ -26,11 +26,11 @@ type Change =
 	| ({ type: "dropped_domains" } & WhatsChanged["droppedDomains"][number]);
 
 const CHANGE_TYPE_TABS: { key: ChangeType; label: string }[] = [
-	{ key: "new_pages", label: "New Pages" },
-	{ key: "dropped_pages", label: "Dropped Pages" },
-	{ key: "title", label: "Title Changes" },
-	{ key: "new_domains", label: "New Domains" },
-	{ key: "dropped_domains", label: "Dropped Domains" },
+	{ key: "new_pages", label: t("recent-changes-card.tab-new-pages") },
+	{ key: "dropped_pages", label: t("recent-changes-card.tab-dropped-pages") },
+	{ key: "title", label: t("recent-changes-card.tab-title-changes") },
+	{ key: "new_domains", label: t("recent-changes-card.tab-new-domains") },
+	{ key: "dropped_domains", label: t("recent-changes-card.tab-dropped-domains") },
 ];
 
 const CHANGE_ICONS: Record<ChangeType, ReactNode> = {

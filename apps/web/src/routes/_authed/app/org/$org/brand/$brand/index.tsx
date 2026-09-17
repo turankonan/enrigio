@@ -209,10 +209,10 @@ function TrendSection({
 }
 
 const STAT_PLACEHOLDERS = [
-	{ label: "prompts tracked", icon: IconList },
-	{ label: "evaluations", icon: IconActivity },
-	{ label: "run frequency", icon: IconClock },
-	{ label: "last updated", icon: IconRefresh },
+	{ label: t("dashboard.stat_prompts_tracked"), icon: IconList },
+	{ label: t("dashboard.stat_evaluations"), icon: IconActivity },
+	{ label: t("dashboard.stat_run_frequency"), icon: IconClock },
+	{ label: t("dashboard.stat_last_updated"), icon: IconRefresh },
 ];
 
 function TrackingStats({
@@ -299,7 +299,7 @@ function TrackingStats({
 				tooltip={
 					lastUpdatedAt
 						? `The last prompts we evaluated for your brand were run on ${new Date(lastUpdatedAt).toLocaleString()}`
-						: "No evaluations have been run yet."
+						: t("dashboard.last_updated_tooltip_never")
 				}
 			/>
 		</div>
@@ -316,7 +316,7 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 	const message = hasEnabledPrompts
 		? "You are ready to track your AI visibility. We're currently running the first evaluation against AI models. This usually takes a few minutes."
 		: hasPrompts
-			? "You have prompts configured but none are currently enabled. Add or enable some prompts to start tracking your AI visibility."
+			? t("dashboard.awaiting_message_disabled")
 			: "Set up prompts to start tracking your AI visibility. Once configured, we'll evaluate them against AI models automatically.";
 
 	return (
@@ -324,7 +324,9 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 			<div className="rounded-full bg-muted p-4 mb-6">
 				<IconClock className="h-10 w-10 text-muted-foreground" />
 			</div>
-			<h2 className="text-2xl font-bold mb-3">{hasEnabledPrompts ? "Waiting for First Evaluation" : "No Data Yet"}</h2>
+			<h2 className="text-2xl font-bold mb-3">
+				{hasEnabledPrompts ? t("dashboard.awaiting_title") : t("dashboard.no_data_title")}
+			</h2>
 			<p className="text-muted-foreground mb-6 text-balance">{message}</p>
 			<div className="flex flex-col gap-3 w-full">
 				{hasEnabledPrompts && (
@@ -341,7 +343,11 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 					params={params}
 					className={buttonVariants({ variant: "outline", className: "w-full" })}
 				>
-					{hasEnabledPrompts ? "View Your Prompts" : hasPrompts ? "Edit Prompts" : "Set Up Prompts"}{" "}
+					{hasEnabledPrompts
+						? t("dashboard.view_your_prompts")
+						: hasPrompts
+							? t("dashboard.edit_prompts_cta")
+							: t("dashboard.set_up_prompts")}{" "}
 					<IconArrowRight className="h-4 w-4 ml-1" />
 				</Link>
 			</div>

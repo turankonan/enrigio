@@ -228,7 +228,12 @@ function PlatformGroups({ picker }: { picker: ModelPickerState }) {
 function summarizeSelection(count: number, spend: { saved: number; next: number } | null): string {
 	const platforms = `${count} platform${count === 1 ? "" : "s"} selected`;
 	if (!spend) return platforms;
-	const direction = spend.next > spend.saved ? "up from" : spend.next < spend.saved ? "down from" : "unchanged from";
+	const direction =
+		spend.next > spend.saved
+			? t("settings.llms.spend_up_from")
+			: spend.next < spend.saved
+				? t("settings.llms.spend_down_from")
+				: t("settings.llms.spend_unchanged_from");
 	return `${platforms} · ≈${formatUsd(spend.next)}/mo, ${direction} ${formatUsd(spend.saved)}`;
 }
 
@@ -346,8 +351,8 @@ function PremiumApiPool({ premium }: { premium: PremiumPool }) {
  * single list of provider names hid that choice.
  */
 const PROVIDER_COLUMNS = [
-	{ access: "scraped", header: "Scrapers" },
-	{ access: "api", header: "Direct APIs" },
+	{ access: "scraped", header: t("settings.llms.col_scrapers") },
+	{ access: "api", header: t("settings.llms.col_direct_apis") },
 ] as const;
 
 const PROVIDER_GRID = "grid grid-cols-[minmax(7rem,1fr)_1.5fr_1fr] gap-x-4";

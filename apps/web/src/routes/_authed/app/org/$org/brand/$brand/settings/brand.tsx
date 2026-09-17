@@ -223,7 +223,7 @@ function BrandSettingsPage() {
 
 				<div className="flex gap-2">
 					<Button type="submit" disabled={isSubmitting} className="cursor-pointer">
-						{isSubmitting ? "Saving..." : "Save Changes"}
+						{isSubmitting ? t("settings.brand.saving") : t("settings.brand.save_changes")}
 					</Button>
 				</div>
 			</form>

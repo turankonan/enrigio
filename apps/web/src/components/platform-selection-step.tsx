@@ -54,7 +54,9 @@ export function PlatformSelectionStep({
 
 			{!locked && (
 				<p className="text-xs text-muted-foreground">
-					{selected.size === 0 ? "Pick at least one platform." : `${selected.size} of ${limit} selected`}
+					{selected.size === 0
+						? t("platform-selection-step.pick-at-least-one")
+						: `${selected.size} of ${limit} selected`}
 				</p>
 			)}
 

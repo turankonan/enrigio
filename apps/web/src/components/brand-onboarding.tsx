@@ -88,7 +88,7 @@ export default function BrandOnboarding({ organizationSlug, brandId, brandName, 
 					error={error}
 					onBack={() => setStep("website")}
 					onSubmit={() => createBrand([...selected])}
-					submitLabel={isLoading ? "Setting up..." : "Complete Setup"}
+					submitLabel={isLoading ? t("brand-onboarding.setting-up") : t("brand-onboarding.complete-setup")}
 				/>
 			</FullPageCard>
 		);
@@ -119,7 +119,11 @@ export default function BrandOnboarding({ organizationSlug, brandId, brandName, 
 				{error && <p className="text-sm text-destructive">{error}</p>}
 
 				<Button type="submit" className="w-full" disabled={isLoading}>
-					{isLoading ? "Setting up..." : platformState ? "Continue" : "Complete Setup"}
+					{isLoading
+						? t("brand-onboarding.setting-up")
+						: platformState
+							? t("new_brand.continue")
+							: t("brand-onboarding.complete-setup")}
 				</Button>
 			</form>
 		</FullPageCard>

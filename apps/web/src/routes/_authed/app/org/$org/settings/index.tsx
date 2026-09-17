@@ -86,7 +86,7 @@ function OrganizationSettingsPage() {
 				{error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
 
 				<Button type="submit" disabled={saving || !isDirty || !isComplete}>
-					{saving ? "Saving..." : "Save"}
+					{saving ? t("settings.brand.saving") : t("settings.organization.save")}
 				</Button>
 			</form>
 		</div>

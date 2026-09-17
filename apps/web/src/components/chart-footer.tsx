@@ -36,7 +36,9 @@ function DownloadButton({ onDownload, isDownloading }: { onDownload: () => void;
 			title={t("chart-footer.download-chart-tooltip")}
 		>
 			<Download className="size-3 mr-0.5" />
-			<span className="text-xs font-normal">{isDownloading ? "Exporting..." : "Export (PNG)"}</span>
+			<span className="text-xs font-normal">
+				{isDownloading ? t("chart-footer.exporting") : t("chart-footer.export-png")}
+			</span>
 		</Button>
 	);
 }

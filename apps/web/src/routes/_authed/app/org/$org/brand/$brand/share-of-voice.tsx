@@ -42,9 +42,9 @@ function currentShareOf(series: Array<{ share: number | null }>): number | null 
 }
 
 const TIPS = {
-	mentions: "Number of runs in which this brand was mentioned in the AI answer.",
+	mentions: t("share_of_voice.tip_mentions"),
 	share: "This brand's share of all brand + competitor mentions.",
-	prompts: "Number of distinct prompts this brand appeared in.",
+	prompts: t("share_of_voice.tip_prompts"),
 };
 
 function ShareOfVoicePage() {

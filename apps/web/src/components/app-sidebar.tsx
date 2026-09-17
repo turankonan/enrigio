@@ -80,9 +80,9 @@ function organizationGroups(organization: OrganizationSummary, features?: Featur
 	});
 
 	return [
-		{ label: "Organization Settings", items },
+		{ label: t("app-sidebar.organization-settings"), items },
 		{
-			label: "Docs",
+			label: t("app-sidebar.docs"),
 			items: [
 				{ title: t("app-sidebar.api"), link: { to: "/app/org/$org/settings/api", params }, icon: IconCode },
 				{ title: t("app-sidebar.mcp"), link: { to: "/app/org/$org/settings/mcp", params }, icon: IconPlugConnected },
@@ -179,7 +179,9 @@ export function AppSidebar({ section, organization, brand }: AppSidebarProps) {
 	const groups: NavGroup[] = [
 		...(section === "brand" && organization && brand ? brandGroups(organization, brand) : []),
 		...(section === "organization" && organization ? organizationGroups(organization, features) : []),
-		...(section === "admin" && adminItems.length > 0 ? [{ label: "Admin", items: adminItems }] : []),
+		...(section === "admin" && adminItems.length > 0
+			? [{ label: t("settings.members.role_admin"), items: adminItems }]
+			: []),
 	];
 	const brandmark = (
 		<>

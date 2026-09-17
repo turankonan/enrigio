@@ -8,6 +8,7 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { ArrowUpDown } from "lucide-react";
 import { FilterTriggerButton } from "@/components/filter-bar";
+import { t } from "@/lib/i18n";
 import { coercePromptOrder, DEFAULT_PROMPT_ORDER, PROMPT_ORDER_OPTIONS, type PromptOrder } from "@/lib/prompt-order";
 
 /** Sort control for the prompts list (#60). Reads/writes the `order` URL key
@@ -37,8 +38,8 @@ export function PromptOrderDropdown() {
 	// chosen order's menu label (arrows and all).
 	const label =
 		selected === DEFAULT_PROMPT_ORDER
-			? "Sort"
-			: (PROMPT_ORDER_OPTIONS.find((o) => o.value === selected)?.label ?? "Sort");
+			? t("prompt-order-dropdown.sort")
+			: (PROMPT_ORDER_OPTIONS.find((o) => o.value === selected)?.label ?? t("prompt-order-dropdown.sort"));
 
 	return (
 		<DropdownMenu>

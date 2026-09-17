@@ -10,6 +10,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { validateBrandFilterSearch } from "@/hooks/use-list-filters";
 import { requireAuthSession, requireOrgAccess } from "@/lib/auth/helpers";
+import { t } from "@/lib/i18n";
 import { getAppName } from "@/lib/route-head";
 
 interface BrandData {
@@ -93,7 +94,7 @@ export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand")({
 				{ title: brandName ? `${brandName} · ${appName}` : appName },
 				{
 					name: "description",
-					content: brandName ? `AI visibility tracking for ${brandName}.` : "AI visibility tracking and optimization.",
+					content: brandName ? `AI visibility tracking for ${brandName}.` : t("brand.head_description_generic"),
 				},
 			],
 		};
