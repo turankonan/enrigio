@@ -3,6 +3,10 @@
 // `domain-categories.server.ts` (server-only) so the ~25k-entry editorial list
 // never ships in the browser bundle.
 
+import { extractDomain } from "@workspace/lib/net/hostname";
+
+export { extractDomain };
+
 export type CitationCategory =
 	| "brand"
 	| "competitor"
@@ -78,16 +82,6 @@ export const CITATION_PAGE_TYPES: CitationPageType[] = [
 
 export const emptyPageTypeCounts = (): Record<CitationPageType, number> =>
 	Object.fromEntries(CITATION_PAGE_TYPES.map((p) => [p, 0])) as Record<CitationPageType, number>;
-
-export function extractDomain(urlOrDomain: string): string {
-	try {
-		const cleaned = urlOrDomain.replace(/^https?:\/\//, "");
-		const withoutWww = cleaned.replace(/^www\./, "");
-		return withoutWww.split("/")[0].toLowerCase();
-	} catch {
-		return urlOrDomain.toLowerCase();
-	}
-}
 
 const DOMAIN_REGEX = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/;
 
