@@ -5,6 +5,7 @@
  * Replicates: apps/web/src/app/reports/page.tsx + reports-content.tsx
  */
 
+import { ArrowSquareOut } from "@phosphor-icons/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
@@ -14,7 +15,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { Textarea } from "@workspace/ui/components/textarea";
-import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { trackEvent } from "@/lib/posthog";
 import { pageHead } from "@/lib/route-head";
@@ -223,7 +223,7 @@ function ReportsPage() {
 														target="_blank"
 													>
 														<Button variant="default" size="sm" className="cursor-pointer h-6 px-2 text-xs">
-															<ExternalLink className="size-3 mr-0.5" />
+															<ArrowSquareOut className="size-3 mr-0.5" />
 															View Report
 														</Button>
 													</Link>

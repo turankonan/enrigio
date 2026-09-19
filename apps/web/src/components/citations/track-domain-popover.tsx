@@ -1,5 +1,5 @@
+import { Info, Plus } from "@phosphor-icons/react";
 import * as Sentry from "@sentry/tanstackstart-react";
-import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
@@ -99,7 +99,7 @@ export function TrackDomainPopover({
 					/>
 				}
 			>
-				<IconPlus className="h-3.5 w-3.5" />
+				<Plus className="h-3.5 w-3.5" />
 			</PopoverTrigger>
 			<PopoverContent className="w-72 p-3" align="end">
 				<div className="space-y-3">
@@ -113,7 +113,7 @@ export function TrackDomainPopover({
 						<div className="flex items-center gap-1">
 							<p className="text-[11px] text-muted-foreground">{t("track-domain-popover.add-as-brand-domain")}</p>
 							<Tooltip>
-								<TooltipTrigger render={<IconInfoCircle className="h-3 w-3 text-muted-foreground cursor-help" />} />
+								<TooltipTrigger render={<Info className="h-3 w-3 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-xs font-normal">
 									{t("track-domain-popover.brand-retroactive-tooltip")}
 								</TooltipContent>
@@ -137,7 +137,7 @@ export function TrackDomainPopover({
 									{t("track-domain-popover.add-to-existing-competitor")}
 								</p>
 								<Tooltip>
-									<TooltipTrigger render={<IconInfoCircle className="h-3 w-3 text-muted-foreground cursor-help" />} />
+									<TooltipTrigger render={<Info className="h-3 w-3 text-muted-foreground cursor-help" />} />
 									<TooltipContent className="max-w-xs text-xs font-normal">
 										{t("track-domain-popover.competitor-retroactive-tooltip")}
 									</TooltipContent>

@@ -1,4 +1,4 @@
-import { IconExternalLink, IconInfoCircle, IconSearch } from "@tabler/icons-react";
+import { ArrowSquareOut, Info, MagnifyingGlass } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
@@ -69,7 +69,7 @@ export function TopUrlsCard({
 						<CardTitle className="flex items-center gap-1.5">
 							{t("top-urls-card.title")}
 							<Tooltip>
-								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+								<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-sm font-normal">
 									<p className="mb-2">{t("top-urls-card.tooltip-pages")}</p>
 									<p>
@@ -107,7 +107,7 @@ export function TopUrlsCard({
 							className="h-8 text-xs"
 						/>
 						<InputGroupAddon className="pl-2.5">
-							<IconSearch className="size-3.5" />
+							<MagnifyingGlass className="size-3.5" />
 						</InputGroupAddon>
 					</InputGroup>
 				</div>
@@ -195,7 +195,7 @@ export function TopUrlsCard({
 										</TooltipTrigger>
 										<TooltipContent className="text-xs">{t("top-urls-card.count-tooltip")}</TooltipContent>
 									</Tooltip>
-									<IconExternalLink className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+									<ArrowSquareOut className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
 								</div>
 							</a>
 						);

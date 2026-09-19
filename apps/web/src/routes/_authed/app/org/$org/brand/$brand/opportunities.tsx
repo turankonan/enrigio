@@ -7,7 +7,7 @@
  * server-side and regenerated only when stale — see server/opportunities.ts.
  */
 
-import { IconClock } from "@tabler/icons-react";
+import { Clock } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Spinner } from "@workspace/ui/components/spinner";
@@ -53,7 +53,7 @@ function OpportunitiesPage() {
 function LastEvaluatedAt({ date }: { date: string }) {
 	return (
 		<p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-			<IconClock className="size-4" aria-hidden />
+			<Clock className="size-4" aria-hidden />
 			Last evaluated{" "}
 			<time dateTime={date}>
 				{new Date(date).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}

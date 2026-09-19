@@ -2,6 +2,18 @@
  * /admin/workflows - Monitor prompt scheduling, job execution, and worker health
  */
 
+import {
+	ArrowsClockwise,
+	CaretDown,
+	CaretRight,
+	CheckCircle,
+	Clock,
+	HardDrives,
+	Play,
+	Pulse,
+	Warning,
+	XCircle,
+} from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
@@ -18,18 +30,6 @@ import { Progress } from "@workspace/ui/components/progress";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
-import {
-	Activity,
-	AlertTriangle,
-	CheckCircle2,
-	ChevronDown,
-	ChevronRight,
-	Clock,
-	Play,
-	RefreshCw,
-	Server,
-	XCircle,
-} from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
@@ -176,7 +176,7 @@ function QueueStatsCard({ stats, title }: { stats: QueueStats; title: string }) 
 		<Card className={hasIssues ? "border-amber-500/50" : ""}>
 			<CardHeader className="pb-2">
 				<CardTitle className="text-sm font-medium flex items-center gap-2">
-					<Server className="h-4 w-4" />
+					<HardDrives className="h-4 w-4" />
 					{title}
 				</CardTitle>
 				<CardDescription>pg-boss Job Queue Status</CardDescription>
@@ -240,7 +240,7 @@ function TargetStatus({ status }: { status?: TargetRunStatus }) {
 		return (
 			<div className="flex flex-col gap-0.5">
 				<div className="flex items-center gap-1">
-					<AlertTriangle className="h-3 w-3 text-amber-500" />
+					<Warning className="h-3 w-3 text-amber-500" />
 					<span className="text-amber-600 text-xs">{lastRunText}</span>
 				</div>
 				{status.overdueByMs && <span className="text-red-500 text-xs">(+{formatDuration(status.overdueByMs)})</span>}
@@ -250,7 +250,7 @@ function TargetStatus({ status }: { status?: TargetRunStatus }) {
 
 	return (
 		<div className="flex items-center gap-1">
-			<CheckCircle2 className="h-3 w-3 text-emerald-500" />
+			<CheckCircle className="h-3 w-3 text-emerald-500" />
 			<span className="text-emerald-600 text-xs">{lastRunText}</span>
 		</div>
 	);
@@ -281,7 +281,7 @@ function RetryButton({ promptId, onSuccess }: { promptId?: string; jobId?: strin
 	if (success) {
 		return (
 			<Button size="sm" variant="outline" disabled className="cursor-default">
-				<CheckCircle2 className="h-3 w-3 mr-1 text-emerald-500" />
+				<CheckCircle className="h-3 w-3 mr-1 text-emerald-500" />
 				{success === "recreated" ? "Scheduler Reset" : "Queued"}
 			</Button>
 		);
@@ -379,7 +379,7 @@ function RetryJobFooter({
 		<div className="flex items-center gap-3 pt-2 border-t">
 			{succeeded ? (
 				<div className="flex items-center gap-2 text-emerald-600">
-					<CheckCircle2 className="h-4 w-4" />
+					<CheckCircle className="h-4 w-4" />
 					<span>Job queued for retry</span>
 				</div>
 			) : (
@@ -419,7 +419,7 @@ function JobDetailsDialog({ job, onRetrySuccess }: { job: RecentJob; onRetrySucc
 						{isFailed ? (
 							<XCircle className="h-5 w-5 text-red-500" />
 						) : (
-							<CheckCircle2 className="h-5 w-5 text-emerald-500" />
+							<CheckCircle className="h-5 w-5 text-emerald-500" />
 						)}
 						{isFailed ? "Failed Job Details" : "Completed Job Details"}
 					</DialogTitle>
@@ -480,9 +480,9 @@ function BrandRow({
 				<TableCell>
 					<div className="flex items-center gap-2">
 						{isExpanded ? (
-							<ChevronDown className="h-4 w-4 text-muted-foreground" />
+							<CaretDown className="h-4 w-4 text-muted-foreground" />
 						) : (
-							<ChevronRight className="h-4 w-4 text-muted-foreground" />
+							<CaretRight className="h-4 w-4 text-muted-foreground" />
 						)}
 						<div>
 							<Link
@@ -755,7 +755,7 @@ function WorkflowsPage() {
 				</div>
 				<div className="flex items-center gap-2">
 					<Button variant="outline" onClick={() => fetchData(true)} disabled={isRefreshing} className="cursor-pointer">
-						<RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+						<ArrowsClockwise className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
 						Refresh
 					</Button>
 				</div>
@@ -766,7 +766,7 @@ function WorkflowsPage() {
 				<Card>
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
-							<Activity className="h-4 w-4" />
+							<Pulse className="h-4 w-4" />
 							Schedule Health
 						</CardTitle>
 					</CardHeader>
@@ -786,7 +786,7 @@ function WorkflowsPage() {
 				<Card>
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
-							<CheckCircle2 className="h-4 w-4 text-emerald-500" />
+							<CheckCircle className="h-4 w-4 text-emerald-500" />
 							On Schedule
 						</CardTitle>
 					</CardHeader>
@@ -806,7 +806,7 @@ function WorkflowsPage() {
 				>
 					<CardHeader className="pb-2">
 						<CardTitle className="text-sm font-medium flex items-center gap-2">
-							<AlertTriangle className={`h-4 w-4 ${overdueBreakdown.severe > 0 ? "text-red-500" : "text-amber-500"}`} />
+							<Warning className={`h-4 w-4 ${overdueBreakdown.severe > 0 ? "text-red-500" : "text-amber-500"}`} />
 							Overdue &gt;30min
 						</CardTitle>
 					</CardHeader>

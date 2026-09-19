@@ -4,6 +4,8 @@
  * Production-quality printable report (US Letter 8.5 x 11 in).
  * Uses Share of Voice as the primary metric with rich competitive analysis.
  */
+
+import { ChartBar, Rocket, Target } from "@phosphor-icons/react";
 import { createFileRoute, notFound, useRouteContext } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import type { ClientConfig } from "@workspace/config/types";
@@ -23,7 +25,6 @@ import {
 	type ReportPromptRun,
 	selectRepresentativePrompts,
 } from "@workspace/lib/report-metrics";
-import { BarChart3, Rocket, Target } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { PromptChartPrint } from "@/components/prompt-chart-print";
 import { hasReportAccess, requireAuthSession } from "@/lib/auth/helpers";
@@ -925,7 +926,7 @@ function CallToActionPage({ branding }: { branding?: ClientConfig["branding"] })
 						</div>
 						<div className="text-center p-4">
 							<div className="flex justify-center mb-3">
-								<BarChart3 className="h-8 w-8 text-slate-600" />
+								<ChartBar className="h-8 w-8 text-slate-600" />
 							</div>
 							<h3 className="font-semibold text-slate-800 mb-2">Continuous Monitoring</h3>
 							<p className="text-sm text-slate-600 leading-relaxed">

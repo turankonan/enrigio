@@ -1,3 +1,4 @@
+import { CaretDown, Clock, MagnifyingGlass, Tag as TagIcon, X } from "@phosphor-icons/react";
 import { useSearch } from "@tanstack/react-router";
 import { ModelIcon } from "@workspace/ui/brand/model-icon";
 import { Button } from "@workspace/ui/components/button";
@@ -13,7 +14,6 @@ import {
 } from "@workspace/ui/components/dropdown-menu";
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from "@workspace/ui/components/input-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
-import { ChevronDown, Clock, Search, Tag as TagIcon, X } from "lucide-react";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { MdSelectAll } from "react-icons/md";
 import { useBrand } from "@/hooks/use-brands";
@@ -90,7 +90,7 @@ export function FilterTriggerButton({
 					{badgeCount}
 				</span>
 			)}
-			<ChevronDown className="size-3.5 text-muted-foreground" />
+			<CaretDown className="size-3.5 text-muted-foreground" />
 		</Button>
 	);
 }
@@ -325,7 +325,7 @@ function SearchInput({ placeholder = t("query_fan_out.search_prompts_placeholder
 				className="h-8 text-sm"
 			/>
 			<InputGroupAddon className="pl-2.5">
-				<Search className="size-3.5" />
+				<MagnifyingGlass className="size-3.5" />
 			</InputGroupAddon>
 			{local && (
 				<InputGroupAddon align="inline-end" className="pr-1.5">

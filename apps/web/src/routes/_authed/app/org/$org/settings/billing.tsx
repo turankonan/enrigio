@@ -1,4 +1,4 @@
-import { IconExternalLink } from "@tabler/icons-react";
+import { ArrowSquareOut } from "@phosphor-icons/react";
 import { createFileRoute, redirect, useRouter } from "@tanstack/react-router";
 import type { Entitlements } from "@workspace/config/entitlements";
 import { PREMIUM_ADDON_MONTHLY_USD, planDisplayName, summarizeSubscriptionCost } from "@workspace/config/plans";
@@ -251,7 +251,7 @@ function BillingAction({
 	if (hasSubscription) {
 		return (
 			<Button variant="outline" size="sm" onClick={onOpenPortal} disabled={busy !== null}>
-				{busy === "portal" ? <Spinner /> : <IconExternalLink className="h-4 w-4" />}
+				{busy === "portal" ? <Spinner /> : <ArrowSquareOut className="h-4 w-4" />}
 				Manage billing
 			</Button>
 		);

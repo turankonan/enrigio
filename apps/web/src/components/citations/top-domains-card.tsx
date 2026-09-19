@@ -1,4 +1,4 @@
-import { IconInfoCircle, IconSearch } from "@tabler/icons-react";
+import { Info, MagnifyingGlass } from "@phosphor-icons/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@workspace/ui/components/input-group";
 import { Separator } from "@workspace/ui/components/separator";
@@ -54,7 +54,7 @@ export function TopDomainsCard({
 						<CardTitle className="flex items-center gap-1.5">
 							{t("top-domains-card.title")}
 							<Tooltip>
-								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+								<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-sm font-normal">
 									{t("top-domains-card.tooltip")}
 								</TooltipContent>
@@ -73,7 +73,7 @@ export function TopDomainsCard({
 							className="h-8 text-xs"
 						/>
 						<InputGroupAddon className="pl-2.5">
-							<IconSearch className="size-3.5" />
+							<MagnifyingGlass className="size-3.5" />
 						</InputGroupAddon>
 					</InputGroup>
 				</div>

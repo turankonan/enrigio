@@ -7,14 +7,13 @@
  * configured" footer live here so both surfaces look identical.
  */
 
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info, PencilSimple, Plus, Trash } from "@phosphor-icons/react";
 import { MAX_COMPETITORS } from "@workspace/lib/constants";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { TagsInput } from "@workspace/ui/components/tags-input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
-import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useCallback } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { SiteIcon } from "@/components/site-icon";
@@ -89,7 +88,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 							className="p-1.5 h-auto cursor-pointer shrink-0"
 							disabled={disabled}
 						>
-							<Pencil className="h-3.5 w-3.5 text-muted-foreground" />
+							<PencilSimple className="h-3.5 w-3.5 text-muted-foreground" />
 						</Button>
 						<Button
 							type="button"
@@ -99,7 +98,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 							className="p-1.5 h-auto cursor-pointer shrink-0 text-muted-foreground hover:text-destructive"
 							disabled={disabled}
 						>
-							<Trash2 className="h-3.5 w-3.5" />
+							<Trash className="h-3.5 w-3.5" />
 						</Button>
 					</div>
 
@@ -109,9 +108,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 								<Label className="text-xs font-medium flex items-center gap-1.5">
 									{t("settings.api_keys.name_label")}
 									<Tooltip>
-										<TooltipTrigger
-											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
-										/>
+										<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 										<TooltipContent className="max-w-xs text-xs font-normal">
 											{t("competitors-editor.name-tooltip")}
 										</TooltipContent>
@@ -131,9 +128,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 								<Label className="text-xs font-medium flex items-center gap-1.5">
 									{t("competitors-editor.domains")}
 									<Tooltip>
-										<TooltipTrigger
-											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
-										/>
+										<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 										<TooltipContent className="max-w-xs text-xs font-normal">
 											{t("competitors-editor.domains-tooltip")}
 										</TooltipContent>
@@ -154,9 +149,7 @@ export function CompetitorsEditor({ competitors, onChange, disabled }: Competito
 								<Label className="text-xs font-medium flex items-center gap-1.5">
 									{t("admin.tools.aliases")}
 									<Tooltip>
-										<TooltipTrigger
-											render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />}
-										/>
+										<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 										<TooltipContent className="max-w-xs text-xs font-normal">
 											{t("competitors-editor.aliases-tooltip")}
 										</TooltipContent>

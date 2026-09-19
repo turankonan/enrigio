@@ -1,10 +1,9 @@
-import { IconEditCircle } from "@tabler/icons-react";
+import { PencilCircle, Tray } from "@phosphor-icons/react";
 import { Link, useSearch } from "@tanstack/react-router";
 import type { Competitor } from "@workspace/lib/db/schema";
 import { buttonVariants } from "@workspace/ui/components/button";
 import { Card } from "@workspace/ui/components/card";
 import { cn } from "@workspace/ui/lib/utils";
-import { Inbox } from "lucide-react";
 import { useMemo } from "react";
 import { PromptChartSkeleton } from "@/components/cached-prompt-chart";
 import { ALL_MODELS_VALUE } from "@/components/filter-bar";
@@ -124,14 +123,14 @@ function PromptsContent({ brandId }: { brandId: string | undefined }) {
 			emptyState={
 				<div className="border-2 border-dashed border-muted rounded-lg min-h-48 flex items-center justify-center">
 					<div className="text-center py-8 text-muted-foreground">
-						<Inbox className="h-12 w-12 mx-auto mb-4 opacity-50" />
+						<Tray className="h-12 w-12 mx-auto mb-4 opacity-50" />
 						<p className="mb-4">{t("prompts-display.no-prompts-yet")}</p>
 						<Link
 							to="/app/org/$org/brand/$brand/settings/prompts"
 							params={brandParams}
 							className={cn(buttonVariants({ size: "sm" }), "h-7 flex cursor-pointer")}
 						>
-							<IconEditCircle />
+							<PencilCircle size={24} />
 							<span>{t("prompts-display.edit")}</span>
 						</Link>
 					</div>

@@ -1,4 +1,4 @@
-import { IconChevronDown, IconExternalLink, IconInfoCircle } from "@tabler/icons-react";
+import { ArrowSquareOut, CaretDown, Info } from "@phosphor-icons/react";
 import { Badge } from "@workspace/ui/components/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
@@ -76,7 +76,7 @@ export function RedditCard({ subreddits }: { subreddits: ReturnType<typeof useSu
 				<CardTitle className="flex items-center gap-1.5">
 					{t("reddit-card.title")}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">{t("reddit-card.tooltip")}</TooltipContent>
 					</Tooltip>
 				</CardTitle>
@@ -95,7 +95,7 @@ export function RedditCard({ subreddits }: { subreddits: ReturnType<typeof useSu
 										onClick={() => setExpandedSubreddit(isExpanded ? null : sub.name)}
 										className="flex items-center gap-1.5 min-w-0 cursor-pointer group"
 									>
-										<IconChevronDown
+										<CaretDown
 											className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${isExpanded ? "" : "-rotate-90"}`}
 										/>
 										<span className="text-sm font-medium text-foreground group-hover:underline truncate">
@@ -124,7 +124,7 @@ export function RedditCard({ subreddits }: { subreddits: ReturnType<typeof useSu
 											onClick={(e) => e.stopPropagation()}
 											className="text-muted-foreground hover:text-foreground transition-colors"
 										>
-											<IconExternalLink className="h-3.5 w-3.5" />
+											<ArrowSquareOut className="h-3.5 w-3.5" />
 										</a>
 									</div>
 								</div>

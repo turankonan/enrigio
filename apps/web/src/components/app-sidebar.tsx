@@ -1,21 +1,21 @@
 import {
-	IconBriefcase,
-	IconBuilding,
-	IconBuildings,
-	IconChartBar,
-	IconCode,
-	IconCpu,
-	IconCreditCard,
-	IconDashboard,
-	IconKey,
-	IconLink,
-	IconListDetails,
-	IconPlugConnected,
-	IconSitemap,
-	IconSpeakerphone,
-	IconTarget,
-	IconUsers,
-} from "@tabler/icons-react";
+	Briefcase,
+	Building,
+	Buildings,
+	ChartBar,
+	Code,
+	Cpu,
+	CreditCard,
+	Gauge,
+	Key,
+	Link as LinkIcon,
+	ListChecks,
+	Megaphone,
+	PlugsConnected,
+	Target,
+	TreeStructure,
+	Users,
+} from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import type { FeaturesConfig } from "@workspace/config/types";
 import { brandLinkParams, orgLinkParams } from "@workspace/lib/app-urls";
@@ -51,17 +51,17 @@ function organizationGroups(organization: OrganizationSummary, features?: Featur
 		{
 			title: t("app-sidebar.organization"),
 			link: { to: "/app/org/$org/settings", params },
-			icon: IconBriefcase,
+			icon: Briefcase,
 			exact: true,
 		},
-		{ title: t("app-sidebar.brands"), link: { to: "/app/org/$org/settings/brands", params }, icon: IconBuildings },
+		{ title: t("app-sidebar.brands"), link: { to: "/app/org/$org/settings/brands", params }, icon: Buildings },
 	];
 
 	if (features?.teamInvites) {
 		items.push({
 			title: t("app-sidebar.team"),
 			link: { to: "/app/org/$org/settings/members", params },
-			icon: IconUsers,
+			icon: Users,
 		});
 	}
 
@@ -69,14 +69,14 @@ function organizationGroups(organization: OrganizationSummary, features?: Featur
 		items.push({
 			title: t("app-sidebar.billing"),
 			link: { to: "/app/org/$org/settings/billing", params },
-			icon: IconCreditCard,
+			icon: CreditCard,
 		});
 	}
 
 	items.push({
 		title: t("app-sidebar.api-keys"),
 		link: { to: "/app/org/$org/settings/api-keys", params },
-		icon: IconKey,
+		icon: Key,
 	});
 
 	return [
@@ -84,8 +84,8 @@ function organizationGroups(organization: OrganizationSummary, features?: Featur
 		{
 			label: t("app-sidebar.docs"),
 			items: [
-				{ title: t("app-sidebar.api"), link: { to: "/app/org/$org/settings/api", params }, icon: IconCode },
-				{ title: t("app-sidebar.mcp"), link: { to: "/app/org/$org/settings/mcp", params }, icon: IconPlugConnected },
+				{ title: t("app-sidebar.api"), link: { to: "/app/org/$org/settings/api", params }, icon: Code },
+				{ title: t("app-sidebar.mcp"), link: { to: "/app/org/$org/settings/mcp", params }, icon: PlugsConnected },
 			],
 		},
 	];
@@ -97,7 +97,7 @@ function brandGroups(organization: OrganizationSummary, brand: BrandWithPrompts)
 		{
 			title: t("app-sidebar.overview"),
 			link: { to: "/app/org/$org/brand/$brand", params },
-			icon: IconDashboard,
+			icon: Gauge,
 			exact: true,
 		},
 	];
@@ -107,27 +107,27 @@ function brandGroups(organization: OrganizationSummary, brand: BrandWithPrompts)
 			{
 				title: t("app-sidebar.visibility"),
 				link: { to: "/app/org/$org/brand/$brand/visibility", params },
-				icon: IconChartBar,
+				icon: ChartBar,
 			},
 			{
 				title: t("app-sidebar.share-of-voice"),
 				link: { to: "/app/org/$org/brand/$brand/share-of-voice", params },
-				icon: IconSpeakerphone,
+				icon: Megaphone,
 			},
 			{
 				title: t("app-sidebar.query-fan-out"),
 				link: { to: "/app/org/$org/brand/$brand/query-fan-out", params },
-				icon: IconSitemap,
+				icon: TreeStructure,
 			},
 			{
 				title: t("app-sidebar.citations"),
 				link: { to: "/app/org/$org/brand/$brand/citations", params },
-				icon: IconLink,
+				icon: LinkIcon,
 			},
 			{
 				title: t("app-sidebar.opportunities"),
 				link: { to: "/app/org/$org/brand/$brand/opportunities", params },
-				icon: IconTarget,
+				icon: Target,
 			},
 		);
 	}
@@ -141,22 +141,22 @@ function brandGroups(organization: OrganizationSummary, brand: BrandWithPrompts)
 				{
 					title: t("app-sidebar.brand"),
 					link: { to: "/app/org/$org/brand/$brand/settings/brand", params },
-					icon: IconBuilding,
+					icon: Building,
 				},
 				{
 					title: t("app-sidebar.competitors"),
 					link: { to: "/app/org/$org/brand/$brand/settings/competitors", params },
-					icon: IconBuildings,
+					icon: Buildings,
 				},
 				{
 					title: t("app-sidebar.prompts"),
 					link: { to: "/app/org/$org/brand/$brand/settings/prompts", params },
-					icon: IconListDetails,
+					icon: ListChecks,
 				},
 				{
 					title: t("app-sidebar.llms"),
 					link: { to: "/app/org/$org/brand/$brand/settings/llms", params },
-					icon: IconCpu,
+					icon: Cpu,
 				},
 			],
 		});

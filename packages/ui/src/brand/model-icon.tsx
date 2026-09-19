@@ -6,7 +6,7 @@
  * @workspace/config/models; this only turns that into an icon, falling back to a
  * neutral glyph for anything without a brand mark.
  */
-import { Sparkles } from "lucide-react";
+import { Sparkle } from "@phosphor-icons/react";
 import type { IconType } from "react-icons";
 import { RiOpenaiFill } from "react-icons/ri";
 import {
@@ -42,6 +42,6 @@ const ICONS: Record<string, IconType> = {
 
 export function ModelIcon({ iconId, className = "size-3.5" }: { iconId: string; className?: string }) {
 	const Icon = ICONS[iconId];
-	if (!Icon) return <Sparkles className={className} />;
+	if (!Icon) return <Sparkle className={className} />;
 	return <Icon className={className} />;
 }

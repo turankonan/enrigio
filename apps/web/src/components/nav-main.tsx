@@ -1,4 +1,4 @@
-import type { Icon } from "@tabler/icons-react";
+import type { Icon } from "@phosphor-icons/react";
 import { Link, type LinkProps, useLocation, useRouter } from "@tanstack/react-router";
 import {
 	SidebarGroup,

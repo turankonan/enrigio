@@ -1,9 +1,9 @@
+import { Sparkle, Warning } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { DiscoveredCompetitor } from "@workspace/lib/competitor-discovery";
 import { Alert, AlertDescription, AlertTitle } from "@workspace/ui/components/alert";
 import { Button } from "@workspace/ui/components/button";
-import { AlertTriangle, Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { type CompetitorEntry, CompetitorsEditor } from "@/components/competitors-editor";
@@ -75,7 +75,7 @@ function DiscoveryPanel({
 					<p className="text-muted-foreground text-sm">{t("settings.competitors.discover_description")}</p>
 				</div>
 				<Button variant="outline" size="sm" onClick={discover} disabled={loading || disabled}>
-					<Sparkles className="size-4" />
+					<Sparkle className="size-4" />
 					{loading ? t("settings.competitors.scanning") : t("settings.competitors.discover_button")}
 				</Button>
 			</div>
@@ -192,7 +192,7 @@ function CompetitorsSettingsPage() {
 			</div>
 
 			<Alert variant="default" className="border-yellow-200 bg-yellow-50 text-yellow-800">
-				<AlertTriangle className="h-4 w-4 text-yellow-600" />
+				<Warning className="h-4 w-4 text-yellow-600" />
 				<AlertTitle>{t("settings.competitors.warning_title")}</AlertTitle>
 				<AlertDescription className="text-yellow-700">{t("settings.competitors.warning_body")}</AlertDescription>
 			</Alert>

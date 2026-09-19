@@ -3,6 +3,7 @@
  * arbitrary website without going through the wizard.
  */
 
+import { Check, Copy, Sparkle } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import type { OnboardingSuggestion } from "@workspace/lib/onboarding";
 import { Badge } from "@workspace/ui/components/badge";
@@ -19,7 +20,6 @@ import {
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Spinner } from "@workspace/ui/components/spinner";
-import { Check, Copy, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
@@ -83,7 +83,7 @@ function AnalyzeBrandDialog() {
 	return (
 		<Dialog open={open} onOpenChange={(o) => (o ? setOpen(true) : handleClose())}>
 			<DialogTrigger render={<Button variant="outline" className="cursor-pointer w-full" />}>
-				<Sparkles className="h-4 w-4 mr-2" />
+				<Sparkle className="h-4 w-4 mr-2" />
 				Analyze brand
 			</DialogTrigger>
 			<DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
@@ -248,7 +248,7 @@ function ToolsPage() {
 				<Card>
 					<CardHeader>
 						<CardTitle className="flex items-center gap-2">
-							<Sparkles className="h-5 w-5" />
+							<Sparkle className="h-5 w-5" />
 							Brand analysis
 						</CardTitle>
 						<CardDescription>

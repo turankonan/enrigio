@@ -1,4 +1,4 @@
-import { IconChevronDown, IconInfoCircle, IconSearch } from "@tabler/icons-react";
+import { CaretDown, Info, MagnifyingGlass } from "@phosphor-icons/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
@@ -53,7 +53,7 @@ export function GoogleShoppingCard({ googleModule }: { googleModule: GoogleModul
 				<CardTitle className="flex items-center gap-1.5">
 					{t("google-shopping-card.title")}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">
 							{t("google-shopping-card.tooltip")}
 						</TooltipContent>
@@ -106,7 +106,7 @@ export function GoogleShoppingCard({ googleModule }: { googleModule: GoogleModul
 												onClick={() => setExpandedProduct(isExpanded ? null : product.name)}
 												className="flex items-center gap-1.5 min-w-0 cursor-pointer group text-left"
 											>
-												<IconChevronDown
+												<CaretDown
 													className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "" : "-rotate-90"}`}
 												/>
 												<span className={`shrink-0 rounded-full h-2 w-2 ${attributionDotClass(product.attribution)}`} />
@@ -146,10 +146,10 @@ export function GoogleShoppingCard({ googleModule }: { googleModule: GoogleModul
 												onClick={() => setExpandedQuery(isExpanded ? null : q.query)}
 												className="flex items-center gap-1.5 min-w-0 cursor-pointer group text-left"
 											>
-												<IconChevronDown
+												<CaretDown
 													className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform ${isExpanded ? "" : "-rotate-90"}`}
 												/>
-												<IconSearch className="h-3 w-3 shrink-0 text-muted-foreground" />
+												<MagnifyingGlass className="h-3 w-3 shrink-0 text-muted-foreground" />
 												<span className="text-sm font-medium text-foreground group-hover:underline truncate">
 													{q.query}
 												</span>

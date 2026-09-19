@@ -1,13 +1,4 @@
-import {
-	IconActivity,
-	IconArrowRight,
-	IconClock,
-	IconEye,
-	IconInfoCircle,
-	IconList,
-	IconRefresh,
-	IconSpeakerphone,
-} from "@tabler/icons-react";
+import { ArrowRight, ArrowsClockwise, Clock, Eye, Info, List, Megaphone, Pulse } from "@phosphor-icons/react";
 import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import { labelForModelFilter } from "@workspace/config/model-filter";
 import type { ClientConfig } from "@workspace/config/types";
@@ -97,7 +88,7 @@ function StatWithTooltip({
 	value,
 	tooltip,
 }: {
-	icon: typeof IconList;
+	icon: typeof List;
 	label: string;
 	value: string | number;
 	tooltip: ReactNode;
@@ -109,7 +100,7 @@ function StatWithTooltip({
 				<span>
 					<span className="font-semibold text-foreground">{value}</span> {label}
 				</span>
-				<IconInfoCircle className="h-3.5 w-3.5 opacity-50" />
+				<Info className="h-3.5 w-3.5 opacity-50" />
 			</TooltipTrigger>
 			<TooltipContent className="max-w-xs text-sm">{tooltip}</TooltipContent>
 		</Tooltip>
@@ -131,11 +122,11 @@ function CardTitleWithTooltip({
 			{title}
 			{tooltip ? (
 				<Tooltip>
-					<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+					<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 					<TooltipContent className="max-w-xs text-sm font-normal">{tooltip}</TooltipContent>
 				</Tooltip>
 			) : (
-				<IconInfoCircle className="h-3.5 w-3.5 opacity-70" />
+				<Info className="h-3.5 w-3.5 opacity-70" />
 			)}
 		</CardTitle>
 	);
@@ -158,7 +149,7 @@ function TrendSection({
 	series,
 	loading,
 }: {
-	icon: typeof IconEye;
+	icon: typeof Eye;
 	title: string;
 	linkTo: "/app/org/$org/brand/$brand/visibility" | "/app/org/$org/brand/$brand/share-of-voice";
 	linkLabel: string;
@@ -183,7 +174,7 @@ function TrendSection({
 					params={params}
 					className={buttonVariants({ variant: "ghost", size: "sm", className: "h-8" })}
 				>
-					{linkLabel} <IconArrowRight className="h-4 w-4 ml-1" />
+					{linkLabel} <ArrowRight className="h-4 w-4 ml-1" />
 				</Link>
 			</div>
 
@@ -209,10 +200,10 @@ function TrendSection({
 }
 
 const STAT_PLACEHOLDERS = [
-	{ label: t("dashboard.stat_prompts_tracked"), icon: IconList },
-	{ label: t("dashboard.stat_evaluations"), icon: IconActivity },
-	{ label: t("dashboard.stat_run_frequency"), icon: IconClock },
-	{ label: t("dashboard.stat_last_updated"), icon: IconRefresh },
+	{ label: t("dashboard.stat_prompts_tracked"), icon: List },
+	{ label: t("dashboard.stat_evaluations"), icon: Pulse },
+	{ label: t("dashboard.stat_run_frequency"), icon: Clock },
+	{ label: t("dashboard.stat_last_updated"), icon: ArrowsClockwise },
 ];
 
 function TrackingStats({
@@ -246,7 +237,7 @@ function TrackingStats({
 	return (
 		<div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-3 text-sm text-muted-foreground">
 			<StatWithTooltip
-				icon={IconList}
+				icon={List}
 				label={t("dashboard.stat_prompts_tracked")}
 				value={totalPrompts.toLocaleString()}
 				tooltip={
@@ -265,13 +256,13 @@ function TrackingStats({
 				}
 			/>
 			<StatWithTooltip
-				icon={IconActivity}
+				icon={Pulse}
 				label={t("dashboard.stat_evaluations_30d")}
 				value={totalRuns.toLocaleString()}
 				tooltip={t("dashboard.evaluations_tooltip")}
 			/>
 			<StatWithTooltip
-				icon={IconClock}
+				icon={Clock}
 				label={t("dashboard.stat_run_frequency")}
 				value={formatRunFrequency(delayHours)}
 				tooltip={
@@ -293,7 +284,7 @@ function TrackingStats({
 				}
 			/>
 			<StatWithTooltip
-				icon={IconRefresh}
+				icon={ArrowsClockwise}
 				label={t("dashboard.stat_last_updated")}
 				value={formatRelativeTime(lastUpdatedAt)}
 				tooltip={
@@ -322,7 +313,7 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 	return (
 		<div className="flex flex-1 flex-col items-center justify-center p-8 max-w-xl mx-auto text-center">
 			<div className="rounded-full bg-muted p-4 mb-6">
-				<IconClock className="h-10 w-10 text-muted-foreground" />
+				<Clock className="h-10 w-10 text-muted-foreground" />
 			</div>
 			<h2 className="text-2xl font-bold mb-3">
 				{hasEnabledPrompts ? t("dashboard.awaiting_title") : t("dashboard.no_data_title")}
@@ -332,7 +323,7 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 				{hasEnabledPrompts && (
 					<div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
 						<div className="flex items-center gap-2">
-							<IconList className="h-5 w-5 text-muted-foreground" />
+							<List className="h-5 w-5 text-muted-foreground" />
 							<span className="text-sm">{t("dashboard.prompts_configured_enabled")}</span>
 						</div>
 						<span className="font-semibold">{totalPrompts.toLocaleString()}</span>
@@ -348,7 +339,7 @@ function AwaitingFirstEvaluation({ totalPrompts, hasPrompts }: { totalPrompts: n
 						: hasPrompts
 							? t("dashboard.edit_prompts_cta")
 							: t("dashboard.set_up_prompts")}{" "}
-					<IconArrowRight className="h-4 w-4 ml-1" />
+					<ArrowRight className="h-4 w-4 ml-1" />
 				</Link>
 			</div>
 			{hasEnabledPrompts && <p className="text-xs text-muted-foreground mt-6">{t("dashboard.refresh_hint")}</p>}
@@ -453,7 +444,7 @@ function DashboardPage() {
 		<div className="flex flex-1 flex-col">
 			<div className="m-auto flex w-full max-w-[1600px] flex-col gap-3 p-4">
 				<TrendSection
-					icon={IconEye}
+					icon={Eye}
 					title={t("dashboard.ai_visibility_title")}
 					linkTo="/app/org/$org/brand/$brand/visibility"
 					linkLabel={t("dashboard.view_visibility")}
@@ -470,7 +461,7 @@ function DashboardPage() {
 				/>
 
 				<TrendSection
-					icon={IconSpeakerphone}
+					icon={Megaphone}
 					title={t("dashboard.sov_title")}
 					linkTo="/app/org/$org/brand/$brand/share-of-voice"
 					linkLabel={t("dashboard.view_sov")}

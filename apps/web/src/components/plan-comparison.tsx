@@ -13,7 +13,7 @@
  * whose columns don't line up isn't one.
  */
 
-import { IconCheck, IconMinus } from "@tabler/icons-react";
+import { Check, Minus } from "@phosphor-icons/react";
 import {
 	PLAN_KEYS,
 	PLANS,
@@ -238,9 +238,9 @@ function Row({ label, cell }: { label: ReactNode; cell: (plan: PlanDefinition) =
 				return (
 					<div key={key} className="flex items-center justify-center border-b px-3 py-2 text-center text-sm">
 						{value === true ? (
-							<IconCheck className="size-4 text-emerald-600" aria-label={t("plan-comparison.included")} />
+							<Check className="size-4 text-emerald-600" aria-label={t("plan-comparison.included")} />
 						) : value === false ? (
-							<IconMinus className="size-4 text-muted-foreground/40" aria-label={t("plan-comparison.not-included")} />
+							<Minus className="size-4 text-muted-foreground/40" aria-label={t("plan-comparison.not-included")} />
 						) : (
 							<span className="tabular-nums">{value}</span>
 						)}

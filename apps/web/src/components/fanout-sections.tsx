@@ -5,7 +5,7 @@
  * (term cloud + Added/Preserved/Dropped word changes).
  */
 
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Switch } from "@workspace/ui/components/switch";
@@ -31,7 +31,7 @@ export function InfoTip({ children }: { children: React.ReactNode }) {
 	return (
 		<Tooltip>
 			<TooltipTrigger render={<span className="cursor-help" />}>
-				<IconInfoCircle className="text-muted-foreground/60 size-3.5" />
+				<Info className="text-muted-foreground/60 size-3.5" />
 			</TooltipTrigger>
 			<TooltipContent className="max-w-xs text-sm font-normal">{children}</TooltipContent>
 		</Tooltip>

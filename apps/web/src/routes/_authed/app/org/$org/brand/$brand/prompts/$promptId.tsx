@@ -1,4 +1,4 @@
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { extractTextContent } from "@workspace/lib/text-extraction";
 import { Badge } from "@workspace/ui/components/badge";
@@ -423,7 +423,7 @@ function MentionsTab({
 				<CardTitle className="flex items-center gap-1.5 text-base">
 					{t("prompt_details.tab_mentions")}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">
 							<p>
 								Only competitors from your{" "}

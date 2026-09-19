@@ -6,7 +6,7 @@
  * sign-in and also offers Google OAuth.
  */
 
-import { IconBrandGoogle } from "@tabler/icons-react";
+import { GoogleLogo } from "@phosphor-icons/react";
 import { createFileRoute, Link, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { CLOUD_ENTRY_PRICE_USD } from "@workspace/config/plans";
 import type { ClientConfig } from "@workspace/config/types";
@@ -168,7 +168,7 @@ export function RegisterForm({
 						className="w-full"
 						onClick={() => authClient.signIn.social({ provider: "google", callbackURL: safeReturnTo(returnTo) })}
 					>
-						<IconBrandGoogle className="size-4" />
+						<GoogleLogo className="size-4" />
 						Continue with Google
 					</Button>
 					<div className="flex items-center gap-3">
