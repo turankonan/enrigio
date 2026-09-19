@@ -26,6 +26,7 @@ export * from "./schema-auth";
 // ============================================================================
 
 export const reportStatusEnum = pgEnum("report_status", ["pending", "processing", "completed", "failed"]);
+export const runSentimentEnum = pgEnum("run_sentiment", ["positive", "neutral", "negative"]);
 
 export const brands = pgTable(
 	"brands",
@@ -123,6 +124,10 @@ export const promptRuns = pgTable(
 		webQueries: text("web_queries").array().notNull().default([]),
 		brandMentioned: boolean("brand_mentioned").notNull(),
 		competitorsMentioned: text("competitors_mentioned").array().notNull().default([]),
+		// Only set when brandMentioned is true — a single structured LLM pass over
+		// the answer text. Null means "not mentioned" or "classifier unavailable".
+		sentiment: runSentimentEnum("sentiment"),
+		brandRank: smallint("brand_rank"),
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => ({
