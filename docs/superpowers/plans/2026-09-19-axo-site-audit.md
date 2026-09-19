@@ -1,4 +1,6 @@
-# AXO — Website AI-Readiness Audit (Phase 1) Implementation Plan (v3)
+# AXO — Website AI-Readiness Audit (Phase 1) Implementation Plan (v4)
+
+> **v4 changelog (plan review round 3):** `localConcurrency` (not `teamConcurrency`, which isn't a pg-boss v12 option); `retryLimit: 0` so paid LLM scoring isn't duplicated on queue retry; a `running` audit row inserted first and updated to completed/failed (crash-safe, gives the cooldown an in-flight record, and de-dupes concurrent enqueues); the safe-fetch transport takes an `AbortSignal` so connect/TLS/header hangs are truly cancelled; `fetchRobots` takes the brand `allowHosts` (apex↔www redirects); orchestrator computes `usedFallback` and the fallback test stubs `targets:[]`; the completion wrapper throws an attributed `StructuredCompletionError` so scoring failures keep `providerId`; owned-domain filter is ordered before the page limit; Opportunities gains an explicit `requireBrandSession` import+call.
 
 > **v3 changelog (plan review round 2):** safe-fetch tests inject the *transport* (not just resolver) so loopback stays blocked while a fixture is reachable; `selectAuditPages` returns `SelectionResult` metadata and the orchestrator (not the core) composes the homepage+sitemap fallback; scorer returns a discriminated `ScoreResult` (failures keep provider/model) and only the completion *wrapper* type gains `providerId`; Opportunities cache comparison normalizes `null`/`undefined`; enqueue cooldown keys off the latest *attempt* with a separate `AUDIT_FAILED_RETRY_DAYS` (no failed-audit retry loop); domain-helper re-export uses import+export; hostname tests cover ports/IPv6 and SSRF exact-match keeps `www` explicit; robots percent-decode is non-fatal; digest is char-bounded + delimited as untrusted.
 
@@ -73,7 +75,7 @@ Run `pnpm --filter @workspace/web exec tsc --noEmit` → PASS.
 
 - [ ] **Step 1:** add enum + table + FK column:
 ```ts
-export const siteAuditStatusEnum = pgEnum("site_audit_status", ["completed", "failed"]);
+export const siteAuditStatusEnum = pgEnum("site_audit_status", ["running", "completed", "failed"]);   // running = in-flight attempt row (crash-safe + gives the enqueue cooldown something to see before completion)
 export const siteAudits = pgTable("site_audits", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   brandId: text("brand_id").references(() => brands.id).notNull(),
@@ -108,7 +110,7 @@ export interface SafeFetchResult { status: SafeFetchStatus; httpStatus: number |
 export interface SafeFetchOptions {
   allowHosts: string[]; accept: "html" | "text"; maxBytes?: number; timeoutMs?: number; maxRedirects?: number; allowPorts?: number[];
   resolver?: (host: string) => Promise<string[]>;          // injectable DNS (tests control resolution)
-  transport?: (opts: { hostname: string; port: number; pinnedIp: string; path: string; headers: Record<string,string> }) => Promise<{ statusCode: number; headers: Record<string,string>; stream: NodeJS.ReadableStream }>;  // injectable request transport (tests route a validated public IP to a local fixture)
+  transport?: (opts: { protocol: "http:" | "https:"; hostname: string; port: number; pinnedIp: string; path: string; headers: Record<string,string>; signal: AbortSignal }) => Promise<{ statusCode: number; headers: Record<string,string>; stream: NodeJS.ReadableStream }>;  // injectable request transport; **signal** lets safeFetch abort connect/TLS/headers hangs (default transport attaches it to http(s).request)
 }
 export function isDisallowedAddress(ip: string): boolean;
 ```
@@ -128,7 +130,7 @@ Behavior contract (each a test case in Steps 1/5):
 - [ ] **Step 2:** run → FAIL.
 - [ ] **Step 3:** implement `isDisallowedAddress` + the request core (node:https with `lookup` pinning; manual redirect loop; capped streaming read that destroys on overflow; `finally` cleanup).
 - [ ] **Step 4:** run pure-guard tests → PASS.
-- [ ] **Step 5:** behavior tests using the **injected `resolver` (returns an approved public IP)** + **injected `transport` (routes `pinnedIp` to a local `node:http` fixture)** — loopback stays blocked in production, and pinning is still asserted: (a) the transport receives the exact `pinnedIp` the resolver returned; (b) credentials URL (`https://u:p@rigosis.com`) → `blocked`; (c) disallowed port (`:8443` with default `allowPorts`) → `blocked`; (d) redirect off-allowlist → `blocked` (re-checked post-redirect); (e) body `>maxBytes` → `too-large` (not truncated-ok); (f) fixture `404` → `not-found`, `500` → `failed` (with `httpStatus`); (g) redirect response stream destroyed before the next hop; (h) resolver returning `::ffff:10.0.0.1` → `blocked`. Also assert the default (non-injected) path rejects a resolver result of `127.0.0.1`. Run → PASS.
+- [ ] **Step 5:** behavior tests using the **injected `resolver` (returns an approved public IP)** + **injected `transport` (routes `pinnedIp` to a local `node:http` fixture)** — loopback stays blocked in production, and pinning is still asserted: (a) the transport receives the exact `pinnedIp` the resolver returned; (b) credentials URL (`https://u:p@rigosis.com`) → `blocked`; (c) disallowed port (`:8443` with default `allowPorts`) → `blocked`; (d) redirect off-allowlist → `blocked` (re-checked post-redirect); (e) body `>maxBytes` → `too-large` (not truncated-ok); (f) fixture `404` → `not-found`, `500` → `failed` (with `httpStatus`); (g) redirect response stream destroyed before the next hop; (h) resolver returning `::ffff:10.0.0.1` → `blocked`; (i) **a transport that never resolves → `timeout`, and the `AbortSignal` passed to it fires** (assert abort even before headers arrive). Also assert the default (non-injected) path rejects a resolver result of `127.0.0.1`. Run → PASS.
 - [ ] **Step 6:** add `./net/safe-fetch` export; commit `add SSRF-safe fetch with pinned lookup and injectable resolver`.
 
 ---
@@ -179,7 +181,13 @@ The pure core returns **cited targets only** (empty array when the brand has no 
 
 - [ ] **Step 1:** failing tests on `chooseAuditTargets` (pure): own-domain filter via shared `extractDomain`; dedup; **rank pages by citation count**; **rank each page's related prompts by citation count before the ≤8 cap**; **empty citations → `[]`** (no homepage).
 - [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement. The DB query **aggregates in SQL with nested per-(url,prompt) counts** — group citations by `(url, prompt_value)` to get per-prompt frequency, then by `url` for page frequency; select the top pages by page-frequency and, within each, the top-N prompts by per-prompt frequency **before** the page limit (do not load every citation row). Window = 30d; own-domain via shared `extractDomain`. `selectAuditPages` wraps this and returns `SelectionResult`.
+- [ ] **Step 3:** implement with this **explicit order (owned-domain filter must precede the page limit)** so competitor/third-party citations can never consume the 10-page budget and wrongly force the fallback:
+  1. restrict citations to the brand's normalized **owned** domains (shared `extractDomain`), 30-day window;
+  2. aggregate by `(url, prompt_value)` for per-prompt frequency;
+  3. rank prompts within each URL, cap at ≤8;
+  4. rank URLs by page frequency;
+  5. apply the 10-page limit.
+  Aggregate in SQL (do not load every citation row). `selectAuditPages` wraps `chooseAuditTargets`, always returns `usedFallback:false` (the orchestrator decides fallback), and includes `citationCount` + `window`.
 - [ ] **Step 4:** run → PASS.
 - [ ] **Step 5:** commit `add AXO page selection with SQL aggregation and prompt ranking`.
 
@@ -187,7 +195,7 @@ The pure core returns **cited targets only** (empty array when the brand has no 
 
 ### Task 8: fetchers — `fetchRobots`, `fetchSitemapUrls` (bounded index traversal, correct status)
 
-**Produces:** `fetchRobots(origin): Promise<RobotsInfo>`; `parseSitemapDoc(xml): { pages: string[]; sitemaps: string[] }` (pure); `fetchSitemapUrls(origin, allowHosts, caps): Promise<string[]>`; `statusFromFetch(r: SafeFetchResult): ResourceStatus`.
+**Produces:** `fetchRobots(origin, allowHosts): Promise<RobotsInfo>` (needs the full brand allowlist — `robots.txt` commonly redirects apex↔`www`, so robots/sitemap/page requests all share the same `allowHosts`); `parseSitemapDoc(xml): { pages: string[]; sitemaps: string[] }` (pure); `fetchSitemapUrls(origin, allowHosts, caps): Promise<string[]>`; `statusFromFetch(r: SafeFetchResult): ResourceStatus`.
 
 Resource mapping (`statusFromFetch`): `ok`→`present`; `not-found`→`absent`; `blocked|timeout|too-large|unsupported-content-type|failed`→`unavailable`.
 
@@ -208,14 +216,21 @@ Sitemap: distinguish `<urlset>` (pages) from `<sitemapindex>` (nested sitemaps);
 - [ ] **Step 1:** extend **only the wrapper's return type** (do NOT add a required field to the shared `StructuredResearchResult` — that would break every provider implementation). In `llm.ts`:
 ```ts
 export type StructuredCompletionResult<T> = StructuredResearchResult<T> & { providerId: string };
+export class StructuredCompletionError extends Error {   // carries attribution even when the provider call fails
+  constructor(message: string, readonly providerId: string, readonly model: string | null, options?: ErrorOptions) { super(message, options); }
+}
 export async function runStructuredCompletionPrompt<T>(prompt: string, schema: z.ZodType<T>): Promise<StructuredCompletionResult<T>> {
   const provider = resolveResearchProvider();
   if (!provider.runStructuredResearch) throw new Error(`Provider "${provider.id}" does not implement structured research`);
-  const result = await provider.runStructuredResearch({ prompt, schema, webSearch: false });
-  return { ...result, providerId: provider.id };
+  try {
+    const result = await provider.runStructuredResearch({ prompt, schema, webSearch: false });
+    return { ...result, providerId: provider.id };
+  } catch (e) {
+    throw new StructuredCompletionError((e as Error)?.message ?? "completion failed", provider.id, null, { cause: e });
+  }
 }
 ```
-Phase 0 callers ignore the extra field (additive, safe). `pnpm --filter @workspace/lib exec tsc --noEmit` → PASS.
+Phase 0 callers ignore the extra field / see a normal thrown error (additive, safe). `pnpm --filter @workspace/lib exec tsc --noEmit` → PASS.
 - [ ] **Step 2:** `scorePageRelevance` returns a **discriminated result** so a failure still carries provider/model for `site_audit_score_failed`:
 ```ts
 export type ScoreResult =
@@ -223,8 +238,8 @@ export type ScoreResult =
   | { ok: false; providerId: string | null; model: string | null; errorKind: string };
 export function scorePageRelevance(input: { pageText: string; brandName: string; relatedPrompts: string[] }): Promise<ScoreResult>;
 ```
-- [ ] **Step 3:** failing tests (stub `../onboarding/llm`): success → `{ok:true, score, note, providerId, model}`; thrown error → `{ok:false, providerId:null, model:null, errorKind:"exception"}`.
-- [ ] **Step 4:** run → FAIL, then implement (Zod score 1–5; prompt conditions on `relatedPrompts`; treats page text as untrusted; on success reads `providerId`/`modelVersion` from the wrapper; on catch returns `ok:false` with whatever provider/model context is available).
+- [ ] **Step 3:** failing tests (stub `../onboarding/llm`): success → `{ok:true, score, note, providerId, model}`; **wrapper throws `StructuredCompletionError("boom","openai-api",null)` → `{ok:false, providerId:"openai-api", model:null, errorKind:"exception"}`** (attribution preserved); a plain non-attributed throw → `{ok:false, providerId:null, model:null, errorKind:"exception"}`.
+- [ ] **Step 4:** run → FAIL, then implement (Zod score 1–5; prompt conditions on `relatedPrompts`; treats page text as untrusted; success reads `providerId`/`modelVersion`; catch: if `err instanceof StructuredCompletionError` preserve `err.providerId`/`err.model`, else null).
 - [ ] **Step 5:** run → PASS; commit `add providerId to completion wrapper and discriminated AXO scorer`.
 
 ---
@@ -235,12 +250,21 @@ export function scorePageRelevance(input: { pageText: string; brandName: string;
 
 **Produces:** `runSiteAudit(brandId): Promise<string>`; `getLatestCompletedAudit(brandId): Promise<SiteAudit | null>`; `getLatestAuditAttempt(brandId): Promise<SiteAudit | null>` (newest of any status — for the enqueue cooldown).
 
-Behavior: `const sel = await selectAuditPages(brandId)`. **Fallback composed here** (not in selection): if `sel.targets` is empty, build targets from the brand homepage plus `fetchSitemapUrls(origin, allowHosts, cap)` up to the page limit, each carrying the brand's top enabled prompts; mark the audit as fallback via `sel.usedFallback` / an empty `citationCount`. Resolve distinct origins; `fetchRobots` once per origin; for each page `safeFetch(html)` → on `ok`: `checklistForPage` + `evaluateRobots` per `AiBot` (path-specific) + `scorePageRelevance(extractCleanText(body), …)`. **Record a `usage_events` row per score from the discriminated result**: `ok:true` → `site_audit_score` with `provider = res.providerId`, `model = res.model`; `ok:false` → `site_audit_score_failed` with `provider = res.providerId`, `model = res.model` (either may be null); both with org+brand from the brand row, `units:1`, `estimatedCostUsd` via `estimateRunCostUsd`; the insert is wrapped so it never throws the audit. Run scoring at **concurrency ≤ 3** (manual gate). `status = pages.every(p => p.fetchStatus !== "ok") ? "failed" : "completed"`, with `failureSummary` when failed; insert one `siteAudits` row (`schemaVersion`, `startedAt`, `report.window` with `sel.window` + `sel.citationCount`) and return its id. `getLatestCompletedAudit` = newest `status='completed'` row; **also add `getLatestAuditAttempt(brandId)` = newest row of any status** (used by the enqueue cooldown in Task 12).
+Behavior:
+1. **Insert a `running` row first** (`status:"running"`, `startedAt: now`, minimal `report`) and capture its id — this is the crash-safe attempt record the enqueue cooldown sees during an in-flight audit. Wrap everything after in `try/catch`; on any unexpected throw, **update the row to `failed`** with a `failureSummary` (so a mid-run crash never leaves a phantom or bypasses the cooldown).
+2. `const sel = await selectAuditPages(brandId)`. **Compute fallback in the orchestrator** (selection never sets it): `const usedFallback = sel.targets.length === 0`. When `usedFallback`, build targets from the brand homepage plus `fetchSitemapUrls(origin, allowHosts, cap)` up to the page limit, each carrying the brand's top enabled prompts.
+3. Resolve distinct origins; `fetchRobots(origin, allowHosts)` once per origin; for each page `safeFetch(html)` → on `ok`: `checklistForPage` + `evaluateRobots` per `AiBot` (path-specific) + `scorePageRelevance(extractCleanText(body), …)`.
+4. **Record a `usage_events` row per score from the discriminated `ScoreResult`**: `ok:true` → `site_audit_score` (`provider=res.providerId`, `model=res.model`); `ok:false` → `site_audit_score_failed` (`provider=res.providerId`, `model=res.model`, either may be null); both org+brand from the brand row, `units:1`, `estimatedCostUsd` via `estimateRunCostUsd`, wrapped so it never throws the audit. Scoring runs at **concurrency ≤ 3** (manual gate).
+5. `status = pages.every(p => p.fetchStatus !== "ok") ? "failed" : "completed"` (`failureSummary` when failed). **Update the running row** to that status with the full `report` (`schemaVersion`, `report.window` = `sel.window`+`sel.citationCount`, `report.usedFallback`). Return its id.
 
-- [ ] **Step 1:** failing tests (mock collaborators + a fake `db` capturing inserts, as in the Phase 0 style):
-  - all pages fail → stored `status:"failed"` + `failureSummary`;
-  - **fallback path**: `selectAuditPages` returns homepage only when no cited pages, and the audit still runs;
-  - **usage recording**: a scored page inserts a `site_audit_score` usage row; a failed score inserts `site_audit_score_failed`;
+`getLatestCompletedAudit` = newest `status='completed'` row. `getLatestAuditAttempt(brandId)` = newest row of **any** status (running/completed/failed) — used by the Task 12 cooldown.
+
+- [ ] **Step 1:** failing tests (mock collaborators + a fake `db` capturing insert/update, as in the Phase 0 style):
+  - **running→final**: a `running` row is inserted first, then updated to `completed`/`failed` (assert both the insert and the update);
+  - **crash-safe**: a collaborator throwing mid-run still updates the running row to `failed` (no phantom, cooldown sees a failed attempt);
+  - all pages fail → final `status:"failed"` + `failureSummary`;
+  - **fallback path**: `selectAuditPages` stubbed to `{ targets: [], usedFallback: false, citationCount: 0, window }` → the orchestrator adds the homepage + sitemap targets and sets `report.usedFallback = true`;
+  - **usage recording**: a scored page inserts a `site_audit_score` row; a failed score inserts `site_audit_score_failed` with the preserved `providerId`;
   - **bounded concurrency**: instrument the mocked scorer to assert peak in-flight ≤ 3.
 - [ ] **Step 2:** run → FAIL.
 - [ ] **Step 3:** implement.
@@ -263,12 +287,13 @@ export async function auditSiteJob(jobs: Job<{ brandId: string }>[]): Promise<vo
 ```
 - [ ] **Step 2:** register in `handlers.ts` mirroring `process-prompt`, wrapped in `withSentry`, with a low team concurrency:
 ```ts
-await boss.work<{ brandId: string }>("audit-site", { batchSize: 1, teamConcurrency: 1 }, withSentry("audit-site", auditSiteJob));
+// pg-boss v12 uses localConcurrency (NOT teamConcurrency); matches the other handlers.
+await boss.work<{ brandId: string }>("audit-site", { batchSize: 1, localConcurrency: 1 }, withSentry("audit-site", auditSiteJob));
 console.log("Registered handler: audit-site");
 ```
-- [ ] **Step 3:** create the queue in **both** `apps/worker/src/index.ts` and `apps/web/src/lib/boss-client.ts` (idempotent), identical options:
+- [ ] **Step 3:** create the queue in **both** `apps/worker/src/index.ts` and `apps/web/src/lib/boss-client.ts` (idempotent), identical options. **`retryLimit: 0`** — an audit fans out paid LLM calls; a queue retry would repeat scoring and double-charge usage (same rationale as `process-prompt`). Rely instead on the Task 12 daily failed-retry policy:
 ```ts
-await boss.createQueue("audit-site", { retryLimit: 2, retryDelay: 60, retryBackoff: true, expireInSeconds: 15 * 60 });
+await boss.createQueue("audit-site", { retryLimit: 0, expireInSeconds: 15 * 60 });
 ```
 - [ ] **Step 4:** `pnpm --filter @workspace/worker exec tsc --noEmit && pnpm --filter @workspace/web exec tsc --noEmit` → PASS.
 - [ ] **Step 5:** commit `add audit-site worker job, queue, and Sentry-wrapped registration`.
@@ -281,18 +306,20 @@ await boss.createQueue("audit-site", { retryLimit: 2, retryDelay: 60, retryBacko
 ```ts
 export const AUDIT_REFRESH_AFTER_DAYS = 7;      // re-audit cadence after a SUCCESS
 export const AUDIT_FAILED_RETRY_DAYS = 1;       // don't re-crawl a failing site more than daily
+export const AUDIT_RUNNING_STALE_MINUTES = 20;  // a running row older than this is treated as crashed
 export async function enqueueSiteAuditIfStale(brandId: string): Promise<{ enqueued: boolean }>;   // authorized
 export async function getLatestBrandAudit(brandId: string): Promise<SiteAudit | null>;            // authorized — latest COMPLETED, for display
 ```
 Both call `requireBrandSession(brandId)` first (as `dashboard.ts` does). No `pgboss.job` coupling — return `{ enqueued }` only (MVP has no AXO UI needing queued/running). Enqueue is best-effort; a queue error is caught, logged, returns `{ enqueued:false }`.
 
-**Cooldown keys off the latest _attempt_ (any status), not the latest completed** — otherwise a repeatedly-failing site would be re-enqueued forever once the singleton window lapses:
+**Cooldown keys off the latest _attempt_ (any status incl. `running`), not the latest completed** — otherwise a repeatedly-failing (or in-flight) site would be re-enqueued once the singleton window lapses:
+- latest attempt is `running` and age < the audit ceiling (`AUDIT_RUNNING_STALE_MINUTES`, e.g. 20 = the enqueue `singletonSeconds`) → skip (in flight); a `running` older than that is treated as crashed → retry-eligible;
 - latest attempt is `completed` and age < `AUDIT_REFRESH_AFTER_DAYS` → skip;
 - latest attempt is `failed` and age < `AUDIT_FAILED_RETRY_DAYS` → skip;
-- otherwise (no attempt / stale success / retry-eligible failure) → enqueue.
+- otherwise (no attempt / stale success / retry-eligible failure / crashed running) → enqueue with `singletonKey: audit-<brandId>` + `singletonSeconds` (defence-in-depth against a concurrent burst before the `running` row lands).
 Display (`getLatestBrandAudit`) always returns the latest **completed** audit.
 
-- [ ] **Step 1:** failing tests: (a) unauthorized brand → `requireBrandSession` rejects both; (b) no attempt → one `send` with `singletonKey: audit-<brandId>` + full options; (c) fresh completed attempt → no `send`; (d) **recent failed attempt → no `send`** (retry cooldown); (e) old failed attempt (> `AUDIT_FAILED_RETRY_DAYS`) → `send`; (f) `send` throwing → `{ enqueued:false }`, no throw. Mock `@/lib/boss-client`, `@workspace/lib/axo` (`getLatestAuditAttempt`, `getLatestCompletedAudit`), and the auth guard.
+- [ ] **Step 1:** failing tests: (a) unauthorized brand → `requireBrandSession` rejects both; (b) no attempt → one `send` with `singletonKey: audit-<brandId>` + full options; (c) fresh completed attempt → no `send`; (d) recent failed attempt → no `send`; (e) old failed attempt (> `AUDIT_FAILED_RETRY_DAYS`) → `send`; (f) **fresh `running` attempt → no `send`**; (g) **stale `running` (> `AUDIT_RUNNING_STALE_MINUTES`) → `send`**; (h) `send` throwing → `{ enqueued:false }`, no throw. Mock `@/lib/boss-client`, `@workspace/lib/axo` (`getLatestAuditAttempt`, `getLatestCompletedAudit`), and the auth guard.
 - [ ] **Step 2:** run → FAIL.
 - [ ] **Step 3:** implement (guard → `getLatestAuditAttempt` → cooldown gate above → `boss.send(...)` in try/catch; `getLatestBrandAudit` → `getLatestCompletedAudit`).
 - [ ] **Step 4:** run → PASS.
@@ -306,8 +333,8 @@ Display (`getLatestBrandAudit`) always returns the latest **completed** audit.
 
 - [ ] **Step 1:** add `"axo"` to `CATEGORIES`; add en/tr `category-axo` + `-desc`; add `axo` to `CATEGORY_META` in the renderer. Run the i18n parity test → PASS.
 - [ ] **Step 2:** **control flow in `resolveOpportunities`** (must run before the fresh early-return):
-  1. authorize (existing `requireBrandSession`);
-  2. `await enqueueSiteAuditIfStale(brandId)` (best-effort; wrapped so a failure logs and continues);
+  1. **authorize — this is a new modification** (`opportunities.ts` does not currently call it): `import { requireBrandSession } from "@/lib/auth/helpers";` and `await requireBrandSession(brandId)` at the top of `resolveOpportunities`; private internal helpers then skip re-checking;
+  2. `await enqueueSiteAuditIfStale(brandId)` (best-effort; wrapped so a failure logs and continues — `enqueueSiteAuditIfStale` also authorizes, but the explicit check above guards the whole path);
   3. `latestAudit = await getLatestBrandAudit(brandId)`;
   4. load latest opportunities report; **normalize the id comparison to avoid `null !== undefined` churn**:
      ```ts
