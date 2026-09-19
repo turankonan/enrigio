@@ -205,17 +205,21 @@ export const reports = pgTable(
 // One row per generated Opportunities report, per brand — append-only history
 // (every generation is kept, not overwritten). The page reads the latest row and
 // regenerates only when it's stale; see apps/web/src/server/opportunities.ts.
-export const siteAudits = pgTable("site_audits", {
-	id: uuid("id").defaultRandom().primaryKey().notNull(),
-	brandId: text("brand_id")
-		.references(() => brands.id)
-		.notNull(),
-	status: siteAuditStatusEnum("status").notNull(),
-	report: json("report").notNull(),
-	schemaVersion: smallint("schema_version").notNull(),
-	startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
-	createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-}, (t) => ({ brandCreatedIdx: index("site_audits_brand_created_idx").on(t.brandId, t.createdAt) })).enableRLS();
+export const siteAudits = pgTable(
+	"site_audits",
+	{
+		id: uuid("id").defaultRandom().primaryKey().notNull(),
+		brandId: text("brand_id")
+			.references(() => brands.id)
+			.notNull(),
+		status: siteAuditStatusEnum("status").notNull(),
+		report: json("report").notNull(),
+		schemaVersion: smallint("schema_version").notNull(),
+		startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+	},
+	(t) => ({ brandCreatedIdx: index("site_audits_brand_created_idx").on(t.brandId, t.createdAt) }),
+).enableRLS();
 
 export const brandOpportunities = pgTable(
 	"brand_opportunities",
