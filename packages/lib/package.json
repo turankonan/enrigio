@@ -28,6 +28,7 @@
 		"./text-extraction": "./src/text-extraction.ts",
 		"./onboarding": "./src/onboarding/index.ts",
 		"./mentions": "./src/mentions.ts",
+		"./mention-classify": "./src/mention-classify.ts",
 		"./competitor-discovery": "./src/competitor-discovery.ts",
 		"./tag-utils": "./src/tag-utils.ts",
 		"./bulk-prompts": "./src/bulk-prompts.ts",
