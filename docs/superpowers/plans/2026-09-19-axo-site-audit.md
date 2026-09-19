@@ -1,4 +1,6 @@
-# AXO — Website AI-Readiness Audit (Phase 1) Implementation Plan (v2)
+# AXO — Website AI-Readiness Audit (Phase 1) Implementation Plan (v3)
+
+> **v3 changelog (plan review round 2):** safe-fetch tests inject the *transport* (not just resolver) so loopback stays blocked while a fixture is reachable; `selectAuditPages` returns `SelectionResult` metadata and the orchestrator (not the core) composes the homepage+sitemap fallback; scorer returns a discriminated `ScoreResult` (failures keep provider/model) and only the completion *wrapper* type gains `providerId`; Opportunities cache comparison normalizes `null`/`undefined`; enqueue cooldown keys off the latest *attempt* with a separate `AUDIT_FAILED_RETRY_DAYS` (no failed-audit retry loop); domain-helper re-export uses import+export; hostname tests cover ports/IPv6 and SSRF exact-match keeps `www` explicit; robots percent-decode is non-fatal; digest is char-bounded + delimited as untrusted.
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax.
 
@@ -35,24 +37,32 @@ Extract the normalization AXO and Opportunities both need into lib (Opportunitie
 
 **Files:** Create `packages/lib/src/net/hostname.ts`(+`.test.ts`); modify `packages/lib/package.json` (export `./net/hostname`); modify `apps/web/src/lib/domain-categories.ts` to re-export `extractDomain` from lib.
 
-**Produces:** `export function extractDomain(urlOrDomain: string): string;` (lowercase host, strip scheme/path/port/trailing dot, strip leading `www.`); `export function hostMatchesAllowlist(host: string, allow: string[]): boolean;` (exact, case/dot-insensitive, port-agnostic host compare).
+**Produces:** `export function extractDomain(urlOrDomain: string): string;` (lowercase host, strip scheme/path/port/trailing dot, strip leading `www.` — used for **citation-domain grouping only**); `export function hostMatchesAllowlist(host: string, allow: string[]): boolean;` — **exact normalized-host match (lowercase + trailing-dot only; NO `www.` stripping)**, port-agnostic. The SSRF allowlist uses `hostMatchesAllowlist`, so the brand allowlist must be built to include both apex and `www.` forms explicitly (deliberate — `www`-stripping is not exact-host matching and must not weaken the SSRF gate).
 
 - [ ] **Step 1: failing test**
 ```ts
 import { describe, expect, it } from "vitest";
 import { extractDomain, hostMatchesAllowlist } from "./hostname";
-it("normalizes host", () => {
+it("normalizes host for grouping", () => {
   expect(extractDomain("https://WWW.Rigosis.com:443/x?y")).toBe("rigosis.com");
   expect(extractDomain("rigosis.com.")).toBe("rigosis.com");
+  expect(extractDomain("rigosis.com:8443")).toBe("rigosis.com");   // schemeless host:port
 });
-it("allowlist is exact + rejects look-alikes", () => {
-  expect(hostMatchesAllowlist("rigosis.com", ["rigosis.com"])).toBe(true);
+it("allowlist is exact (no www strip), port-agnostic, rejects look-alikes", () => {
+  expect(hostMatchesAllowlist("rigosis.com:443", ["rigosis.com"])).toBe(true);
+  expect(hostMatchesAllowlist("www.rigosis.com", ["rigosis.com"])).toBe(false);   // caller must add the www variant
   expect(hostMatchesAllowlist("rigosis.com.evil.test", ["rigosis.com"])).toBe(false);
+  expect(hostMatchesAllowlist("[::1]", ["::1"])).toBe(true);       // IPv6 literal
 });
 ```
 - [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement (URL-parse when a scheme is present; else treat as host; lowercase, drop `www.`, drop trailing dot; `hostMatchesAllowlist` compares normalized host, ignoring port).
-- [ ] **Step 4:** run → PASS. Update `apps/web/src/lib/domain-categories.ts`: `export { extractDomain } from "@workspace/lib/net/hostname";` and delete the local copy; run `pnpm --filter @workspace/web exec tsc --noEmit` → PASS.
+- [ ] **Step 3:** implement (URL-parse when a scheme is present; else treat as `host[:port]`; `extractDomain` lowercases, drops `www.`, drops trailing dot; `hostMatchesAllowlist` strips only port + trailing-dot + lowercases, then compares exactly — no `www` stripping; handle IPv6 literals in brackets).
+- [ ] **Step 4:** run → PASS. In `apps/web/src/lib/domain-categories.ts`, replace the local `extractDomain` with an import + re-export so in-file callers keep a local binding:
+```ts
+import { extractDomain } from "@workspace/lib/net/hostname";
+export { extractDomain };
+```
+Run `pnpm --filter @workspace/web exec tsc --noEmit` → PASS.
 - [ ] **Step 5:** commit `add shared hostname normalization and reuse it in web`.
 
 ---
@@ -95,9 +105,15 @@ Use native `node:https`/`node:http` with a **custom `lookup`** that returns only
 ```ts
 export type SafeFetchStatus = "ok" | "not-found" | "blocked" | "timeout" | "too-large" | "unsupported-content-type" | "failed";
 export interface SafeFetchResult { status: SafeFetchStatus; httpStatus: number | null; finalUrl: string | null; body: string | null; contentType: string | null; }
-export interface SafeFetchOptions { allowHosts: string[]; accept: "html" | "text"; maxBytes?: number; timeoutMs?: number; maxRedirects?: number; allowPorts?: number[]; resolver?: (host: string) => Promise<string[]>; }
+export interface SafeFetchOptions {
+  allowHosts: string[]; accept: "html" | "text"; maxBytes?: number; timeoutMs?: number; maxRedirects?: number; allowPorts?: number[];
+  resolver?: (host: string) => Promise<string[]>;          // injectable DNS (tests control resolution)
+  transport?: (opts: { hostname: string; port: number; pinnedIp: string; path: string; headers: Record<string,string> }) => Promise<{ statusCode: number; headers: Record<string,string>; stream: NodeJS.ReadableStream }>;  // injectable request transport (tests route a validated public IP to a local fixture)
+}
 export function isDisallowedAddress(ip: string): boolean;
 ```
+
+The `resolver` still enforces the private-IP gate (mandatory — production must reject loopback). The **`transport`** seam is what tests use to reach a local fixture: the resolver returns an *approved public* address (e.g. `93.184.216.34`), the gate passes, and the injected transport routes that pinned IP to the local `node:http` server — so pinning is asserted (the transport receives `pinnedIp`) without ever whitelisting loopback. In production, the default transport connects `node:https` to `pinnedIp` with the `lookup` override.
 
 Behavior contract (each a test case in Steps 1/5):
 - Reject non-http(s) scheme, embedded credentials (`u.username||u.password`), and ports outside `allowPorts` (default `[80,443]`) → `blocked`.
@@ -112,7 +128,7 @@ Behavior contract (each a test case in Steps 1/5):
 - [ ] **Step 2:** run → FAIL.
 - [ ] **Step 3:** implement `isDisallowedAddress` + the request core (node:https with `lookup` pinning; manual redirect loop; capped streaming read that destroys on overflow; `finally` cleanup).
 - [ ] **Step 4:** run pure-guard tests → PASS.
-- [ ] **Step 5:** behavior tests with an **injected resolver** + a local `node:http` test server (bind `127.0.0.1`, but pass its address via the injected resolver so pinning is exercised without hitting the network): assert (a) pinned address is the one the resolver returned, (b) credentials URL → `blocked`, (c) disallowed port → `blocked`, (d) redirect off-allowlist → `blocked`, (e) `>maxBytes` → `too-large`, (f) `404` → `not-found`, `500` → `failed`, (g) redirect body destroyed, (h) `::ffff:` mapped private → `blocked`. Run → PASS.
+- [ ] **Step 5:** behavior tests using the **injected `resolver` (returns an approved public IP)** + **injected `transport` (routes `pinnedIp` to a local `node:http` fixture)** — loopback stays blocked in production, and pinning is still asserted: (a) the transport receives the exact `pinnedIp` the resolver returned; (b) credentials URL (`https://u:p@rigosis.com`) → `blocked`; (c) disallowed port (`:8443` with default `allowPorts`) → `blocked`; (d) redirect off-allowlist → `blocked` (re-checked post-redirect); (e) body `>maxBytes` → `too-large` (not truncated-ok); (f) fixture `404` → `not-found`, `500` → `failed` (with `httpStatus`); (g) redirect response stream destroyed before the next hop; (h) resolver returning `::ffff:10.0.0.1` → `blocked`. Also assert the default (non-injected) path rejects a resolver result of `127.0.0.1`. Run → PASS.
 - [ ] **Step 6:** add `./net/safe-fetch` export; commit `add SSRF-safe fetch with pinned lookup and injectable resolver`.
 
 ---
@@ -125,7 +141,7 @@ Subset: group by user-agent (case-insensitive; a group with no matching UA and n
 
 - [ ] **Step 1:** failing tests — fix the earlier contradiction; assert `unspecified` when no group/`*` matches; add cases for `Disallow: /*.pdf$`, equal-length Allow-wins, and two UAs in one group.
 - [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement parser (translate `*`→`.*`, `$`→end, escape other regex chars; track match length = literal prefix length; Allow-wins on tie).
+- [ ] **Step 3:** implement parser (translate `*`→`.*`, `$`→end, escape other regex chars; track match length = literal prefix length; Allow-wins on tie). Percent-decode rule + path inside `try/catch` — **malformed encoding is non-fatal**, fall back to the raw string.
 - [ ] **Step 4:** run → PASS.
 - [ ] **Step 5:** commit `add RFC 9309-subset robots evaluation for AXO`.
 
@@ -152,11 +168,18 @@ import { parseHTML } from "linkedom";
 
 ### Task 7: `selectAuditPages` (SQL-aggregated, prompt-ranked)
 
-**Produces:** `selectAuditPages(brandId, opts?): Promise<AuditTarget[]>` + pure core `chooseAuditTargets(input)`.
+**Produces:**
+```ts
+export interface AuditWindow { fromIso: string; toIso: string }
+export interface SelectionResult { targets: AuditTarget[]; usedFallback: boolean; citationCount: number; window: AuditWindow }
+export function selectAuditPages(brandId: string, opts?): Promise<SelectionResult>;   // cited-only; targets:[] when none
+export function chooseAuditTargets(input): AuditTarget[];                              // pure; cited rows → ranked targets, NO homepage
+```
+The pure core returns **cited targets only** (empty array when the brand has no owned citations) — it does **not** inject the homepage. `selectAuditPages` returns `usedFallback:false` + `citationCount` + `window`; the **orchestrator (Task 10)** composes the homepage + sitemap fallback when `targets` is empty (so the fallback contract is unambiguous — the reviewer's fix).
 
-- [ ] **Step 1:** failing tests on `chooseAuditTargets` (pure): own-domain filter via shared `extractDomain`; dedup; **rank pages by citation count**; **rank each page's related prompts by citation count before applying the ≤8 cap**; empty→homepage fallback carrying top enabled prompts.
+- [ ] **Step 1:** failing tests on `chooseAuditTargets` (pure): own-domain filter via shared `extractDomain`; dedup; **rank pages by citation count**; **rank each page's related prompts by citation count before the ≤8 cap**; **empty citations → `[]`** (no homepage).
 - [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement. The DB query **aggregates in SQL** — `select url, count(*) as cites, array_agg(prompt order by …)` grouped by url (do not load every citation row); window 30d; use shared `extractDomain`; prompts ranked by per-(url,prompt) citation count then capped. Sitemap-URL fallback is layered in Task 10 (needs `fetchSitemapUrls`); the pure core handles homepage fallback.
+- [ ] **Step 3:** implement. The DB query **aggregates in SQL with nested per-(url,prompt) counts** — group citations by `(url, prompt_value)` to get per-prompt frequency, then by `url` for page frequency; select the top pages by page-frequency and, within each, the top-N prompts by per-prompt frequency **before** the page limit (do not load every citation row). Window = 30d; own-domain via shared `extractDomain`. `selectAuditPages` wraps this and returns `SelectionResult`.
 - [ ] **Step 4:** run → PASS.
 - [ ] **Step 5:** commit `add AXO page selection with SQL aggregation and prompt ranking`.
 
@@ -182,18 +205,27 @@ Sitemap: distinguish `<urlset>` (pages) from `<sitemapindex>` (nested sitemaps);
 
 **Files:** modify `packages/lib/src/onboarding/llm.ts`; create `packages/lib/src/axo/score.ts`(+test).
 
-- [ ] **Step 1:** extend the wrapper so usage attribution has a provider. In `runStructuredCompletionPrompt`:
+- [ ] **Step 1:** extend **only the wrapper's return type** (do NOT add a required field to the shared `StructuredResearchResult` — that would break every provider implementation). In `llm.ts`:
 ```ts
-const provider = resolveResearchProvider();
-if (!provider.runStructuredResearch) throw new Error(`Provider "${provider.id}" does not implement structured research`);
-const result = await provider.runStructuredResearch({ prompt, schema, webSearch: false });
-return { ...result, providerId: provider.id };
+export type StructuredCompletionResult<T> = StructuredResearchResult<T> & { providerId: string };
+export async function runStructuredCompletionPrompt<T>(prompt: string, schema: z.ZodType<T>): Promise<StructuredCompletionResult<T>> {
+  const provider = resolveResearchProvider();
+  if (!provider.runStructuredResearch) throw new Error(`Provider "${provider.id}" does not implement structured research`);
+  const result = await provider.runStructuredResearch({ prompt, schema, webSearch: false });
+  return { ...result, providerId: provider.id };
+}
 ```
-Widen `StructuredResearchResult` (or the wrapper's return type) with `providerId: string`. Existing Phase 0 callers ignore the extra field (additive, safe). Run `pnpm --filter @workspace/lib exec tsc --noEmit` → PASS.
-- [ ] **Step 2:** failing tests for `scorePageRelevance` (stub `../onboarding/llm`): returns `{score,note,model,providerId}`; returns `null` on throw.
-- [ ] **Step 3:** run → FAIL.
-- [ ] **Step 4:** implement (Zod score 1–5; prompt conditions on `relatedPrompts`; treats page text as untrusted; returns `providerId` from the wrapper).
-- [ ] **Step 5:** run → PASS; commit `add providerId to structured completion and AXO scorer`.
+Phase 0 callers ignore the extra field (additive, safe). `pnpm --filter @workspace/lib exec tsc --noEmit` → PASS.
+- [ ] **Step 2:** `scorePageRelevance` returns a **discriminated result** so a failure still carries provider/model for `site_audit_score_failed`:
+```ts
+export type ScoreResult =
+  | { ok: true;  score: number; note: string; providerId: string; model: string }
+  | { ok: false; providerId: string | null; model: string | null; errorKind: string };
+export function scorePageRelevance(input: { pageText: string; brandName: string; relatedPrompts: string[] }): Promise<ScoreResult>;
+```
+- [ ] **Step 3:** failing tests (stub `../onboarding/llm`): success → `{ok:true, score, note, providerId, model}`; thrown error → `{ok:false, providerId:null, model:null, errorKind:"exception"}`.
+- [ ] **Step 4:** run → FAIL, then implement (Zod score 1–5; prompt conditions on `relatedPrompts`; treats page text as untrusted; on success reads `providerId`/`modelVersion` from the wrapper; on catch returns `ok:false` with whatever provider/model context is available).
+- [ ] **Step 5:** run → PASS; commit `add providerId to completion wrapper and discriminated AXO scorer`.
 
 ---
 
@@ -201,9 +233,9 @@ Widen `StructuredResearchResult` (or the wrapper's return type) with `providerId
 
 **Files:** create `axo/run.ts`, `axo/read.ts`, `axo/index.ts`; modify `packages/lib/package.json` (`./axo`).
 
-**Produces:** `runSiteAudit(brandId): Promise<string>`; `getLatestCompletedAudit(brandId): Promise<SiteAudit | null>`.
+**Produces:** `runSiteAudit(brandId): Promise<string>`; `getLatestCompletedAudit(brandId): Promise<SiteAudit | null>`; `getLatestAuditAttempt(brandId): Promise<SiteAudit | null>` (newest of any status — for the enqueue cooldown).
 
-Behavior: select targets (cited-first; if empty, homepage + `fetchSitemapUrls` up to the cap); resolve distinct origins; `fetchRobots` once per origin; for each page `safeFetch(html)` → on `ok`: `checklistForPage` + `evaluateRobots` per `AiBot` (path-specific) + `scorePageRelevance(extractCleanText(body), …)`; **record a `usage_events` row per score** (`site_audit_score`/`site_audit_score_failed`; org+brand from the brand row; `provider`, `model` from the scorer's `providerId`/`model`; `units:1`; `estimatedCostUsd` via `estimateRunCostUsd`; wrapped so it never throws the audit); run scoring at **concurrency ≤ 3** (manual gate); `status = pages.every(p => p.fetchStatus !== "ok") ? "failed" : "completed"`, with `failureSummary` when failed; insert one `siteAudits` row (`schemaVersion`, `startedAt`, `window` with `citationCount`) and return its id. `getLatestCompletedAudit` = newest `status='completed'` row.
+Behavior: `const sel = await selectAuditPages(brandId)`. **Fallback composed here** (not in selection): if `sel.targets` is empty, build targets from the brand homepage plus `fetchSitemapUrls(origin, allowHosts, cap)` up to the page limit, each carrying the brand's top enabled prompts; mark the audit as fallback via `sel.usedFallback` / an empty `citationCount`. Resolve distinct origins; `fetchRobots` once per origin; for each page `safeFetch(html)` → on `ok`: `checklistForPage` + `evaluateRobots` per `AiBot` (path-specific) + `scorePageRelevance(extractCleanText(body), …)`. **Record a `usage_events` row per score from the discriminated result**: `ok:true` → `site_audit_score` with `provider = res.providerId`, `model = res.model`; `ok:false` → `site_audit_score_failed` with `provider = res.providerId`, `model = res.model` (either may be null); both with org+brand from the brand row, `units:1`, `estimatedCostUsd` via `estimateRunCostUsd`; the insert is wrapped so it never throws the audit. Run scoring at **concurrency ≤ 3** (manual gate). `status = pages.every(p => p.fetchStatus !== "ok") ? "failed" : "completed"`, with `failureSummary` when failed; insert one `siteAudits` row (`schemaVersion`, `startedAt`, `report.window` with `sel.window` + `sel.citationCount`) and return its id. `getLatestCompletedAudit` = newest `status='completed'` row; **also add `getLatestAuditAttempt(brandId)` = newest row of any status** (used by the enqueue cooldown in Task 12).
 
 - [ ] **Step 1:** failing tests (mock collaborators + a fake `db` capturing inserts, as in the Phase 0 style):
   - all pages fail → stored `status:"failed"` + `failureSummary`;
@@ -247,15 +279,22 @@ await boss.createQueue("audit-site", { retryLimit: 2, retryDelay: 60, retryBacko
 
 **Produces:**
 ```ts
-export const AUDIT_REFRESH_AFTER_DAYS = 7;
+export const AUDIT_REFRESH_AFTER_DAYS = 7;      // re-audit cadence after a SUCCESS
+export const AUDIT_FAILED_RETRY_DAYS = 1;       // don't re-crawl a failing site more than daily
 export async function enqueueSiteAuditIfStale(brandId: string): Promise<{ enqueued: boolean }>;   // authorized
-export async function getLatestBrandAudit(brandId: string): Promise<SiteAudit | null>;            // authorized
+export async function getLatestBrandAudit(brandId: string): Promise<SiteAudit | null>;            // authorized — latest COMPLETED, for display
 ```
-Both call `requireBrandSession(brandId)` first (as `dashboard.ts` does). No `pgboss.job` coupling — return `{ enqueued }` only (MVP has no AXO UI needing queued/running). Enqueue is best-effort; a queue error is caught, logged, and returns `{ enqueued: false }` (must not break callers).
+Both call `requireBrandSession(brandId)` first (as `dashboard.ts` does). No `pgboss.job` coupling — return `{ enqueued }` only (MVP has no AXO UI needing queued/running). Enqueue is best-effort; a queue error is caught, logged, returns `{ enqueued:false }`.
 
-- [ ] **Step 1:** failing tests: (a) unauthorized brand → `requireBrandSession` rejects both functions; (b) no/stale audit → one `send` with `singletonKey: audit-<brandId>` + full options; (c) fresh audit → no `send`; (d) `send` throwing → `{ enqueued:false }`, no throw. Mock `@/lib/boss-client`, `@workspace/lib/axo`, and the auth guard.
+**Cooldown keys off the latest _attempt_ (any status), not the latest completed** — otherwise a repeatedly-failing site would be re-enqueued forever once the singleton window lapses:
+- latest attempt is `completed` and age < `AUDIT_REFRESH_AFTER_DAYS` → skip;
+- latest attempt is `failed` and age < `AUDIT_FAILED_RETRY_DAYS` → skip;
+- otherwise (no attempt / stale success / retry-eligible failure) → enqueue.
+Display (`getLatestBrandAudit`) always returns the latest **completed** audit.
+
+- [ ] **Step 1:** failing tests: (a) unauthorized brand → `requireBrandSession` rejects both; (b) no attempt → one `send` with `singletonKey: audit-<brandId>` + full options; (c) fresh completed attempt → no `send`; (d) **recent failed attempt → no `send`** (retry cooldown); (e) old failed attempt (> `AUDIT_FAILED_RETRY_DAYS`) → `send`; (f) `send` throwing → `{ enqueued:false }`, no throw. Mock `@/lib/boss-client`, `@workspace/lib/axo` (`getLatestAuditAttempt`, `getLatestCompletedAudit`), and the auth guard.
 - [ ] **Step 2:** run → FAIL.
-- [ ] **Step 3:** implement (guard → `getLatestCompletedAudit` → freshness gate → `boss.send(...)` in try/catch).
+- [ ] **Step 3:** implement (guard → `getLatestAuditAttempt` → cooldown gate above → `boss.send(...)` in try/catch; `getLatestBrandAudit` → `getLatestCompletedAudit`).
 - [ ] **Step 4:** run → PASS.
 - [ ] **Step 5:** commit `add authorized AXO enqueue and read in web layer`.
 
@@ -270,9 +309,14 @@ Both call `requireBrandSession(brandId)` first (as `dashboard.ts` does). No `pgb
   1. authorize (existing `requireBrandSession`);
   2. `await enqueueSiteAuditIfStale(brandId)` (best-effort; wrapped so a failure logs and continues);
   3. `latestAudit = await getLatestBrandAudit(brandId)`;
-  4. load latest opportunities report; treat it stale if older than the time gate **OR** `report.siteAuditId !== latestAudit?.id`;
+  4. load latest opportunities report; **normalize the id comparison to avoid `null !== undefined` churn**:
+     ```ts
+     const latestAuditId = latestAudit?.id ?? null;
+     const auditStale = (report.siteAuditId ?? null) !== latestAuditId;
+     const isStale = timeGateStale || auditStale;
+     ```
   5. serve if fresh, else regenerate.
-- [ ] **Step 3:** in `buildDigest`, append a compact summary of `latestAudit.report` (per page: final URL, `fetchStatus`, missing schema/meta, blocked AI bots, `relevanceScore`+note) and extend `GUIDANCE`/`TASK` to allow `axo` opportunities describing concrete readiness fixes. Persist `siteAuditId = latestAudit?.id ?? null` on the inserted `brand_opportunities` row.
+- [ ] **Step 3:** in `buildDigest`, append a **character-bounded** (e.g. ≤2000 chars) summary of `latestAudit.report`, **clearly delimited as untrusted page-derived data** (e.g. wrapped in a labelled `""" … """` block the prompt is told to treat as data, not instructions): per page — final URL, `fetchStatus`, missing schema/meta, blocked AI bots, `relevanceScore`+note. Extend `GUIDANCE`/`TASK` to allow `axo` opportunities describing concrete readiness fixes. Persist `siteAuditId = latestAudit?.id ?? null` on the inserted `brand_opportunities` row.
 - [ ] **Step 4:** test: with a stubbed `site-audit` module, a newer completed audit id than the stored report's `siteAuditId` marks the report stale (regenerate path taken); equal id + fresh time → served. `pnpm --filter @workspace/web exec tsc --noEmit` → PASS.
 - [ ] **Step 5:** changeset + commit:
 ```md
