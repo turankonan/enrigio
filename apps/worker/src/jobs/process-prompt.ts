@@ -369,9 +369,11 @@ async function runModelIteration({
 	} catch (error) {
 		// A single run's failure doesn't fail the job, so report it here to keep
 		// per-provider failure rates visible.
-		const err = error as { name?: string; message?: string; stack?: string; cause?: unknown; status?: number; statusCode?: number };
+		const err = error as { name?: string; message?: string; cause?: unknown };
+		// Surface the real error on the console too — it previously only reached
+		// Sentry, leaving "N/N failed runs" summaries with no diagnosable cause.
 		console.error(
-			`[run-fail ${config.provider}/${config.model} online=${config.webSearch}] ${err?.name}: ${err?.message} | status=${err?.status ?? err?.statusCode} | cause=${err?.cause instanceof Error ? err.cause.message : String(err?.cause)}\n${err?.stack ?? ""}`,
+			`[run-fail ${config.provider}/${config.model}] ${err?.name}: ${err?.message}${err?.cause instanceof Error ? ` (cause: ${err.cause.message})` : ""}`,
 		);
 		Sentry.withScope((scope) => {
 			scope.setTag("queue", "process-prompt");
