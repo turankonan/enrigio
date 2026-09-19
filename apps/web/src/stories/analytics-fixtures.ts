@@ -32,6 +32,7 @@ const visibilityTimeSeries = DATES.map((date, i) => ({
 
 export const mockDashboardSummary = {
 	totalPrompts: 42,
+	promptsWithMention: 33,
 	totalRuns: 3120,
 	averageVisibility: 68,
 	nonBrandedVisibility: 51,

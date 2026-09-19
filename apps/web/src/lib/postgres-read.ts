@@ -18,6 +18,7 @@ import {
 
 export interface DashboardSummary {
 	total_prompts: number;
+	prompts_with_mention: number;
 	total_runs: number;
 	avg_visibility: number;
 	non_branded_visibility: number;
@@ -190,6 +191,7 @@ export async function getDashboardSummary(
 	const rows = await queryPg<DashboardSummary>(sql`
 		SELECT
 			count(DISTINCT prompt_id)::int AS total_prompts,
+			count(DISTINCT prompt_id) FILTER (WHERE brand_mentioned)::int AS prompts_with_mention,
 			count(*)::int AS total_runs,
 			round(count(*) FILTER (WHERE brand_mentioned) * 100.0 / NULLIF(count(*), 0), 0)::int AS avg_visibility,
 			round(count(*) FILTER (WHERE brand_mentioned) * 100.0 / NULLIF(count(*), 0), 0)::int AS non_branded_visibility,

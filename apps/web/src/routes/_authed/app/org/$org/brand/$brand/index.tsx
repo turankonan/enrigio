@@ -201,6 +201,7 @@ function TrendSection({
 
 const STAT_PLACEHOLDERS = [
 	{ label: t("dashboard.stat_prompts_tracked"), icon: List },
+	{ label: t("dashboard.stat_coverage"), icon: Eye },
 	{ label: t("dashboard.stat_evaluations"), icon: Pulse },
 	{ label: t("dashboard.stat_run_frequency"), icon: Clock },
 	{ label: t("dashboard.stat_last_updated"), icon: ArrowsClockwise },
@@ -209,6 +210,7 @@ const STAT_PLACEHOLDERS = [
 function TrackingStats({
 	loading,
 	totalPrompts,
+	promptsWithMention,
 	totalRuns,
 	lastUpdatedAt,
 	delayHours,
@@ -216,6 +218,7 @@ function TrackingStats({
 }: {
 	loading: boolean;
 	totalPrompts: number;
+	promptsWithMention: number;
 	totalRuns: number;
 	lastUpdatedAt: string | null;
 	delayHours: number;
@@ -254,6 +257,12 @@ function TrackingStats({
 						t("dashboard.prompts_tooltip_no_platforms")
 					)
 				}
+			/>
+			<StatWithTooltip
+				icon={Eye}
+				label={t("dashboard.stat_coverage")}
+				value={t("dashboard.coverage_value", { mentioned: promptsWithMention, total: totalPrompts })}
+				tooltip={t("dashboard.coverage_tooltip")}
 			/>
 			<StatWithTooltip
 				icon={Pulse}
@@ -389,6 +398,7 @@ function useDashboardMetrics(brandId: string | undefined) {
 		isLoadingSov,
 		totalRuns: dashboardSummary?.totalRuns || 0,
 		totalPrompts: dashboardSummary?.totalPrompts,
+		promptsWithMention: dashboardSummary?.promptsWithMention || 0,
 		visibilityTimeSeries: dashboardSummary?.visibilityTimeSeries || [],
 		sovTimeSeries: sovData?.shareTimeSeries ?? [],
 		nonBrandedVisibility: dashboardSummary?.nonBrandedVisibility || 0,
@@ -419,6 +429,7 @@ function DashboardPage() {
 		isLoadingSov,
 		totalRuns,
 		totalPrompts,
+		promptsWithMention,
 		visibilityTimeSeries,
 		sovTimeSeries,
 		nonBrandedVisibility,
@@ -477,6 +488,7 @@ function DashboardPage() {
 					<TrackingStats
 						loading={loadingVisibility}
 						totalPrompts={totalPrompts ?? 0}
+						promptsWithMention={promptsWithMention}
 						totalRuns={totalRuns}
 						lastUpdatedAt={lastUpdatedAt}
 						delayHours={brand?.delayOverrideHours ?? clientConfig?.defaultDelayHours ?? 24}

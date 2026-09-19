@@ -23,6 +23,8 @@ interface PromptRunData {
 	brandId: string;
 	brandMentioned: boolean;
 	competitorsMentioned: string[];
+	sentiment: "positive" | "neutral" | "negative" | null;
+	brandRank: number | null;
 	createdAt: Date;
 	model: string;
 	provider: string | null;

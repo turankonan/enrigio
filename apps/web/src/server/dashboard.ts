@@ -33,6 +33,7 @@ type CitationTimeSeriesPoint = { date: string } & Record<CitationCategory, numbe
 
 export interface DashboardSummaryResponse {
 	totalPrompts: number;
+	promptsWithMention: number;
 	totalRuns: number;
 	averageVisibility: number;
 	nonBrandedVisibility: number;
@@ -154,6 +155,7 @@ export const getDashboardSummaryFn = createServerFn({ method: "GET" })
 
 		return {
 			totalPrompts: Number(totalPrompts),
+			promptsWithMention: summary ? Number(summary.prompts_with_mention) : 0,
 			totalRuns,
 			averageVisibility,
 			nonBrandedVisibility,
