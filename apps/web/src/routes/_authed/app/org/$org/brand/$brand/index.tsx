@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowsClockwise, Clock, Eye, Info, List, Megaphone, Pulse } from "@phosphor-icons/react";
+import { ArrowRight, ArrowsClockwise, Clock, Eye, Info, List, Megaphone, Pulse, Ranking, Smiley } from "@phosphor-icons/react";
 import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import { labelForModelFilter } from "@workspace/config/model-filter";
 import type { ClientConfig } from "@workspace/config/types";
@@ -202,6 +202,8 @@ function TrendSection({
 const STAT_PLACEHOLDERS = [
 	{ label: t("dashboard.stat_prompts_tracked"), icon: List },
 	{ label: t("dashboard.stat_coverage"), icon: Eye },
+	{ label: t("dashboard.stat_sentiment"), icon: Smiley },
+	{ label: t("dashboard.stat_avg_position"), icon: Ranking },
 	{ label: t("dashboard.stat_evaluations"), icon: Pulse },
 	{ label: t("dashboard.stat_run_frequency"), icon: Clock },
 	{ label: t("dashboard.stat_last_updated"), icon: ArrowsClockwise },
@@ -211,6 +213,10 @@ function TrackingStats({
 	loading,
 	totalPrompts,
 	promptsWithMention,
+	sentimentPositive,
+	sentimentNeutral,
+	sentimentNegative,
+	avgBrandRank,
 	totalRuns,
 	lastUpdatedAt,
 	delayHours,
@@ -219,6 +225,10 @@ function TrackingStats({
 	loading: boolean;
 	totalPrompts: number;
 	promptsWithMention: number;
+	sentimentPositive: number;
+	sentimentNeutral: number;
+	sentimentNegative: number;
+	avgBrandRank: number | null;
 	totalRuns: number;
 	lastUpdatedAt: string | null;
 	delayHours: number;
@@ -263,6 +273,22 @@ function TrackingStats({
 				label={t("dashboard.stat_coverage")}
 				value={t("dashboard.coverage_value", { mentioned: promptsWithMention, total: totalPrompts })}
 				tooltip={t("dashboard.coverage_tooltip")}
+			/>
+			<StatWithTooltip
+				icon={Smiley}
+				label={t("dashboard.stat_sentiment")}
+				value={t("dashboard.sentiment_value", {
+					positive: sentimentPositive,
+					neutral: sentimentNeutral,
+					negative: sentimentNegative,
+				})}
+				tooltip={t("dashboard.sentiment_tooltip")}
+			/>
+			<StatWithTooltip
+				icon={Ranking}
+				label={t("dashboard.stat_avg_position")}
+				value={avgBrandRank === null ? "—" : avgBrandRank.toLocaleString()}
+				tooltip={t("dashboard.avg_position_tooltip")}
 			/>
 			<StatWithTooltip
 				icon={Pulse}
@@ -399,6 +425,10 @@ function useDashboardMetrics(brandId: string | undefined) {
 		totalRuns: dashboardSummary?.totalRuns || 0,
 		totalPrompts: dashboardSummary?.totalPrompts,
 		promptsWithMention: dashboardSummary?.promptsWithMention || 0,
+		sentimentPositive: dashboardSummary?.sentimentPositive || 0,
+		sentimentNeutral: dashboardSummary?.sentimentNeutral || 0,
+		sentimentNegative: dashboardSummary?.sentimentNegative || 0,
+		avgBrandRank: dashboardSummary?.avgBrandRank ?? null,
 		visibilityTimeSeries: dashboardSummary?.visibilityTimeSeries || [],
 		sovTimeSeries: sovData?.shareTimeSeries ?? [],
 		nonBrandedVisibility: dashboardSummary?.nonBrandedVisibility || 0,
@@ -430,6 +460,10 @@ function DashboardPage() {
 		totalRuns,
 		totalPrompts,
 		promptsWithMention,
+		sentimentPositive,
+		sentimentNeutral,
+		sentimentNegative,
+		avgBrandRank,
 		visibilityTimeSeries,
 		sovTimeSeries,
 		nonBrandedVisibility,
@@ -489,6 +523,10 @@ function DashboardPage() {
 						loading={loadingVisibility}
 						totalPrompts={totalPrompts ?? 0}
 						promptsWithMention={promptsWithMention}
+						sentimentPositive={sentimentPositive}
+						sentimentNeutral={sentimentNeutral}
+						sentimentNegative={sentimentNegative}
+						avgBrandRank={avgBrandRank}
 						totalRuns={totalRuns}
 						lastUpdatedAt={lastUpdatedAt}
 						delayHours={brand?.delayOverrideHours ?? clientConfig?.defaultDelayHours ?? 24}

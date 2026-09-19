@@ -38,6 +38,10 @@ export interface DashboardSummaryResponse {
 	averageVisibility: number;
 	nonBrandedVisibility: number;
 	brandedVisibility: number;
+	sentimentPositive: number;
+	sentimentNeutral: number;
+	sentimentNegative: number;
+	avgBrandRank: number | null;
 	visibilityTimeSeries: VisibilityTimeSeriesPoint[];
 	citationTimeSeries: CitationTimeSeriesPoint[];
 	lastUpdatedAt: string | null;
@@ -160,6 +164,10 @@ export const getDashboardSummaryFn = createServerFn({ method: "GET" })
 			averageVisibility,
 			nonBrandedVisibility,
 			brandedVisibility,
+			sentimentPositive: summary ? Number(summary.sentiment_positive) : 0,
+			sentimentNeutral: summary ? Number(summary.sentiment_neutral) : 0,
+			sentimentNegative: summary ? Number(summary.sentiment_negative) : 0,
+			avgBrandRank: summary?.avg_brand_rank ?? null,
 			visibilityTimeSeries,
 			citationTimeSeries,
 			lastUpdatedAt,
