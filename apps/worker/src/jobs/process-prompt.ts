@@ -14,6 +14,7 @@ import {
 	usageEvents,
 } from "@workspace/lib/db/schema";
 import { getOrgEntitlements } from "@workspace/lib/entitlements";
+import { classifyMention } from "@workspace/lib/mention-classify";
 import { analyzeMentions } from "@workspace/lib/mentions";
 import { getProvider, type ModelConfig, type Provider } from "@workspace/lib/providers";
 import { failureBackoffHours } from "@workspace/lib/run-backoff";
@@ -210,6 +211,8 @@ async function savePromptRun(
 	webQueries: string[],
 	brandMentioned: boolean,
 	competitorsMentioned: string[],
+	sentiment: "positive" | "neutral" | "negative" | null,
+	brandRank: number | null,
 ): Promise<{ id: string; createdAt: Date }> {
 	const [result] = await db
 		.insert(promptRuns)
@@ -224,6 +227,8 @@ async function savePromptRun(
 			webQueries,
 			brandMentioned,
 			competitorsMentioned,
+			sentiment,
+			brandRank,
 		})
 		.returning({ id: promptRuns.id, createdAt: promptRuns.createdAt });
 
@@ -327,6 +332,16 @@ async function runModelIteration({
 
 		const recordedVersion = modelVersion ?? config.version ?? config.provider;
 
+		// Sentiment and in-answer rank are meaningless without a mention; skip the
+		// classifier (and its cost) unless the brand actually showed up.
+		const classification = brandMentioned
+			? await classifyMention({
+					answer: safeTextContent,
+					brandName: brand.name,
+					competitorNames: competitorsList.map((c) => c.name),
+				})
+			: null;
+
 		const { id: promptRunId, createdAt } = await savePromptRun(
 			promptId,
 			brand.id,
@@ -338,6 +353,8 @@ async function runModelIteration({
 			webQueries,
 			brandMentioned,
 			competitorsMentioned,
+			classification?.sentiment ?? null,
+			classification?.brandRank ?? null,
 		);
 		console.log(`${logPrefix} Saved prompt run ${promptRunId}`);
 
