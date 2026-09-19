@@ -85,7 +85,9 @@ const PRIORITY_RANK = { high: 0, medium: 1, low: 2 };
 
 function OpportunityCard({ o }: { o: Opportunity }) {
 	const [open, setOpen] = useState<Tab | null>(null);
-	const priority = PRIORITY_META[o.priority];
+	// Reports persisted before priority/expectedImpact existed have neither —
+	// render those cleanly instead of crashing; they gain the fields on refresh.
+	const priority = o.priority ? PRIORITY_META[o.priority] : null;
 	const tabs: { key: Tab; label: string; count: number }[] = [
 		{ key: "prompts", label: t("query_fan_out.prompts_title"), count: o.relatedPrompts.length },
 		{ key: "your", label: t("opportunities-report.tab-your-citations"), count: o.yourCitations.length },
@@ -95,14 +97,18 @@ function OpportunityCard({ o }: { o: Opportunity }) {
 		<div className="rounded-xl border border-border p-4">
 			<div className="flex items-start justify-between gap-2">
 				<h3 className="text-pretty text-base font-semibold">{o.title}</h3>
-				<Badge variant={priority.variant} className="mt-0.5 shrink-0">
-					{priority.label}
-				</Badge>
+				{priority && (
+					<Badge variant={priority.variant} className="mt-0.5 shrink-0">
+						{priority.label}
+					</Badge>
+				)}
 			</div>
 			<p className="mt-1 text-pretty text-sm text-muted-foreground">{o.why}</p>
-			<p className="mt-1.5 text-pretty text-sm">
-				<span className="font-medium">{t("opportunities-report.expected-impact")}:</span> {o.expectedImpact}
-			</p>
+			{o.expectedImpact && (
+				<p className="mt-1.5 text-pretty text-sm">
+					<span className="font-medium">{t("opportunities-report.expected-impact")}:</span> {o.expectedImpact}
+				</p>
+			)}
 
 			<div className="mt-3 border-t border-border/60 pt-3">
 				<div className="flex flex-wrap gap-2">
@@ -168,7 +174,7 @@ export function OpportunitiesReport({ report }: { report: OpportunitiesReportDat
 			{CATEGORY_META.map((c) => {
 				const opps = report.opportunities
 					.filter((o) => o.category === c.key)
-					.sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]);
+					.sort((a, b) => (PRIORITY_RANK[a.priority] ?? 1) - (PRIORITY_RANK[b.priority] ?? 1));
 				if (opps.length === 0) return null;
 				return (
 					<section key={c.key} className="space-y-3">
