@@ -96,22 +96,49 @@ export async function runStructuredResearchPrompt<T>(prompt: string, schema: z.Z
 	return result.object;
 }
 
+export type StructuredCompletionResult<T> = StructuredResearchResult<T> & { providerId: string };
+
+/**
+ * Thrown by {@link runStructuredCompletionPrompt} when the resolved provider's
+ * call fails, carrying which provider (and, if known, model) was in use so
+ * callers can attribute the failure instead of losing that context to a bare
+ * `Error`.
+ */
+export class StructuredCompletionError extends Error {
+	constructor(
+		message: string,
+		readonly providerId: string,
+		readonly model: string | null,
+		options?: ErrorOptions,
+	) {
+		super(message, options);
+	}
+}
+
 /**
  * Like {@link runStructuredResearchPrompt} but with the web-search tool OFF — a
  * single structured completion over context you assemble into the prompt. Same
  * provider selection (honors `ONBOARDING_LLM_TARGET` / the preference order),
  * no tools and no agent loop. Use when the prompt already carries all the data.
  *
- * Returns the validated object plus the resolved model id (`modelVersion`) so
- * callers can record which model produced the result.
+ * Returns the validated object plus the resolved model id (`modelVersion`) and
+ * the provider id that produced it. Throws {@link StructuredCompletionError} on
+ * provider failure so callers can record which provider failed.
  */
 export async function runStructuredCompletionPrompt<T>(
 	prompt: string,
 	schema: z.ZodType<T>,
-): Promise<StructuredResearchResult<T>> {
+): Promise<StructuredCompletionResult<T>> {
 	const provider = resolveResearchProvider();
 	if (!provider.runStructuredResearch) {
 		throw new Error(`Provider "${provider.id}" does not implement structured research`);
 	}
-	return provider.runStructuredResearch({ prompt, schema, webSearch: false });
+	try {
+		const result = await provider.runStructuredResearch({ prompt, schema, webSearch: false });
+		return { ...result, providerId: provider.id };
+	} catch (e) {
+		throw new StructuredCompletionError((e as Error)?.message ?? "completion failed", provider.id, null, {
+			cause: e,
+		});
+	}
 }
