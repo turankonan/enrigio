@@ -202,9 +202,6 @@ export const reports = pgTable(
 	}),
 ).enableRLS();
 
-// One row per generated Opportunities report, per brand — append-only history
-// (every generation is kept, not overwritten). The page reads the latest row and
-// regenerates only when it's stale; see apps/web/src/server/opportunities.ts.
 export const siteAudits = pgTable(
 	"site_audits",
 	{
@@ -221,6 +218,9 @@ export const siteAudits = pgTable(
 	(t) => ({ brandCreatedIdx: index("site_audits_brand_created_idx").on(t.brandId, t.createdAt) }),
 ).enableRLS();
 
+// One row per generated Opportunities report, per brand — append-only history
+// (every generation is kept, not overwritten). The page reads the latest row and
+// regenerates only when it's stale; see apps/web/src/server/opportunities.ts.
 export const brandOpportunities = pgTable(
 	"brand_opportunities",
 	{

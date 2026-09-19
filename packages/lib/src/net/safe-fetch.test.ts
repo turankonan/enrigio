@@ -97,6 +97,10 @@ describe("safeFetch behavior", () => {
 					res.writeHead(200, { "content-type": "application/json" });
 					res.end("{}");
 					return;
+				case "/xhtml":
+					res.writeHead(200, { "content-type": "application/xhtml+xml" });
+					res.end('<?xml version="1.0"?><html><body>xhtml</body></html>');
+					return;
 				default:
 					res.writeHead(404);
 					res.end();
@@ -244,6 +248,16 @@ describe("safeFetch behavior", () => {
 			transport: makeFixtureTransport([]),
 		});
 		expect(result.status).toBe("unsupported-content-type");
+	});
+
+	it("accepts application/xhtml+xml on the html content-type path", async () => {
+		const result = await safeFetch("https://rigosis.com/xhtml", {
+			allowHosts: ["rigosis.com"],
+			accept: "html",
+			resolver: approvedResolver,
+			transport: makeFixtureTransport([]),
+		});
+		expect(result.status).toBe("ok");
 	});
 
 	it("(g) destroys the redirect response stream before following the next hop", async () => {

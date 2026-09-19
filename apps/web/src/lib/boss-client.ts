@@ -53,6 +53,10 @@ export async function getBoss(): Promise<PgBoss> {
 		});
 		await boss.createQueue("audit-site", {
 			retryLimit: 0, // paid LLM fan-out; a retry would double-charge usage
+			// Intentionally shorter than the 20-minute AUDIT_RUNNING_STALE_MINUTES/
+			// singletonSeconds in apps/web/src/server/site-audit.ts: if pg-boss
+			// expires a crawl first, the audit's own completed row still gets
+			// written and cached — the gap doesn't strand anything.
 			expireInSeconds: 60 * 15,
 		});
 
