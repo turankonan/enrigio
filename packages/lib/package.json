@@ -41,7 +41,8 @@
 		"./run-policy": "./src/run-policy/index.ts",
 		"./usage": "./src/usage/cost.ts",
 		"./net/hostname": "./src/net/hostname.ts",
-		"./net/safe-fetch": "./src/net/safe-fetch.ts"
+		"./net/safe-fetch": "./src/net/safe-fetch.ts",
+		"./axo": "./src/axo/index.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^4.0.49",
