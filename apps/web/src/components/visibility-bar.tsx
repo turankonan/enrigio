@@ -1,4 +1,4 @@
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
@@ -109,7 +109,7 @@ export function VisibilityBar({
 				)}
 
 				<Tooltip>
-					<TooltipTrigger render={<IconInfoCircle className={`h-3.5 w-3.5 shrink-0 ${colors.muted} cursor-help`} />} />
+					<TooltipTrigger render={<Info className={`h-3.5 w-3.5 shrink-0 ${colors.muted} cursor-help`} />} />
 					<TooltipContent side="bottom" className="max-w-xs text-sm">
 						{t("visibility-bar.tooltip", {
 							count: totalPrompts.toLocaleString(),

@@ -1,4 +1,4 @@
-import { IconWorld } from "@tabler/icons-react";
+import { Globe } from "@phosphor-icons/react";
 import { useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
@@ -22,7 +22,7 @@ export function NavAppInfo() {
 					<TooltipTrigger
 						render={<a href="https://www.rigosis.com/" target="_blank" className={linkClass} rel="noopener" />}
 					>
-						<IconWorld className="size-4" />
+						<Globe className="size-4" />
 					</TooltipTrigger>
 					<TooltipContent>{t("nav-app-info.website-tooltip")}</TooltipContent>
 				</Tooltip>

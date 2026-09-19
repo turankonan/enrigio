@@ -1,10 +1,4 @@
-import {
-	IconArrowDownRight,
-	IconExternalLink,
-	IconInfoCircle,
-	IconPlus,
-	IconSwitchHorizontal,
-} from "@tabler/icons-react";
+import { ArrowDownRight, ArrowSquareOut, ArrowsLeftRight, Info, Plus } from "@phosphor-icons/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
@@ -34,11 +28,11 @@ const CHANGE_TYPE_TABS: { key: ChangeType; label: string }[] = [
 ];
 
 const CHANGE_ICONS: Record<ChangeType, ReactNode> = {
-	new_pages: <IconPlus className="h-3.5 w-3.5 text-green-600" />,
-	new_domains: <IconPlus className="h-3.5 w-3.5 text-green-600" />,
-	dropped_pages: <IconArrowDownRight className="h-3.5 w-3.5 text-red-600" />,
-	dropped_domains: <IconArrowDownRight className="h-3.5 w-3.5 text-red-600" />,
-	title: <IconSwitchHorizontal className="h-3.5 w-3.5 text-amber-600" />,
+	new_pages: <Plus className="h-3.5 w-3.5 text-green-600" />,
+	new_domains: <Plus className="h-3.5 w-3.5 text-green-600" />,
+	dropped_pages: <ArrowDownRight className="h-3.5 w-3.5 text-red-600" />,
+	dropped_domains: <ArrowDownRight className="h-3.5 w-3.5 text-red-600" />,
+	title: <ArrowsLeftRight className="h-3.5 w-3.5 text-amber-600" />,
 };
 
 const MAX_VISIBLE_CHANGES = 6;
@@ -98,7 +92,7 @@ function ChangeRow({ icon, label, url, description }: { icon: ReactNode } & Retu
 			<div className="min-w-0 flex-1">
 				<div className="flex items-center gap-1.5">
 					<span className="text-sm font-medium truncate text-foreground group-hover:underline">{label}</span>
-					<IconExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+					<ArrowSquareOut className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
 				</div>
 				<p className="text-xs text-muted-foreground mt-0.5">{description}</p>
 			</div>
@@ -128,7 +122,7 @@ export function RecentChangesCard({ whatsChanged, days }: { whatsChanged: WhatsC
 				<CardTitle className="flex items-center gap-1.5">
 					{t("recent-changes-card.title")}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">
 							Compares this {formatPeriodLabel(days)} with the {formatPeriodLabel(days)} before it. Shows new and
 							dropped pages, title changes, and new and dropped domains.

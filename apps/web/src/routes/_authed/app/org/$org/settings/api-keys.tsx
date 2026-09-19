@@ -3,7 +3,7 @@
  * the api-key plugin's own membership check. This page just avoids showing a
  * form that would be refused.
  */
-import { IconAlertTriangle, IconCircleCheck, IconKey, IconPlus, IconX } from "@tabler/icons-react";
+import { CheckCircle, Key, Plus, Warning, X } from "@phosphor-icons/react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { orgLinkParams } from "@workspace/lib/app-urls";
 import { Alert, AlertDescription, AlertTitle } from "@workspace/ui/components/alert";
@@ -150,7 +150,7 @@ function ApiKeysSettingsPage() {
 
 			{!isKeyAdmin && !readOnly && (
 				<Alert className="border-yellow-200 bg-yellow-50 text-yellow-800">
-					<IconAlertTriangle />
+					<Warning size={24} />
 					<AlertTitle>{t("settings.api_keys.limited_access_title")}</AlertTitle>
 					<AlertDescription className="text-yellow-700">{t("settings.api_keys.limited_access_body")}</AlertDescription>
 				</Alert>
@@ -161,7 +161,7 @@ function ApiKeysSettingsPage() {
 					<h2 className="text-lg font-semibold">{t("prompt_details.status_active")}</h2>
 					{canManage && (
 						<Button type="button" size="sm" onClick={() => setCreatingOpen(true)}>
-							<IconPlus className="size-4" />
+							<Plus className="size-4" />
 							{t("settings.api_keys.add_key")}
 						</Button>
 					)}
@@ -228,7 +228,7 @@ function ApiKeysSettingsPage() {
 					</DialogHeader>
 					{revokeError && (
 						<Alert variant="destructive">
-							<IconAlertTriangle />
+							<Warning size={24} />
 							<AlertDescription>{revokeError}</AlertDescription>
 						</Alert>
 					)}
@@ -303,7 +303,7 @@ function CreateKeyForm({
 			<div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-1">
 				{error && (
 					<Alert variant="destructive">
-						<IconAlertTriangle />
+						<Warning size={24} />
 						<AlertDescription>{error}</AlertDescription>
 					</Alert>
 				)}
@@ -480,7 +480,7 @@ function IssuedKeyCard({ value }: { value: string }) {
 	return (
 		<Card className="flex-row flex-wrap items-center justify-between gap-3 border-emerald-500/40 bg-emerald-50/60 px-4 py-3">
 			<CardTitle className="flex items-center gap-2 text-emerald-700">
-				<IconCircleCheck className="size-5" />
+				<CheckCircle className="size-5" />
 				{t("settings.api_keys.key_created")}
 			</CardTitle>
 			<div className="flex min-w-0 items-center gap-2">
@@ -615,7 +615,7 @@ function RevokeButton({ onClick }: { onClick: () => void }) {
 						className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
 						onClick={onClick}
 					>
-						<IconX className="size-4" />
+						<X className="size-4" />
 						<span className="sr-only">{t("settings.api_keys.revoke")}</span>
 					</Button>
 				}
@@ -641,7 +641,7 @@ function EmptyKeys({
 	return (
 		<div className="flex flex-col items-center gap-3 rounded-md border border-dashed px-6 py-12 text-center">
 			<span className="flex size-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
-				<IconKey className="size-5" />
+				<Key className="size-5" />
 			</span>
 			<div className="space-y-1">
 				<p className="font-medium">{hasInactive ? "No active API keys" : "No API keys yet"}</p>
@@ -651,7 +651,7 @@ function EmptyKeys({
 			</div>
 			{canManage && (
 				<Button type="button" onClick={onCreate}>
-					<IconPlus className="size-4" />
+					<Plus className="size-4" />
 					{hasInactive ? "Create a key" : "Create your first key"}
 				</Button>
 			)}

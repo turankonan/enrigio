@@ -1,4 +1,4 @@
-import { IconCheck, IconCopy } from "@tabler/icons-react";
+import { Check, Copy } from "@phosphor-icons/react";
 import { Button } from "@workspace/ui/components/button";
 import { useEffect, useState } from "react";
 import { t } from "@/lib/i18n";
@@ -24,7 +24,7 @@ export function CopyButton({ value, label, className }: { value: string; label?:
 				setCopied(true);
 			}}
 		>
-			{copied ? <IconCheck className="size-4" /> : <IconCopy className="size-4" />}
+			{copied ? <Check className="size-4" /> : <Copy className="size-4" />}
 			{label ? (
 				copied ? (
 					t("copy-button.copied")

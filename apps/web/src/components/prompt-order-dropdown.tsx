@@ -1,3 +1,4 @@
+import { ArrowsDownUp } from "@phosphor-icons/react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import {
 	DropdownMenu,
@@ -6,7 +7,6 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { ArrowUpDown } from "lucide-react";
 import { FilterTriggerButton } from "@/components/filter-bar";
 import { t } from "@/lib/i18n";
 import { coercePromptOrder, DEFAULT_PROMPT_ORDER, PROMPT_ORDER_OPTIONS, type PromptOrder } from "@/lib/prompt-order";
@@ -46,7 +46,7 @@ export function PromptOrderDropdown() {
 			<DropdownMenuTrigger
 				render={
 					<FilterTriggerButton
-						icon={<ArrowUpDown className="size-3.5" />}
+						icon={<ArrowsDownUp className="size-3.5" />}
 						label={label}
 						active={selected !== DEFAULT_PROMPT_ORDER}
 					/>

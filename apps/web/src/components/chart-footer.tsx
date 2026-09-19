@@ -1,10 +1,10 @@
+import { Download } from "@phosphor-icons/react";
 import { useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { getOptimizeButtonForMode } from "@workspace/deployment/client";
 import { Button } from "@workspace/ui/components/button";
 import { CardFooter } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
-import { Download } from "lucide-react";
 import { useCallback } from "react";
 import { t } from "@/lib/i18n";
 import type { LookbackPeriod } from "@/lib/lookback";

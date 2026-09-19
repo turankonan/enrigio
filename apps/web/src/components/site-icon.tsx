@@ -4,7 +4,7 @@
  * Decorative by design — every surface renders the name alongside it, so the
  * mark carries no information a screen reader would otherwise miss.
  */
-import { IconWorld } from "@tabler/icons-react";
+import { Globe } from "@phosphor-icons/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import { cn } from "@workspace/ui/lib/utils";
 import { useState } from "react";
@@ -80,7 +80,7 @@ export function SiteIcon({
 			    row of a table and then swapping it for an icon. Nothing to wait
 			    for once the icon is ruled out, so those fall back at once. */}
 			<AvatarFallback delay={iconSrc ? 300 : 0} className="rounded-[inherit] bg-muted text-muted-foreground">
-				<IconWorld className={GLYPH_SCALE} />
+				<Globe className={GLYPH_SCALE} />
 			</AvatarFallback>
 		</Avatar>
 	);

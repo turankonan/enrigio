@@ -10,7 +10,7 @@
  * renders them.
  */
 
-import { IconArrowUpRight, IconExternalLink } from "@tabler/icons-react";
+import { ArrowSquareOut, ArrowUpRight } from "@phosphor-icons/react";
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { PROVIDERS_DOCS_URL } from "@workspace/config/constants";
 import { getModelMeta } from "@workspace/config/models";
@@ -268,7 +268,7 @@ function UpgradePanel({ options }: { options: ModelPickerState["upgradeOptions"]
 				className={buttonVariants({ variant: "outline", size: "sm" })}
 			>
 				{t("settings.llms.compare_plans")}
-				<IconArrowUpRight className="h-4 w-4" />
+				<ArrowUpRight className="h-4 w-4" />
 			</Link>
 		</div>
 	);
@@ -330,7 +330,7 @@ function PremiumApiPool({ premium }: { premium: PremiumPool }) {
 						className={buttonVariants({ variant: "ghost", size: "sm" })}
 					>
 						{t("settings.llms.change_how_many")}
-						<IconArrowUpRight className="h-4 w-4" />
+						<ArrowUpRight className="h-4 w-4" />
 					</Link>
 				</div>
 			</CardContent>
@@ -395,7 +395,7 @@ function AddPlatformsCard({ platforms }: { platforms: ModelPickerState["unconfig
 					className={buttonVariants({ variant: "outline", size: "sm" })}
 				>
 					{t("settings.llms.provider_setup_guide")}
-					<IconExternalLink className="h-4 w-4" />
+					<ArrowSquareOut className="h-4 w-4" />
 				</a>
 			</CardContent>
 		</Card>

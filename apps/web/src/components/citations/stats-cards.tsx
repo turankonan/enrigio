@@ -1,4 +1,4 @@
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { t } from "@/lib/i18n";
@@ -10,7 +10,7 @@ function StatCard({ title, tooltip, value }: { title: string; tooltip: React.Rea
 				<CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
 					{title}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">{tooltip}</TooltipContent>
 					</Tooltip>
 				</CardTitle>

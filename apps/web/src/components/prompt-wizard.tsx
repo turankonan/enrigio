@@ -5,6 +5,7 @@
  * saving.
  */
 
+import { Play, Rocket, WarningCircle } from "@phosphor-icons/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
@@ -12,7 +13,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Separator } from "@workspace/ui/components/separator";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { TagsInput } from "@workspace/ui/components/tags-input";
-import { AlertCircle, Play, Rocket } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { type CompetitorEntry, CompetitorsEditor, newCompetitorEntry } from "@/components/competitors-editor";
 import { type EditablePrompt, newPromptEntry, PromptsListEditor } from "@/components/prompts-list-editor";
@@ -268,7 +268,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 				</p>
 				{error && (
 					<div className="flex items-start gap-2 rounded-md border border-red-200 bg-red-50 p-2 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
-						<AlertCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+						<WarningCircle className="h-4 w-4 flex-shrink-0 mt-0.5" />
 						<span>{error}</span>
 					</div>
 				)}
@@ -364,7 +364,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 
 			{submitError && (
 				<div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-					<AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+					<WarningCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
 					<div className="text-sm">{submitError}</div>
 				</div>
 			)}

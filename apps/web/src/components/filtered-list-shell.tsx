@@ -1,5 +1,5 @@
+import { Tray } from "@phosphor-icons/react";
 import { Button } from "@workspace/ui/components/button";
-import { Inbox } from "lucide-react";
 import type { ReactNode } from "react";
 import { FilterBar } from "@/components/filter-bar";
 import { FilterSection } from "@/components/page-header";
@@ -79,7 +79,7 @@ export function FilteredListShell({
 		body = (
 			<div className="border-2 border-dashed border-muted rounded-lg min-h-48 flex items-center justify-center">
 				<div className="text-center py-8 text-muted-foreground">
-					<Inbox className="h-12 w-12 mx-auto mb-4 opacity-50" />
+					<Tray className="h-12 w-12 mx-auto mb-4 opacity-50" />
 					<p className="mb-2">{noMatchesTitle ?? t("filtered-list-shell.no-matches-title")}</p>
 					<p className="text-sm mb-4">{noMatchesDescription ?? t("filtered-list-shell.no-matches-description")}</p>
 					<Button variant="outline" size="sm" onClick={filters.clearFilters} className="cursor-pointer">

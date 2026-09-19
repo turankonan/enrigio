@@ -9,7 +9,7 @@
  * in the wizard since onboarding hasn't yet computed any system tags.
  */
 
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info, ListPlus, Plus, Tray } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { getModelMeta } from "@workspace/config/models";
 import {
@@ -31,7 +31,6 @@ import { TagsInput } from "@workspace/ui/components/tags-input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { cn } from "@workspace/ui/lib/utils";
-import { Inbox, ListPlus, Plus } from "lucide-react";
 import { type ReactNode, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { useOrganizationParams } from "@/hooks/use-route-params";
@@ -273,7 +272,7 @@ function ColumnHeader({
 			<div className="flex items-center gap-1 min-w-0">
 				{t("prompts-list-editor.column-prompt-text")}
 				<Tooltip>
-					<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+					<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 					<TooltipContent>
 						<p className="max-w-xs">{t("prompts-list-editor.prompt-text-tooltip")}</p>
 					</TooltipContent>
@@ -283,7 +282,7 @@ function ColumnHeader({
 				<div className="hidden md:flex items-center gap-1">
 					{t("prompts-list-editor.column-system")}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent>
 							<p className="max-w-xs">{t("prompts-list-editor.system-tooltip")}</p>
 						</TooltipContent>
@@ -293,7 +292,7 @@ function ColumnHeader({
 			<div className="flex items-center gap-1 min-w-0">
 				{t("filter-bar.tags")}
 				<Tooltip>
-					<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+					<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 					<TooltipContent>
 						<p className="max-w-xs">{t("prompts-list-editor.tags-tooltip")}</p>
 					</TooltipContent>
@@ -303,7 +302,7 @@ function ColumnHeader({
 				<div className="flex items-center justify-center gap-1">
 					{t("prompts-list-editor.column-premium")}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent>
 							<p className="max-w-xs">
 								Also track this prompt on a model called directly with its own web search on, for a grounded answer with
@@ -590,7 +589,7 @@ export function PromptsListEditor({
 			{prompts.length === 0 ? (
 				<div className="border-2 border-dashed border-muted rounded-lg min-h-48 flex items-center justify-center">
 					<div className="text-center py-8 text-muted-foreground">
-						<Inbox className="h-12 w-12 mx-auto mb-4 opacity-50" />
+						<Tray className="h-12 w-12 mx-auto mb-4 opacity-50" />
 						<p>{t("prompts-display.no-prompts-yet")}</p>
 					</div>
 				</div>

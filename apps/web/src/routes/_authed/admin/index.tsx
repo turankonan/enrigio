@@ -2,6 +2,7 @@
  * /admin - Admin dashboard with brand statistics and charts
  */
 
+import { GearSix, TrendDown, TrendUp } from "@phosphor-icons/react";
 import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { brandSegment } from "@workspace/lib/app-urls";
@@ -21,7 +22,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
-import { Settings, TrendingDown, TrendingUp } from "lucide-react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import { pageHead } from "@/lib/route-head";
@@ -139,7 +139,7 @@ function DelayOverrideDialog({ brand, onUpdate }: { brand: BrandStats; onUpdate:
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger render={<Button variant="outline" size="sm" className="cursor-pointer" />}>
-				<Settings className="h-4 w-4" />
+				<GearSix className="h-4 w-4" />
 			</DialogTrigger>
 			<DialogContent className="max-w-2xl">
 				<DialogHeader>
@@ -241,13 +241,13 @@ function ActivityIndicator({ added, removed }: { added: number; removed: number 
 		<div className="flex items-center gap-2">
 			{added > 0 && (
 				<div className="flex items-center text-green-600">
-					<TrendingUp className="h-4 w-4 mr-1" />
+					<TrendUp className="h-4 w-4 mr-1" />
 					<span>+{added}</span>
 				</div>
 			)}
 			{removed > 0 && (
 				<div className="flex items-center text-red-600">
-					<TrendingDown className="h-4 w-4 mr-1" />
+					<TrendDown className="h-4 w-4 mr-1" />
 					<span>-{removed}</span>
 				</div>
 			)}

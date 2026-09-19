@@ -7,6 +7,7 @@
  * browser back/forward, and closing the tab.
  */
 
+import { FloppyDisk } from "@phosphor-icons/react";
 import { useBlocker } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -18,7 +19,6 @@ import {
 	DialogTitle,
 } from "@workspace/ui/components/dialog";
 import { Spinner } from "@workspace/ui/components/spinner";
-import { Save } from "lucide-react";
 import { useState } from "react";
 import { t } from "@/lib/i18n";
 
@@ -87,7 +87,7 @@ export function UnsavedChangesBar({ isDirty, isSaving, summary, error, onSave, o
 										</>
 									) : (
 										<>
-											<Save className="h-4 w-4" /> {t("unsaved-changes-bar.save-changes")}
+											<FloppyDisk className="h-4 w-4" /> {t("unsaved-changes-bar.save-changes")}
 										</>
 									)}
 								</Button>

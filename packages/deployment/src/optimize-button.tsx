@@ -1,6 +1,6 @@
 "use client";
 
-import { IconChevronDown, IconExternalLink } from "@tabler/icons-react";
+import { ArrowSquareOut, CaretDown } from "@phosphor-icons/react";
 import { labelForModelFilter } from "@workspace/config/model-filter";
 import type { OptimizeButtonProps } from "@workspace/config/types";
 import { Button } from "@workspace/ui/components/button";
@@ -84,7 +84,7 @@ export function OptimizeButton({
 			>
 				{loading && <Spinner className="mr-0.5 size-3" />}
 				Optimize with {parentName}
-				<IconExternalLink size={12} className="size-3 ml-0.5" />
+				<ArrowSquareOut size={12} className="size-3 ml-0.5" />
 			</Button>
 		);
 	}
@@ -94,7 +94,7 @@ export function OptimizeButton({
 		<DropdownMenu>
 			<DropdownMenuTrigger render={<Button size="sm" className="text-xs cursor-pointer p-0 m-0 h-6" />}>
 				Optimize with {parentName}
-				<IconChevronDown size={12} className="size-3 ml-0.5" />
+				<CaretDown size={12} className="size-3 ml-0.5" />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-48">
 				{availableModels.map((model, index) => {
@@ -117,7 +117,7 @@ export function OptimizeButton({
 										{loading ? (
 											<Spinner className="ml-2 size-3" />
 										) : (
-											<IconExternalLink size={12} className="size-3 ml-2" />
+											<ArrowSquareOut size={12} className="size-3 ml-2" />
 										)}
 									</div>
 								</DropdownMenuItem>

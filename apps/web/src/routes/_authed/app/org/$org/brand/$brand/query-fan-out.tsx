@@ -1,4 +1,4 @@
-import { IconChevronDown, IconChevronRight, IconSearch } from "@tabler/icons-react";
+import { CaretDown, CaretRight, MagnifyingGlass } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Input } from "@workspace/ui/components/input";
@@ -320,7 +320,7 @@ function Prompts({ prompts }: { prompts: PromptFanoutStat[] }) {
 						<CardDescription>{t("query_fan_out.prompts_description")}</CardDescription>
 					</div>
 					<div className="relative w-64 shrink-0">
-						<IconSearch className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2" />
+						<MagnifyingGlass className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2" />
 						<Input
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
@@ -354,7 +354,7 @@ function Prompts({ prompts }: { prompts: PromptFanoutStat[] }) {
 									aria-expanded={isOpen}
 								>
 									<span className="text-muted-foreground">
-										{isOpen ? <IconChevronDown className="size-4" /> : <IconChevronRight className="size-4" />}
+										{isOpen ? <CaretDown className="size-4" /> : <CaretRight className="size-4" />}
 									</span>
 									<span className="min-w-0">
 										<span className="block truncate text-sm font-medium" title={p.promptValue}>
@@ -449,7 +449,7 @@ function TopQueries({ data }: { data: FanoutData }) {
 									aria-expanded={isOpen}
 								>
 									<span className="text-muted-foreground">
-										{isOpen ? <IconChevronDown className="size-4" /> : <IconChevronRight className="size-4" />}
+										{isOpen ? <CaretDown className="size-4" /> : <CaretRight className="size-4" />}
 									</span>
 									<span className="min-w-0 truncate text-sm" title={q.query}>
 										{q.query}

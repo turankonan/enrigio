@@ -7,7 +7,7 @@
  * Whitelabel mode: auto-redirects to Auth0 SSO (no form shown).
  */
 
-import { IconBrandGoogle, IconInfoCircle } from "@tabler/icons-react";
+import { GoogleLogo, Info } from "@phosphor-icons/react";
 import { createFileRoute, Link, useNavigate, useRouteContext } from "@tanstack/react-router";
 import { MCP_AUTHORIZE_ENDPOINT } from "@workspace/config/constants";
 import type { ClientConfig } from "@workspace/config/types";
@@ -252,7 +252,7 @@ export function EmailPasswordLogin({
 						className="w-full"
 						onClick={() => authClient.signIn.social({ provider: "google", callbackURL: destination })}
 					>
-						<IconBrandGoogle className="size-4" />
+						<GoogleLogo className="size-4" />
 						{t("auth.login.continue-with-google")}
 					</Button>
 					<div className="flex items-center gap-3">
@@ -323,7 +323,7 @@ export function EmailPasswordLogin({
 function DemoCredentialsCallout() {
 	return (
 		<div className="flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-			<IconInfoCircle className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+			<Info className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
 			<div className="space-y-2">
 				<p className="font-medium text-amber-900 dark:text-amber-100">{t("auth.login.demo-account")}</p>
 				<dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-amber-900/90 dark:text-amber-100/80">

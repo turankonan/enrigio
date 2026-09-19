@@ -1,4 +1,4 @@
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import type { ReactNode } from "react";
 
@@ -19,7 +19,7 @@ export function PageHeader({ title, subtitle, infoContent, children }: PageHeade
 					{title}
 					{infoContent && (
 						<Tooltip>
-							<TooltipTrigger render={<IconInfoCircle className="h-5 w-5 text-muted-foreground cursor-help" />} />
+							<TooltipTrigger render={<Info className="h-5 w-5 text-muted-foreground cursor-help" />} />
 							<TooltipContent className="max-w-xs text-sm font-normal">{infoContent}</TooltipContent>
 						</Tooltip>
 					)}

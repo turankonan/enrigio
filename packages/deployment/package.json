@@ -20,6 +20,7 @@
 	},
 	"dependencies": {
 		"@better-auth/stripe": "^1.7.4",
+		"@phosphor-icons/react": "^2.1.10",
 		"@workspace/config": "workspace:*",
 		"@workspace/lib": "workspace:*",
 		"@workspace/ui": "workspace:*",
@@ -31,7 +32,6 @@
 		"zod": "^4.5.4"
 	},
 	"peerDependencies": {
-		"@tabler/icons-react": "^3.0.0",
 		"auth0": "^6.0.0",
 		"react": "^19.0.0"
 	},

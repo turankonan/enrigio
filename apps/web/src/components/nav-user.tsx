@@ -1,15 +1,15 @@
 import {
-	IconBriefcase,
-	IconCheck,
-	IconExternalLink,
-	IconLogout,
-	IconPlus,
-	IconRefresh,
-	IconSelector,
-	IconSettings,
-	IconStatusChange,
-	IconUser,
-} from "@tabler/icons-react";
+	ArrowSquareOut,
+	ArrowsClockwise,
+	Briefcase,
+	CaretUpDown,
+	Check,
+	GearSix,
+	Plus,
+	SignOut,
+	Swap,
+	User,
+} from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { authClient } from "@workspace/lib/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
@@ -74,14 +74,14 @@ export function NavUser({
 						<Avatar className="h-8 w-8 rounded-lg">
 							<AvatarImage src={user.picture} alt={user.name} />
 							<AvatarFallback className="rounded-lg bg-primary/10 text-primary">
-								<IconUser className="size-4" />
+								<User className="size-4" />
 							</AvatarFallback>
 						</Avatar>
 						<div className="grid flex-1 text-left text-sm leading-tight">
 							<span className="truncate font-medium">{user.name}</span>
 							<span className="truncate text-xs">{isNameEmailSame ? t("nav-user.your-account") : user.email}</span>
 						</div>
-						<IconSelector className="ml-auto size-4" />
+						<CaretUpDown className="ml-auto size-4" />
 					</DropdownMenuTrigger>
 					<DropdownMenuContent
 						className="w-(--anchor-width) min-w-56 rounded-lg"
@@ -96,7 +96,7 @@ export function NavUser({
 									<Avatar className="h-8 w-8 rounded-lg">
 										<AvatarImage src={user.picture} alt={user.name} />
 										<AvatarFallback className="rounded-lg bg-primary/10 text-primary">
-											<IconUser className="size-4" />
+											<User className="size-4" />
 										</AvatarFallback>
 									</Avatar>
 									<div className="grid flex-1 text-left text-sm leading-tight">
@@ -116,7 +116,7 @@ export function NavUser({
 								{features?.canCreateOrganizations && (
 									<>
 										<DropdownMenuItem render={<Link to="/app/new" onClick={close} />} className="cursor-pointer">
-											<IconPlus />
+											<Plus size={24} />
 											{t("new_organization.crumb")}
 										</DropdownMenuItem>
 										<DropdownMenuSeparator />
@@ -153,7 +153,7 @@ export function NavUser({
 										render={<a href={parentDashboard.url} target="_blank" rel="noreferrer" />}
 										className="cursor-pointer"
 									>
-										<IconExternalLink />
+										<ArrowSquareOut size={24} />
 										{parentDashboard.name} Dashboard
 									</DropdownMenuItem>
 								</DropdownMenuGroup>
@@ -173,7 +173,7 @@ export function NavUser({
 								});
 							}}
 						>
-							<IconLogout />
+							<SignOut size={24} />
 							{t("nav-user.log-out")}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
@@ -191,7 +191,7 @@ function OrganizationSwitcher({ onNavigate }: { onNavigate: () => void }) {
 		return (
 			<>
 				<DropdownMenuItem render={<Link to="/app" onClick={onNavigate} />} className="cursor-pointer">
-					<IconStatusChange />
+					<Swap size={24} />
 					{t("nav-user.switch-brand")}
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
@@ -223,7 +223,7 @@ function OrganizationSwitcher({ onNavigate }: { onNavigate: () => void }) {
 						refetch();
 					}}
 				>
-					<IconRefresh className={isFetching ? "animate-spin" : undefined} />
+					<ArrowsClockwise size={24} className={isFetching ? "animate-spin" : undefined} />
 					{isFetching ? t("nav-user.retrying") : "Couldn't load your organizations — retry"}
 				</DropdownMenuItem>
 			)}
@@ -249,10 +249,10 @@ function OrganizationSection({
 				aria-label={heading.ariaLabel}
 				className="cursor-pointer font-medium"
 			>
-				<IconBriefcase className="size-4 shrink-0 text-muted-foreground" />
+				<Briefcase className="size-4 shrink-0 text-muted-foreground" />
 				<span className="truncate">{heading.label}</span>
 				<span className="ml-auto flex w-7 shrink-0 justify-center">
-					<IconSettings className="size-4 text-muted-foreground" />
+					<GearSix className="size-4 text-muted-foreground" />
 				</span>
 			</DropdownMenuItem>
 
@@ -268,7 +268,7 @@ function OrganizationSection({
 							<span className="truncate">{row.label}</span>
 							{row.kind === "brand" && row.id === currentBrandId && (
 								<span className="ml-auto flex w-7 shrink-0 justify-center">
-									<IconCheck className="size-3.5" />
+									<Check className="size-3.5" />
 								</span>
 							)}
 						</DropdownMenuItem>

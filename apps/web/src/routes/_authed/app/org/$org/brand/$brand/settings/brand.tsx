@@ -1,4 +1,4 @@
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { brandSegment, brandSlugPrefix, normalizeSlug } from "@workspace/lib/app-urls";
@@ -177,7 +177,7 @@ function BrandSettingsPage() {
 						<Label className="flex items-center gap-1.5">
 							{t("settings.brand.additional_domains_label")}
 							<Tooltip>
-								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+								<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-xs font-normal">
 									{t("settings.brand.additional_domains_tooltip")}
 								</TooltipContent>
@@ -198,7 +198,7 @@ function BrandSettingsPage() {
 						<Label className="flex items-center gap-1.5">
 							{t("settings.brand.aliases_label")}
 							<Tooltip>
-								<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+								<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 								<TooltipContent className="max-w-xs text-xs font-normal">
 									{t("settings.brand.aliases_tooltip")}
 								</TooltipContent>

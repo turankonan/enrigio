@@ -1,4 +1,4 @@
-import { IconBriefcase, IconPlus, IconSettings } from "@tabler/icons-react";
+import { Briefcase, GearSix, Plus } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { buttonVariants } from "@workspace/ui/components/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
@@ -20,7 +20,7 @@ export function OrganizationDirectory({ organizations }: { organizations: Organi
 			))}
 			{features?.canCreateOrganizations && (
 				<Link to="/app/new" className={buttonVariants({ variant: "outline", className: "w-full gap-1.5" })}>
-					<IconPlus className="size-4" />
+					<Plus className="size-4" />
 					{t("new_organization.crumb")}
 				</Link>
 			)}
@@ -38,10 +38,10 @@ function OrganizationBlock({ organization }: { organization: OrganizationSummary
 					render={<Link {...heading.link} aria-label={heading.ariaLabel} className={`${ROW} justify-between`} />}
 				>
 					<span className="flex min-w-0 items-center gap-2">
-						<IconBriefcase className="size-4 shrink-0 text-muted-foreground" />
+						<Briefcase className="size-4 shrink-0 text-muted-foreground" />
 						<span className="truncate font-medium">{heading.label}</span>
 					</span>
-					<IconSettings className="size-4 shrink-0 text-muted-foreground" />
+					<GearSix className="size-4 shrink-0 text-muted-foreground" />
 				</TooltipTrigger>
 				<TooltipContent>{t("organization-directory.organization-settings")}</TooltipContent>
 			</Tooltip>

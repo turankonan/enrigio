@@ -1,4 +1,4 @@
-import { IconAlertTriangle, IconInfoCircle } from "@tabler/icons-react";
+import { Info, Warning } from "@phosphor-icons/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Separator } from "@workspace/ui/components/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
@@ -21,7 +21,7 @@ export function ContentGapsCard({
 				<CardTitle className="flex items-center gap-1.5">
 					{t("reports.render.content-gaps")}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">{t("content-gaps-card.tooltip")}</TooltipContent>
 					</Tooltip>
 				</CardTitle>
@@ -33,7 +33,7 @@ export function ContentGapsCard({
 					{pageItems.map((prompt) => (
 						<BrandPromptLink key={prompt.id} promptId={prompt.id} className="flex items-start gap-2.5 py-2 group">
 							<div className="shrink-0 mt-0.5">
-								<IconAlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+								<Warning className="h-3.5 w-3.5 text-amber-500" />
 							</div>
 							<div className="min-w-0 flex-1">
 								<div className="flex items-center gap-1.5">

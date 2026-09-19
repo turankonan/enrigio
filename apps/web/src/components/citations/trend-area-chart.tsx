@@ -1,4 +1,4 @@
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { type ChartConfig, ChartContainer, ChartTooltip } from "@workspace/ui/components/chart";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
@@ -35,7 +35,7 @@ export function TrendAreaChart({
 				<CardTitle className="text-sm font-medium flex items-center gap-1.5">
 					{title}
 					<Tooltip>
-						<TooltipTrigger render={<IconInfoCircle className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
+						<TooltipTrigger render={<Info className="h-3.5 w-3.5 text-muted-foreground cursor-help" />} />
 						<TooltipContent className="max-w-xs text-sm font-normal">{tooltip}</TooltipContent>
 					</Tooltip>
 				</CardTitle>

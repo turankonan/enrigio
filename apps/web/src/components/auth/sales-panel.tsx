@@ -9,7 +9,7 @@
  * decided to look, and a whitelabel tenant is not ours to sell to.
  */
 
-import { IconCheck } from "@tabler/icons-react";
+import { Check } from "@phosphor-icons/react";
 import { platformTierMembers } from "@workspace/config/plans";
 import type { ReferralSource } from "@workspace/config/referrals";
 import { ModelIcon } from "@workspace/ui/brand/model-icon";
@@ -47,7 +47,7 @@ export function SalesPanel({
 			<ul className="space-y-2.5">
 				{PITCH.bullets.map((bullet) => (
 					<li key={bullet} className="flex items-start gap-2.5 text-sm">
-						<IconCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+						<Check className="mt-0.5 size-4 shrink-0 text-primary" />
 						<span>{bullet}</span>
 					</li>
 				))}

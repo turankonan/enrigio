@@ -1,4 +1,4 @@
-import { IconInfoCircle } from "@tabler/icons-react";
+import { Info } from "@phosphor-icons/react";
 import { useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
@@ -17,7 +17,7 @@ export function DemoModePill() {
 					<span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-700 dark:text-amber-400" />
 				}
 			>
-				<IconInfoCircle className="size-3" />
+				<Info className="size-3" />
 				{t("demo-mode-pill.demo")}
 			</TooltipTrigger>
 			<TooltipContent>{t("demo-mode-pill.read-only-tooltip")}</TooltipContent>
