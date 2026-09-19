@@ -36,6 +36,16 @@ describe("isDisallowedAddress", () => {
 		expect(isDisallowedAddress("::ffff:93.184.216.34")).toBe(false);
 	});
 
+	it("blocks NAT64 (64:ff9b::/96) and IPv4-compatible (::/96) embeddings of private/metadata v4", () => {
+		expect(isDisallowedAddress("64:ff9b::a9fe:a9fe")).toBe(true); // NAT64 -> 169.254.169.254 (cloud metadata)
+		expect(isDisallowedAddress("::a9fe:a9fe")).toBe(true); // IPv4-compatible -> 169.254.169.254
+		expect(isDisallowedAddress("64:ff9b::a00:1")).toBe(true); // NAT64 -> 10.0.0.1 (private)
+	});
+
+	it("allows NAT64 embeddings of public v4 (NAT64 legitimately carries public IPv4)", () => {
+		expect(isDisallowedAddress("64:ff9b::808:808")).toBe(false); // NAT64 -> 8.8.8.8 (public)
+	});
+
 	it("allows public IPv6 addresses", () => {
 		expect(isDisallowedAddress("2001:4860:4860::8888")).toBe(false);
 	});

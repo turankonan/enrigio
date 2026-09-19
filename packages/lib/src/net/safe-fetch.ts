@@ -96,8 +96,77 @@ disallowedAddresses.addSubnet("fe80::", 10, "ipv6");
 disallowedAddresses.addSubnet("ff00::", 8, "ipv6");
 
 /**
+ * Parse an IPv6 literal into its eight 16-bit groups, handling "::"
+ * compression and a trailing dotted-decimal IPv4 tail (e.g. "::ffff:1.2.3.4").
+ * Returns null for anything malformed — callers must fail closed on that.
+ */
+function parseIPv6Groups(address: string): number[] | null {
+	const firstDoubleColon = address.indexOf("::");
+	const lastDoubleColon = address.lastIndexOf("::");
+	if (firstDoubleColon !== -1 && firstDoubleColon !== lastDoubleColon) return null; // "::" used twice
+	const head = firstDoubleColon === -1 ? address : address.slice(0, firstDoubleColon);
+	const tail = firstDoubleColon === -1 ? "" : address.slice(firstDoubleColon + 2);
+
+	const parseSide = (side: string): number[] | null => {
+		if (side === "") return [];
+		const parts = side.split(":");
+		const groups: number[] = [];
+		for (const [i, part] of parts.entries()) {
+			if (i === parts.length - 1 && part.includes(".")) {
+				// Trailing embedded IPv4 in dotted-decimal form, e.g. "::ffff:1.2.3.4".
+				if (!isIPv4(part)) return null;
+				const octets = part.split(".").map(Number);
+				groups.push((octets[0] << 8) | octets[1], (octets[2] << 8) | octets[3]);
+				continue;
+			}
+			if (!/^[0-9a-fA-F]{1,4}$/.test(part)) return null;
+			groups.push(Number.parseInt(part, 16));
+		}
+		return groups;
+	};
+
+	const headGroups = parseSide(head);
+	const tailGroups = parseSide(tail);
+	if (headGroups === null || tailGroups === null) return null;
+
+	if (firstDoubleColon === -1) {
+		return headGroups.length === 8 ? headGroups : null;
+	}
+	const missing = 8 - headGroups.length - tailGroups.length;
+	if (missing < 0) return null;
+	return [...headGroups, ...new Array(missing).fill(0), ...tailGroups];
+}
+
+/**
+ * Node's `BlockList.check(addr, "ipv6")` only auto-normalizes IPv4-**mapped**
+ * addresses (`::ffff:a.b.c.d`) against the IPv4 subnets. It does NOT unwrap:
+ *  - NAT64 `64:ff9b::/96` (e.g. `64:ff9b::a9fe:a9fe` is `169.254.169.254` on
+ *    an IPv6-only host behind a NAT64 gateway), or
+ *  - the deprecated IPv4-compatible `::/96` (e.g. `::a9fe:a9fe` is also
+ *    `169.254.169.254`).
+ * Both would otherwise let a private/metadata IPv4 address slip past the
+ * gate wrapped in an IPv6 literal. We don't blanket-block either prefix —
+ * NAT64 legitimately carries public IPv4 for IPv6-only egress — we only
+ * extract the embedded v4 and run it through the same IPv4 BlockList check.
+ * Returns null (no embedding) for anything else, including addresses that
+ * happen to fail to parse — callers already fail closed via the ipv6 check.
+ */
+function extractNat64OrCompatIPv4(address: string): string | null {
+	const groups = parseIPv6Groups(address);
+	if (!groups) return null;
+	const prefixIsZero = groups[0] === 0 && groups[1] === 0 && groups[2] === 0 && groups[3] === 0 && groups[4] === 0;
+	const isNat64 = groups[0] === 0x0064 && groups[1] === 0xff9b && groups[2] === 0 && groups[3] === 0 && groups[4] === 0;
+	const isIPv4Compatible = prefixIsZero && groups[5] === 0;
+	if (!isNat64 && !isIPv4Compatible) return null;
+	const hi = groups[6];
+	const lo = groups[7];
+	return `${(hi >>> 8) & 0xff}.${hi & 0xff}.${(lo >>> 8) & 0xff}.${lo & 0xff}`;
+}
+
+/**
  * True if `ip` is loopback/private/link-local/multicast/metadata, or an
- * IPv4-mapped IPv6 address whose embedded v4 address is any of those.
+ * IPv6 address (IPv4-mapped, NAT64, or IPv4-compatible) whose embedded v4
+ * address is any of those.
  * Fails closed: anything that isn't a parseable IPv4/IPv6 literal is treated
  * as disallowed.
  */
@@ -109,7 +178,9 @@ export function isDisallowedAddress(ip: string): boolean {
 	if (isIPv6(address)) {
 		// BlockList.check(..., "ipv6") normalizes IPv4-mapped addresses
 		// (::ffff:a.b.c.d) against ipv4 subnets automatically.
-		return disallowedAddresses.check(address, "ipv6");
+		if (disallowedAddresses.check(address, "ipv6")) return true;
+		const embeddedV4 = extractNat64OrCompatIPv4(address);
+		return embeddedV4 !== null && disallowedAddresses.check(embeddedV4, "ipv4");
 	}
 	return true;
 }
@@ -188,7 +259,7 @@ function defaultTransport(opts: TransportRequestOptions): Promise<TransportRespo
 function isAcceptableContentType(contentType: string | null, accept: "html" | "text"): boolean {
 	if (!contentType) return false;
 	const mime = contentType.split(";")[0]?.trim().toLowerCase() ?? "";
-	if (accept === "html") return mime === "text/html";
+	if (accept === "html") return mime === "text/html" || mime === "application/xhtml+xml";
 	return (
 		mime.startsWith("text/") || mime === "application/xhtml+xml" || mime.endsWith("+xml") || mime === "application/xml"
 	);
