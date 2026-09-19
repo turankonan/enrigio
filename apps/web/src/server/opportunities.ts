@@ -82,9 +82,7 @@ const OpportunitySchema = z.object({
 		.describe(
 			"One or two tight sentences, in plain language a marketer who has never used this tool will understand, on WHY this is worth doing — the motivation and the payoff. You may include one concrete stat from the data if it strengthens the case (and say what it measures). Do NOT propose on-page specifics you can't verify — you cannot see page contents, so never say things like 'add an FAQ / schema / H2s'. Don't restate long page titles (the UI lists the cited pages).",
 		),
-	priority: z
-		.enum(["high", "medium", "low"])
-		.describe("Relative priority given effort and expected visibility gain."),
+	priority: z.enum(["high", "medium", "low"]).describe("Relative priority given effort and expected visibility gain."),
 	expectedImpact: z
 		.string()
 		.describe("One short sentence on the concrete visibility outcome if done — the payoff, not the task."),

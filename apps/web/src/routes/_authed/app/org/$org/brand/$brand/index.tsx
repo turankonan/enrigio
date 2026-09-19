@@ -1,4 +1,15 @@
-import { ArrowRight, ArrowsClockwise, Clock, Eye, Info, List, Megaphone, Pulse, Ranking, Smiley } from "@phosphor-icons/react";
+import {
+	ArrowRight,
+	ArrowsClockwise,
+	Clock,
+	Eye,
+	Info,
+	List,
+	Megaphone,
+	Pulse,
+	Ranking,
+	Smiley,
+} from "@phosphor-icons/react";
 import { createFileRoute, Link, useRouteContext } from "@tanstack/react-router";
 import { labelForModelFilter } from "@workspace/config/model-filter";
 import type { ClientConfig } from "@workspace/config/types";
