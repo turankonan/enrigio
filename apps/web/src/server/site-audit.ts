@@ -41,10 +41,13 @@ function isOnCooldown(attempt: SiteAudit): boolean {
  * cooldown (in flight, a fresh success, or a recent failure). Sending is
  * best-effort: a queue error is caught and logged rather than thrown, since a
  * failed enqueue should never break the page that triggered it.
+ *
+ * Does NOT authorize on its own — it's the shared core for both the public
+ * browser entry point (`enqueueSiteAuditIfStale`, which authorizes first) and
+ * callers like `resolveOpportunities` that authorize at their own entry point
+ * (v1 API / MCP) and must not be forced through a browser-session check.
  */
-export async function enqueueSiteAuditIfStale(brandId: string): Promise<{ enqueued: boolean }> {
-	await requireBrandSession(brandId);
-
+export async function maybeEnqueueSiteAudit(brandId: string): Promise<{ enqueued: boolean }> {
 	const attempt = await getLatestAuditAttempt(brandId);
 	if (attempt && isOnCooldown(attempt)) {
 		return { enqueued: false };
@@ -67,6 +70,13 @@ export async function enqueueSiteAuditIfStale(brandId: string): Promise<{ enqueu
 		console.error(`Failed to enqueue site audit for brand ${brandId}:`, error);
 		return { enqueued: false };
 	}
+}
+
+/** Authorized browser entry point: a signed-in user asking to (re)audit their
+ * own brand's site. Authorizes, then defers to the shared core. */
+export async function enqueueSiteAuditIfStale(brandId: string): Promise<{ enqueued: boolean }> {
+	await requireBrandSession(brandId);
+	return maybeEnqueueSiteAudit(brandId);
 }
 
 /** The latest completed audit for `brandId`, for display. */

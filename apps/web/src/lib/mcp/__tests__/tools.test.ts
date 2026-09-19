@@ -9,8 +9,9 @@ import type { AdminAuth, OrganizationAuth, UserAuth } from "@/lib/auth/api-auth"
 import { MCP_TOOLS, toolsFor } from "../tools";
 
 // `get_opportunities` (among `MCP_TOOLS`) reaches `@/server/opportunities`,
-// which now calls `requireBrandSession` (Task 13) and pulls in the real
-// better-auth instance at import time.
+// which imports `@/server/site-audit` — that module imports `requireBrandSession`
+// for its authorized wrappers, pulling the real better-auth instance in at
+// import time. Stub it so the tool registry stays loadable without an auth env.
 vi.mock("@/lib/auth/helpers", () => ({ requireBrandSession: vi.fn() }));
 
 const WRITE_TOOLS = ["create_prompts", "update_prompt"];

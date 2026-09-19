@@ -18,13 +18,12 @@
  * is older than REFRESH_AFTER_DAYS or a newer site audit has completed, so a
  * normal page load doesn't trigger an LLM call.
  */
-import type { SiteAudit } from "@workspace/lib/axo";
+import { getLatestCompletedAudit, type SiteAudit } from "@workspace/lib/axo";
 import { db } from "@workspace/lib/db/db";
 import { brandOpportunities, brands, competitors } from "@workspace/lib/db/schema";
 import { runStructuredCompletionPrompt } from "@workspace/lib/onboarding";
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
-import { requireBrandSession } from "@/lib/auth/helpers";
 import { type CitationCategory, extractDomain } from "@/lib/domain-categories";
 import { categorizeDomain } from "@/lib/domain-categories.server";
 import {
@@ -40,7 +39,7 @@ import { isBrandedPrompt } from "@/lib/prompt-tags";
 import { resolveLookbackRange, resolveTimezone } from "@/lib/timezone-utils";
 import { computeVolatility, type DailyDomainCount, stabilityScore } from "@/lib/visibility-stats";
 import { resolveFilteredPrompts } from "@/server/prompt-resolution";
-import { enqueueSiteAuditIfStale, getLatestBrandAudit } from "@/server/site-audit";
+import { maybeEnqueueSiteAudit } from "@/server/site-audit";
 
 /** First occurrence of each entry, by whatever `key` identifies it. */
 function distinctBy<T>(items: T[], key: (item: T) => string): T[] {
@@ -617,17 +616,18 @@ function isReportStale(
  * gate is what bounds the spend.
  */
 export async function resolveOpportunities(brandId: string, timezone = "UTC"): Promise<OpportunitiesResponse> {
-	await requireBrandSession(brandId);
+	// Authorization stays at the entry points (browser session, or v1-API/MCP
+	// scope checks) — this shared resolve is reached by all three, so it uses
+	// unauthorized internals and never re-checks here.
 
 	// Best-effort: a queueing hiccup here must never break the page a user is
-	// waiting on. `enqueueSiteAuditIfStale` re-authorizes internally too, but the
-	// check above already guards this whole function.
+	// waiting on.
 	try {
-		await enqueueSiteAuditIfStale(brandId);
+		await maybeEnqueueSiteAudit(brandId);
 	} catch (err) {
 		console.error(`[opportunities] failed to enqueue site audit for brand ${brandId}:`, err);
 	}
-	const latestAudit = await getLatestBrandAudit(brandId);
+	const latestAudit = await getLatestCompletedAudit(brandId);
 
 	const [latest] = await db
 		.select()

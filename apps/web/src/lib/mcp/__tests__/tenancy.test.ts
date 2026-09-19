@@ -47,10 +47,11 @@ vi.mock("@/lib/postgres-read", () => ({
 	countPromptRuns: async () => 0,
 }));
 
-// `get_opportunities` reaches `@/server/opportunities`, which now calls
-// `requireBrandSession` (Task 13) — importing the real module would construct
-// the better-auth instance and require an auth environment. Every tool here
-// is refused by the stubbed `lib/api/scope` before that call would happen.
+// `get_opportunities` reaches `@/server/opportunities`, which imports
+// `@/server/site-audit` — that module imports `requireBrandSession` for its
+// authorized wrappers, so importing the tool registry pulls the real
+// better-auth instance in and needs an auth env. Every tool here is refused by
+// the stubbed `lib/api/scope` before that call would happen anyway.
 vi.mock("@/lib/auth/helpers", () => ({ requireBrandSession: vi.fn() }));
 
 const { MCP_TOOLS } = await import("../tools");
