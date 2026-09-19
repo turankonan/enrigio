@@ -51,6 +51,10 @@ export async function getBoss(): Promise<PgBoss> {
 			retryBackoff: false,
 			expireInSeconds: 60 * 15,
 		});
+		await boss.createQueue("audit-site", {
+			retryLimit: 0, // paid LLM fan-out; a retry would double-charge usage
+			expireInSeconds: 60 * 15,
+		});
 
 		bossInstance = boss;
 		return boss;

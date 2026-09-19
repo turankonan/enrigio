@@ -3,6 +3,7 @@ import { getDeployment } from "@workspace/deployment";
 import type { OnboardingSuggestion } from "@workspace/lib/onboarding";
 import type { Job, PgBoss } from "pg-boss";
 import { type AnalyzeBrandData, analyzeBrandJob } from "./jobs/analyze-brand";
+import { type AuditSiteData, auditSiteJob } from "./jobs/audit-site";
 import { type GenerateReportData, generateReportJob } from "./jobs/generate-report";
 import { type ProcessPromptData, processPromptJob } from "./jobs/process-prompt";
 import { type ScheduleMaintenanceData, scheduleMaintenanceJob } from "./jobs/schedule-maintenance";
@@ -54,6 +55,13 @@ export async function registerHandlers(boss: PgBoss): Promise<void> {
 		withSentry("analyze-brand", analyzeBrandJob),
 	);
 	console.log("Registered handler: analyze-brand");
+
+	await boss.work<AuditSiteData>(
+		"audit-site",
+		{ batchSize: 1, localConcurrency: 1 },
+		withSentry("audit-site", auditSiteJob),
+	);
+	console.log("Registered handler: audit-site");
 
 	await boss.work<ScheduleMaintenanceData>(
 		"schedule-maintenance",

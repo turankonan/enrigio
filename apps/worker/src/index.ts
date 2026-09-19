@@ -59,6 +59,10 @@ async function main() {
 		retryBackoff: false,
 		expireInSeconds: 60 * 15, // 15 minute timeout for onboarding brand analysis
 	});
+	await boss.createQueue("audit-site", {
+		retryLimit: 0, // paid LLM fan-out; a retry would double-charge usage
+		expireInSeconds: 60 * 15, // 15 minute timeout
+	});
 	await boss.createQueue("schedule-maintenance", {
 		retryLimit: 3,
 		retryDelay: 300, // 5 minutes between retries
