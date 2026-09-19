@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chooseAuditTargets } from "./select-pages";
+import { chooseAuditTargets, countOwnedCitations } from "./select-pages";
 
 describe("chooseAuditTargets", () => {
 	it("returns [] when there are no citations", () => {
@@ -121,5 +121,28 @@ describe("chooseAuditTargets", () => {
 			ownedDomains: ["example.com"],
 		});
 		expect(targets).toEqual([{ url: "https://example.com/only", relatedPrompts: ["p1"] }]);
+	});
+});
+
+describe("countOwnedCitations", () => {
+	it("counts only citations to owned domains, excluding competitor volume", () => {
+		const rows = [
+			{ url: "https://example.com/a", domain: "example.com", promptValue: "p1", count: 3 },
+			{ url: "https://www.example.com/b", domain: "www.example.com", promptValue: "p2", count: 4 },
+			{ url: "https://competitor.com/x", domain: "competitor.com", promptValue: "p1", count: 100 },
+			{ url: "https://third-party.io/y", domain: "third-party.io", promptValue: "p3", count: 50 },
+		];
+		// owned sum is 3 + 4 = 7; the 150 competitor/third-party citations are excluded.
+		expect(countOwnedCitations(rows, ["https://example.com"])).toBe(7);
+	});
+
+	it("returns 0 when the brand has zero owned citations despite heavy competitor volume", () => {
+		const rows = [{ url: "https://competitor.com/x", domain: "competitor.com", promptValue: "p1", count: 100 }];
+		expect(countOwnedCitations(rows, ["example.com"])).toBe(0);
+	});
+
+	it("returns 0 when there are no owned domains", () => {
+		const rows = [{ url: "https://example.com/a", domain: "example.com", promptValue: "p1", count: 3 }];
+		expect(countOwnedCitations(rows, [])).toBe(0);
 	});
 });

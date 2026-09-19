@@ -43,6 +43,26 @@ export interface SelectionResult {
 	window: AuditWindow;
 }
 
+/** Brand's owned domains, normalized for citation-domain grouping (see `extractDomain`). */
+function normalizeOwnedDomains(ownedDomains: string[]): Set<string> {
+	return new Set(ownedDomains.map(extractDomain).filter(Boolean));
+}
+
+function isOwned(domain: string, owned: Set<string>): boolean {
+	return owned.has(extractDomain(domain));
+}
+
+/**
+ * Total citations to the brand's OWNED domains only — the report's provenance
+ * count. Competitor/third-party volume must never inflate it, so this applies
+ * the same owned-domain filter `chooseAuditTargets` uses before summing.
+ */
+export function countOwnedCitations(rows: CitationAggregate[], ownedDomains: string[]): number {
+	const owned = normalizeOwnedDomains(ownedDomains);
+	if (owned.size === 0) return 0;
+	return rows.reduce((sum, row) => (isOwned(row.domain, owned) ? sum + row.count : sum), 0);
+}
+
 /**
  * Pure ranking core.
  *
@@ -57,12 +77,12 @@ export interface SelectionResult {
 export function chooseAuditTargets(input: ChooseAuditTargetsInput): AuditTarget[] {
 	const { citations: rows, ownedDomains, promptCap = DEFAULT_PROMPT_CAP, pageLimit = DEFAULT_PAGE_LIMIT } = input;
 
-	const owned = new Set(ownedDomains.map(extractDomain).filter(Boolean));
+	const owned = normalizeOwnedDomains(ownedDomains);
 	if (owned.size === 0) return [];
 
 	const byUrl = new Map<string, { total: number; prompts: Map<string, number> }>();
 	for (const row of rows) {
-		if (!owned.has(extractDomain(row.domain))) continue;
+		if (!isOwned(row.domain, owned)) continue;
 
 		let entry = byUrl.get(row.url);
 		if (!entry) {
@@ -123,7 +143,7 @@ export async function selectAuditPages(brandId: string, opts: SelectAuditPagesOp
 		.where(and(eq(citations.brandId, brandId), gte(citations.createdAt, from), lte(citations.createdAt, now)))
 		.groupBy(citations.url, citations.domain, prompts.value);
 
-	const citationCount = rows.reduce((sum, row) => sum + row.count, 0);
+	const citationCount = countOwnedCitations(rows, ownedDomains);
 	const targets = chooseAuditTargets({
 		citations: rows,
 		ownedDomains,
