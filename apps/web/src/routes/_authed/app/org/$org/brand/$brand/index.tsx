@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/componen
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { type ReactNode, useEffect } from "react";
+import { MetricInfo } from "@/components/metric-info";
 import PromptWizard from "@/components/prompt-wizard";
 import { TrendChart, type TrendPoint } from "@/components/trend-chart";
 import { useBrand } from "@/hooks/use-brands";
@@ -148,6 +149,7 @@ function TrendSection({
 	value,
 	series,
 	loading,
+	info,
 }: {
 	icon: typeof Eye;
 	title: string;
@@ -159,6 +161,8 @@ function TrendSection({
 	value: number | null;
 	series: TrendPoint[];
 	loading: boolean;
+	/** Optional `ⓘ` popover explaining how the hero number is calculated. */
+	info?: ReactNode;
 }) {
 	const params = useBrandParams();
 	const heroTone = value === null ? "" : `${getVisibilityBgColor(value)} ${getVisibilityBorderColor(value)}`;
@@ -180,7 +184,7 @@ function TrendSection({
 
 			<div className="grid gap-4 lg:grid-cols-4">
 				<Card className={`shadow-none flex flex-col gap-3 py-4 ${heroTone}`}>
-					<HeroStat value={value} loading={loading} />
+					<HeroStat value={value} loading={loading} info={info} />
 				</Card>
 				<Card className="shadow-none lg:col-span-3 flex flex-col gap-3 py-4">
 					<CardHeader className="border-b border-dotted pb-2!">
@@ -365,16 +369,26 @@ function ResearchBrandData({ brandId, clientConfig }: { brandId: string; clientC
 }
 
 /** The big "current" stat that fills a card — the latest point of its trend, colour-coded by value. */
-function HeroStat({ value, loading }: { value: number | null; loading: boolean }) {
+function HeroStat({ value, loading, info }: { value: number | null; loading: boolean; info?: ReactNode }) {
 	return (
-		<CardContent className="flex-1 flex items-center justify-center">
-			<div
-				className={`font-bold tracking-tight tabular-nums ${value === null ? "text-muted-foreground" : getVisibilityTextColor(value)}`}
-				style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}
-			>
-				{loading ? <Skeleton className="h-16 w-32" /> : value === null ? "—" : `${value}%`}
-			</div>
-		</CardContent>
+		<>
+			{info && !loading && (
+				<div className="flex items-center justify-between px-4">
+					<span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+						{t("dashboard.current_label")}
+					</span>
+					{info}
+				</div>
+			)}
+			<CardContent className="flex-1 flex items-center justify-center">
+				<div
+					className={`font-bold tracking-tight tabular-nums ${value === null ? "text-muted-foreground" : getVisibilityTextColor(value)}`}
+					style={{ fontSize: "clamp(2.5rem, 6vw, 5rem)" }}
+				>
+					{loading ? <Skeleton className="h-16 w-32" /> : value === null ? "—" : `${value}%`}
+				</div>
+			</CardContent>
+		</>
 	);
 }
 
@@ -408,6 +422,56 @@ const visibilityTooltipText = (nonBrandedVisibility: number) =>
 
 const SOV_TOOLTIP =
 	"Your brand's share of all brand and competitor mentions across the AI answers to your prompts — the big number is the latest point on this line. It shifts as AI models change, as you and competitors publish, or as the sites AI scans move; the line is smoothed for staggered prompt schedules.";
+
+/** Plain-language definition + the calculation behind the AI Visibility score, using this brand's real figures. */
+function VisibilityInfo({
+	prompts,
+	platforms,
+	evaluations,
+	value,
+}: {
+	prompts: number;
+	platforms: number;
+	evaluations: number;
+	value: number | null;
+}) {
+	return (
+		<MetricInfo label={t("dashboard.visibility_info_label")}>
+			<p className="font-medium text-foreground">{t("dashboard.visibility_info_title")}</p>
+			<p className="text-muted-foreground">{t("dashboard.visibility_info_definition")}</p>
+			<div className="space-y-1 rounded-md bg-muted/60 p-3 text-xs text-muted-foreground">
+				<p>
+					{platforms > 0
+						? t("dashboard.visibility_info_calc_scope", { prompts, platforms })
+						: t("dashboard.visibility_info_calc_scope_no_platforms", { prompts })}
+				</p>
+				<p>{t("dashboard.visibility_info_calc_checked", { evaluations })}</p>
+				<p className="font-medium text-foreground">
+					{value === null
+						? t("dashboard.visibility_info_calc_pending")
+						: t("dashboard.visibility_info_calc_result", { value })}
+				</p>
+			</div>
+			<p className="text-xs text-muted-foreground">{t("dashboard.visibility_info_scope")}</p>
+		</MetricInfo>
+	);
+}
+
+/** Plain-language definition + what the Share of Voice number compares. */
+function SovInfo({ value }: { value: number | null }) {
+	return (
+		<MetricInfo label={t("dashboard.sov_info_label")}>
+			<p className="font-medium text-foreground">{t("dashboard.sov_info_title")}</p>
+			<p className="text-muted-foreground">{t("dashboard.sov_info_definition")}</p>
+			<div className="space-y-1 rounded-md bg-muted/60 p-3 text-xs text-muted-foreground">
+				<p className="font-medium text-foreground">
+					{value === null ? t("dashboard.sov_info_pending") : t("dashboard.sov_info_result", { value })}
+				</p>
+			</div>
+			<p className="text-xs text-muted-foreground">{t("dashboard.sov_info_scope")}</p>
+		</MetricInfo>
+	);
+}
 
 function DashboardPage() {
 	const { brandId } = Route.useRouteContext();
@@ -458,6 +522,14 @@ function DashboardPage() {
 					value={lastValue(visibilityTimeSeries, "overall")}
 					series={visibilityTimeSeries.map((p) => ({ date: p.date, value: p.overall }))}
 					loading={loadingVisibility}
+					info={
+						<VisibilityInfo
+							prompts={totalPrompts ?? 0}
+							platforms={trackedTargets.length}
+							evaluations={totalRuns}
+							value={lastValue(visibilityTimeSeries, "overall")}
+						/>
+					}
 				/>
 
 				<TrendSection
@@ -471,6 +543,7 @@ function DashboardPage() {
 					value={lastValue(sovTimeSeries, "share")}
 					series={sovTimeSeries.map((p) => ({ date: p.date, value: p.share }))}
 					loading={loadingSov}
+					info={<SovInfo value={lastValue(sovTimeSeries, "share")} />}
 				/>
 
 				<section className="pt-2">
