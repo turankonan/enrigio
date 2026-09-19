@@ -27,6 +27,7 @@ export * from "./schema-auth";
 
 export const reportStatusEnum = pgEnum("report_status", ["pending", "processing", "completed", "failed"]);
 export const runSentimentEnum = pgEnum("run_sentiment", ["positive", "neutral", "negative"]);
+export const siteAuditStatusEnum = pgEnum("site_audit_status", ["running", "completed", "failed"]);
 
 export const brands = pgTable(
 	"brands",
@@ -204,6 +205,18 @@ export const reports = pgTable(
 // One row per generated Opportunities report, per brand — append-only history
 // (every generation is kept, not overwritten). The page reads the latest row and
 // regenerates only when it's stale; see apps/web/src/server/opportunities.ts.
+export const siteAudits = pgTable("site_audits", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	brandId: text("brand_id")
+		.references(() => brands.id)
+		.notNull(),
+	status: siteAuditStatusEnum("status").notNull(),
+	report: json("report").notNull(),
+	schemaVersion: smallint("schema_version").notNull(),
+	startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+	createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (t) => ({ brandCreatedIdx: index("site_audits_brand_created_idx").on(t.brandId, t.createdAt) })).enableRLS();
+
 export const brandOpportunities = pgTable(
 	"brand_opportunities",
 	{
@@ -215,6 +228,7 @@ export const brandOpportunities = pgTable(
 		report: json("report").notNull(),
 		/** Model/provider that generated it, when known. */
 		model: text("model"),
+		siteAuditId: uuid("site_audit_id").references(() => siteAudits.id),
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => ({
