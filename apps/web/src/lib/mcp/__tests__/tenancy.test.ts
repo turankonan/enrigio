@@ -47,6 +47,12 @@ vi.mock("@/lib/postgres-read", () => ({
 	countPromptRuns: async () => 0,
 }));
 
+// `get_opportunities` reaches `@/server/opportunities`, which now calls
+// `requireBrandSession` (Task 13) — importing the real module would construct
+// the better-auth instance and require an auth environment. Every tool here
+// is refused by the stubbed `lib/api/scope` before that call would happen.
+vi.mock("@/lib/auth/helpers", () => ({ requireBrandSession: vi.fn() }));
+
 const { MCP_TOOLS } = await import("../tools");
 const scope = await import("@/lib/api/scope");
 

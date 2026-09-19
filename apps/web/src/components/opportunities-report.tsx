@@ -31,6 +31,11 @@ const CATEGORY_META = [
 		label: t("opportunities-report.category-social"),
 		desc: t("opportunities-report.category-social-desc"),
 	},
+	{
+		key: "axo",
+		label: t("opportunities-report.category-axo"),
+		desc: t("opportunities-report.category-axo-desc"),
+	},
 ] as const;
 
 type Opportunity = OpportunitiesReportData["opportunities"][number];

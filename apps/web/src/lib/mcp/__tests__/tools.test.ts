@@ -8,6 +8,11 @@ import { API_SCOPES, type ApiScope } from "@/lib/api/scopes";
 import type { AdminAuth, OrganizationAuth, UserAuth } from "@/lib/auth/api-auth";
 import { MCP_TOOLS, toolsFor } from "../tools";
 
+// `get_opportunities` (among `MCP_TOOLS`) reaches `@/server/opportunities`,
+// which now calls `requireBrandSession` (Task 13) and pulls in the real
+// better-auth instance at import time.
+vi.mock("@/lib/auth/helpers", () => ({ requireBrandSession: vi.fn() }));
+
 const WRITE_TOOLS = ["create_prompts", "update_prompt"];
 const UNSCOPED_TOOLS = ["whoami", "list_models"];
 

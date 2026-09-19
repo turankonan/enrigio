@@ -6,8 +6,15 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import spec from "@workspace/api-spec";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { type ApiHandlerMeta, apiHandlerMeta } from "../handler";
+
+// The opportunities route reaches `@/server/opportunities`, which now calls
+// `requireBrandSession` (Task 13) and so pulls in the real better-auth
+// instance at import time. This test only inspects each route's exported
+// handler metadata, never calls a handler, so a stub keeps every route
+// importable without an auth environment.
+vi.mock("@/lib/auth/helpers", () => ({ requireBrandSession: vi.fn() }));
 
 const V1_ROOT = join(import.meta.dirname, "../../../routes/api/v1");
 const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"] as const;

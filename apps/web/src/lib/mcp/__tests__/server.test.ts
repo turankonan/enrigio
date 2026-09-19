@@ -12,6 +12,11 @@ import type { AdminAuth } from "@/lib/auth/api-auth";
 import { createMcpServer, MCP_SERVER_INFO } from "../server";
 import { MCP_TOOLS, type McpTool } from "../tools";
 
+// `get_opportunities` (among `MCP_TOOLS`) reaches `@/server/opportunities`,
+// which now calls `requireBrandSession` (Task 13) and pulls in the real
+// better-auth instance at import time.
+vi.mock("@/lib/auth/helpers", () => ({ requireBrandSession: vi.fn() }));
+
 const adminKey: AdminAuth = { kind: "admin", scopes: null, organizationId: null };
 
 function stubTool(overrides: Partial<McpTool> & Pick<McpTool, "name" | "run">): McpTool {

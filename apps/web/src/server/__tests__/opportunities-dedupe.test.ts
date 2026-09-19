@@ -1,4 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+// `@/server/opportunities` now calls `requireBrandSession` (Task 13), which
+// pulls in the real better-auth instance and its required env vars at import
+// time. This test only exercises `withoutRepeats`, a pure function, so a stub
+// is enough to keep the module loadable without an auth environment.
+vi.mock("@/lib/auth/helpers", () => ({ requireBrandSession: vi.fn() }));
+
 import { type OpportunitiesReport, withoutRepeats } from "@/server/opportunities";
 
 function opportunity(title: string, overrides: Partial<OpportunitiesReport["opportunities"][number]> = {}) {
