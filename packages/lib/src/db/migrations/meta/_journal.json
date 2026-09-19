@@ -162,6 +162,13 @@
       "when": 1789821231344,
       "tag": "0022_whole_monster_badoon",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1789849139860,
+      "tag": "0023_big_agent_zero",
+      "breakpoints": true
     }
   ]
 }
