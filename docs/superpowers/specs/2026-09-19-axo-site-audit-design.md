@@ -1,104 +1,114 @@
-# AXO — Website AI-Readiness Audit (Phase 1) — Design (v2)
+# AXO — Website AI-Readiness Audit (Phase 1) — Design (v3)
 
-> Status: revised after external review; pending final approval before the implementation plan.
-> Part of the AnswerEcho ↔ Maya gap-closing effort. Phase 0 (sentiment, in-answer
-> rank, coverage, opportunities-as-plan) is shipped. This is Phase 1 — the one whole
-> Maya pillar AnswerEcho does not yet have.
+> Status: revised after two review rounds; pending final approval before the implementation plan.
+> Phase 0 (sentiment, in-answer rank, coverage, opportunities-as-plan) is shipped. This is
+> Phase 1 — the Maya website-audit pillar AnswerEcho does not yet have.
 >
-> **v2 changelog (from review):** execution moved to a background worker job (was
-> inline); added a shared SSRF-safe fetch boundary; added an empty-audit fallback;
-> made relevance scoring prompt-conditioned; made the report types represent failure
-> states; tied the Opportunities cache to the audit; made robots evaluation per-URL;
-> added HTML→clean-text + prompt-injection handling; expanded provenance and tests.
+> **v3 changelog (round 2):** explicit lib/worker/web ownership split + full queue options;
+> connection-pinned SSRF (not just pre-resolution); dropped the non-existent Opportunities
+> regen job (MVP uses the sync path + `siteAuditId` staleness); capped related-prompts and
+> bounded LLM concurrency; AXO LLM calls recorded as usage events; `resolveSiteAudit` returns
+> queue-derived refresh status; explicit 30-day selection window + failed-report contract;
+> sitemap XXE/size/bounds rules.
 
 ## Goal
 
-For a brand, audit **its own pages that AI answer engines already cite**, score each page
-for AI-readiness, and turn the findings into **prioritized recommendations in a new `axo`
-category inside the existing Opportunities report**. The audit runs as a background job
-and is cached; the web path only ever reads the latest completed audit.
+For a brand, audit **its own pages that AI answer engines already cite**, score each page for
+AI-readiness, and surface findings as **prioritized `axo`-category recommendations inside the
+existing Opportunities report**. The audit runs as a background job and is cached; the web
+path only reads the latest completed audit.
 
-Non-goal: a new dashboard page, a headline "AXO score", a whole-site crawl, or
-JS-rendered/headless crawling.
+Non-goals: new dashboard page, headline "AXO score", whole-site crawl, JS/headless crawling.
 
 ## Resolved decisions
 
-| Decision | Choice |
-|---|---|
-| Which pages | **Cited-pages-first**, with a bounded fallback (homepage → sitemap URLs) when the brand has no owned citations |
-| Execution | **`audit-site` pg-boss worker job**; the web request checks freshness and *enqueues* (never crawls inline) |
-| Freshness | **Staleness-gated + cached** — the gate decides whether to enqueue a job, preserving the "no manual button" intent |
-| Result placement | **Advisory** — a new `axo` category in the Opportunities report (no headline score, no new page) |
-| Findings → recommendations | **LLM-integrated** — audit findings feed the Opportunities prompt, which emits `axo`-category opportunities carrying the Phase 0 `priority` + `expectedImpact` fields (zero new UI) |
+Cited-pages-first (with homepage→sitemap fallback) · `audit-site` worker job · staleness-gated
+caching (gate decides *enqueue*, never inline crawl) · advisory in Opportunities (`axo`
+category) · findings feed the Opportunities LLM so they inherit Phase 0 `priority`/`expectedImpact`.
 
-## Execution model (revised — critical)
+## Component ownership (round 2 — critical)
 
-The audit crawls up to ten pages and makes up to ten LLM calls. That must **not** happen
-in an HTTP request (timeout risk, duplicate audits from concurrent loads). Instead:
+`packages/lib` must not import `apps/web`/`apps/worker`. The split:
 
-1. **`audit-site` worker job** (pg-boss, registered in `apps/worker/src/handlers.ts`
-   alongside `process-prompt`/`generate-report`). Payload: `{ brandId }`.
-   Enqueued with `singletonKey: audit-${brandId}` so concurrent requests cannot start
-   duplicate audits (same guard `process-prompt` uses).
-2. **`resolveSiteAudit(brandId)`** (read path, used by the web/opportunities layer):
-   returns the **latest completed** `site_audits` row and its status. If none exists or
-   the latest is older than `AUDIT_REFRESH_AFTER_DAYS` (propose 7), it enqueues one
-   `audit-site` job and returns the stale-or-empty result immediately (never blocks).
-3. The worker performs selection → fetch → checklist → scoring → assembly → insert.
-4. Opportunities generation consumes **only the latest completed audit** (see cache
-   dependency below).
+| Layer | File | Responsibility |
+|---|---|---|
+| lib | `packages/lib/src/axo/` | selection, safe fetch, robots eval, HTML parse, clean-text, scoring, `runSiteAudit()` (orchestration), `site_audits` reads/writes — **no queue code** |
+| lib | `packages/lib/src/net/safe-fetch.ts` | shared SSRF-safe fetch (platform-owned, not AXO-specific) |
+| worker | `apps/worker/src/jobs/audit-site.ts` | pg-boss handler → calls `runSiteAudit(brandId)` |
+| worker | `apps/worker/src/handlers.ts` | register the `audit-site` handler |
+| web | `apps/web/src/server/site-audit.ts` | authz, freshness check, **enqueue** via `getBoss()`, expose read model to Opportunities |
+| web | `apps/web/src/lib/boss-client.ts` | `createQueue("audit-site", …)` (idempotent, pg-boss v12) |
 
-## SSRF-safe fetch boundary (new — critical)
+Enqueue options (mirroring the `process-prompt` guard, with a longer ceiling for a crawl):
 
-Citation URLs are externally derived and untrusted. All AXO network access goes through a
-**shared** `packages/lib/src/net/safe-fetch.ts` (not AXO-specific — the platform should
-own this boundary):
-
-- Scheme allowlist: `http:`/`https:` only.
-- Host allowlist: must exactly match one of the brand's approved domains
-  (`brand.website` + `additionalDomains`), re-checked **after every redirect**.
-- DNS resolution with rejection of loopback, private, link-local, multicast, and
-  cloud-metadata (`169.254.169.254`) addresses; re-resolved per redirect (DNS-rebinding
-  guard).
-- Limits: max redirects, max response bytes, request timeout.
-- Content-type must be HTML for page fetches; text for robots/llms.
-- Never forward credentials or cookies. Own dedicated User-Agent constant
-  (`BROWSER_UA` in `website-excerpt.ts` is private and not reused).
-- Bounded concurrency and a per-host rate limit.
-
-`safe-fetch` returns a discriminated result (`ok` | `blocked` | `timeout` | `non-html` |
-`failed`) rather than throwing for expected conditions.
-
-## Page selection (revised)
-
-**`selectAuditPages(brandId, limit = 10): Promise<AuditTarget[]>`** where
-`AuditTarget = { url: string; relatedPrompts: string[] }`:
-
-1. Distinct cited URLs whose host is one of the brand's own domains, over a recent window,
-   ranked by citation frequency, each carrying the **tracked prompts responsible for the
-   citation** (citations already join URL→prompt) — used to give the relevance score its
-   question context.
-2. **Fallback when step 1 is empty** (so brands most needing an audit still get one):
-   the homepage first, then URLs declared in `sitemap.xml`, capped by the remaining
-   allowance. Still a top-`limit` audit — not a whole-site crawl. Fallback targets carry
-   the brand's enabled prompts as `relatedPrompts`.
-
-## Data model (revised)
-
-`site_audits` (append-only; mirrors `brand_opportunities`):
-
-```
-site_audits
-  id           uuid pk
-  brand_id     text → brands.id   (indexed with created_at)
-  status       text               'completed' | 'failed'   (never store all-failed as a fresh success)
-  report       jsonb not null
-  schema_version smallint not null            -- report shape version (provenance)
-  started_at   timestamptz not null
-  created_at   timestamptz default now()      -- completion time
+```ts
+{ singletonKey: `audit-${brandId}`,
+  singletonSeconds: /* > max audit duration, e.g. 20*60 */,
+  retryLimit: 2, retryDelay: 60, retryBackoff: true,
+  expireInSeconds: /* crawl+LLM ceiling, e.g. 15*60 */ }
 ```
 
-`report` shape (`SiteAuditReport`):
+## Execution & read model
+
+- **`enqueueSiteAuditIfStale(brandId)`** (web): authorize, look up latest `completed` audit;
+  if missing or older than `AUDIT_REFRESH_AFTER_DAYS` (7), enqueue one `audit-site` job
+  (singleton dedups concurrent requests). Never blocks on the crawl.
+- **`getSiteAuditView(brandId)`** (web read model):
+  ```ts
+  { latestCompleted: SiteAudit | null;
+    refreshStatus: "idle" | "queued" | "running"; }   // queue-derived, from pgboss.job
+  ```
+  This distinguishes never-requested / queued / running / refreshing — the append-only table
+  stays completed/failed only.
+- **`runSiteAudit(brandId)`** (lib, invoked by the worker): select → safe-fetch → checklist +
+  robots + clean-text + score → assemble → insert one `completed` row (or `failed`).
+
+## SSRF-safe fetch (round 2 — critical: connection pinning)
+
+Shared `safe-fetch` for all AXO network access. Pre-resolution alone is **insufficient** — the
+HTTP client would re-resolve at connect time (rebinding/TOCTOU). Therefore:
+
+- Resolve the host, reject loopback/private/link-local/multicast/metadata (`169.254.169.254`),
+  then **pin the connection to the validated IP** via an Undici dispatcher / custom `lookup`
+  that returns only that IP, while preserving the original hostname for `Host` header + TLS SNI.
+- Re-validate host against the brand's approved domains **and** re-pin **on every redirect**.
+- Scheme `http`/`https` only; max redirects, max response bytes, timeout; HTML content-type for
+  pages / text for robots; never forward credentials or cookies; dedicated UA
+  (`BROWSER_UA` in `website-excerpt.ts` is private — not reused); bounded concurrency + per-host
+  rate limit.
+- Returns a discriminated result (`ok`/`blocked`/`timeout`/`non-html`/`failed`), never throws for
+  expected conditions.
+
+## Page selection & prompt capping (round 2)
+
+**`selectAuditPages(brandId, limit = 10): Promise<AuditTarget[]>`**,
+`AuditTarget = { url; relatedPrompts: string[] }` (**capped at ≤ N related prompts**, propose 8):
+
+1. **Cited-first:** distinct cited URLs on the brand's own domains over a **30-day window**
+   (same window as Opportunities), ranked by citation frequency; each carries its **top-N
+   related prompts by citation count**.
+2. **Fallback when empty:** homepage, then `sitemap.xml` URLs, capped by remaining allowance;
+   `relatedPrompts` = the brand's **top-N enabled prompts by visibility gap**, not all ~70.
+
+Selected prompt texts/ids are persisted in the report for explainability. LLM scoring runs with
+**bounded concurrency** (not just HTTP).
+
+## Sitemap parsing (round 2)
+
+XML parse with: response-size limit, **DTD/external-entity processing disabled (XXE)**, bounded
+handling of sitemap-index files (no unbounded recursion), `http`/`https` URLs only, every URL
+revalidated through `safe-fetch`, dedup + hard URL cap before any page fetch.
+
+## Data model
+
+`site_audits` (append-only):
+
+```
+id uuid pk · brand_id text→brands.id (idx w/ created_at) · status text ('completed'|'failed')
+report jsonb not null · schema_version smallint not null · started_at timestamptz · created_at timestamptz default now()
+```
+
+Consumers **must filter `status = 'completed'`**. `report` (`SiteAuditReport`):
 
 ```ts
 type ResourceStatus = "present" | "absent" | "unavailable";
@@ -106,102 +116,69 @@ type BotPosture     = "allowed" | "blocked" | "unspecified";
 type FetchStatus    = "ok" | "blocked" | "timeout" | "non-html" | "failed";
 
 interface SiteAuditReport {
-  window: { fromIso: string; toIso: string; citationCount: number };   // provenance
-  origins: {
-    origin: string;                        // scheme+host (robots is per-origin)
-    llmsTxt: ResourceStatus;
-    sitemap: ResourceStatus;
-  }[];
+  window: { fromIso; toIso; citationCount: number };
+  failureSummary?: string;                 // e.g. "all-targets-unavailable" (failed audits)
+  origins: { origin; llmsTxt: ResourceStatus; sitemap: ResourceStatus }[];
   pages: {
-    requestedUrl: string;
-    finalUrl: string | null;               // after redirects (provenance)
-    fetchStatus: FetchStatus;
+    requestedUrl; finalUrl: string | null; fetchStatus: FetchStatus;
+    relatedPrompts: string[];              // the (capped) prompts scored against
     title: string | null;
-    hasSchema: boolean | null;             // null when not fetched
-    hasMetaDescription: boolean | null;
+    hasSchema: boolean | null; hasMetaDescription: boolean | null;
     headingStructure: "ok" | "no-h1" | "weak" | null;
-    robotsPosture: { GPTBot: BotPosture; ClaudeBot: BotPosture; PerplexityBot: BotPosture; GoogleExtended: BotPosture }; // evaluated for THIS url's path
-    relevanceScore: number | null;         // 1–5, null on scorer failure
-    relevanceNote: string | null;
-    scoreModel: string | null;             // per-page model id (provenance)
+    robotsPosture: { GPTBot; ClaudeBot; PerplexityBot; GoogleExtended: BotPosture };  // for THIS url's path
+    relevanceScore: number | null; relevanceNote: string | null; scoreModel: string | null;
   }[];
 }
 ```
 
-One generated migration, committed, **not run**.
+A **failed** audit still writes a `status='failed'` row with the diagnostic `report` above
+(no sensitive network internals) — never a blank fresh success.
 
 ## Components (`packages/lib/src/axo/`)
 
-1. **`selectAuditPages`** — cited-first + fallback, returns `AuditTarget[]` with related
-   prompts. Pure query.
-2. **`fetchRobots(origin)`** — via `safe-fetch`; returns raw robots.txt text +
-   `llms.txt`/`sitemap.xml` `ResourceStatus`, **once per origin**.
-3. **`evaluateRobots(robotsText, url, bot)`** — pure: per-URL path evaluation with
-   user-agent specificity and longest-match precedence; returns `BotPosture`, preserving
-   `unspecified`. (Prefer a small vetted robots parser if it clears the supply-chain
-   cooldown; otherwise a minimal matcher. `llms.txt` is treated as informational, never as
-   proof of readiness.)
-4. **`checklistForPage(html)`** — **pure, no LLM, no network**: JSON-LD/schema.org, title,
-   meta description, heading hierarchy. Core correctness unit.
-5. **`extractCleanText(html)`** — strips scripts/styles/comments/hidden boilerplate, returns
-   bounded visible text (strict char/token cap) for the LLM. Structural checklist uses raw
-   HTML; the scorer only ever sees cleaned, bounded text.
-6. **`scorePageRelevance({ pageText, brandName, relatedPrompts })`** — one
-   `runStructuredCompletionPrompt({ webSearch:false })` scoring the page against its
-   related tracked prompts (the Phase 0 `mention-classify` pattern). Prompt explicitly
-   treats page content as untrusted data and ignores any instructions embedded in it.
-   Returns `null` on failure.
-7. **`runSiteAudit(brandId)`** — orchestrator invoked **by the worker job**: select →
-   fetch (safe) → checklist + robots + score → assemble `SiteAuditReport` → insert a
-   `completed` row (or `failed` if every page failed; never a blank fresh success).
+`selectAuditPages` · `fetchRobots(origin)` (once per origin) · `evaluateRobots(text,url,bot)`
+(pure: per-URL path, UA specificity, longest-match, preserve `unspecified`; `llms.txt`
+informational) · `checklistForPage(html)` (pure) · `extractCleanText(html)` (strip
+scripts/styles/comments/hidden; bounded; scorer sees only this) · `scorePageRelevance({pageText,
+brandName, relatedPrompts})` (one `runStructuredCompletionPrompt({webSearch:false})`; prompt
+treats page text as untrusted, ignores embedded instructions; returns `null` on failure) ·
+`runSiteAudit(brandId)`. Add `"./axo"` + `"./net/safe-fetch"` to the lib `package.json` exports.
 
-Add `"./axo"` and `"./net/safe-fetch"` to `packages/lib` `package.json` exports (explicit
-exports map — a missing entry won't resolve).
+## Usage recording (round 2)
 
-## Integration into Opportunities (revised — cache dependency)
+Each scoring attempt records a `usage_events` row (the table already has org/brand/provider/
+model/units/`estimated_cost_usd`): `site_audit_score` on success, `site_audit_score_failed` on
+failure. Cost via `estimateRunCostUsd`. **Recording failure never fails the audit.**
 
-- Add `"axo"` to `CATEGORIES` + label/description (en + tr) + `CATEGORY_META` in the renderer.
-- `buildDigest` calls `resolveSiteAudit(brandId)` (read path — never crawls) and appends a
-  compact summary of the latest completed audit to the generation prompt; extend
-  `GUIDANCE`/`TASK` so the model may emit `axo` opportunities describing concrete fixes.
-  These are ordinary `OpportunitySchema` items → inherit `priority`/`expectedImpact` →
-  render via the existing Task 6 UI.
-- **Cache coherence:** persist the `siteAuditId` each Opportunities report was built from.
-  Opportunities is treated as stale when a **newer completed audit** exists than the one it
-  referenced (in addition to the existing time gate). Preferred: the `audit-site` job, on
-  completion, enqueues an Opportunities regeneration so new AXO findings surface promptly
-  rather than waiting out the 6-day Opportunities gate.
+## Opportunities integration & cache coherence (round 2)
 
-## Cost & limits
-
-- Bounded by top-10 pages × one `webSearch:false` completion; staleness-gated; robots/llms/
-  sitemap fetched once per origin. All LLM via the completion path (Phase 0 discipline).
+- Add `"axo"` to `CATEGORIES` + label/description (en+tr) + renderer `CATEGORY_META`.
+- `buildDigest` reads the latest **completed** audit (via the web read model) and appends a
+  compact summary to the generation prompt; `GUIDANCE`/`TASK` allow `axo` opportunities. They
+  render through the existing Task 6 UI (priority + impact), no new components.
+- **Cache coherence (MVP, no new job):** persist the `siteAuditId` each Opportunities report was
+  built from; treat the report as stale when a newer completed audit exists (in addition to the
+  time gate); regenerate on the **next Opportunities request** via the existing synchronous path.
+  (Moving Opportunities generation to a worker is a separate future improvement — **not** in this
+  plan; there is no Opportunities regen job today.)
 
 ## Testing (behavior / security / concurrency — no SQL-text fallback)
 
-- `selectAuditPages`: own-domain filter, dedup, frequency rank, cap, and the empty→fallback path.
-- `safe-fetch`: redirect-based SSRF, private/loopback/metadata rejection, DNS-rebinding,
-  max-redirect / max-size / timeout enforcement, non-HTML rejection.
-- `evaluateRobots`: path-specific rules, UA specificity, longest-match precedence, `unspecified`.
-- `checklistForPage`: schema present/absent, missing h1, missing meta (fixture HTML).
-- `scorePageRelevance`: stubbed provider (as `mention-classify.test.ts`); prompt-conditioned
-  score; `null` on failure.
-- `runSiteAudit`: partial fetch failure, complete failure → `failed` not blank-success.
-- Concurrency: duplicate refresh requests enqueue only one job (singleton).
-- Cache: Opportunities invalidates when a newer completed audit exists.
-
-Where a DB harness is unavailable, assert on observable behavior with seeded rows — do
-**not** fall back to asserting SQL text (repo guidance favors behavior).
+`selectAuditPages` (own-domain, dedup, rank, cap, empty→fallback, prompt cap) · `safe-fetch`
+(redirect SSRF, private/loopback/metadata reject, **rebinding via pinned IP**, max-redirect/size/
+timeout, non-HTML) · `evaluateRobots` (path rules, UA specificity, longest-match, `unspecified`)
+· `checklistForPage` (fixtures) · sitemap (XXE disabled, size cap, index bounds, dedup/cap) ·
+`scorePageRelevance` (stubbed provider, prompt-conditioned, `null` on failure) · `runSiteAudit`
+(partial + complete failure → `failed`) · concurrency (singleton dedups) · cache (Opportunities
+stale when newer completed audit) · usage events recorded on score success/failure.
 
 ## Explicitly out of scope (MVP)
 
-JS-rendered/headless crawling; whole-site crawl (fallback is homepage + sitemap top-N only);
-headline AXO score; per-opportunity workflow state; auto-fixing the customer's site.
+JS/headless crawling; whole-site crawl; headline AXO score; per-opportunity workflow state;
+auto-fixing the site; moving Opportunities generation into a worker.
 
 ## Open items for the implementation plan
 
-- `AUDIT_REFRESH_AFTER_DAYS` value (propose 7).
-- Robots parser: vetted dependency vs minimal in-house matcher (decide at plan time against
-  the supply-chain cooldown).
-- Whether `safe-fetch` grows a small allowlist-of-resolvers cache; the digest summary format
-  (kept compact to bound tokens).
+`AUDIT_REFRESH_AFTER_DAYS`=7 · related-prompt cap N=8 (confirm) · robots parser: vetted dep vs
+minimal matcher (decide against supply-chain cooldown) · exact `singletonSeconds`/`expireInSeconds`
+· digest summary format (compact).
