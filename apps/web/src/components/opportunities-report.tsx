@@ -4,6 +4,7 @@
  * each card leads with a plain-language "why", then three drill-downs — Prompts /
  * Your citations / Competitor citations — to explore the underlying data.
  */
+import { Badge } from "@workspace/ui/components/badge";
 import { useState } from "react";
 import { BrandPromptLink } from "@/components/brand-prompt-link";
 import { t } from "@/lib/i18n";
@@ -75,8 +76,16 @@ function Panel({ children }: { children: React.ReactNode }) {
 	return <div className="mt-2 rounded-md bg-muted/30 p-1">{children}</div>;
 }
 
+const PRIORITY_META = {
+	high: { label: t("opportunities-report.priority-high"), variant: "default" as const },
+	medium: { label: t("opportunities-report.priority-medium"), variant: "secondary" as const },
+	low: { label: t("opportunities-report.priority-low"), variant: "outline" as const },
+};
+const PRIORITY_RANK = { high: 0, medium: 1, low: 2 };
+
 function OpportunityCard({ o }: { o: Opportunity }) {
 	const [open, setOpen] = useState<Tab | null>(null);
+	const priority = PRIORITY_META[o.priority];
 	const tabs: { key: Tab; label: string; count: number }[] = [
 		{ key: "prompts", label: t("query_fan_out.prompts_title"), count: o.relatedPrompts.length },
 		{ key: "your", label: t("opportunities-report.tab-your-citations"), count: o.yourCitations.length },
@@ -84,8 +93,16 @@ function OpportunityCard({ o }: { o: Opportunity }) {
 	];
 	return (
 		<div className="rounded-xl border border-border p-4">
-			<h3 className="text-pretty text-base font-semibold">{o.title}</h3>
+			<div className="flex items-start justify-between gap-2">
+				<h3 className="text-pretty text-base font-semibold">{o.title}</h3>
+				<Badge variant={priority.variant} className="mt-0.5 shrink-0">
+					{priority.label}
+				</Badge>
+			</div>
 			<p className="mt-1 text-pretty text-sm text-muted-foreground">{o.why}</p>
+			<p className="mt-1.5 text-pretty text-sm">
+				<span className="font-medium">{t("opportunities-report.expected-impact")}:</span> {o.expectedImpact}
+			</p>
 
 			<div className="mt-3 border-t border-border/60 pt-3">
 				<div className="flex flex-wrap gap-2">
@@ -149,7 +166,9 @@ export function OpportunitiesReport({ report }: { report: OpportunitiesReportDat
 			)}
 
 			{CATEGORY_META.map((c) => {
-				const opps = report.opportunities.filter((o) => o.category === c.key);
+				const opps = report.opportunities
+					.filter((o) => o.category === c.key)
+					.sort((a, b) => PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority]);
 				if (opps.length === 0) return null;
 				return (
 					<section key={c.key} className="space-y-3">

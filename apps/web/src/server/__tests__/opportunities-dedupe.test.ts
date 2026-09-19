@@ -6,6 +6,8 @@ function opportunity(title: string, overrides: Partial<OpportunitiesReport["oppo
 		category: "creation" as const,
 		title,
 		why: "because",
+		priority: "medium" as const,
+		expectedImpact: "more mentions",
 		relatedPrompts: [],
 		yourCitations: [],
 		competitorCitations: [],
