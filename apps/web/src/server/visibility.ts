@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "@workspace/lib/db/db";
 import { brands, competitors } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireBrandSession } from "@/lib/auth/helpers";
@@ -74,7 +75,11 @@ export const getBatchChartDataFn = createServerFn({ method: "GET" })
 		const promptIds = resolvedPrompts.map((p) => p.id);
 
 		const [brandResult, competitorsResult] = await Promise.all([
-			db.select({ id: brands.id, name: brands.name }).from(brands).where(eq(brands.id, data.brandId)).limit(1),
+			db
+				.select({ id: brands.id, name: brands.name, defaultMarketKey: brands.defaultMarketKey })
+				.from(brands)
+				.where(eq(brands.id, data.brandId))
+				.limit(1),
 			db
 				.select({ id: competitors.id, name: competitors.name })
 				.from(competitors)
@@ -86,6 +91,7 @@ export const getBatchChartDataFn = createServerFn({ method: "GET" })
 		}
 
 		const brand = brandResult[0];
+		const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey }).key;
 
 		// No prompts match the current filters — return an empty-but-valid
 		// payload rather than erroring (the page renders an empty state).
@@ -106,6 +112,7 @@ export const getBatchChartDataFn = createServerFn({ method: "GET" })
 			timezone,
 			undefined,
 			data.model,
+			effectiveMarketKey,
 		);
 
 		return {

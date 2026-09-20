@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "@workspace/lib/db/db";
 import { brands, competitors, prompts, SYSTEM_TAGS } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { getEffectiveBrandedStatus } from "@workspace/lib/tag-utils";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -363,6 +364,7 @@ export const getCitationsFn = createServerFn({ method: "GET" })
 				.where(and(eq(prompts.brandId, data.brandId), eq(prompts.enabled, true))),
 		]);
 		const brand = brandResult[0];
+		const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brand?.defaultMarketKey ?? null }).key;
 
 		const brandDomains = new Set(
 			[extractDomain(brand?.website || ""), ...(brand?.additionalDomains || []).map(extractDomain)].filter(Boolean),
@@ -385,10 +387,42 @@ export const getCitationsFn = createServerFn({ method: "GET" })
 		if (enabledPromptIds.length === 0) return emptyCitationsResult(availableTags, competitorSummary);
 
 		const [urlStats, perPromptDailyPages, perPromptPages, prevUrlStats] = await Promise.all([
-			getCitationUrlStats(data.brandId, fromDateStr, toDateStr, timezone, enabledPromptIds, data.model),
-			getPerPromptDailyCitationPages(data.brandId, fromDateStr, toDateStr, timezone, enabledPromptIds, data.model),
-			getPerPromptCitationPages(data.brandId, fromDateStr, toDateStr, timezone, enabledPromptIds, data.model),
-			getCitationUrlStats(data.brandId, prevFromDateStr, prevToDateStr, timezone, enabledPromptIds, data.model),
+			getCitationUrlStats(
+				data.brandId,
+				fromDateStr,
+				toDateStr,
+				timezone,
+				enabledPromptIds,
+				data.model,
+				effectiveMarketKey,
+			),
+			getPerPromptDailyCitationPages(
+				data.brandId,
+				fromDateStr,
+				toDateStr,
+				timezone,
+				enabledPromptIds,
+				data.model,
+				effectiveMarketKey,
+			),
+			getPerPromptCitationPages(
+				data.brandId,
+				fromDateStr,
+				toDateStr,
+				timezone,
+				enabledPromptIds,
+				data.model,
+				effectiveMarketKey,
+			),
+			getCitationUrlStats(
+				data.brandId,
+				prevFromDateStr,
+				prevToDateStr,
+				timezone,
+				enabledPromptIds,
+				data.model,
+				effectiveMarketKey,
+			),
 		]);
 
 		const categorizeDomain = (domain: string): CitationCategory =>

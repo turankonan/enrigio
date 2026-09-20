@@ -9,6 +9,7 @@ import {
 	promptSaveDelta,
 	withQuotaLock,
 } from "@workspace/lib/entitlements";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { computeSystemTags, getEffectiveBrandedStatus } from "@workspace/lib/tag-utils";
 import { and, count, desc, eq, gte, sql } from "drizzle-orm";
 import { z } from "zod";
@@ -169,9 +170,25 @@ export const getPromptsSummaryFn = createServerFn({ method: "GET" })
 
 		const webSearchEnabled = data.webSearchEnabled != null ? data.webSearchEnabled === "true" : undefined;
 
+		const [brandRow] = await db
+			.select({ defaultMarketKey: brands.defaultMarketKey })
+			.from(brands)
+			.where(eq(brands.id, data.brandId))
+			.limit(1);
+		const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brandRow?.defaultMarketKey ?? null }).key;
+
 		const [summaryData, firstEvaluatedData] = await Promise.all([
-			getPromptsSummary(data.brandId, fromDateStr, toDateStr, timezone, webSearchEnabled, data.model, promptIds),
-			getPromptsFirstEvaluatedAt(data.brandId, promptIds),
+			getPromptsSummary(
+				data.brandId,
+				fromDateStr,
+				toDateStr,
+				timezone,
+				webSearchEnabled,
+				data.model,
+				promptIds,
+				effectiveMarketKey,
+			),
+			getPromptsFirstEvaluatedAt(data.brandId, promptIds, effectiveMarketKey),
 		]);
 
 		const summaryMap = new Map(summaryData.map((s) => [s.prompt_id, s]));
@@ -366,7 +383,12 @@ export const getPromptStatsFn = createServerFn({ method: "GET" })
 		// ---- Citation stats ----
 		const [brandInfo, competitorsList] = await Promise.all([
 			db
-				.select({ name: brands.name, website: brands.website, additionalDomains: brands.additionalDomains })
+				.select({
+					name: brands.name,
+					website: brands.website,
+					additionalDomains: brands.additionalDomains,
+					defaultMarketKey: brands.defaultMarketKey,
+				})
 				.from(brands)
 				.where(eq(brands.id, prompt[0].brandId))
 				.limit(1),
@@ -381,7 +403,14 @@ export const getPromptStatsFn = createServerFn({ method: "GET" })
 		const brandDomains = new Set([primaryBrandDomain, ...additionalBrandDomains].filter(Boolean));
 		const competitorDomains = new Set(competitorsList.flatMap((c) => c.domains.map(extractDomain)).filter(Boolean));
 
-		const urlStats = await getPromptCitationUrlStats(data.promptId, fromDateStr, toDateStr, timezone);
+		const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brandInfo[0]?.defaultMarketKey ?? null }).key;
+		const urlStats = await getPromptCitationUrlStats(
+			data.promptId,
+			fromDateStr,
+			toDateStr,
+			timezone,
+			effectiveMarketKey,
+		);
 
 		const citationStats = computePromptCitationStats({
 			urlStats,
@@ -557,7 +586,21 @@ export const getPromptWebQueryFn = createServerFn({ method: "GET" })
 		const { fromDateStr } = getTimezoneLookbackRange((data.lookback || "1m") as LookbackPeriod, timezone);
 		const toDateStr = new Date().toLocaleDateString("en-CA", { timeZone: timezone });
 
-		const webQueryData = await getPromptWebQueryCounts(data.promptId, fromDateStr, toDateStr, timezone, data.model);
+		const [brandRow] = await db
+			.select({ defaultMarketKey: brands.defaultMarketKey })
+			.from(brands)
+			.where(eq(brands.id, data.brandId))
+			.limit(1);
+		const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brandRow?.defaultMarketKey ?? null }).key;
+
+		const webQueryData = await getPromptWebQueryCounts(
+			data.promptId,
+			fromDateStr,
+			toDateStr,
+			timezone,
+			data.model,
+			effectiveMarketKey,
+		);
 
 		let webQuery: string | null = null;
 		let maxOverallCount = 0;

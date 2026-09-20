@@ -7,6 +7,7 @@
 import { getModelMeta } from "@workspace/config/models";
 import { db } from "@workspace/lib/db/db";
 import { brands, competitors } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { getEffectiveBrandedStatus } from "@workspace/lib/tag-utils";
 import { eq } from "drizzle-orm";
 import { generateDateRange } from "@/lib/chart-utils";
@@ -76,6 +77,17 @@ export interface BrandVisibility {
 	series: VisibilityPoint[];
 }
 
+/** The market every brand-scoped read in this module is fixed to for the
+ * request: the brand's own market plus `global` — never a user-facing filter. */
+async function resolveMarketKey(brandId: string): Promise<string> {
+	const [row] = await db
+		.select({ defaultMarketKey: brands.defaultMarketKey })
+		.from(brands)
+		.where(eq(brands.id, brandId))
+		.limit(1);
+	return resolveEffectiveMarket({ defaultMarketKey: row?.defaultMarketKey ?? null }).key;
+}
+
 async function resolveScope(brandId: string, filters: AnalyticsFilters) {
 	const resolved = await resolveFilteredPrompts(brandId, { tags: filters.tags, search: filters.search });
 	return {
@@ -96,15 +108,27 @@ export async function getBrandVisibility(
 	window: AnalyticsWindow,
 	filters: AnalyticsFilters = {},
 ): Promise<BrandVisibility> {
-	const { promptIds, brandedPromptIds } = await resolveScope(brandId, filters);
+	const [{ promptIds, brandedPromptIds }, effectiveMarketKey] = await Promise.all([
+		resolveScope(brandId, filters),
+		resolveMarketKey(brandId),
+	]);
 	if (promptIds.length === 0) {
 		return { currentVisibility: null, totalRuns: 0, totalPrompts: 0, totalCitations: 0, series: [] };
 	}
 
 	const { from, to, timezone } = window;
 	const [daily, totalCitations] = await Promise.all([
-		getVisibilityDailyAggregate(brandId, from, to, timezone, promptIds, brandedPromptIds, filters.model),
-		getCitationsTotalCount(brandId, from, to, timezone, promptIds, filters.model),
+		getVisibilityDailyAggregate(
+			brandId,
+			from,
+			to,
+			timezone,
+			promptIds,
+			brandedPromptIds,
+			filters.model,
+			effectiveMarketKey,
+		),
+		getCitationsTotalCount(brandId, from, to, timezone, promptIds, filters.model, effectiveMarketKey),
 	]);
 
 	let totalRuns = 0;
@@ -151,20 +175,33 @@ export async function getBrandShareOfVoice(
 ): Promise<BrandShareOfVoice> {
 	const { from, to, timezone } = window;
 	const [brandRow, scope] = await Promise.all([
-		db.select({ name: brands.name }).from(brands).where(eq(brands.id, brandId)).limit(1),
+		db
+			.select({ name: brands.name, defaultMarketKey: brands.defaultMarketKey })
+			.from(brands)
+			.where(eq(brands.id, brandId))
+			.limit(1),
 		resolveScope(brandId, filters),
 	]);
 	const brandName = brandRow[0]?.name ?? "Your brand";
 	if (scope.promptIds.length === 0) {
 		return { brandName, brandShare: null, totalRuns: 0, entries: [], series: [] };
 	}
+	const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brandRow[0]?.defaultMarketKey ?? null }).key;
 
 	const bounds = windowInstants(window);
 	const dateRange = generateDateRange(bounds.start, new Date(bounds.end.getTime() - 1));
 	const [totals, perPromptDaily, perPromptCompetitorDaily] = await Promise.all([
-		getBrandMentionTotals(brandId, from, to, timezone, scope.promptIds, filters.model),
-		getPerPromptDailyMentions(brandId, from, to, timezone, scope.promptIds, filters.model),
-		getPerPromptDailyCompetitorMentions(brandId, from, to, timezone, scope.promptIds, filters.model),
+		getBrandMentionTotals(brandId, from, to, timezone, scope.promptIds, filters.model, effectiveMarketKey),
+		getPerPromptDailyMentions(brandId, from, to, timezone, scope.promptIds, filters.model, effectiveMarketKey),
+		getPerPromptDailyCompetitorMentions(
+			brandId,
+			from,
+			to,
+			timezone,
+			scope.promptIds,
+			filters.model,
+			effectiveMarketKey,
+		),
 	]);
 
 	const standings = shareOfVoiceLeaderboardLVCF(
@@ -226,17 +263,31 @@ async function getBrandModelBreakdown(
 	window: AnalyticsWindow,
 	filters: AnalyticsFilters = {},
 ): Promise<ModelVisibility[]> {
-	const { promptIds } = await resolveScope(brandId, filters);
+	const [{ promptIds }, effectiveMarketKey] = await Promise.all([
+		resolveScope(brandId, filters),
+		resolveMarketKey(brandId),
+	]);
 	if (promptIds.length === 0) return [];
 	const { from, to, timezone } = window;
 
-	const rows = await getBrandMentionRateByModel(brandId, from, to, timezone, promptIds, filters.model);
+	const rows = await getBrandMentionRateByModel(
+		brandId,
+		from,
+		to,
+		timezone,
+		promptIds,
+		filters.model,
+		effectiveMarketKey,
+	);
 
 	// The URL roll-up has no model column to group by.
 	const citationsByModel = new Map<string, number>();
 	await Promise.all(
 		rows.map(async (row) => {
-			citationsByModel.set(row.model, await getCitationsTotalCount(brandId, from, to, timezone, promptIds, row.model));
+			citationsByModel.set(
+				row.model,
+				await getCitationsTotalCount(brandId, from, to, timezone, promptIds, row.model, effectiveMarketKey),
+			);
 		}),
 	);
 
@@ -268,7 +319,10 @@ async function citationContext(brandId: string) {
 }
 
 export async function getBrandCitations(brandId: string, window: AnalyticsWindow, filters: AnalyticsFilters = {}) {
-	const { promptIds } = await resolveScope(brandId, filters);
+	const [{ promptIds }, effectiveMarketKey] = await Promise.all([
+		resolveScope(brandId, filters),
+		resolveMarketKey(brandId),
+	]);
 	const { from, to, timezone } = window;
 	if (promptIds.length === 0) {
 		return { urls: [], domains: [], totals: { citations: 0, uniqueDomains: 0, uniqueUrls: 0 } };
@@ -282,9 +336,9 @@ export async function getBrandCitations(brandId: string, window: AnalyticsWindow
 
 	const [{ brandDomains, competitorDomains }, current, previous, promptsByDomain] = await Promise.all([
 		citationContext(brandId),
-		getCitationUrlStats(brandId, from, to, timezone, promptIds, filters.model),
-		getCitationUrlStats(brandId, previousStart, previousEnd, timezone, promptIds, filters.model),
-		getCitationDomainPromptCounts(brandId, from, to, timezone, promptIds, filters.model),
+		getCitationUrlStats(brandId, from, to, timezone, promptIds, filters.model, effectiveMarketKey),
+		getCitationUrlStats(brandId, previousStart, previousEnd, timezone, promptIds, filters.model, effectiveMarketKey),
+		getCitationDomainPromptCounts(brandId, from, to, timezone, promptIds, filters.model, effectiveMarketKey),
 	]);
 
 	const classify = (domain: string, url: string, title?: string | null) =>
@@ -349,18 +403,23 @@ export async function getBrandQueryFanout(
 ): Promise<FanoutAnalysis & { brandName: string }> {
 	const { from, to, timezone } = window;
 	const [brandRow, scope] = await Promise.all([
-		db.select({ name: brands.name }).from(brands).where(eq(brands.id, brandId)).limit(1),
+		db
+			.select({ name: brands.name, defaultMarketKey: brands.defaultMarketKey })
+			.from(brands)
+			.where(eq(brands.id, brandId))
+			.limit(1),
 		resolveScope(brandId, filters),
 	]);
 	const brandName = brandRow[0]?.name ?? "Your brand";
+	const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brandRow[0]?.defaultMarketKey ?? null }).key;
 
 	const promptIds = options.promptId ? scope.promptIds.filter((id) => id === options.promptId) : scope.promptIds;
 	if (promptIds.length === 0) return { brandName, ...emptyFanout() };
 
 	const [breakdown, modelTotals, promptTotals] = await Promise.all([
-		getFanoutBreakdown(brandId, from, to, timezone, promptIds, filters.model),
-		getFanoutModelTotals(brandId, from, to, timezone, promptIds, filters.model),
-		getFanoutPromptTotals(brandId, from, to, timezone, promptIds, filters.model),
+		getFanoutBreakdown(brandId, from, to, timezone, promptIds, filters.model, effectiveMarketKey),
+		getFanoutModelTotals(brandId, from, to, timezone, promptIds, filters.model, effectiveMarketKey),
+		getFanoutPromptTotals(brandId, from, to, timezone, promptIds, filters.model, effectiveMarketKey),
 	]);
 
 	const promptValues = new Map(
@@ -425,13 +484,13 @@ export async function getBrandPromptPerformance(
 	window: AnalyticsWindow,
 	filters: AnalyticsFilters = {},
 ): Promise<PromptPerformance[]> {
-	const scope = await resolveScope(brandId, filters);
+	const [scope, effectiveMarketKey] = await Promise.all([resolveScope(brandId, filters), resolveMarketKey(brandId)]);
 	if (scope.promptIds.length === 0) return [];
 	const { from, to, timezone } = window;
 
 	const [summary, firstEvaluated] = await Promise.all([
-		getPromptsSummary(brandId, from, to, timezone, undefined, filters.model, scope.promptIds),
-		getPromptsFirstEvaluatedAt(brandId, scope.promptIds),
+		getPromptsSummary(brandId, from, to, timezone, undefined, filters.model, scope.promptIds, effectiveMarketKey),
+		getPromptsFirstEvaluatedAt(brandId, scope.promptIds, effectiveMarketKey),
 	]);
 
 	const statsById = new Map(summary.map((row) => [row.prompt_id, row]));

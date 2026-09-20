@@ -185,12 +185,41 @@ function webSearchFilter(webSearchEnabled?: boolean): SQL {
 	return sql`AND web_search_enabled = ${webSearchEnabled}`;
 }
 
+/**
+ * A closed set of known FROM shapes reached by brand-scoped reads —
+ * deliberately not an arbitrary alias string through `sql.raw`, so this can
+ * never be pointed at an unvetted table/column.
+ */
+type MarketScopeSource =
+	| "prompt_runs" // unaliased prompt_runs row
+	| "pr" // prompt_runs aliased "pr" (fanout queries)
+	| "citations"; // citations row — EXISTS-join back to prompt_runs
+
+/**
+ * Scopes a brand-scoped read to the brand's effective market plus `global`
+ * (proven non-localizable, so it belongs in every market's view). `legacy`
+ * and every other real market are excluded by omission — this is a fixed,
+ * single-market scope, not a user-facing filter.
+ */
+export function marketScope(effectiveMarketKey: string, source: MarketScopeSource = "prompt_runs"): SQL {
+	if (source === "citations") {
+		return sql`AND EXISTS (
+			SELECT 1 FROM prompt_runs AS ms_run
+			WHERE ms_run.id = prompt_run_id
+				AND (ms_run.market_key = ${effectiveMarketKey} OR ms_run.market_key = 'global')
+		)`;
+	}
+	const prefix = source === "pr" ? sql.raw("pr.") : sql``;
+	return sql`AND (${prefix}market_key = ${effectiveMarketKey} OR ${prefix}market_key = 'global')`;
+}
+
 export async function getDashboardSummary(
 	brandId: string,
 	fromDate: string | null,
 	toDate: string | null,
 	timezone: string,
-	enabledPromptIds?: string[],
+	enabledPromptIds: string[] | undefined,
+	effectiveMarketKey: string,
 ): Promise<DashboardSummary[]> {
 	const rows = await queryPg<DashboardSummary>(sql`
 		SELECT
@@ -208,6 +237,7 @@ export async function getDashboardSummary(
 		WHERE brand_id = ${brandId}
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
+			${marketScope(effectiveMarketKey)}
 	`);
 	return rows;
 }
@@ -224,8 +254,9 @@ export async function getPerPromptVisibilityTimeSeries(
 	fromDate: string | null,
 	toDate: string | null,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PerPromptVisibilityPoint[]> {
 	if (!enabledPromptIds?.length) return [];
 	const rows = await queryPg<PerPromptVisibilityPoint>(sql`
@@ -239,6 +270,7 @@ export async function getPerPromptVisibilityTimeSeries(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY prompt_id, date
 		ORDER BY prompt_id, date
 	`);
@@ -280,7 +312,8 @@ export async function getVisibilityDailyAggregate(
 	timezone: string,
 	enabledPromptIds: string[],
 	brandedPromptIds: string[],
-	model?: string,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<VisibilityDailyAggregate[]> {
 	if (enabledPromptIds.length === 0) return [];
 
@@ -326,6 +359,7 @@ export async function getVisibilityDailyAggregate(
 					AND created_at >= ${windowStart(fromDate, timezone)}
 					AND created_at < ${windowEnd(toDate, timezone)}
 					${modelFilter(model)}
+					${marketScope(effectiveMarketKey)}
 				-- Group by the SELECT alias, not the full expression: drizzle
 				-- emits a fresh $N parameter for every timezone interpolation,
 				-- so the SELECT expression and GROUP BY expression aren't
@@ -398,8 +432,9 @@ export async function getCitationsTotalCount(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<number> {
 	if (enabledPromptIds && enabledPromptIds.length === 0) return 0;
 	const rows = await queryPg<{ total: number }>(sql`
@@ -410,6 +445,7 @@ export async function getCitationsTotalCount(
 			AND created_at < ${windowEnd(toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 	`);
 	return Number(rows[0]?.total ?? 0);
 }
@@ -420,8 +456,9 @@ export async function getVisibilityTimeSeries(
 	toDate: string | null,
 	timezone: string,
 	brandedPromptIds: string[],
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<VisibilityTimeSeriesPoint[]> {
 	const isBranded = brandedPromptIds.length > 0 ? sql`(prompt_id IN (${uuidList(brandedPromptIds)}))` : sql`FALSE`;
 	const rows = await queryPg<VisibilityTimeSeriesPoint>(sql`
@@ -435,6 +472,7 @@ export async function getVisibilityTimeSeries(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY date, is_branded
 		ORDER BY date
 	`);
@@ -444,6 +482,7 @@ export async function getVisibilityTimeSeries(
 export async function getPromptsFirstEvaluatedAt(
 	brandId: string,
 	promptIds: string[],
+	effectiveMarketKey: string,
 ): Promise<PromptFirstEvaluatedAt[]> {
 	if (promptIds.length === 0) return [];
 
@@ -454,6 +493,7 @@ export async function getPromptsFirstEvaluatedAt(
 		FROM prompt_runs
 		WHERE brand_id = ${brandId}
 			AND prompt_id IN (${uuidList(promptIds)})
+			${marketScope(effectiveMarketKey)}
 		GROUP BY prompt_id
 	`);
 	return rows;
@@ -464,9 +504,10 @@ export async function getPromptsSummary(
 	fromDate: string | null,
 	toDate: string | null,
 	timezone: string,
-	webSearchEnabled?: boolean,
-	model?: string,
-	enabledPromptIds?: string[],
+	webSearchEnabled: boolean | undefined,
+	model: string | undefined,
+	enabledPromptIds: string[] | undefined,
+	effectiveMarketKey: string,
 ): Promise<PromptSummary[]> {
 	const rows = await queryPg<PromptSummary>(sql`
 		SELECT
@@ -482,6 +523,7 @@ export async function getPromptsSummary(
 			${webSearchFilter(webSearchEnabled)}
 			${modelFilter(model)}
 			${promptIdFilter(enabledPromptIds)}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY prompt_id
 		ORDER BY total_runs DESC
 	`);
@@ -499,7 +541,8 @@ export async function getPromptWebQueryCounts(
 	fromDate: string | null,
 	toDate: string | null,
 	timezone: string,
-	model?: string,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<WebQueryCount[]> {
 	// The `unavailable` sentinel (search happened, query strings unexposed) isn't
 	// a usable web query — without this filter it becomes a model's "top query"
@@ -515,6 +558,7 @@ export async function getPromptWebQueryCounts(
 			AND lower(btrim(web_query)) <> ${UNAVAILABLE_SENTINEL}
 			${dateFilter(fromDate, toDate, timezone)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY model, web_query
 		ORDER BY model, query_count DESC
 	`);
@@ -526,8 +570,9 @@ export async function getCitationDomainStats(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<CitationDomainStats[]> {
 	const rows = await queryPg<CitationDomainStats>(sql`
 		SELECT
@@ -540,6 +585,7 @@ export async function getCitationDomainStats(
 			AND created_at < ${windowEnd(toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY domain
 		ORDER BY count DESC
 	`);
@@ -551,8 +597,9 @@ export async function getCitationUrlStats(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<CitationUrlStats[]> {
 	const rows = await queryPg<CitationUrlStats>(sql`
 		SELECT
@@ -568,6 +615,7 @@ export async function getCitationUrlStats(
 			AND created_at < ${windowEnd(toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY url, domain
 		ORDER BY count DESC
 	`);
@@ -579,8 +627,9 @@ export async function getCitationDomainPromptCounts(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<Map<string, number>> {
 	const rows = await queryPg<{ domain: string; prompt_count: number }>(sql`
 		SELECT domain, count(DISTINCT prompt_id)::int AS prompt_count
@@ -590,6 +639,7 @@ export async function getCitationDomainPromptCounts(
 			AND created_at < ${windowEnd(toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY domain
 	`);
 	return new Map(rows.map((row) => [row.domain, Number(row.prompt_count)]));
@@ -600,6 +650,7 @@ export async function getPromptCitationUrlStats(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
+	effectiveMarketKey: string,
 ): Promise<CitationUrlStats[]> {
 	const rows = await queryPg<CitationUrlStats>(sql`
 		SELECT
@@ -613,6 +664,7 @@ export async function getPromptCitationUrlStats(
 		WHERE prompt_id = ${promptId}
 			AND created_at >= ${windowStart(fromDate, timezone)}
 			AND created_at < ${windowEnd(toDate, timezone)}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY url, domain
 		ORDER BY count DESC
 	`);
@@ -624,6 +676,7 @@ export async function getPromptMentionSummary(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
+	effectiveMarketKey: string,
 ): Promise<PromptMentionSummary> {
 	const rows = await queryPg<PromptMentionSummary>(sql`
 		SELECT
@@ -634,6 +687,7 @@ export async function getPromptMentionSummary(
 		WHERE prompt_id = ${promptId}
 			AND created_at >= ${windowStart(fromDate, timezone)}
 			AND created_at < ${windowEnd(toDate, timezone)}
+			${marketScope(effectiveMarketKey)}
 	`);
 	return rows[0] || { total_runs: 0, brand_mentioned_count: 0, competitor_mentioned_count: 0 };
 }
@@ -644,6 +698,7 @@ export async function getPromptTopCompetitorMentions(
 	toDate: string,
 	timezone: string,
 	limit: number,
+	effectiveMarketKey: string,
 ): Promise<TopCompetitorMention[]> {
 	const rows = await queryPg<TopCompetitorMention>(sql`
 		SELECT
@@ -653,6 +708,7 @@ export async function getPromptTopCompetitorMentions(
 		WHERE pr.prompt_id = ${promptId}
 			AND pr.created_at >= ${windowStart(fromDate, timezone)}
 			AND pr.created_at < ${windowEnd(toDate, timezone)}
+			${marketScope(effectiveMarketKey, "pr")}
 		GROUP BY competitor_name
 		ORDER BY mention_count DESC
 		LIMIT ${limit}
@@ -665,8 +721,9 @@ export async function getDailyCitationStats(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<DailyCitationStats[]> {
 	const rows = await queryPg<DailyCitationStats>(sql`
 		SELECT
@@ -679,6 +736,7 @@ export async function getDailyCitationStats(
 			AND created_at < ${windowEnd(toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY date, domain
 		ORDER BY date
 	`);
@@ -697,8 +755,9 @@ export async function getPerPromptDailyCitationStats(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PerPromptDailyCitationStats[]> {
 	if (!enabledPromptIds?.length) return [];
 	const rows = await queryPg<PerPromptDailyCitationStats>(sql`
@@ -713,6 +772,7 @@ export async function getPerPromptDailyCitationStats(
 			AND created_at < ${windowEnd(toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY prompt_id, date, domain
 		ORDER BY prompt_id, date
 	`);
@@ -735,8 +795,9 @@ export async function getPerPromptRunStats(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PerPromptRunStats[]> {
 	const rows = await queryPg<PerPromptRunStats>(sql`
 		SELECT
@@ -750,6 +811,7 @@ export async function getPerPromptRunStats(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY prompt_id
 	`);
 	return rows;
@@ -767,8 +829,9 @@ export async function getBrandMentionTotals(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<BrandMentionTotals> {
 	const rows = await queryPg<BrandMentionTotals>(sql`
 		SELECT
@@ -780,6 +843,7 @@ export async function getBrandMentionTotals(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 	`);
 	return rows[0] ?? { total_runs: 0, brand_mentioned_runs: 0, brand_mentioned_prompts: 0 };
 }
@@ -799,8 +863,9 @@ export async function getPerPromptDailyMentions(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PerPromptDailyMentionRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	const rows = await queryPg<PerPromptDailyMentionRow>(sql`
@@ -814,6 +879,7 @@ export async function getPerPromptDailyMentions(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY prompt_id, date
 		ORDER BY prompt_id, date
 	`);
@@ -843,7 +909,8 @@ export async function getPromptRuns(
 	timezone: string,
 	limit: number,
 	offset: number,
-	model?: string,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PromptRunRow[]> {
 	return queryPg<PromptRunRow>(sql`
 		SELECT
@@ -862,6 +929,7 @@ export async function getPromptRuns(
 		WHERE prompt_id = ${promptId}::uuid
 			${dateFilter(fromDate, toDate, timezone)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 		ORDER BY prompt_runs.created_at DESC
 		LIMIT ${limit} OFFSET ${offset}
 	`);
@@ -872,7 +940,8 @@ export async function countPromptRuns(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	model?: string,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<number> {
 	const rows = await queryPg<{ total: number }>(sql`
 		SELECT count(*)::int AS total
@@ -880,6 +949,7 @@ export async function countPromptRuns(
 		WHERE prompt_id = ${promptId}::uuid
 			${dateFilter(fromDate, toDate, timezone)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 	`);
 	return rows[0]?.total ?? 0;
 }
@@ -903,8 +973,9 @@ export async function getPerPromptDailyCompetitorMentions(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PerPromptDailyCompetitorRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	const rows = await queryPg<PerPromptDailyCompetitorRow>(sql`
@@ -918,6 +989,7 @@ export async function getPerPromptDailyCompetitorMentions(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model)}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY prompt_id, date, competitor
 		ORDER BY prompt_id, date
 	`);
@@ -941,8 +1013,9 @@ export async function getPerPromptCitationPages(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PerPromptCitationPageRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	const rows = await queryPg<PerPromptCitationPageRow>(sql`
@@ -957,6 +1030,7 @@ export async function getPerPromptCitationPages(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY prompt_id, url, domain
 		ORDER BY prompt_id, count DESC
 	`);
@@ -979,8 +1053,9 @@ export async function getPerPromptDailyCitationPages(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<PerPromptDailyCitationPageRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	const rows = await queryPg<PerPromptDailyCitationPageRow>(sql`
@@ -996,6 +1071,7 @@ export async function getPerPromptDailyCitationPages(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "citations" })}
+			${marketScope(effectiveMarketKey, "citations")}
 		GROUP BY prompt_id, date, url, domain
 		ORDER BY prompt_id, date
 	`);
@@ -1015,8 +1091,9 @@ export async function getBrandMentionRateByModel(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<ModelMentionRateRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	const rows = await queryPg<ModelMentionRateRow>(sql`
@@ -1029,17 +1106,19 @@ export async function getBrandMentionRateByModel(
 			${dateFilter(fromDate, toDate, timezone)}
 			${promptIdFilter(enabledPromptIds)}
 			${modelFilter(model, { source: "prompt_runs" })}
+			${marketScope(effectiveMarketKey)}
 		GROUP BY model
 		ORDER BY runs DESC
 	`);
 	return rows;
 }
 
-export async function getBrandEarliestRunDate(brandId: string): Promise<string | null> {
+export async function getBrandEarliestRunDate(brandId: string, effectiveMarketKey: string): Promise<string | null> {
 	const rows = await queryPg<{ earliest_date: string | null }>(sql`
 		SELECT min(created_at) AS earliest_date
 		FROM prompt_runs
 		WHERE brand_id = ${brandId}
+			${marketScope(effectiveMarketKey)}
 	`);
 	return rows[0]?.earliest_date || null;
 }
@@ -1050,8 +1129,9 @@ export async function getBatchChartData(
 	fromDate: string | null,
 	toDate: string | null,
 	timezone: string,
-	webSearchEnabled?: boolean,
-	model?: string,
+	webSearchEnabled: boolean | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<ProcessedBatchChartDataPoint[]> {
 	if (promptIds.length === 0) return [];
 
@@ -1073,6 +1153,7 @@ export async function getBatchChartData(
 				${dateFilter(fromDate, toDate, timezone)}
 				${webSearchFilter(webSearchEnabled)}
 				${modelFilter(model)}
+				${marketScope(effectiveMarketKey)}
 			GROUP BY prompt_id, date
 			ORDER BY prompt_id, date
 		`),
@@ -1093,6 +1174,7 @@ export async function getBatchChartData(
 				${dateFilter(fromDate, toDate, timezone)}
 				${webSearchFilter(webSearchEnabled)}
 				${modelFilter(model)}
+				${marketScope(effectiveMarketKey)}
 			GROUP BY prompt_id, date, competitor_name
 			ORDER BY prompt_id, date, competitor_name
 		`),
@@ -1150,8 +1232,9 @@ export async function getFanoutBreakdown(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<FanoutBreakdownRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	return queryPg<FanoutBreakdownRow>(sql`
@@ -1171,6 +1254,7 @@ export async function getFanoutBreakdown(
 			AND pr.created_at < ${windowEnd(toDate, timezone)}
 			AND pr.prompt_id IN (${uuidList(enabledPromptIds)})
 			${modelFilter(model, { alias: "pr" })}
+			${marketScope(effectiveMarketKey, "pr")}
 		GROUP BY pr.prompt_id, pr.model, fq.query
 	`);
 }
@@ -1181,8 +1265,9 @@ export async function getFanoutModelTotals(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<FanoutModelTotalRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	// `runs` counts every web-search-enabled run ("Search Prompt Runs"); `fanout_runs`
@@ -1207,6 +1292,7 @@ export async function getFanoutModelTotals(
 			AND pr.created_at < ${windowEnd(toDate, timezone)}
 			AND pr.prompt_id IN (${uuidList(enabledPromptIds)})
 			${modelFilter(model, { alias: "pr" })}
+			${marketScope(effectiveMarketKey, "pr")}
 		GROUP BY pr.model
 		ORDER BY total_queries DESC
 	`);
@@ -1222,8 +1308,9 @@ export async function getFanoutPromptTotals(
 	fromDate: string,
 	toDate: string,
 	timezone: string,
-	enabledPromptIds?: string[],
-	model?: string,
+	enabledPromptIds: string[] | undefined,
+	model: string | undefined,
+	effectiveMarketKey: string,
 ): Promise<FanoutPromptTotalRow[]> {
 	if (!enabledPromptIds?.length) return [];
 	return queryPg<FanoutPromptTotalRow>(sql`
@@ -1240,6 +1327,7 @@ export async function getFanoutPromptTotals(
 			AND pr.created_at < ${windowEnd(toDate, timezone)}
 			AND pr.prompt_id IN (${uuidList(enabledPromptIds)})
 			${modelFilter(model, { alias: "pr" })}
+			${marketScope(effectiveMarketKey, "pr")}
 		GROUP BY pr.prompt_id
 	`);
 }

@@ -87,56 +87,75 @@ async function benchBrand(brandId: string, runCount: number, hasCitations: boole
 
 	const results: BenchResult[] = [];
 
+	// This is throughput tooling, not a real dashboard request, so there is no
+	// brand to resolve an effective market from — "global" exercises the same
+	// marketScope predicate shape as a real request without favoring one market.
+	const marketKey = "global";
+
 	results.push(
-		await bench("getDashboardSummary", () => pgRead.getDashboardSummary(brandId, fromDate, toDate, tz, promptIds)),
+		await bench("getDashboardSummary", () =>
+			pgRead.getDashboardSummary(brandId, fromDate, toDate, tz, promptIds, marketKey),
+		),
 	);
 
 	results.push(
 		await bench("getVisibilityTimeSeries", () =>
-			pgRead.getVisibilityTimeSeries(brandId, fromDate, toDate, tz, brandedPromptIds, promptIds),
+			pgRead.getVisibilityTimeSeries(brandId, fromDate, toDate, tz, brandedPromptIds, promptIds, undefined, marketKey),
 		),
 	);
 
-	results.push(await bench("getPromptsSummary", () => pgRead.getPromptsSummary(brandId, fromDate, toDate, tz)));
-
-	results.push(await bench("getPromptsFirstEvaluatedAt", () => pgRead.getPromptsFirstEvaluatedAt(brandId, promptIds)));
+	results.push(
+		await bench("getPromptsSummary", () =>
+			pgRead.getPromptsSummary(brandId, fromDate, toDate, tz, undefined, undefined, undefined, marketKey),
+		),
+	);
 
 	results.push(
-		await bench("getPromptMentionSummary", () => pgRead.getPromptMentionSummary(firstPromptId, fromDate, toDate, tz)),
+		await bench("getPromptsFirstEvaluatedAt", () => pgRead.getPromptsFirstEvaluatedAt(brandId, promptIds, marketKey)),
+	);
+
+	results.push(
+		await bench("getPromptMentionSummary", () =>
+			pgRead.getPromptMentionSummary(firstPromptId, fromDate, toDate, tz, marketKey),
+		),
 	);
 
 	results.push(
 		await bench("getPromptTopCompetitorMentions", () =>
-			pgRead.getPromptTopCompetitorMentions(firstPromptId, fromDate, toDate, tz, 10),
+			pgRead.getPromptTopCompetitorMentions(firstPromptId, fromDate, toDate, tz, 10, marketKey),
 		),
 	);
 
 	results.push(
-		await bench("getBatchChartData", () => pgRead.getBatchChartData(brandId, promptIds, fromDate, toDate, tz)),
+		await bench("getBatchChartData", () =>
+			pgRead.getBatchChartData(brandId, promptIds, fromDate, toDate, tz, undefined, undefined, marketKey),
+		),
 	);
 
-	results.push(await bench("getBrandEarliestRunDate", () => pgRead.getBrandEarliestRunDate(brandId)));
+	results.push(await bench("getBrandEarliestRunDate", () => pgRead.getBrandEarliestRunDate(brandId, marketKey)));
 
 	if (hasCitations) {
 		results.push(
 			await bench("getCitationDomainStats", () =>
-				pgRead.getCitationDomainStats(brandId, fromDate, toDate, tz, promptIds),
+				pgRead.getCitationDomainStats(brandId, fromDate, toDate, tz, promptIds, undefined, marketKey),
 			),
 		);
 
 		results.push(
-			await bench("getCitationUrlStats", () => pgRead.getCitationUrlStats(brandId, fromDate, toDate, tz, promptIds)),
+			await bench("getCitationUrlStats", () =>
+				pgRead.getCitationUrlStats(brandId, fromDate, toDate, tz, promptIds, undefined, marketKey),
+			),
 		);
 
 		results.push(
 			await bench("getDailyCitationStats", () =>
-				pgRead.getDailyCitationStats(brandId, fromDate, toDate, tz, promptIds),
+				pgRead.getDailyCitationStats(brandId, fromDate, toDate, tz, promptIds, undefined, marketKey),
 			),
 		);
 
 		results.push(
 			await bench("getPromptCitationUrlStats", () =>
-				pgRead.getPromptCitationUrlStats(firstPromptId, fromDate, toDate, tz),
+				pgRead.getPromptCitationUrlStats(firstPromptId, fromDate, toDate, tz, marketKey),
 			),
 		);
 	}

@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "@workspace/lib/db/db";
 import { brands, competitors, prompts } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { getEffectiveBrandedStatus } from "@workspace/lib/tag-utils";
 import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -75,6 +76,7 @@ export const getDashboardSummaryFn = createServerFn({ method: "GET" })
 					website: brands.website,
 					additionalDomains: brands.additionalDomains,
 					delayOverrideHours: brands.delayOverrideHours,
+					defaultMarketKey: brands.defaultMarketKey,
 				})
 				.from(brands)
 				.where(eq(brands.id, data.brandId))
@@ -97,15 +99,34 @@ export const getDashboardSummaryFn = createServerFn({ method: "GET" })
 		const competitorDomains = new Set(competitorsList.flatMap((c) => c.domains.map(extractDomain)).filter(Boolean));
 		const totalPrompts = totalPromptsResult[0]?.count || 0;
 
+		const effectiveMarketKey = resolveEffectiveMarket({
+			defaultMarketKey: brandResult[0]?.defaultMarketKey ?? null,
+		}).key;
 		const enabledPromptIds = enabledPromptsResult.map((p) => p.id);
 		const brandedPromptIds = enabledPromptsResult
 			.filter((p) => getEffectiveBrandedStatus(p.systemTags || [], p.tags || []).isBranded)
 			.map((p) => p.id);
 
 		const [summaryResult, perPromptVisibility, perPromptCitations] = await Promise.all([
-			getDashboardSummary(data.brandId, fromDateStr, toDateStr, timezone, enabledPromptIds),
-			getPerPromptVisibilityTimeSeries(data.brandId, fromDateStr, toDateStr, timezone, enabledPromptIds),
-			getPerPromptDailyCitationStats(data.brandId, fromDateStr, toDateStr, timezone, enabledPromptIds),
+			getDashboardSummary(data.brandId, fromDateStr, toDateStr, timezone, enabledPromptIds, effectiveMarketKey),
+			getPerPromptVisibilityTimeSeries(
+				data.brandId,
+				fromDateStr,
+				toDateStr,
+				timezone,
+				enabledPromptIds,
+				undefined,
+				effectiveMarketKey,
+			),
+			getPerPromptDailyCitationStats(
+				data.brandId,
+				fromDateStr,
+				toDateStr,
+				timezone,
+				enabledPromptIds,
+				undefined,
+				effectiveMarketKey,
+			),
 		]);
 
 		const summary = summaryResult[0];

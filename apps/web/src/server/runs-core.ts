@@ -3,11 +3,25 @@
  * exposing that would make its shape part of this contract.
  */
 import { db } from "@workspace/lib/db/db";
-import { citations, promptRuns } from "@workspace/lib/db/schema";
+import { brands, citations, promptRuns, prompts } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { extractTextContent } from "@workspace/lib/text-extraction";
 import { and, asc, eq } from "drizzle-orm";
 import { countPromptRuns, getPromptRuns } from "@/lib/postgres-read";
 import type { AnalyticsWindow } from "@/server/analytics-core";
+
+/** `listPromptRuns` is reached through a prompt id only, so the brand's
+ * effective market is resolved from that prompt's own brand rather than
+ * asking every caller to carry `brandId` just for this. */
+async function resolveEffectiveMarketKeyForPrompt(promptId: string): Promise<string> {
+	const [row] = await db
+		.select({ defaultMarketKey: brands.defaultMarketKey })
+		.from(prompts)
+		.innerJoin(brands, eq(brands.id, prompts.brandId))
+		.where(eq(prompts.id, promptId))
+		.limit(1);
+	return resolveEffectiveMarket({ defaultMarketKey: row?.defaultMarketKey ?? null }).key;
+}
 
 export interface RunSummary {
 	id: string;
@@ -47,10 +61,11 @@ export interface ListRunsOptions {
 export async function listPromptRuns(options: ListRunsOptions): Promise<{ data: RunSummary[]; total: number }> {
 	const { promptId, window, limit, offset, model } = options;
 	const { from, to, timezone } = window;
+	const effectiveMarketKey = await resolveEffectiveMarketKeyForPrompt(promptId);
 
 	const [rows, total] = await Promise.all([
-		getPromptRuns(promptId, from, to, timezone, limit, offset, model),
-		countPromptRuns(promptId, from, to, timezone, model),
+		getPromptRuns(promptId, from, to, timezone, limit, offset, model, effectiveMarketKey),
+		countPromptRuns(promptId, from, to, timezone, model, effectiveMarketKey),
 	]);
 
 	return {

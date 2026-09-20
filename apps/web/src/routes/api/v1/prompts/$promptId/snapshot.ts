@@ -7,6 +7,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { db } from "@workspace/lib/db/db";
 import { competitors } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { ApiError, createApiHandler, withMethodGuard } from "@/lib/api/handler";
@@ -83,10 +84,11 @@ export const Route = createFileRoute("/api/v1/prompts/$promptId/snapshot")({
 					);
 
 					const timezone = "UTC";
+					const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey }).key;
 					const [mentionData, topCompetitors, citationUrlStats] = await Promise.all([
-						getPromptMentionSummary(promptId, startDate, endDate, timezone),
-						getPromptTopCompetitorMentions(promptId, startDate, endDate, timezone, kMentions),
-						getPromptCitationUrlStats(promptId, startDate, endDate, timezone),
+						getPromptMentionSummary(promptId, startDate, endDate, timezone, effectiveMarketKey),
+						getPromptTopCompetitorMentions(promptId, startDate, endDate, timezone, kMentions, effectiveMarketKey),
+						getPromptCitationUrlStats(promptId, startDate, endDate, timezone, effectiveMarketKey),
 					]);
 
 					const mentionsTopK = topCompetitors.map((row) => ({

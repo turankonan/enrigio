@@ -21,6 +21,7 @@
 import { getLatestCompletedAudit, type SiteAudit } from "@workspace/lib/axo";
 import { db } from "@workspace/lib/db/db";
 import { brandOpportunities, brands, competitors } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { runStructuredCompletionPrompt } from "@workspace/lib/onboarding";
 import { desc, eq } from "drizzle-orm";
 import { z } from "zod";
@@ -250,9 +251,14 @@ async function loadDigestData(
 	windows: { r30: { fromDateStr: string; toDateStr: string }; r7: { fromDateStr: string; toDateStr: string } },
 ) {
 	const { r30, r7 } = windows;
-	const [brandRows, competitorRows, run30, comp30, daily30, pages30, run7, comp7, byModel] = await Promise.all([
+	const [brandRows, competitorRows] = await Promise.all([
 		db
-			.select({ name: brands.name, website: brands.website, additionalDomains: brands.additionalDomains })
+			.select({
+				name: brands.name,
+				website: brands.website,
+				additionalDomains: brands.additionalDomains,
+				defaultMarketKey: brands.defaultMarketKey,
+			})
 			.from(brands)
 			.where(eq(brands.id, brandId))
 			.limit(1),
@@ -260,13 +266,57 @@ async function loadDigestData(
 			.select({ name: competitors.name, domains: competitors.domains })
 			.from(competitors)
 			.where(eq(competitors.brandId, brandId)),
-		getPerPromptRunStats(brandId, r30.fromDateStr, r30.toDateStr, timezone, promptIds),
-		getPerPromptDailyCompetitorMentions(brandId, r30.fromDateStr, r30.toDateStr, timezone, promptIds),
-		getPerPromptDailyCitationStats(brandId, r30.fromDateStr, r30.toDateStr, timezone, promptIds),
-		getPerPromptCitationPages(brandId, r30.fromDateStr, r30.toDateStr, timezone, promptIds),
-		getPerPromptRunStats(brandId, r7.fromDateStr, r7.toDateStr, timezone, promptIds),
-		getPerPromptDailyCompetitorMentions(brandId, r7.fromDateStr, r7.toDateStr, timezone, promptIds),
-		getBrandMentionRateByModel(brandId, r30.fromDateStr, r30.toDateStr, timezone, promptIds),
+	]);
+	const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brandRows[0]?.defaultMarketKey ?? null }).key;
+
+	const [run30, comp30, daily30, pages30, run7, comp7, byModel] = await Promise.all([
+		getPerPromptRunStats(brandId, r30.fromDateStr, r30.toDateStr, timezone, promptIds, undefined, effectiveMarketKey),
+		getPerPromptDailyCompetitorMentions(
+			brandId,
+			r30.fromDateStr,
+			r30.toDateStr,
+			timezone,
+			promptIds,
+			undefined,
+			effectiveMarketKey,
+		),
+		getPerPromptDailyCitationStats(
+			brandId,
+			r30.fromDateStr,
+			r30.toDateStr,
+			timezone,
+			promptIds,
+			undefined,
+			effectiveMarketKey,
+		),
+		getPerPromptCitationPages(
+			brandId,
+			r30.fromDateStr,
+			r30.toDateStr,
+			timezone,
+			promptIds,
+			undefined,
+			effectiveMarketKey,
+		),
+		getPerPromptRunStats(brandId, r7.fromDateStr, r7.toDateStr, timezone, promptIds, undefined, effectiveMarketKey),
+		getPerPromptDailyCompetitorMentions(
+			brandId,
+			r7.fromDateStr,
+			r7.toDateStr,
+			timezone,
+			promptIds,
+			undefined,
+			effectiveMarketKey,
+		),
+		getBrandMentionRateByModel(
+			brandId,
+			r30.fromDateStr,
+			r30.toDateStr,
+			timezone,
+			promptIds,
+			undefined,
+			effectiveMarketKey,
+		),
 	]);
 	return { brandRows, competitorRows, run30, comp30, daily30, pages30, run7, comp7, byModel };
 }
