@@ -1,18 +1,24 @@
-# Phase 2 — Country/Market Support — Design (v4)
+# Phase 2 — Country/Market Support — Design (v5)
 
-> Status: v4, split into **Phase 2a (build now)** and **Phase 2b (deferred design)** after
-> the product signal that *most customers have only one location*. Three external review
-> rounds folded in. Phase 2a is ready for an implementation plan; Phase 2b is captured design,
-> not in this plan.
+> Status: v5, split into **Phase 2a (build now)** and **Phase 2b (deferred design)** after
+> the product signal that *most customers have only one location*. Four external review rounds
+> folded in. Phase 2a is ready for an implementation plan; Phase 2b is captured design, not in
+> this plan.
 >
-> **v4 changelog:** three data-model corrections to 2a — (1) localizable runs resolve and
-> persist an **effective market** (brand market, else the deployment env's market), so they
-> are never mis-stamped `global`; (2) a distinct **`legacy`** sentinel for historical rows of
-> unknown scope, separate from `global` (known non-localizable), so 2b never blends legacy
-> localized data into a selected market; (3) the 2a brand column is named **`default_market_key`**
-> up front so 2b adds only the `markets` list. Plus: `localizableFor` explicitly covers
-> DataForSEO's unpinned chatbot scrapers; the picker is "Evaluation market" with an explicit
-> no-translation note; the backfill command is config-only.
+> **v5 changelog (review round 4):** corrected the overclaim that 2a needs "no scheduler or
+> read-layer changes" — because a brand can *change* its market, 2a now makes (1) **scheduler
+> freshness market-aware** (effective market in `targetKey`/last-run) so a new market isn't
+> suppressed by the old market's recency, and (2) **dashboards market-correct** via a fixed
+> `marketScope` predicate (effective market + `global`, excluding `legacy`/other markets).
+> Also: `ProviderOptions.market` is defined and resolved in the worker (no silent env reads in
+> low-level helpers); the migration is staged (nullable → `legacy` → NOT NULL, no default); the
+> env fallback is validated at evaluation time (layered rule), not a hard startup failure; and
+> the stage list is corrected to `default_market_key`. 2a still has no fan-out, variants,
+> ceiling scaling, comparison surface, or market selector.
+>
+> **v4:** effective-market stamping; distinct `legacy` vs `global` sentinels;
+> `default_market_key` named up front; DataForSEO scraper localizability; "Evaluation market"
+> picker with no-translation note; config-only backfill.
 >
 > **v3:** Multi-market is **opt-in and additive** — a brand with no configured markets behaves
 > exactly like today. v1 ships **per-brand location** (2a); multi-market comparison with
@@ -67,15 +73,22 @@ majority is never burdened by it.
 ## Goal
 
 Each brand is configured with **its own single market** (country + language); its localizable
-evaluations run in that market instead of the deployment-wide env. No comparison, no variants,
-no fan-out multiplication. Backward-compatible: a brand with no market falls back to the
-deployment env, exactly as today.
+evaluations run in that market instead of the deployment-wide env, are **attributed** to it,
+and its dashboards show **only that market's** data (plus non-localizable `global` engines).
+No comparison, no variants, no fan-out multiplication. Backward-compatible: a brand with no
+explicit market resolves the deployment env's market at runtime, exactly as today.
+
+> **Scope honesty:** 2a is small but NOT zero-touch on the scheduler or read layer. Because a
+> brand can *change* its market, scheduling freshness and displayed aggregates must both be
+> market-aware, or a change silently mixes markets (review round 4, #1/#2). 2a still has **no
+> fan-out, no variants, no ceiling scaling, no comparison surface, no market selector** — those
+> remain 2b.
 
 ## Decisions (2a)
 
 - A brand has **one** optional `default_market_key` (its evaluation market). Absent → resolve
-  from the deployment env at runtime (current behavior, correctly attributed). Named
-  `default_market_key` now so 2b adds only the ordered `markets` list, seeded from it.
+  from the deployment env at runtime. Named `default_market_key` now so 2b adds only the ordered
+  `markets` list, seeded from it.
 - **Curated catalog** of markets in `packages/config`, keyed by stable **BCP-47-style keys**
   (`tr-TR`, `de-DE`, `en-GB`), storing `{key, countryCode, languageCode, locationCode}` — no
   English labels (render via `Intl.DisplayNames`).
@@ -85,29 +98,64 @@ deployment env, exactly as today.
   while the LLM-Responses routes (pinned ChatGPT/Gemini, Perplexity) do not. For every other
   provider it is `false` (direct-API have no locale; BrightData is hardcoded US). Non-localizable
   runs are stamped `global`.
-- **Effective-market resolution (review #1):** for a localizable run, the persisted market is
-  `brand.defaultMarketKey ?? getMarketForCodes(dfsLocationCode(), dfsLanguageCode())`. Localized
-  runs are therefore **never stamped `global`**. If the env code pair maps to no catalog entry,
-  fail clearly (startup validation and/or on brand save) rather than silently mislabeling.
+- **Effective-market resolution in the worker (review #1, #5, #6):** the worker resolves the
+  effective market once per prompt — `brand.defaultMarketKey ?? getMarketForCodes(dfsLocationCode(),
+  dfsLanguageCode())` — and passes it explicitly down (see `ProviderOptions.market`) rather than
+  letting low-level DataForSEO helpers read `process.env`. Localized runs are therefore **never
+  stamped `global`**. Validation rule (single, layered): explicit `default_market_key` is
+  validated on brand save; the env fallback is resolved+validated **at evaluation time** for a
+  brand whose default is null (a clear run error + optional health/config check if the env pair
+  isn't in the catalog) — **not** a hard startup failure, so a deployment where every brand has
+  an explicit market is unaffected.
+
+## Provider interface change
+
+Add an optional market to `ProviderOptions`:
+```ts
+interface ProviderOptions { webSearch?: boolean; version?: string;
+  market?: { locationCode: number; languageCode: string }; }
+```
+The worker sets `market` only for **localizable** targets; DataForSEO uses `options.market` when
+present and falls back to env only when absent (backward-compat). Non-localizable providers
+ignore it.
 
 ## Data model (2a)
 
-One committed Drizzle migration (generated, never run locally):
+One committed Drizzle migration (generated, then **inspected/edited** to the staged sequence —
+review #3):
 - `brands`: add `default_market_key text` (nullable; null = resolve from env at runtime).
-- `prompt_runs`: add `market_key text NOT NULL`; **existing rows set to `legacy`** by the
-  migration (their scope can't be proven — review #2); index `(brand_id, market_key,
-  created_at)` (for 2b, cheap now). New rows always get an explicit value from the app.
+- `prompt_runs`: add `market_key`, staged so it succeeds on a populated table:
+  1. add `market_key text` **nullable**;
+  2. `UPDATE prompt_runs SET market_key = 'legacy'` (scope of history can't be proven — #2);
+  3. `ALTER … SET NOT NULL` with **no DB default** (new code must write an intentional value);
+  4. index `(brand_id, market_key, created_at)`.
 
 No `usage_events.market_key`, no variants table, no `brands.markets` list in 2a — those are 2b.
 
-## Run pipeline (2a)
+## Run pipeline & scheduler (2a)
 
-At run time resolve the run's market: if `isLocalizable(target)`, use the **effective market**
-(`brand.defaultMarketKey ?? env-codes→catalog`) and pass its `location_code`/`language_code`
-to the DataForSEO request; else `global`. `savePromptRun` stamps the resolved `market_key`
-(a real key or `global`, never `legacy`). **No fan-out change** — one run per target per
-replica; the only change is *which* location DataForSEO uses and that we now record it.
-Therefore no scheduler, dedup, ceiling, or read-layer changes are needed in 2a.
+- The worker resolves the effective market per prompt (above). For each **localizable** target
+  it passes `ProviderOptions.market = { locationCode, languageCode }`; DataForSEO applies it.
+  `savePromptRun` stamps the resolved `market_key` (a real key, or `global` for non-localizable;
+  never `legacy`). No fan-out change — one run per target per replica.
+- **Scheduler freshness is market-aware (review #1):** include the effective market in
+  `targetKey` and the `getLastRunsByTargetKey` grouping. With one market per brand this is inert
+  day-to-day, but when a brand's market changes it correctly makes the new market's runs due
+  immediately instead of inheriting the old market's freshness.
+
+## Read semantics (2a) — market-correct dashboards (review #2)
+
+Introduce a single fixed `marketScope` predicate on the brand's analytics (the same mechanism
+2b generalizes, but hardwired to the brand's one effective market — no selector):
+```sql
+(market_key = :effectiveMarket OR market_key = 'global')   -- excludes other markets AND 'legacy'
+```
+- Localizable engines contribute only the brand's effective market; non-localizable contribute
+  `global`; `legacy` history is excluded from market-specific metrics.
+- Applied centrally in the shared read helpers (alongside `modelFilter`); it is a fixed
+  single-market scope, not a user-facing filter, so it is far smaller than 2b's selector work.
+- UI note: after a market change, the new market's history starts accumulating from the change
+  (older-market and `legacy` data are excluded), so metrics may be sparse briefly.
 
 ## UI (2a)
 
@@ -116,52 +164,63 @@ Therefore no scheduler, dedup, ceiling, or read-layer changes are needed in 2a.
 - A note by the picker (review #5): *"This sets where and in which interface language
   evaluations run. Your questions must already be written in the selected market's language;
   automatic translation arrives later."*
-- Optionally surface the brand's market as a small label on the dashboard header (not a
-  selector — there's only one). No comparison surfaces in 2a.
+- Surface the brand's market as a small label on the dashboard header (not a selector — there's
+  only one). No comparison surfaces in 2a.
 - i18n: en + tr keys for the picker label + note; market names via `Intl.DisplayNames`.
 
 ## Backfill (2a) — config only
 
-Deterministic migration (existing `prompt_runs` → `legacy`). A small, **idempotent app
-command** sets each existing brand's `default_market_key` from the deployment env. It does
-**not** reclassify historical runs (they stay `legacy` — review #2/#6). Skipping it is
-behaviorally safe: brands without an explicit value resolve the same effective market from env
-at runtime; the command just makes the config explicit.
+Deterministic migration (existing `prompt_runs` → `legacy`). A small, **idempotent app command**
+sets each existing brand's `default_market_key` from the deployment env. It does **not**
+reclassify historical runs (they stay `legacy` — review #2/#6). Skipping it is behaviorally
+safe: brands without an explicit value resolve the same effective market from env at runtime.
 
 ## Testing (2a — behavior)
 
-- **Effective market (review #1):** a localizable run for a brand *without* an explicit market
-  is stamped with the env's catalog market key — **not** `global`; with an explicit market, it
-  is stamped that market and DataForSEO gets its location/language.
-- **`localizableFor` matrix (review #4)**, tested independently from `accessFor`:
-  Google AI Mode ✔ · Google AI Overview ✔ · ChatGPT scraper (no pinned version) ✔ ·
-  Gemini scraper (no pinned version) ✔ · ChatGPT LLM-Responses (pinned) ✗ · Gemini
-  LLM-Responses (pinned) ✗ · Perplexity ✗ · any direct-API ✗ · BrightData ✗.
+- **Effective market (#1):** a localizable run for a brand *without* an explicit market is
+  stamped the env's catalog market key — **not** `global`; with an explicit market, it is
+  stamped that market and DataForSEO receives its location/language via `ProviderOptions.market`.
+- **`localizableFor` matrix (#4)**, tested independently from `accessFor`:
+  Google AI Mode ✔ · Google AI Overview ✔ · ChatGPT scraper (unpinned) ✔ · Gemini scraper
+  (unpinned) ✔ · ChatGPT LLM-Responses (pinned) ✗ · Gemini LLM-Responses (pinned) ✗ ·
+  Perplexity ✗ · any direct-API ✗ · BrightData ✗.
 - Non-localizable targets are stamped `global` and ignore the brand market.
-- Migration stamps pre-existing `prompt_runs` as `legacy`; new runs never write `legacy`.
-- Missing env→catalog mapping fails clearly rather than mislabeling as `global`.
+- **Scheduler freshness (#1):** after a brand's market changes, the new market's target is due
+  immediately (not suppressed by the prior market's recent run).
+- **Read scope (#2):** dashboards for a brand include only its effective market + `global`, and
+  **exclude** `legacy` and any other market's rows (regression: a market change does not blend
+  old-market data into the new market's metrics).
+- Migration stamps pre-existing `prompt_runs` as `legacy`; new runs never write `legacy`; the
+  staged migration succeeds on a populated table.
+- Env→catalog fallback: a null-default brand resolves the env market at evaluation time; a
+  missing mapping surfaces a clear run/config error, not a startup crash and not a `global`
+  mislabel.
 - Catalog entries have valid `(locationCode, languageCode)`; unknown keys rejected on brand
   save; demo mode read-only; i18n en/tr parity.
 
 ## Out of scope for 2a (→ 2b)
 
-Multiple markets per brand; comparison view; translated prompt variants; market-scaled
-ceiling; `usage_events.market_key`; read-layer market scoping; the top-of-brand market
-selector/strip.
+Multiple markets per brand; comparison view; translated prompt variants; market-scaled ceiling;
+`usage_events.market_key`; the multi-market read *selector* (2a has only a fixed single-market
+scope); the top-of-brand market strip.
 
 ## Suggested 2a plan stages
 
-1. Catalog + `Market` types + `localizableFor` (config + providers).
-2. Migration (`brands.market_key`, `prompt_runs.market_key`).
-3. Pipeline: resolve + apply per-brand market in DataForSEO; stamp `savePromptRun`.
-4. Brand-settings location picker + i18n; demo read-only.
-5. Idempotent brand-location backfill command.
+1. Catalog + `Market` types + `getMarketForCodes` + `localizableFor` (config + providers).
+2. Staged migration (`brands.default_market_key`; `prompt_runs.market_key` nullable→`legacy`→NOT NULL).
+3. `ProviderOptions.market`; worker effective-market resolution; DataForSEO applies it;
+   `savePromptRun` stamps `market_key`.
+4. Market-aware `targetKey`/last-run grouping (scheduler freshness).
+5. Fixed `marketScope` read predicate in the shared analytics helpers.
+6. Brand-settings "Evaluation market" picker + note + header label + i18n; demo read-only.
+7. Idempotent brand-market backfill command.
 
 ## Open items (2a)
 
-Initial catalog entries (demo's Türkiye + a couple more); whether the backfill command runs as
-part of the normal deploy or is invoked manually; whether to show the location label on the
-dashboard header in 2a or wait for 2b.
+Initial catalog entries (demo's Türkiye + a couple more, e.g. `de-DE`, `en-GB`); whether the
+backfill command runs on deploy or is invoked manually; whether the null-default env-fallback
+also surfaces via a startup health/config check (non-fatal) in addition to the evaluation-time
+validation.
 
 ---
 
