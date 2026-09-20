@@ -54,6 +54,16 @@ export function resolveProviderAccess(config: ModelConfig): ProviderAccess {
 }
 
 /**
+ * Whether a target's route can be localized to a brand's market — a scraped
+ * consumer surface can be pointed at a location/language, a direct API call
+ * (or a DataForSEO route pinned to a specific model) cannot.
+ */
+export function resolveLocalizable(config: ModelConfig): boolean {
+	const provider = getProvider(config.provider);
+	return provider.localizableFor?.(config) ?? provider.localizable ?? false;
+}
+
+/**
  * Whether a target is a model called directly with its own web search on — the
  * expensive kind, an order of magnitude dearer than the same call ungrounded,
  * which is why these are sold from a metered pool rather than picked per brand.

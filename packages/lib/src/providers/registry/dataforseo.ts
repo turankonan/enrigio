@@ -290,6 +290,7 @@ export const dataforseo: Provider = {
 	access: "scraped",
 	// A pinned version routes to LLM Responses; without one the surface is scraped.
 	accessFor: dataforseoAccess,
+	localizableFor: (config) => dataforseoAccess(config) === "scraped",
 	docsAnchor: "dataforseo",
 
 	isConfigured: isDataforseoConfigured,

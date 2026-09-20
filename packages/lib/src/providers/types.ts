@@ -18,6 +18,8 @@ export interface ScrapeResult {
 export interface ProviderOptions {
 	webSearch?: boolean;
 	version?: string;
+	/** Localized market for scraped routes; set by the worker for localizable targets only. */
+	market?: { locationCode: number; languageCode: string };
 }
 
 export interface StructuredResearchOptions<T> {
@@ -61,6 +63,10 @@ export interface Provider {
 	 * the target.
 	 */
 	accessFor?(config: ModelConfig): ProviderAccess;
+	/** Whether this provider localizes for targets that don't refine it. Defaults false. */
+	localizable?: boolean;
+	/** Per-target localizability; wins over `localizable`. */
+	localizableFor?(config: ModelConfig): boolean;
 	/**
 	 * Section of the provider setup guide covering this provider, so the app can
 	 * point an operator at how to configure it. Omitted for providers with no
