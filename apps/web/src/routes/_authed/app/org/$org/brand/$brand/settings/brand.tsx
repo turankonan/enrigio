@@ -1,10 +1,11 @@
 import { Info } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
 import { brandSegment, brandSlugPrefix, normalizeSlug } from "@workspace/lib/app-urls";
 import { Button } from "@workspace/ui/components/button";
 import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import { TagsInput } from "@workspace/ui/components/tags-input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
 import { useCallback, useState } from "react";
@@ -16,15 +17,68 @@ import { useOrganization, useOrganizationsChanged } from "@/hooks/use-organizati
 import { useBrandParams } from "@/hooks/use-route-params";
 import { cleanAndValidateDomain } from "@/lib/domain-categories";
 import { t } from "@/lib/i18n";
+import { marketLabel } from "@/lib/market-label";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
+import { type BrandMarketState, getBrandMarketStateFn, updateBrandMarketFn } from "@/server/brand-market";
 import { updateBrandFn } from "@/server/brands";
 
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand/settings/brand")({
 	staticData: { crumb: t("settings.brand.crumb") },
+	loader: ({ context }): Promise<BrandMarketState> => getBrandMarketStateFn({ data: { brandId: context.brandId } }),
 	head: pageHead({ title: t("settings.brand.head_title"), description: t("settings.brand.head_description") }),
 	component: BrandSettingsPage,
 });
+
+/** The evaluation market picker: a single select bound to the brand's
+ *  `defaultMarketKey`, disabled and explained when the deployment owns it. */
+function MarketPicker() {
+	const { brandId } = Route.useRouteContext();
+	const market = Route.useLoaderData();
+	const router = useRouter();
+	const writeError = useWriteErrorMessage();
+	const [marketKey, setMarketKey] = useState(market.marketKey);
+	const [saving, setSaving] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
+	const handleChange = async (value: string | null) => {
+		if (!value) return;
+		const previous = marketKey;
+		setMarketKey(value);
+		setSaving(true);
+		setError(null);
+		try {
+			await updateBrandMarketFn({ data: { brandId, marketKey: value } });
+			await router.invalidate();
+		} catch (err) {
+			setMarketKey(previous);
+			setError(writeError(err, "Failed to update the evaluation market."));
+		} finally {
+			setSaving(false);
+		}
+	};
+
+	return (
+		<div className="space-y-2">
+			<Label htmlFor="market">{t("settings.market.label")}</Label>
+			<Select value={marketKey} onValueChange={handleChange} disabled={!market.editable || saving}>
+				<SelectTrigger id="market" className="w-64">
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent>
+					{market.options.map((option) => (
+						<SelectItem key={option.key} value={option.key}>
+							{marketLabel(option.key)}
+						</SelectItem>
+					))}
+				</SelectContent>
+			</Select>
+			{!market.editable && <p className="text-xs text-muted-foreground">{t("settings.market.readonly")}</p>}
+			<p className="text-xs text-muted-foreground">{t("settings.market.help")}</p>
+			{error && <p className="text-sm text-destructive">{error}</p>}
+		</div>
+	);
+}
 
 function BrandSettingsPage() {
 	const { data: brand, isLoading, refetch: refetchBrand } = useBrand();
@@ -223,6 +277,8 @@ function BrandSettingsPage() {
 					</Button>
 				</div>
 			</form>
+
+			<MarketPicker />
 		</div>
 	);
 }
