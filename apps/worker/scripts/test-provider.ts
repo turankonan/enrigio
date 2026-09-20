@@ -14,9 +14,26 @@
 import { appendFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { getModelMeta } from "@workspace/config/models";
 import { parseScrapeTargets, STATUS_TARGETS } from "@workspace/config/scrape-targets";
-import { getProvider, type ScrapeResult } from "@workspace/lib/providers";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
+import { getProvider, type ModelConfig, resolveLocalizable, type ScrapeResult } from "@workspace/lib/providers";
 import { extractCitations, extractTextContent } from "@workspace/lib/text-extraction";
 import { escapeGitHubSummaryTableCell } from "./github-summary";
+
+// Manual/CI diagnostic runs aren't tied to any brand, so a localizable target
+// (e.g. a DataForSEO scraped route) uses the deployment's default market.
+// Resolved lazily so testing a non-localizable target never requires a valid
+// DataForSEO env pair.
+let diagnosticMarket: ReturnType<typeof resolveEffectiveMarket> | undefined;
+function getDiagnosticMarket() {
+	diagnosticMarket ??= resolveEffectiveMarket({ defaultMarketKey: null });
+	return diagnosticMarket;
+}
+
+function marketOptionFor(config: ModelConfig) {
+	if (!resolveLocalizable(config)) return undefined;
+	const { locationCode, languageCode } = getDiagnosticMarket();
+	return { locationCode, languageCode };
+}
 
 const colors = {
 	reset: "\x1b[0m",
@@ -257,6 +274,7 @@ async function retryForCitations(args: {
 			const retry = await provider.run(config.model, TEST_PROMPTS[i], {
 				webSearch: config.webSearch,
 				version: config.version,
+				market: marketOptionFor(config),
 			});
 			if (retry.citations.length > 0 || hasRealWebQueries(retry.webQueries)) {
 				result = retry;
@@ -326,6 +344,7 @@ async function runTarget(target: string, dumpDir?: string): Promise<{ result: Ta
 		result = await provider.run(config.model, TEST_PROMPTS[0], {
 			webSearch: config.webSearch,
 			version: config.version,
+			market: marketOptionFor(config),
 		});
 	} catch (error) {
 		const latency = Date.now() - attemptStart;

@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/node";
 import type { Entitlements } from "@workspace/config/entitlements";
+import { GLOBAL_MARKET_KEY, type Market } from "@workspace/config/markets";
 import { parseScrapeTargets } from "@workspace/config/scrape-targets";
 import { getDefaultDelayHours } from "@workspace/lib/constants";
 import { db } from "@workspace/lib/db/db";
@@ -14,9 +15,10 @@ import {
 	usageEvents,
 } from "@workspace/lib/db/schema";
 import { getOrgEntitlements } from "@workspace/lib/entitlements";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { classifyMention } from "@workspace/lib/mention-classify";
 import { analyzeMentions } from "@workspace/lib/mentions";
-import { getProvider, type ModelConfig, type Provider } from "@workspace/lib/providers";
+import { getProvider, type ModelConfig, type Provider, resolveLocalizable } from "@workspace/lib/providers";
 import { failureBackoffHours } from "@workspace/lib/run-backoff";
 import {
 	dailyRunCeiling,
@@ -213,6 +215,7 @@ async function savePromptRun(
 	competitorsMentioned: string[],
 	sentiment: "positive" | "neutral" | "negative" | null,
 	brandRank: number | null,
+	marketKey: string,
 ): Promise<{ id: string; createdAt: Date }> {
 	const [result] = await db
 		.insert(promptRuns)
@@ -229,6 +232,7 @@ async function savePromptRun(
 			competitorsMentioned,
 			sentiment,
 			brandRank,
+			marketKey,
 		})
 		.returning({ id: promptRuns.id, createdAt: promptRuns.createdAt });
 
@@ -289,7 +293,7 @@ async function recordUsageEvent(input: {
 	}
 }
 
-async function runModelIteration({
+export async function runModelIteration({
 	promptId,
 	promptValue,
 	brand,
@@ -297,6 +301,7 @@ async function runModelIteration({
 	config,
 	providerImpl,
 	runIndex,
+	effectiveMarket,
 }: {
 	promptId: string;
 	promptValue: string;
@@ -305,13 +310,19 @@ async function runModelIteration({
 	config: ModelConfig;
 	providerImpl: Provider;
 	runIndex: number;
+	effectiveMarket: Market;
 }): Promise<void> {
 	const logPrefix = `[${config.model}_${runIndex}]`;
+	const localizable = resolveLocalizable(config);
+	const runMarketKey = localizable ? effectiveMarket.key : GLOBAL_MARKET_KEY;
 
 	try {
 		const result = await providerImpl.run(config.model, promptValue, {
 			webSearch: config.webSearch,
 			version: config.version,
+			market: localizable
+				? { locationCode: effectiveMarket.locationCode, languageCode: effectiveMarket.languageCode }
+				: undefined,
 		});
 
 		// `webQueries` is stored exactly as the provider reported it — engines do
@@ -355,6 +366,7 @@ async function runModelIteration({
 			competitorsMentioned,
 			classification?.sentiment ?? null,
 			classification?.brandRank ?? null,
+			runMarketKey,
 		);
 		console.log(`${logPrefix} Saved prompt run ${promptRunId}`);
 
@@ -459,6 +471,11 @@ async function processPrompt(
 		`Processing prompt "${prompt.value}" for brand "${brand.name}" — ${dueTargets.length}/${plan.targets.length} targets due`,
 	);
 
+	// Resolved once per cycle (not per target) so every localizable run in this
+	// fan-out lands in the same market and a misconfigured brand market fails
+	// the whole cycle loudly rather than per-target.
+	const effectiveMarket = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey });
+
 	const runPromises = dueTargets.flatMap((target) => {
 		const providerImpl = getProvider(target.config.provider);
 		return Array.from({ length: target.replication }, (_, i) =>
@@ -470,6 +487,7 @@ async function processPrompt(
 				config: target.config,
 				providerImpl,
 				runIndex: i + 1,
+				effectiveMarket,
 			}),
 		);
 	});

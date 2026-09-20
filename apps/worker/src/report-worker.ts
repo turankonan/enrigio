@@ -1,10 +1,12 @@
+import type { Market } from "@workspace/config/markets";
 import { parseScrapeTargets } from "@workspace/config/scrape-targets";
 import { getRunsPerPrompt } from "@workspace/lib/constants";
 import { db } from "@workspace/lib/db/db";
 import { type Brand, brands, reports } from "@workspace/lib/db/schema";
+import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { analyzeMentions } from "@workspace/lib/mentions";
 import { analyzeBrand } from "@workspace/lib/onboarding";
-import { getProvider, type ModelConfig } from "@workspace/lib/providers";
+import { getProvider, type ModelConfig, resolveLocalizable } from "@workspace/lib/providers";
 import { computeSystemTags, isPromptBranded } from "@workspace/lib/tag-utils";
 import { eq } from "drizzle-orm";
 
@@ -168,12 +170,17 @@ async function runPrompt(
 	competitors: CompetitorResult[],
 	scrapeConfigs: ModelConfig[],
 	job: ReportJobContext,
+	effectiveMarket: Market,
 ): Promise<PromptRunResult> {
 	const runOne = async (config: ModelConfig) => {
 		const providerImpl = getProvider(config.provider);
+		const localizable = resolveLocalizable(config);
 		const result = await providerImpl.run(config.model, promptValue, {
 			webSearch: config.webSearch,
 			version: config.version,
+			market: localizable
+				? { locationCode: effectiveMarket.locationCode, languageCode: effectiveMarket.languageCode }
+				: undefined,
 		});
 		const { brandMentioned, competitorsMentioned } = analyzeMentions(
 			result.textContent,
@@ -213,6 +220,10 @@ export async function processReportJob(job: ReportJobContext) {
 	job.log(`Processing report ID: ${reportId} for brand: ${brandName}`);
 
 	const scrapeConfigs = parseScrapeTargets(process.env.SCRAPE_TARGETS);
+	// Reports aren't scoped to an onboarded brand (whitelabel/trial reports run
+	// before a brand row exists), so localizable targets always use the
+	// deployment's default market rather than a brand's configured one.
+	const effectiveMarket = resolveEffectiveMarket({ defaultMarketKey: null });
 
 	const useManualPrompts = manualPrompts && manualPrompts.length > 0;
 	if (useManualPrompts) {
@@ -287,7 +298,15 @@ export async function processReportJob(job: ReportJobContext) {
 			const batch = candidatePrompts.slice(i, i + batchSize);
 			const batchPromises = batch.map(async (candidate) => {
 				try {
-					const result = await runPrompt(candidate.prompt, brandName, brandWebsite, competitors, scrapeConfigs, job);
+					const result = await runPrompt(
+						candidate.prompt,
+						brandName,
+						brandWebsite,
+						competitors,
+						scrapeConfigs,
+						job,
+						effectiveMarket,
+					);
 					completedCandidates++;
 					const progress = 40 + (completedCandidates / totalCandidates) * 30;
 					job.updateProgress(progress);

@@ -118,6 +118,7 @@ describe("dataforseo provider", () => {
 
 			const result = await dataforseo.run("chatgpt", "What speaker released last month reviews well?", {
 				webSearch: true,
+				market: { locationCode: 2840, languageCode: "en" },
 			});
 
 			expect(dataforseoClient.chatgptLlmResponsesLive).not.toHaveBeenCalled();
@@ -192,7 +193,10 @@ describe("dataforseo provider", () => {
 				}),
 			);
 
-			const result = await dataforseo.run("gemini", "What speaker reviews well?", { webSearch: true });
+			const result = await dataforseo.run("gemini", "What speaker reviews well?", {
+				webSearch: true,
+				market: { locationCode: 2840, languageCode: "en" },
+			});
 
 			expect(result.citations).toHaveLength(1);
 			expect(result.citations[0].domain).toBe("whathifi.com");
@@ -202,7 +206,10 @@ describe("dataforseo provider", () => {
 
 		it("re-extracts every shape the one provider id stores from rawOutput", async () => {
 			dataforseoClient.chatGptLlmScraperLiveAdvanced.mockResolvedValueOnce(scraperResponse(CHATGPT_SCRAPE));
-			const scraped = await dataforseo.run("chatgpt", "What speaker reviews well?", { webSearch: true });
+			const scraped = await dataforseo.run("chatgpt", "What speaker reviews well?", {
+				webSearch: true,
+				market: { locationCode: 2840, languageCode: "en" },
+			});
 
 			// Stored rows carry provider "dataforseo" whichever route produced them,
 			// so the shared extractors have to tell the shapes apart.
@@ -210,7 +217,10 @@ describe("dataforseo provider", () => {
 			expect(extractCitations(scraped.rawOutput, "dataforseo")).toHaveLength(1);
 
 			dataforseoClient.googleOrganicLiveAdvanced.mockResolvedValueOnce(AI_OVERVIEW_OK);
-			const serp = await dataforseo.run("google-ai-overview", "What speaker reviews well?", { webSearch: true });
+			const serp = await dataforseo.run("google-ai-overview", "What speaker reviews well?", {
+				webSearch: true,
+				market: { locationCode: 2840, languageCode: "en" },
+			});
 			expect(extractTextContent(serp.rawOutput, "dataforseo")).toContain("Sonos Era 300");
 			expect(extractCitations(serp.rawOutput, "dataforseo")).toHaveLength(1);
 		});
@@ -266,6 +276,7 @@ describe("dataforseo provider", () => {
 
 		const result = await dataforseo.run("google-ai-overview", "What is a well-reviewed speaker released last month?", {
 			webSearch: true,
+			market: { locationCode: 2840, languageCode: "en" },
 		});
 
 		const [payload] = dataforseoClient.googleOrganicLiveAdvanced.mock.calls[0];
@@ -291,6 +302,7 @@ describe("dataforseo provider", () => {
 
 		const promise = dataforseo.run("google-ai-overview", "What is a well-reviewed speaker released last month?", {
 			webSearch: true,
+			market: { locationCode: 2840, languageCode: "en" },
 		});
 		await vi.runAllTimersAsync();
 		const result = await promise;
@@ -308,6 +320,7 @@ describe("dataforseo provider", () => {
 
 		const promise = dataforseo.run("google-ai-overview", "What is a well-reviewed speaker released last month?", {
 			webSearch: true,
+			market: { locationCode: 2840, languageCode: "en" },
 		});
 		const assertion = expect(promise).rejects.toThrow("DataForSEO API Error: 40602 Internal SE Server Error.");
 		await vi.runAllTimersAsync();

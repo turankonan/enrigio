@@ -14,8 +14,6 @@ import {
 	createDfsAiApi,
 	createDfsSerpApi,
 	dfsFirstResult,
-	dfsLanguageCode,
-	dfsLocationCode,
 	dfsResultOrError,
 	fanOutQueries,
 	isDataforseoConfigured,
@@ -56,24 +54,24 @@ const LLM_MODELS: Record<string, { defaultModelName: string; call: keyof typeof 
  * DataForSEO has no Perplexity scraper.
  */
 const SCRAPER_CALLS = {
-	chatgpt: (api: client.AiOptimizationApi, prompt: string) =>
+	chatgpt: (api: client.AiOptimizationApi, prompt: string, locationCode: number, languageCode: string) =>
 		api.chatGptLlmScraperLiveAdvanced([
 			new client.AiOptimizationChatGptLlmScraperLiveAdvancedRequestInfo({
 				keyword: prompt,
-				location_code: dfsLocationCode(),
-				language_code: dfsLanguageCode(),
+				location_code: locationCode,
+				language_code: languageCode,
 				// ChatGPT decides per prompt whether to search; force it so a tracked
 				// run always reflects the browsing experience. Gemini always searches
 				// and has no equivalent flag.
 				force_web_search: true,
 			}),
 		]),
-	gemini: (api: client.AiOptimizationApi, prompt: string) =>
+	gemini: (api: client.AiOptimizationApi, prompt: string, locationCode: number, languageCode: string) =>
 		api.geminiLlmScraperLiveAdvanced([
 			new client.AiOptimizationGeminiLlmScraperLiveAdvancedRequestInfo({
 				keyword: prompt,
-				location_code: dfsLocationCode(),
-				language_code: dfsLanguageCode(),
+				location_code: locationCode,
+				language_code: languageCode,
 			}),
 		]),
 } as const;
@@ -112,13 +110,13 @@ const LLM_CALLS = {
 		api.geminiLlmResponsesLive(body.map((b) => new client.AiOptimizationGeminiLlmResponsesLiveRequestInfo(b))),
 } as const;
 
-async function runGoogleAiMode(prompt: string): Promise<ScrapeResult> {
+async function runGoogleAiMode(prompt: string, locationCode: number, languageCode: string): Promise<ScrapeResult> {
 	assertPromptLength(prompt);
 	const api = createDfsSerpApi();
 	const requestInfo = new client.SerpGoogleAiModeLiveAdvancedRequestInfo({
 		keyword: prompt,
-		location_code: dfsLocationCode(),
-		language_code: dfsLanguageCode(),
+		location_code: locationCode,
+		language_code: languageCode,
 		depth: 10,
 	});
 
@@ -138,13 +136,13 @@ async function runGoogleAiMode(prompt: string): Promise<ScrapeResult> {
 	};
 }
 
-function runGoogleAiOverview(prompt: string): Promise<ScrapeResult> {
+function runGoogleAiOverview(prompt: string, locationCode: number, languageCode: string): Promise<ScrapeResult> {
 	assertPromptLength(prompt);
 	const api = createDfsSerpApi();
 	const requestInfo = new client.SerpGoogleOrganicLiveAdvancedRequestInfo({
 		keyword: prompt,
-		location_code: dfsLocationCode(),
-		language_code: dfsLanguageCode(),
+		location_code: locationCode,
+		language_code: languageCode,
 		depth: 10,
 		// AI Overviews are generated on demand; without this DataForSEO only
 		// returns whatever it had cached, so most runs would come back empty.
@@ -268,8 +266,13 @@ async function runLlmResponse(model: string, prompt: string, options?: ProviderO
 	};
 }
 
-async function runLlmScraper(model: keyof typeof SCRAPER_CALLS, prompt: string): Promise<ScrapeResult> {
-	const response = await SCRAPER_CALLS[model](createDfsAiApi(), prompt);
+async function runLlmScraper(
+	model: keyof typeof SCRAPER_CALLS,
+	prompt: string,
+	locationCode: number,
+	languageCode: string,
+): Promise<ScrapeResult> {
+	const response = await SCRAPER_CALLS[model](createDfsAiApi(), prompt, locationCode, languageCode);
 	const result = dfsFirstResult<{ model?: string; fan_out_queries?: unknown }>(response);
 	const raw = sanitizeForJson(response);
 	const citations = extractCitationsFromDataforseoScraper(raw);
@@ -282,6 +285,18 @@ async function runLlmScraper(model: keyof typeof SCRAPER_CALLS, prompt: string):
 		citations,
 		modelVersion: result.model ?? model,
 	};
+}
+
+/**
+ * Every scraped DataForSEO route is localizable, and the worker is the only
+ * caller expected to run one — it resolves the brand's effective market and
+ * passes it in. Throwing here (rather than silently defaulting) is what makes
+ * an un-marketed caller of a scraped route surface immediately instead of
+ * quietly always scraping the deployment default market.
+ */
+export function requireMarketCodes(options?: ProviderOptions): { locationCode: number; languageCode: string } {
+	if (!options?.market) throw new Error("DataForSEO localizable route requires options.market");
+	return { locationCode: options.market.locationCode, languageCode: options.market.languageCode };
 }
 
 export const dataforseo: Provider = {
@@ -317,15 +332,18 @@ export const dataforseo: Provider = {
 	async run(model: string, prompt: string, options?: ProviderOptions): Promise<ScrapeResult> {
 		assertPromptLength(prompt);
 		if (SERP_MODELS.has(model)) {
-			return runGoogleAiMode(prompt);
+			const { locationCode, languageCode } = requireMarketCodes(options);
+			return runGoogleAiMode(prompt, locationCode, languageCode);
 		}
 		if (model === AI_OVERVIEW_MODEL) {
-			return runGoogleAiOverview(prompt);
+			const { locationCode, languageCode } = requireMarketCodes(options);
+			return runGoogleAiOverview(prompt, locationCode, languageCode);
 		}
 		// Prefer the scraped consumer UI. Pinning a model_name is the opt-in to the
 		// LLM Responses API, which is the only route that can honor one.
 		if (!options?.version && model in SCRAPER_CALLS) {
-			return runLlmScraper(model as keyof typeof SCRAPER_CALLS, prompt);
+			const { locationCode, languageCode } = requireMarketCodes(options);
+			return runLlmScraper(model as keyof typeof SCRAPER_CALLS, prompt, locationCode, languageCode);
 		}
 		if (LLM_MODELS[model]) {
 			return runLlmResponse(model, prompt, options);
