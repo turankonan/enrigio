@@ -42,6 +42,7 @@ export const brands = pgTable(
 		onboarded: boolean("onboarded").default(false).notNull(),
 		delayOverrideHours: integer("delay_override_hours"),
 		enabledModels: text("enabled_models").array(),
+		defaultMarketKey: text("default_market_key"),
 		// Hard tenancy scope. Every brand belongs to exactly one better-auth
 		// organization; org membership (the `member` table) is the access-control
 		// mechanism. Brand and organization ids are independent, so billing and
@@ -129,6 +130,11 @@ export const promptRuns = pgTable(
 		// the answer text. Null means "not mentioned" or "classifier unavailable".
 		sentiment: runSentimentEnum("sentiment"),
 		brandRank: smallint("brand_rank"),
+		// Temporary cutover marker: 'legacy' means pre-cutover/unknown scope.
+		// 'global' is written only explicitly by app code for proven
+		// non-localizable prompts — never make it the default, or legacy rows
+		// become indistinguishable from proven-global ones.
+		marketKey: text("market_key").notNull().default("legacy"),
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(table) => ({
@@ -142,6 +148,11 @@ export const promptRuns = pgTable(
 		),
 		providerIdx: index("prompt_runs_provider_idx").on(table.provider),
 		modelCreatedAtIdx: index("prompt_runs_model_created_at_idx").on(table.model, table.createdAt),
+		brandMarketCreatedAtIdx: index("prompt_runs_brand_id_market_key_created_at_idx").on(
+			table.brandId,
+			table.marketKey,
+			table.createdAt,
+		),
 	}),
 ).enableRLS();
 

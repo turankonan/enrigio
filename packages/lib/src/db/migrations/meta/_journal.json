@@ -169,6 +169,13 @@
       "when": 1789849139860,
       "tag": "0023_big_agent_zero",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1789912255327,
+      "tag": "0024_safe_tarantula",
+      "breakpoints": true
     }
   ]
 }
