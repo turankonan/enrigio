@@ -76,6 +76,16 @@ const SCRAPER_CALLS = {
 		]),
 } as const;
 
+/**
+ * The DataForSEO models with two routes (`SCRAPER_CALLS`): unpinned they hit
+ * the LLM Scraper (localizable), pinned they hit LLM Responses (not
+ * localizable). Used by the market backfill, which can't reconstruct which
+ * route a historical row actually took, to treat both as ambiguous.
+ */
+export function isVersionSensitiveDfsModel(model: string): boolean {
+	return model in SCRAPER_CALLS;
+}
+
 // Google AI Overview is the AI summary block on a standard Google results page.
 // It comes from the Organic SERP endpoint (not AI Mode's dedicated SERP), so it
 // gets its own runner rather than joining SERP_MODELS.
