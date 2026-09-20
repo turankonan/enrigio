@@ -265,8 +265,13 @@ export function latestVisibility(chartData: ChartDataPoint[], id: string): numbe
 
 import type { Competitor, PromptRun } from "@workspace/lib/db/schema";
 
+// The visibility series only needs when each run happened and who it mentioned;
+// it deliberately doesn't require the full row (e.g. market_key) so callers that
+// carry a trimmed run shape can compute a chart without it.
+type VisibilityRun = Pick<PromptRun, "createdAt" | "brandMentioned" | "competitorsMentioned">;
+
 export function calculateVisibilityPercentages(
-	promptRuns: PromptRun[],
+	promptRuns: VisibilityRun[],
 	brand: ChartSubject,
 	competitors: Competitor[],
 	lookback: LookbackPeriod,
@@ -318,7 +323,7 @@ export function calculateVisibilityPercentages(
 			acc[dateKey].push(run);
 			return acc;
 		},
-		{} as Record<string, PromptRun[]>,
+		{} as Record<string, VisibilityRun[]>,
 	);
 
 	return dateRange.map((date) => {
