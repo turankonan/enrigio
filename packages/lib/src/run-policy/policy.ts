@@ -195,9 +195,16 @@ export function defaultPlatformPicks(entitlements: Entitlements, scrapeTargets: 
  * never-run. The one case that does re-fire once is an operator pointing a
  * model at a different provider — which is a different data source, so
  * restarting its cadence is the right answer.
+ *
+ * `marketKey` is optional and appended only when given, so every caller
+ * without market context (the monitoring dashboard, the maintenance sweep)
+ * keeps computing the exact pre-market key. Only the scheduler's due-check
+ * needs market-aware identity: a target run for one market must not read as
+ * fresh for another.
  */
-export function targetKey(config: Pick<ModelConfig, "model" | "provider" | "webSearch">): string {
-	return `${config.model}::${config.provider}::${config.webSearch ? "web" : "base"}`;
+export function targetKey(config: Pick<ModelConfig, "model" | "provider" | "webSearch">, marketKey?: string): string {
+	const base = `${config.model}::${config.provider}::${config.webSearch ? "web" : "base"}`;
+	return marketKey === undefined ? base : `${base}::${marketKey}`;
 }
 
 export interface LastRunRow {
@@ -205,6 +212,13 @@ export interface LastRunRow {
 	/** Nullable on the column: a row without one predates target keying. */
 	provider: string | null;
 	webSearchEnabled: boolean;
+	/**
+	 * Optional: rows the monitoring paths (schedule-maintenance, admin) load
+	 * don't carry a market, and must keep hashing to the pre-market key so
+	 * they still match maintenance's market-blind lookups. Only the process-
+	 * prompt scheduler supplies it, to key freshness per market.
+	 */
+	marketKey?: string;
 	lastRunAt: Date | string;
 }
 
@@ -213,7 +227,7 @@ export function lastRunsByTargetKey(rows: readonly LastRunRow[]): Map<string, Da
 	for (const row of rows) {
 		if (!row.provider) continue;
 		byKey.set(
-			targetKey({ model: row.model, provider: row.provider, webSearch: row.webSearchEnabled }),
+			targetKey({ model: row.model, provider: row.provider, webSearch: row.webSearchEnabled }, row.marketKey),
 			new Date(row.lastRunAt),
 		);
 	}
@@ -270,8 +284,20 @@ export function targetOverdueStatus(input: {
 	return { isOverdue: false, overdueByMs: null };
 }
 
-export function selectDueTargets(targets: TargetPlan[], lastRunAtByKey: Map<string, Date>, now: Date): TargetPlan[] {
-	return targets.filter((plan) => isTargetDue(plan, lastRunAtByKey.get(targetKey(plan.config)), now));
+/**
+ * `marketKeyFor` is optional (default market-blind) because only the
+ * process-prompt scheduler has a resolved market to check freshness against;
+ * other callers keep computing the pre-market key.
+ */
+export function selectDueTargets(
+	targets: TargetPlan[],
+	lastRunAtByKey: Map<string, Date>,
+	now: Date,
+	marketKeyFor: (config: ModelConfig) => string | undefined = () => undefined,
+): TargetPlan[] {
+	return targets.filter((plan) =>
+		isTargetDue(plan, lastRunAtByKey.get(targetKey(plan.config, marketKeyFor(plan.config))), now),
+	);
 }
 
 /**

@@ -166,7 +166,7 @@ async function resolvePlanForPrompt(
 	return { plan, entitlements };
 }
 
-/** Last successful run per target within the cadence lookup window. */
+/** Last successful run per target (and market) within the cadence lookup window. */
 async function getLastRunsByTargetKey(promptId: string, maxIntervalHours: number): Promise<Map<string, Date>> {
 	const windowStart = new Date(Date.now() - lastRunQueryWindowMs(maxIntervalHours));
 	const rows = await db
@@ -174,11 +174,12 @@ async function getLastRunsByTargetKey(promptId: string, maxIntervalHours: number
 			model: promptRuns.model,
 			provider: promptRuns.provider,
 			webSearchEnabled: promptRuns.webSearchEnabled,
+			marketKey: promptRuns.marketKey,
 			lastRunAt: sql<Date>`MAX(${promptRuns.createdAt})`.as("last_run_at"),
 		})
 		.from(promptRuns)
 		.where(and(eq(promptRuns.promptId, promptId), gt(promptRuns.createdAt, windowStart)))
-		.groupBy(promptRuns.model, promptRuns.provider, promptRuns.webSearchEnabled);
+		.groupBy(promptRuns.model, promptRuns.provider, promptRuns.webSearchEnabled, promptRuns.marketKey);
 
 	return lastRunsByTargetKey(rows);
 }
@@ -443,8 +444,17 @@ async function processPrompt(
 		return;
 	}
 
+	// Resolved once per cycle (not per target) so every localizable run in this
+	// fan-out lands in the same market and a misconfigured brand market fails
+	// the whole cycle loudly rather than per-target. The scheduler's due-check
+	// uses the same per-target market identity as the stamping below, so a
+	// brand that changes market doesn't read its old market's run as fresh.
+	const effectiveMarket = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey });
+	const runMarketKeyFor = (config: ModelConfig) =>
+		resolveLocalizable(config) ? effectiveMarket.key : GLOBAL_MARKET_KEY;
+
 	const lastRuns = await getLastRunsByTargetKey(promptId, slowestIntervalHours(plan.targets));
-	const dueTargets = selectDueTargets(plan.targets, lastRuns, new Date());
+	const dueTargets = selectDueTargets(plan.targets, lastRuns, new Date(), runMarketKeyFor);
 
 	if (dueTargets.length === 0) {
 		// Fired early (expedite, duplicate send): everything is fresh. Keep the
@@ -470,11 +480,6 @@ async function processPrompt(
 	console.log(
 		`Processing prompt "${prompt.value}" for brand "${brand.name}" — ${dueTargets.length}/${plan.targets.length} targets due`,
 	);
-
-	// Resolved once per cycle (not per target) so every localizable run in this
-	// fan-out lands in the same market and a misconfigured brand market fails
-	// the whole cycle loudly rather than per-target.
-	const effectiveMarket = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey });
 
 	const runPromises = dueTargets.flatMap((target) => {
 		const providerImpl = getProvider(target.config.provider);
