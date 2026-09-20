@@ -232,7 +232,7 @@ git commit -m "add market catalog and per-target localizability predicate"
 - Test: `packages/lib/src/db/schema.market.test.ts`
 
 **Interfaces:**
-- Produces: `Brand.defaultMarketKey: string | null`; `PromptRun.marketKey: string`; `NewPromptRun.marketKey?: string` (defaulted `'global'`).
+- Produces: `Brand.defaultMarketKey: string | null`; `PromptRun.marketKey: string`; `NewPromptRun.marketKey?: string` (temporary DB default `'legacy'`; app code always writes an explicit value).
 
 - [ ] **Step 1: Write the failing schema test**
 
@@ -691,7 +691,14 @@ In `analytics-core.ts`, resolve the brand's effective market once per request an
 import { resolveEffectiveMarket } from "@workspace/lib/markets/effective";
 const effectiveMarketKey = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey }).key;
 ```
-Thread `effectiveMarketKey` into every `postgres-read` call in `analytics-core.ts`, `citations.ts`, `competitors-core.ts`. Add the **behavioral test** against a seeded test DB (mirror existing postgres-read integration tests if present): insert runs for one brand across `tr-TR`, `de-DE`, `global`, and `legacy`; assert `getDashboardSummary(..., "tr-TR")` counts only `tr-TR` + `global`, excludes `de-DE` and `legacy`.
+Thread `effectiveMarketKey` into every `postgres-read` call in `analytics-core.ts`, `citations.ts`, `competitors-core.ts`. Add **behavioral tests** against a seeded test DB (mirror existing postgres-read integration tests if present): seed one brand with runs + citations across `tr-TR`, `de-DE`, `global`, and `legacy`, then for `effectiveMarketKey = "tr-TR"` assert **each representative read includes `tr-TR` + `global` and excludes `de-DE` + `legacy`** — not just one. Cover, at minimum, one per family (review r6/r7):
+- summary/visibility — `getDashboardSummary`, `getVisibilityDailyAggregate`;
+- run history & count — `getPromptRuns`, `countPromptRuns`;
+- chart start date — `getBrandEarliestRunDate` (and `getPromptsFirstEvaluatedAt`);
+- citations — `getCitationDomainStats` (exercises the `"citations"` EXISTS-join source);
+- competitors / share-of-voice — `getPromptTopCompetitorMentions` (and `getBrandShareOfVoice` via analytics-core);
+- fan-out — `getFanoutBreakdown` (exercises the `"pr"` alias source).
+Each test: the `tr-TR` and `global` seed rows count; the `de-DE` and `legacy` rows do not.
 
 - [ ] **Step 6: Run web tests, tsc, lint**
 
@@ -789,13 +796,15 @@ Add to `apps/web/src/locales/en.json` (flat dotted keys):
 ```json
 "settings.market.label": "Evaluation market",
 "settings.market.help": "Sets where and in which interface language evaluations run. Your questions must already be written in the selected market's language; automatic translation arrives later.",
-"settings.market.readonly": "The evaluation market is set by whoever runs this deployment."
+"settings.market.readonly": "The evaluation market is set by whoever runs this deployment.",
+"market.filling_notice": "Now tracking {market}; historical results from before this change aren't shown here."
 ```
-Add the same three keys to `apps/web/src/locales/tr.json` with Turkish translations, e.g.:
+Add the same four keys to `apps/web/src/locales/tr.json` with Turkish translations, e.g.:
 ```json
 "settings.market.label": "Değerlendirme pazarı",
 "settings.market.help": "Değerlendirmelerin hangi ülkede ve arayüz dilinde çalışacağını belirler. Sorularınız seçilen pazarın dilinde yazılmış olmalıdır; otomatik çeviri daha sonra gelecek.",
-"settings.market.readonly": "Değerlendirme pazarı, bu dağıtımı yöneten kişi tarafından belirlenir."
+"settings.market.readonly": "Değerlendirme pazarı, bu dağıtımı yöneten kişi tarafından belirlenir.",
+"market.filling_notice": "Artık {market} izleniyor; bu değişiklikten önceki geçmiş sonuçlar burada gösterilmez."
 ```
 
 - [ ] **Step 7: Add a locale-parity test (none exists today)**
@@ -856,7 +865,7 @@ git commit -m "add per-brand evaluation market picker"
 - Test: `packages/lib/src/markets/backfill-classify.test.ts`
 
 **Interfaces:**
-- Produces: `historicalMarketKeyFor(row: { model: string; provider: string | null; version: string | null; webSearchEnabled: boolean }, envMarketKey: string): string` — returns the env market for **provably localizable** historical runs, `"global"` for **provably non-localizable**, and `"legacy"` for genuinely **ambiguous** rows (DataForSEO `chatgpt`/`gemini`, whose scraped-vs-LLM-Responses route can't be reconstructed from stored columns).
+- Produces: `historicalMarketKeyFor(row: { model: string; provider: string | null; version: string | null; webSearchEnabled: boolean }): "global" | "legacy"` — returns `"global"` ONLY for **provably non-localizable** historical runs; everything else (localizable, ambiguous, unknown/null provider) → `"legacy"`. It makes **no market assertion** — the historical market cannot be proven from stored columns, and the current environment is not proof (the deployment location may have changed). An explicit `--historical-market <key>` operator flag (below) is the only way to attribute `legacy` localizable history to a confirmed market.
 
 - [ ] **Step 1: Write the failing classifier test**
 
@@ -870,22 +879,23 @@ const row = (o: Partial<{ model: string; provider: string | null; version: strin
 });
 
 describe("historicalMarketKeyFor", () => {
-    it("assigns provably localizable DataForSEO routes (SERP/AI Overview) to the env market", () => {
-        expect(historicalMarketKeyFor(row({ model: "google-ai-overview" }), "tr-TR")).toBe("tr-TR");
-        expect(historicalMarketKeyFor(row({ model: "google-ai-mode" }), "tr-TR")).toBe("tr-TR");
+    it("leaves provably localizable history as legacy (market unprovable)", () => {
+        expect(historicalMarketKeyFor(row({ model: "google-ai-overview" }))).toBe("legacy");
+        expect(historicalMarketKeyFor(row({ model: "google-ai-mode" }))).toBe("legacy");
     });
     it("leaves ambiguous DataForSEO chatbot routes as legacy", () => {
-        expect(historicalMarketKeyFor(row({ model: "chatgpt", provider: "dataforseo" }), "tr-TR")).toBe("legacy");
-        expect(historicalMarketKeyFor(row({ model: "gemini", provider: "dataforseo" }), "tr-TR")).toBe("legacy");
+        expect(historicalMarketKeyFor(row({ model: "chatgpt", provider: "dataforseo" }))).toBe("legacy");
+        expect(historicalMarketKeyFor(row({ model: "gemini", provider: "dataforseo" }))).toBe("legacy");
     });
     it("marks provably non-localizable runs as global", () => {
-        expect(historicalMarketKeyFor(row({ model: "perplexity", provider: "dataforseo" }), "tr-TR")).toBe("global");
+        expect(historicalMarketKeyFor(row({ model: "perplexity", provider: "dataforseo" }))).toBe("global");
         for (const p of ["openai-api", "anthropic-api", "mistral-api", "openrouter", "brightdata", "olostep", "oxylabs", "cloro"]) {
-            expect(historicalMarketKeyFor(row({ model: "x", provider: p }), "tr-TR")).toBe("global");
+            expect(historicalMarketKeyFor(row({ model: "x", provider: p }))).toBe("global");
         }
     });
-    it("treats a null provider as global", () => {
-        expect(historicalMarketKeyFor(row({ provider: null }), "tr-TR")).toBe("global");
+    it("treats null and unknown providers as legacy (unknown route, not proven global)", () => {
+        expect(historicalMarketKeyFor(row({ provider: null }))).toBe("legacy");
+        expect(historicalMarketKeyFor(row({ provider: "retired-provider-xyz" }))).toBe("legacy");
     });
 });
 ```
@@ -901,23 +911,31 @@ Expected: FAIL — module missing.
 `packages/lib/src/markets/backfill-classify.ts`:
 ```ts
 import type { ModelConfig } from "@workspace/config/scrape-targets";
-import { resolveLocalizable } from "../providers";
+import { getProvider, resolveLocalizable } from "../providers";
 import { isVersionSensitiveDfsModel } from "../providers/registry/dataforseo";
 
 /**
- * Attribution for a pre-2a run, from what the stored columns can PROVE:
- *  - DataForSEO chatgpt/gemini: scraped-vs-LLM-Responses depends on the ORIGINAL configured
- *    version, but prompt_runs.version stores the RESOLVED version — unreliable — so we cannot
- *    prove the route → leave "legacy" (hidden from market views, never mis-attributed).
- *  - Everything else: reconstruct ModelConfig and use resolveLocalizable (version-independent
- *    for SERP/AI-Overview and for all non-DataForSEO providers). Localizable → env market;
- *    non-localizable → "global".
+ * Attribution for a pre-2a run — from what the stored columns can PROVE, and nothing more.
+ * The historical MARKET is never assertable here (the deployment location may have changed),
+ * so this returns only "global" (proven non-localizable) or "legacy" (unprovable). Assigning
+ * a legacy localizable run to a real market is the operator's explicit decision (--historical-market).
+ *  - null / unknown provider  → "legacy" (unknown route, not proven anything).
+ *  - DataForSEO chatgpt/gemini → "legacy" (scraped-vs-LLM-Responses unreconstructable).
+ *  - provably localizable      → "legacy" (route localizes, but which market is unknown).
+ *  - provably non-localizable  → "global".
  */
-export function historicalMarketKeyFor(
-    row: { model: string; provider: string | null; version: string | null; webSearchEnabled: boolean },
-    envMarketKey: string,
-): string {
-    if (!row.provider) return "global";
+export function historicalMarketKeyFor(row: {
+    model: string;
+    provider: string | null;
+    version: string | null;
+    webSearchEnabled: boolean;
+}): "global" | "legacy" {
+    if (!row.provider) return "legacy";
+    try {
+        getProvider(row.provider); // unknown/retired provider id → catch → legacy (never abort)
+    } catch {
+        return "legacy";
+    }
     if (row.provider === "dataforseo" && isVersionSensitiveDfsModel(row.model)) return "legacy";
     const config: ModelConfig = {
         model: row.model,
@@ -925,7 +943,7 @@ export function historicalMarketKeyFor(
         version: row.version ?? undefined,
         webSearch: row.webSearchEnabled,
     };
-    return resolveLocalizable(config) ? envMarketKey : "global";
+    return resolveLocalizable(config) ? "legacy" : "global";
 }
 ```
 In `dataforseo.ts` export `export function isVersionSensitiveDfsModel(model: string): boolean { return model in SCRAPER_CALLS; }` (SCRAPER_CALLS keys are the version-sensitive scraper models — `chatgpt`, `gemini`).
@@ -937,10 +955,14 @@ Expected: PASS.
 
 - [ ] **Step 5: Write the backfill script (mirror `verify-membership-dedupe.ts`)**
 
-`packages/lib/scripts/backfill-brand-markets.ts`: read `DATABASE_URL`; refuse a non-local DB unless `ALLOW_REMOTE_DB=1`; using a `pg` `Client`, resolve the env market key via `getMarketForCodes(dfsLocationCode(), dfsLanguageCode())` (abort with a clear message if none); then, idempotently:
-- `UPDATE brands SET default_market_key = $1 WHERE default_market_key IS NULL` (env market key);
-- reassign **only the cutover rows**: iterate `prompt_runs WHERE market_key = 'legacy'` (batched by id), compute `historicalMarketKeyFor(row, envKey)`, and `UPDATE ... SET market_key = $new WHERE id = $id AND market_key = 'legacy'`. **Never touch rows where `market_key <> 'legacy'`** — genuine `global` (proven non-localizable) and real-market rows written by the new worker must be left alone (this is what makes it safe and idempotent).
-Log `✓`/counts (localized / global / left-legacy); `process.exit(1)` on error. Idempotent: a second run finds no `legacy` rows for already-classified provable routes (ambiguous rows that stay `legacy` are simply re-evaluated to `legacy` — a no-op write, or skip them).
+`packages/lib/scripts/backfill-brand-markets.ts`: read `DATABASE_URL`; refuse a non-local DB unless `ALLOW_REMOTE_DB=1`; parse an optional `--historical-market <key>` flag (validate against the catalog; abort clearly if unknown). Using a `pg` `Client`:
+- **Brand defaults:** resolve the env market key via `getMarketForCodes(dfsLocationCode(), dfsLanguageCode())`; if it maps to a catalog entry, `UPDATE brands SET default_market_key = $1 WHERE default_market_key IS NULL`. (If the env pair isn't in the catalog, skip this step with a warning rather than aborting the whole run — the picker still lets operators set it.)
+- **Cutover rows only:** iterate `prompt_runs WHERE market_key = 'legacy'` (batched by id). For each, compute `key = historicalMarketKeyFor(row)`:
+  - if `key === 'global'` → `UPDATE ... SET market_key = 'global' WHERE id = $id AND market_key = 'legacy'`.
+  - if `key === 'legacy'` **and** `--historical-market K` was given **and** the row is provably localizable (`historicalMarketKeyFor` returned legacy but `resolveLocalizable(reconstruct(row))` is true and it's not the ambiguous dfs-chatbot case) → set `market_key = K`. Otherwise **leave it untouched** (skip the write).
+  - **Never write `legacy → legacy`** — skipping the no-op keeps the affected-row count honest and the second run a true no-op.
+- **Never touch rows where `market_key <> 'legacy'`** — genuine `global` and real-market rows written by the new worker are left alone; this is what makes it safe and idempotent.
+Log `✓`/counts (→global / →`K` / left-legacy); `process.exit(1)` on error. Idempotent: a second run without `--historical-market` finds only already-classified or intentionally-left `legacy` rows and writes nothing.
 
 - [ ] **Step 6: Add the package script and smoke-test against a scratch DB**
 
@@ -960,6 +982,48 @@ git commit -m "add idempotent brand-market backfill command"
 
 ---
 
+### Task 8 (MANDATORY follow-up — ships in a SEPARATE release after 2a is live and drained)
+
+> Do **not** include this in the 2a branch/release. It removes the temporary `legacy` DB default so a future omitted `market_key` write fails loudly instead of silently vanishing from analytics. It is safe only once the running production workers already stamp `market_key` (i.e. the 2a release is live and any pre-2a workers have drained).
+
+**Files:**
+- Create (generated): `packages/lib/src/db/migrations/0025_*.sql` + `meta/0025_snapshot.json` + `_journal.json`
+- Test: `packages/lib/src/db/schema.market.test.ts` (extend)
+
+**Interfaces:**
+- Produces: `prompt_runs.market_key` stays `NOT NULL` but loses its DB default.
+
+- [ ] **Step 1: Pre-flight — confirm every writer sets `market_key`**
+
+Re-run the Task 3 write-path inventory (`rg "insert\(promptRuns\)"` / `.values(` on `promptRuns`) and confirm every production insert supplies `marketKey` explicitly. Confirm the 2a release is deployed and no pre-2a worker instances remain (Render shows a single current version serving). If any writer omits it, fix that first — do not proceed.
+
+- [ ] **Step 2: Update the schema to drop the default (keep NOT NULL)**
+
+In `schema.ts`, change `marketKey` from `.notNull().default("legacy")` to `.notNull()`.
+
+- [ ] **Step 3: Extend the schema test**
+
+Update the `schema.market.test.ts` assertion: `col.notNull === true` and `col.default === undefined`.
+
+- [ ] **Step 4: Generate migration 0025 (do NOT run)**
+
+Run: `pnpm --filter @workspace/lib exec drizzle-kit generate`. Confirm the generated SQL is `ALTER TABLE "prompt_runs" ALTER COLUMN "market_key" DROP DEFAULT;` (no data change; `NOT NULL` retained).
+
+- [ ] **Step 5: Prove an omitted write now fails**
+
+Add a test (or a script assertion against a scratch DB) that an `INSERT INTO prompt_runs (...)` omitting `market_key` raises a NOT-NULL violation — proving attribution can no longer silently default.
+
+- [ ] **Step 6: Commit (in the follow-up release branch)**
+
+```bash
+git add packages/lib/src/db/schema.ts packages/lib/src/db/schema.market.test.ts \
+  packages/lib/src/db/migrations/0025_*.sql packages/lib/src/db/migrations/meta/0025_snapshot.json \
+  packages/lib/src/db/migrations/meta/_journal.json
+git commit -m "drop temporary market_key default after cutover"
+```
+
+---
+
 ## Notes for the executor
 
 - **Sentinels:** `legacy` = unknown/cutover scope (the migration's temporary DB default; excluded from market views); `global` = **proven** non-localizable, written only explicitly by the new worker (**included** in every market view); `tr-TR`… = proven localized. The backfill only ever reclassifies `legacy` rows, so it can never corrupt a genuine `global` run — that was the core fix over the first draft.
@@ -968,7 +1032,8 @@ git commit -m "add idempotent brand-market backfill command"
   2. New worker stamps explicit market/`global`; scheduler is market-aware.
   3. Old worker drains (Render replaces the instance); its overlap inserts landed as `legacy` — safe.
   4. **Run the backfill command** (`pnpm -C packages/lib backfill:brand-markets`) to set brand defaults and classify provable `legacy` rows.
-  5. Because Task 5's scoped reads ship in the same release, there is a brief window between deploy and the backfill where historical `legacy` data is **hidden** (not contaminating) from market views — dashboards may look sparse until the backfill runs and new stamped runs accumulate within the lookback window. Run the backfill promptly to shorten it. This is a temporary sparsity, never a wrong number.
-- **Optional follow-up (contract migration):** once you're confident no code path inserts without an explicit `market_key`, a later migration may drop the `legacy` DB default so an omitted attribution fails loudly instead of silently becoming `legacy`. Not required for 2a; the Task 3 write-path inventory is the interim guard.
+  5. Because Task 5's scoped reads ship in the same release, historical `legacy` data is **hidden** (not contaminating) from market views. The backfill only reclassifies proven-non-localizable rows to `global`; **localized history stays `legacy`** unless an operator runs `--historical-market <key>` after confirming the deployment market never changed for that period. So dashboards recover primarily as **newly attributed evaluations accumulate** within the lookback window — not merely when the backfill finishes. This is temporary sparsity, never a wrong number.
+- **UI notice:** add a small, dismissible note on market-scoped views for a brand whose data is still filling (e.g. shown when the effective-market run count in-window is below a small threshold): "Now tracking <market>; historical results from before this change aren't shown here." Add the i18n key in Task 6 (both locales).
+- **Mandatory follow-up — Task 8 (separate later release, NOT bundled with 2a):** see Task 8. Dropping the `legacy` DB default MUST NOT ship in the 2a release (the pre-2a worker, still running during that deploy's overlap, would insert without `market_key` and fail). It ships only after 2a is live and the pre-2a workers have drained.
 - **Never run migrations** against a real database. Generate + commit only.
 - If a test needs a real Postgres (Task 5, Task 7 smoke), use a disposable local DB; if none is available, implement the pure logic + its unit test and note the DB-integration assertion as verified manually, rather than pointing tests at prod.
