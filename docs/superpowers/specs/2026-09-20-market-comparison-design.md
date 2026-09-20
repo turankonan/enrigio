@@ -1,291 +1,203 @@
-# Phase 2 — Per-Market (Country/Language) Comparison — Design (v2)
+# Phase 2 — Country/Market Support — Design (v3)
 
-> Status: v2, revised after an external review round (9 findings, 4 blockers) and two
-> product decisions. Pending user review before the implementation plan.
-> Phase 0 (sentiment, rank, coverage, opportunities-as-plan) and Phase 1 (AXO website audit)
-> are shipped. This is Phase 2 — the last real gap from `docs/CUSTOMER-FEEDBACK-REVIEW.md`
-> (comment #2): compare AI visibility across countries in one report.
+> Status: v3, split into **Phase 2a (build now)** and **Phase 2b (deferred design)** after
+> the product signal that *most customers have only one location*. Two external review rounds
+> folded in. Phase 2a is ready for an implementation plan; Phase 2b is captured design, not
+> in this plan.
 >
-> **v2 changelog:** existing views must be explicitly market-scoped (not "implicitly"); a
-> real market comparison requires **reviewed translated prompt variants** per market;
-> migration cannot read env, so backfill is a separate app command; market must be a target
-> dimension **before** scheduler due-selection; localizability is **per-target**
-> (`localizableFor`), not a flat flag; the daily ceiling + cost projection + `usage_events`
-> must gain a market factor; `market_key` is `NOT NULL default 'global'` (no null/global
-> duality); comparison reports completeness; catalog stores codes (BCP-47 keys) not English
-> labels; a **top-of-brand market selector + breakdown strip** is the UX backbone.
+> **v3 changelog:** Multi-market is **opt-in and additive** — a brand with no configured
+> markets behaves exactly like today. That dissolves the two hardest blockers (no mandatory
+> brand initialization; no risky classification of historical DataForSEO runs). v1 ships
+> **per-brand location** (2a), which helps the single-location majority and is the foundation
+> for comparison; the full **multi-market comparison with translated variants** (2b) is
+> deferred, with review findings #3–#8 resolved in its design below.
 
-## Goal
+## Context & guiding insight
 
-Let a brand be evaluated in multiple **markets** (country + language) with
-language-appropriate question variants, and compare AI visibility across them — Türkiye vs
-Germany vs UK — in one report. Only engines that actually localize participate per market;
-engines with no country concept (direct-API Claude/GPT, and scraped engines that don't honor
-location) run once and are shown as **Global — not localizable**, never treated as localized.
-
-Non-goals (v1): localizing BrightData/olostep/oxylabs/cloro (provider work — they stay
-Global); per-question or per-tag market assignment (markets are per-brand); free-form market
-codes; a cross-country headline rank beyond the equal-weighted mean; localizing `citations`
-storage (join to `prompt_runs`).
+The Maya gap (customer-feedback comment #2) is cross-country comparison. But **most customers
+have only one location**, and today location is a single **deployment-wide** env
+(`DATAFORSEO_LOCATION_CODE`/`_LANGUAGE_CODE`) — so a brand can't even be correctly configured
+for *its* country without changing the whole deployment. The highest-value, lowest-risk first
+step is therefore **per-brand location** (2a). Comparison across multiple markets (2b) is a
+minority feature and a larger build; it layers cleanly on top of 2a and stays opt-in so the
+majority is never burdened by it.
 
 ## Verified reality (from source)
 
-- **No location/market column anywhere** — `prompt_runs`, `brands`, `prompts`, `citations`,
-  `usage_events`, `ModelConfig`, `ProviderOptions` all lack it (schema.ts; migrations 0000–0023).
-- Location is a **deployment-wide env pair** (`DATAFORSEO_LOCATION_CODE`/`_LANGUAGE_CODE`),
-  read only in `dataforseo-shared.ts` and injected per request in `dataforseo.ts`. **Only
-  DataForSEO honors location today**; BrightData AI Overview is hardcoded `&gl=us&hl=en`
-  (`brightdata.ts:47`); its chatbot collectors send no locale.
-- `Provider` capability is `access: "scraped"|"api"` with a per-target `accessFor(config)`
-  refinement (`types.ts`); **DataForSEO is hybrid** — SERP/AIO routes localize, LLM-Responses
-  routes don't. No localizability field exists.
-- **Prompt text** is a single `prompts.value`, read once and passed verbatim to every
-  provider/replica (`process-prompt.ts:307,444`). No per-locale text variation. Setting
-  `language_code` does **not** translate the prompt.
-- **Scheduler order** (`processPrompt`): `getLastRunsByTargetKey` → `selectDueTargets` →
-  `dailyRunCeiling` + `isOrgOverDailyCeiling` gate → **fan-out** (`process-prompt.ts:411-454`).
-  Due-ness dedups by `targetKey` = `(model, provider, webSearchEnabled)`.
-- **Ceiling** `dailyRunCeiling(entitlements)` = `1.5 × (maxPrompts × platformPicks ×
-  standardRunsPerDay × replication + premiumPool × premiumRunsPerDay)`; `null` (unlimited)
-  when `mode !== "cloud"` (`run-policy/policy.ts:283`). Enforced by counting `usage_events`
-  in the last 24h (`isOrgOverDailyCeiling`, `process-prompt.ts:192`). Market-blind today.
-- `usage_events` (schema.ts:287-305): `organization_id, brand_id, prompt_id, event_type,
-  provider, model, web_search_enabled, units, estimated_cost_usd, created_at`. Written by
-  `recordUsageEvent` on run success/failure; cost from `estimateRunCostUsd`. **No market_key.**
-- Coverage = `count(DISTINCT prompt_id) [FILTER brand_mentioned]` over `prompt_runs`
-  (`postgres-read.ts:197`). Reusable filter `modelFilter` + uniform `(…, model?)` arg
-  convention across ~12 aggregates.
-- Content translation: **none today**; but `runStructuredCompletionPrompt<T>(prompt, schema)`
-  (`onboarding/llm.ts:108`, web-search off, returns `modelVersion`) is the ready-made pattern
-  to generate a translated variant.
+- No location/market column anywhere (`prompt_runs`, `brands`, `prompts`, `citations`,
+  `usage_events`, `ModelConfig`, `ProviderOptions`); migrations 0000–0023.
+- Location is deployment-wide env, read only in `dataforseo-shared.ts`, injected per request
+  in `dataforseo.ts`. **Only DataForSEO honors location**; BrightData AI Overview hardcodes
+  `&gl=us&hl=en` (`brightdata.ts:47`); its chatbot collectors and all direct-API providers
+  have no locale.
+- `Provider` capability is `access: "scraped"|"api"` + per-target `accessFor(config)`;
+  **DataForSEO is hybrid** (SERP/AIO localize; LLM-Responses don't). No localizability field.
+- Prompt text is a single `prompts.value`, sent verbatim to every provider
+  (`process-prompt.ts:307,444`). `language_code` does not translate it.
+- Scheduler: `getLastRunsByTargetKey` → `selectDueTargets` → ceiling gate → fan-out
+  (`process-prompt.ts:411-454`); `targetKey = (model, provider, webSearchEnabled)`.
+- Ceiling `dailyRunCeiling(entitlements)` is plan-derived, market-blind; enforced by counting
+  `usage_events`/24h (`isOrgOverDailyCeiling`). Unlimited when `mode !== "cloud"`.
+- `usage_events` has provider/model/web_search/cost but no market_key.
+- Coverage = `count(DISTINCT prompt_id)` over `prompt_runs` (`postgres-read.ts:197`).
+- `runStructuredCompletionPrompt<T>` (`onboarding/llm.ts:108`, web-search off, returns
+  `modelVersion`) is the ready pattern for translation (used only in 2b).
 
-## Resolved decisions
+---
 
-- Markets are **per-brand** (ordered list), capped `MAX_BRAND_MARKETS = 3` (v1).
-- **Curated catalog** of markets, keyed by stable **BCP-47-style keys** (`tr-TR`, `de-DE`,
-  `en-GB`); entries store codes, not English labels.
-- **Localizability is per-target** via `localizableFor(config)` (mirrors `accessFor`).
-  DataForSEO SERP/AIO → localizable; DataForSEO LLM-Responses, all direct-API,
-  BrightData/olostep/oxylabs/cloro → not (Global).
-- **Translated prompt variants**: each market gets a reviewed variant of each enabled
-  question, stored in a new `prompt_market_variants` table; runs keep the parent `promptId`.
-- **Markets are included** (not a paid add-on); the daily ceiling + monthly projection scale
-  by active market count, and `usage_events` gains `market_key` for attribution.
-- **Legacy backfill**: everything → `global` via migration default; a **separate app-level
-  backfill command** (env-aware) optionally re-stamps historical DataForSEO runs to the
-  deployment's configured market. Migration itself stays deterministic.
-- `market_key` is `NOT NULL default 'global'` — a single sentinel, no null/global duality.
-- **v1 UI backbone**: a market selector + per-market breakdown strip at the **top of the
-  brand dashboard**; it both drives the market scope of existing views and is the comparison
-  entry point.
+# PHASE 2a — Per-Brand Location (BUILD NOW)
 
-## Market model & capability
+## Goal
 
-```ts
-interface Market {                 // curated catalog entry (packages/config)
-  key: string;         // BCP-47-style, e.g. "tr-TR" — persisted forever, never reused
-  countryCode: string; // "TR"
-  languageCode: string;// "tr"  (DataForSEO language_code)
-  locationCode: number;// 2792  (DataForSEO location_code)
-}
-```
-Labels are **not** stored; they render via `Intl.DisplayNames` (country + language) or locale
-keys, so the bilingual UI stays clean. `global` is a reserved key, not a catalog entry.
+Each brand is configured with **its own single market** (country + language); its localizable
+evaluations run in that market instead of the deployment-wide env. No comparison, no variants,
+no fan-out multiplication. Backward-compatible: a brand with no market falls back to the
+deployment env, exactly as today.
 
-`Provider` gains an optional per-target predicate, resolved like access:
-```ts
-interface Provider { localizable?: boolean; localizableFor?(config: ModelConfig): boolean; }
-const isLocalizable = (p, config) => p.localizableFor?.(config) ?? p.localizable ?? false;
-```
+## Decisions (2a)
 
-## Prompt-market variants & translation
+- A brand has **one** optional `market_key` (its location). Absent → deployment env default
+  (current behavior). This is *not* the `1..MAX` multi-market list — that arrives in 2b.
+- **Curated catalog** of markets in `packages/config`, keyed by stable **BCP-47-style keys**
+  (`tr-TR`, `de-DE`, `en-GB`), storing `{key, countryCode, languageCode, locationCode}` — no
+  English labels (render via `Intl.DisplayNames`). `global` is the reserved not-localizable
+  sentinel.
+- **Per-target localizability** via `localizableFor(config)` (mirrors `accessFor`): DataForSEO
+  SERP/AIO → localizable; DataForSEO LLM-Responses, direct-API, BrightData/olostep/oxylabs/
+  cloro → not. Non-localizable runs are stamped `global` regardless of the brand's market.
+- `prompt_runs.market_key` is added **now** (stamped per run) so history is correct and 2b
+  needs no second migration/backfill — but in 2a it's pure attribution; nothing reads it yet.
 
-New table `prompt_market_variants`:
-```
-id uuid pk
-prompt_id uuid -> prompts.id NOT NULL      (the PARENT question)
-market_key text NOT NULL                    (catalog key; never 'global')
-text text NOT NULL                          (translated question)
-status text NOT NULL default 'draft'        ('draft' | 'approved')
-source_model text                           (attribution: which LLM produced the draft)
-created_at / updated_at timestamptz
-unique (prompt_id, market_key)
-index (prompt_id)
-```
-- **Generation**: when a market is added to a brand (or a question is created/edited), draft
-  variants are generated for that market's language via `runStructuredCompletionPrompt`
-  (skipped when the market language equals the prompt's source language — then the variant is
-  the original text, auto-approved). This is best-effort and never blocks config saves.
-- **Review**: drafts are shown in the market-config UI for edit/approval. **Runs use only
-  `approved` variants.** If a required market has no approved variant for a prompt, that
-  prompt is simply not evaluated in that market yet (surfaced as "translation pending" in the
-  comparison) — we never send source-language text under a different-language market.
-- **Identity**: `prompt_runs.prompt_id` stays the parent id; the run's text is the variant
-  text for its market (or `prompts.value` for `global`). Coverage `count(DISTINCT prompt_id)`
-  therefore collapses variants to their parent automatically, and the `maxPrompts` entitlement
-  count (which counts `prompts` rows) is unaffected — variants are not prompts.
-
-## Data model
+## Data model (2a)
 
 One committed Drizzle migration (generated, never run locally):
+- `brands`: add `market_key text` (nullable; null = deployment-env default).
 - `prompt_runs`: add `market_key text NOT NULL default 'global'`; index `(brand_id,
-  market_key, created_at)`.
-- `brands`: add `markets jsonb NOT NULL default '[]'` and `default_market_key text`.
-- `usage_events`: add `market_key text NOT NULL default 'global'` (attribution + per-market
-  cost `GROUP BY`).
-- `prompt_market_variants`: new table (above).
-- `citations`: no new column (join to `prompt_runs` for market).
+  market_key, created_at)` (for 2b, cheap now).
 
-**Brand invariants** (enforced in the save server-fn + a check where practical):
-`markets` holds 1..`MAX_BRAND_MARKETS` unique catalog keys; `default_market_key ∈ markets`;
-a new brand is seeded with a valid initial market (the deployment's configured market, else
-the catalog's first entry) so it produces runs immediately; removing the default requires
-choosing another; unknown catalog keys are rejected.
+No `usage_events.market_key`, no variants table, no `brands.markets` list in 2a — those are 2b.
 
-## Migration & backfill (deterministic)
+## Run pipeline (2a)
 
-1. **Migration**: add columns/table with `default 'global'` — no env reads, identical on
-   every deployment.
-2. **App backfill command** (env-aware, run intentionally like other ops tasks): map
-   `DATAFORSEO_LOCATION_CODE` → a catalog key; re-stamp historical runs from a **localizable**
-   provider to that market; set each brand's `default_market_key`/`markets` to `[that key]`.
-   Idempotent; safe to skip (then all history stays `global`).
+At run time, resolve the run's market: if `isLocalizable(target)` and the brand has a
+`market_key`, use that market's `location_code`/`language_code` in the DataForSEO request;
+else `global` (and DataForSEO falls back to the env default for a `global`/unset market, so
+nothing regresses). `savePromptRun` stamps `market_key`. **No fan-out change** — still one run
+per target per replica; the only change is *which* location DataForSEO uses. Therefore no
+scheduler, dedup, ceiling, or read-layer changes are needed in 2a.
 
-## Run pipeline
+## UI (2a)
 
-Restructure the fan-out so **market is a target dimension before due-selection** (blocker #4):
-1. Resolve plans → for each plan target, if `isLocalizable(target)` expand to one
-   `MarketTargetPlan` per brand market (with an **approved variant**); else one `global`
-   target. `MarketTargetPlan = TargetPlan & { marketKey; market: Market | null }`.
-2. `getLastRunsByTargetKey` and `targetKey` grouping gain `marketKey` (so each market's
-   freshness is tracked independently — two markets of one engine are distinct targets).
-3. `selectDueTargets` runs on the expanded targets.
-4. Ceiling gate (below) on the expanded due set.
-5. Fan-out: each due market-target runs with its variant text and, for DataForSEO, the
-   market's `location_code`/`language_code` (falling back to env when `marketKey === 'global'`
-   for backward-compat). `savePromptRun` writes `market_key`.
+- **Brand settings** (near `enabledModels`): a single-select **Location** picker from the
+  catalog, defaulting to the deployment's configured market. **Read-only in demo mode.**
+- Optionally surface the brand's location as a small label on the dashboard header (not a
+  selector — there's only one). No comparison surfaces in 2a.
+- i18n: en + tr keys for the picker label; market names via `Intl.DisplayNames`.
 
-## Cost, ceiling & usage
+## Backfill (2a)
 
-- `recordUsageEvent` gains `marketKey`; `usage_events.market_key` enables per-market spend
-  (`GROUP BY market_key`).
-- `dailyRunCeiling` gains a market factor: the standard term multiplies by the brand's
-  **localizable market count** (Global-only engines aren't multiplied). Concretely the ceiling
-  must cover `enabledPrompts × localizableMarkets × platformPicks(localizable) ×
-  standardRunsPerDay` plus the single-run Global engines — so a multi-market brand isn't
-  throttled. Exact formula worked out in the plan; unlimited (self-hosted) stays `null`.
-- `projectMonthlyTargetCostUsd` similarly multiplies localizable runs by market count.
+Deterministic migration (columns default as above). A small, **idempotent app command**
+(env-aware) sets each existing brand's `market_key` to the deployment's configured location so
+their config reflects reality; historical `prompt_runs` stay `global` (we do **not** try to
+classify historical DataForSEO routes — review finding #2). New runs carry the correct market
+going forward. This command is safe to skip (brands then use the env default until configured).
 
-## Read layer & existing-view scoping (blocker #1)
+## Testing (2a — behavior)
 
-Every existing aggregate must be **explicitly market-scoped** — there is no implicit default.
-Add a `marketScope` predicate applied centrally (alongside `modelFilter`):
-```sql
-(market_key = :selectedMarket OR market_key = 'global')
-```
-`:selectedMarket` comes from the top-of-brand selector (URL state), defaulting to
-`brand.default_market_key`. This includes the chosen localized market plus not-localizable
-engines, and — because legacy localizable rows were backfilled to a real market or `global` —
-never double-counts. This predicate threads through the shared read helpers; it is a fixed
-scope (single selected market), not a full multi-value filter, so it is far smaller than a
-user-facing country filter on every view but still touches the aggregate signatures.
+- A brand with a `market_key` sends that market's location/language to DataForSEO; a brand
+  without one uses the env default (regression: current behavior unchanged).
+- Non-localizable targets (direct-API, BrightData, DataForSEO LLM-Responses) are stamped
+  `global` and ignore the brand market.
+- `savePromptRun` writes the resolved `market_key`.
+- `localizableFor`: DataForSEO SERP/AIO true; LLM-Responses false; BrightData/direct-API false.
+- Catalog entries have valid `(locationCode, languageCode)`; unknown keys rejected on brand
+  save; demo mode read-only. i18n en/tr parity.
 
-New comparison read:
-```ts
-getMarketComparison(brandId, from, to, tz, promptIds): Promise<{
-  markets: Array<{
-    marketKey: string; localizable: boolean;
-    visibility: number | null;      // evaluation-weighted; null if no evaluations
-    questionsTotal: number;         // all filtered prompts (denominator, not only prompts with runs)
-    questionsEvaluated: number;     // prompts with ≥1 run in this market
-    questionsCovered: number;       // prompts with ≥1 mention
-    platformsExpected: number; platformsEvaluated: number;
-    sentiment: { positive; neutral; negative }; evaluations: number;
-    complete: boolean;              // met the completeness threshold
-  }>;
-  consolidated: number | null;      // equal-weighted mean of COMPLETE localizable markets
-}>
-```
-Configured markets with zero runs still appear (server merges the grouped query with the
-brand's configured market list). This prevents a market with many failed engines from looking
-artificially better via a small denominator — completeness is reported, not hidden.
+## Out of scope for 2a (→ 2b)
 
-## Consolidated formula
+Multiple markets per brand; comparison view; translated prompt variants; market-scaled
+ceiling; `usage_events.market_key`; read-layer market scoping; the top-of-brand market
+selector/strip.
 
-`consolidated` = arithmetic mean over **localizable markets that meet the completeness
-threshold** of each market's evaluation-weighted visibility. Equal-weighted, so a high-volume
-market can't dominate. The `global` bucket is shown in `markets` but excluded from the mean
-(labeled "Not localizable"). If no localizable market is complete, `consolidated` is `null`
-and the UI shows an incomplete-data state rather than a misleading number.
+## Suggested 2a plan stages
 
-## UI
+1. Catalog + `Market` types + `localizableFor` (config + providers).
+2. Migration (`brands.market_key`, `prompt_runs.market_key`).
+3. Pipeline: resolve + apply per-brand market in DataForSEO; stamp `savePromptRun`.
+4. Brand-settings location picker + i18n; demo read-only.
+5. Idempotent brand-location backfill command.
 
-- **Top-of-brand market breakdown + selector (backbone)**: at the top of the brand dashboard,
-  immediately after brand selection, a compact strip (`🇹🇷 78% · 🇩🇪 41% · 🇬🇧 pending`) with a
-  selector. Selecting a market sets the scope for all existing charts (via `marketScope`);
-  the strip links to the full comparison. This replaces the need for a separate comparison
-  page in v1.
-- **Comparison detail**: the `getMarketComparison` table (markets + Global row, visibility /
-  coverage / sentiment / completeness, consolidated up top).
-- **Market config + variant review** (brand settings, near `enabledModels`): pick ≤
-  `MAX_BRAND_MARKETS` markets and the default; review/edit/approve generated draft variants.
-  **Read-only in demo mode.**
-- **i18n**: en + tr keys for all new labels (parity enforced by the existing i18n test);
-  market names via `Intl.DisplayNames`.
-- URL state: add `market?` to `BrandFilterSearch` + `validateBrandFilterSearch`.
+## Open items (2a)
 
-## Error handling & edge cases
+Initial catalog entries (demo's Türkiye + a couple more); whether the backfill command runs as
+part of the normal deploy or is invoked manually; whether to show the location label on the
+dashboard header in 2a or wait for 2b.
 
-- Market removed from a brand: historical runs keep `market_key` and still render (labeled by
-  key); no new runs produced. Unknown catalog key → render raw key with "unknown market".
-- Direct-API run under a multi-market brand: exactly one `global` run (fan-out must not
-  multiply it).
-- Required market lacks an approved variant for a prompt: that prompt is skipped for that
-  market and shown "translation pending" — never sent in the wrong language.
-- Ceiling reached: existing skip-cycle behavior, now with market-scaled ceiling so multi-
-  market brands aren't starved.
-- Backward-compat: a run with `market_key = 'global'` uses env location in DataForSEO, so
-  nothing breaks pre-config.
+---
 
-## Testing (behavior, not SQL text)
+# PHASE 2b — Multi-Market Comparison (DEFERRED DESIGN)
 
-- Fan-out: localizable target → one run per brand market with the market's variant text +
-  location/language; non-localizable/direct-API → exactly one `global` run.
-- Scheduler: `targetKey`/last-run keyed by market — second market not skipped as "already
-  ran"; market expansion happens before due-selection.
-- Ceiling: `dailyRunCeiling` scales with localizable market count; a multi-market brand at
-  prior single-market volume is not throttled; unlimited stays null.
-- Variants: runs use only `approved` variants; same-language market auto-approves the source
-  text; missing approved variant → prompt skipped for that market; coverage collapses variants
-  to parent `promptId`.
-- `getMarketComparison`: per-market evaluation-weighted visibility; equal-weighted
-  consolidated over complete localizable markets; `global` excluded from mean but present;
-  zero-run configured markets still appear; completeness fields correct; `null` consolidated
-  when none complete.
-- `isLocalizable`/`localizableFor`: DataForSEO SERP/AIO true, DataForSEO LLM-Responses false,
-  BrightData false, direct-API false.
-- Existing aggregates scoped to selected-market + global (regression: adding a second market
-  does not change the default-market view's numbers).
-- Backfill command: localizable history → deployment market, else global; brand defaults set;
-  idempotent.
-- Catalog: valid `(locationCode, languageCode)` per entry; `MAX_BRAND_MARKETS` + uniqueness +
-  `default ∈ markets` invariants; unknown keys rejected. i18n en/tr parity.
+> Not in the 2a plan. Captured so the 2a foundations are laid correctly and the design is
+> ready when demand justifies it. All external-review findings (#3–#8) are resolved here.
 
-## Suggested implementation stages (for the plan)
+## Shape
 
-This is a large feature; sequence it so each stage is independently reviewable/shippable:
-- **A — Foundation**: catalog + `Market` types (config), `localizableFor`, schema migration
-  (all columns/table, `default 'global'`), brand market config + invariants, backfill command.
-- **B — Variants**: `prompt_market_variants`, translation generator, review UI, run-time
-  variant lookup (approved-only).
-- **C — Pipeline & cost**: pre-dedup market expansion, `targetKey`/last-run keying,
-  market-scaled ceiling + projection, `usage_events.market_key`.
-- **D — Read & UI**: `marketScope` on existing aggregates, `getMarketComparison`, top-of-brand
-  breakdown + selector, comparison detail, i18n.
+Opt-in and additive: a brand may add **1..`MAX_BRAND_MARKETS` (3)** markets (`brands.markets`
+jsonb + `default_market_key`), each with reviewed translated question variants. Single-location
+brands (the majority) never see any of this. Comparison is forward-looking; legacy history
+stays `global`.
 
-## Open items for the plan
+## Translated prompt variants (resolves #3, #4)
 
-Initial catalog entries (demo's Türkiye + at least Germany, UK); exact market-scaled ceiling
-formula; the completeness threshold (e.g. ≥ X% of expected evaluations present); whether draft
-variants auto-approve for same-language markets only or also on user opt-in; whether the
-top-of-brand strip fully replaces a separate comparison route or links to one.
+- New table `prompt_market_variants(id, prompt_id→prompts.id, market_key, text, status
+  'draft'|'approved', source_text_hash, source_language, source_model, timestamps, unique
+  (prompt_id, market_key))`. Runs keep the parent `prompt_id`; coverage `count(DISTINCT
+  prompt_id)` collapses variants to parent automatically; the `maxPrompts` ceiling is
+  unaffected (variants aren't prompts).
+- `prompts` gains `source_language` so "same-language market" auto-approval is well-defined.
+- **Staleness (#3):** a variant is runnable only when `status === 'approved' &&
+  source_text_hash === hash(prompt.value)`. Editing the parent prompt immediately invalidates
+  its approved variants (before regeneration).
+- **Generation is a pg-boss job (#4)**, never inline in settings save: idempotent by
+  `(promptId, marketKey, sourceTextHash)`, bounded concurrency + retries, records
+  `usage_events` (`translation` / `translation_failed`) with model attribution, exposes a
+  failure state + manual retry in the review UI, and cancels/ignores queued jobs for a removed
+  market. Uses `runStructuredCompletionPrompt`.
+
+## Pipeline, cost, reads
+
+- Market becomes a target dimension **before** due-selection; `targetKey`/last-run keyed by
+  market; fan-out expands localizable targets per brand market (approved variant only).
+- `dailyRunCeiling` + `projectMonthlyTargetCostUsd` scale the localizable term by market
+  count; `usage_events.market_key` added for per-market spend.
+- **Existing aggregates market-scoped** (`market_key = :selected OR 'global'`), `:selected`
+  from the top-of-brand selector defaulting to `default_market_key`.
+
+## Comparison output & score (resolves #5, #6, #8)
+
+- `getMarketComparison` returns per-market visibility + a **precise completeness model**:
+  eligible cells = approved variants × entitled localizable targets; report translation
+  readiness, target coverage, expected-vs-observed evaluations, and provider failures
+  **separately** (a missing translation ≠ a provider failure). Zero-run configured markets
+  still appear (merge query with configured list).
+- **Consolidated (#5):** `null` unless **all** configured localizable markets meet the
+  completeness threshold — with `consolidatedReason` and `includedMarkets`/`excludedMarkets`
+  membership so the denominator never silently changes over time. When present, equal-weighted
+  mean; `global` shown but excluded.
+- **Keep a dedicated comparison route (#8)**; the top-of-brand strip is the summary + selector
+  and entry point, not the full surface.
+
+## Safe rollout order (resolves #7)
+
+1. (2a done) catalog/schema/per-brand location.
+2. Existing-read market scoping (defaults to `global`/selected) — **before** any multi-market
+   rows exist.
+3. Variants + review workflow.
+4. Market-aware scheduler, ceiling, usage — behind a feature flag.
+5. Comparison UI + selector.
+6. Enable multi-market fan-out only after 2 and brand initialization are deployed.
+
+## 2b open items
+
+Same-language auto-approval policy; exact ceiling formula; completeness threshold value;
+per-market entitlement if the "included" cost proves too high in practice.
