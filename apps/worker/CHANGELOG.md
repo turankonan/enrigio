@@ -1,5 +1,17 @@
 # @workspace/worker
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [a36ad93]
+- Updated dependencies [82ef778]
+- Updated dependencies [4eb7a64]
+- Updated dependencies [4a7f25f]
+  - @workspace/deployment@0.4.2
+  - @workspace/lib@0.4.2
+  - @workspace/config@0.4.2
+
 ## 0.4.1
 
 ### Patch Changes

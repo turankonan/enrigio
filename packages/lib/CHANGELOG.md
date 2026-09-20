@@ -1,5 +1,15 @@
 # @workspace/lib
 
+## 0.4.2
+
+### Patch Changes
+
+- 82ef778: Make the DataForSEO scrape market configurable via DATAFORSEO_LOCATION_CODE and DATAFORSEO_LANGUAGE_CODE (defaults unchanged: United States, English).
+- 4eb7a64: Discover competitors from collected AI answers: the competitors settings page can now scan the brand's stored evaluation responses and suggest the organizations the engines mention as alternatives, with one-click add.
+- Updated dependencies [82ef778]
+- Updated dependencies [4a7f25f]
+  - @workspace/config@0.4.2
+
 ## 0.4.1
 
 ### Patch Changes

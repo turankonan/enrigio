@@ -1,5 +1,28 @@
 # @workspace/web
 
+## 0.4.2
+
+### Patch Changes
+
+- 0fc8156: Opportunities now include site-readiness (AXO) recommendations from an audit of the pages AI assistants already cite.
+- 208301d: The API, API Keys, and MCP settings pages now say when access is disabled in demo mode, instead of handing out connection steps that the server refuses.
+- 5fce0da: Opportunities now show a priority and the expected visibility impact of each recommendation.
+- a36ad93: Interface icons now use the Phosphor icon set, giving the dashboard, sidebar, and settings pages a more consistent look that fits the refreshed brand.
+- ebdaab9: Show how many tracked questions mention the brand, alongside the overall visibility score.
+- 4742cba: Report how AI answers describe the brand (sentiment) and its average position when recommended.
+- 4eb7a64: Discover competitors from collected AI answers: the competitors settings page can now scan the brand's stored evaluation responses and suggest the organizations the engines mention as alternatives, with one-click add.
+- 4a7f25f: Add Turkish UI support: full tr/en translation dictionaries, a build-time VITE_LOCALE switch, and Turkish rendering for the sign-in, sign-up, sidebar, and login pitch surfaces.
+- Updated dependencies [a36ad93]
+- Updated dependencies [82ef778]
+- Updated dependencies [4eb7a64]
+- Updated dependencies [4a7f25f]
+  - @workspace/ui@0.4.2
+  - @workspace/deployment@0.4.2
+  - @workspace/lib@0.4.2
+  - @workspace/config@0.4.2
+  - @workspace/og@0.4.2
+  - @workspace/api-spec@0.4.2
+
 ## 0.4.1
 
 ### Patch Changes

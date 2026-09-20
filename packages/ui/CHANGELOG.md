@@ -1,5 +1,11 @@
 # @workspace/ui
 
+## 0.4.2
+
+### Patch Changes
+
+- a36ad93: Interface icons now use the Phosphor icon set, giving the dashboard, sidebar, and settings pages a more consistent look that fits the refreshed brand.
+
 ## 0.4.1
 
 No changes in this release.

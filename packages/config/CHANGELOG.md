@@ -1,5 +1,12 @@
 # @workspace/config
 
+## 0.4.2
+
+### Patch Changes
+
+- 82ef778: Make the DataForSEO scrape market configurable via DATAFORSEO_LOCATION_CODE and DATAFORSEO_LANGUAGE_CODE (defaults unchanged: United States, English).
+- 4a7f25f: Add Turkish UI support: full tr/en translation dictionaries, a build-time VITE_LOCALE switch, and Turkish rendering for the sign-in, sign-up, sidebar, and login pitch surfaces.
+
 ## 0.4.1
 
 No changes in this release.
