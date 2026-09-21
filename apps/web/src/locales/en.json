@@ -191,6 +191,7 @@
 	"settings.market.label": "Evaluation market",
 	"settings.market.help": "Sets where and in which interface language evaluations run. Your questions must already be written in the selected market's language; automatic translation arrives later.",
 	"settings.market.readonly": "The evaluation market is set by whoever runs this deployment.",
+	"settings.market.choose": "Choose a market",
 	"market.filling_notice": "Now tracking {market}; historical results from before this change aren't shown here.",
 	"settings.competitors.crumb": "Competitors",
 	"settings.competitors.head_description": "Manage your tracked competitors.",

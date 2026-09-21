@@ -191,6 +191,7 @@
 	"settings.market.label": "Değerlendirme pazarı",
 	"settings.market.help": "Değerlendirmelerin hangi ülkede ve arayüz dilinde çalışacağını belirler. Sorularınız seçilen pazarın dilinde yazılmış olmalıdır; otomatik çeviri daha sonra gelecek.",
 	"settings.market.readonly": "Değerlendirme pazarı, bu dağıtımı yöneten kişi tarafından belirlenir.",
+	"settings.market.choose": "Bir pazar seçin",
 	"market.filling_notice": "Artık {market} izleniyor; bu değişiklikten önceki geçmiş sonuçlar burada gösterilmez.",
 	"settings.competitors.crumb": "Rakipler",
 	"settings.competitors.head_description": "İzlediğiniz rakipleri yönetin.",

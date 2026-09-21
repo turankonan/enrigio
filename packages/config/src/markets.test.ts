@@ -14,6 +14,9 @@ describe("market catalog", () => {
 	it("includes Türkiye (2792/tr) as tr-TR", () => {
 		expect(getMarketForCodes(2792, "tr")?.key).toBe("tr-TR");
 	});
+	it("includes Türkiye with an English interface (2792/en) as en-TR", () => {
+		expect(getMarketForCodes(2792, "en")?.key).toBe("en-TR");
+	});
 	it("looks up by key and returns undefined for unknown", () => {
 		expect(getMarket("de-DE")?.countryCode).toBe("DE");
 		expect(getMarket("zz-ZZ")).toBeUndefined();

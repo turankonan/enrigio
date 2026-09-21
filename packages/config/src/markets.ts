@@ -16,6 +16,7 @@ export const LEGACY_MARKET_KEY = "legacy";
 /** Curated v1 markets. Labels are rendered from codes via Intl.DisplayNames, not stored. */
 export const MARKET_CATALOG: readonly Market[] = [
 	{ key: "tr-TR", countryCode: "TR", languageCode: "tr", locationCode: 2792 },
+	{ key: "en-TR", countryCode: "TR", languageCode: "en", locationCode: 2792 },
 	{ key: "de-DE", countryCode: "DE", languageCode: "de", locationCode: 2276 },
 	{ key: "en-GB", countryCode: "GB", languageCode: "en", locationCode: 2826 },
 	{ key: "en-US", countryCode: "US", languageCode: "en", locationCode: 2840 },

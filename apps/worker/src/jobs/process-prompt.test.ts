@@ -140,4 +140,34 @@ describe("runModelIteration market stamping", () => {
 		);
 		expect(insertedPromptRuns[0]).toMatchObject({ marketKey: "tr-TR" });
 	});
+
+	it("stamps global and still scrapes the env location when the brand's market is unresolvable", async () => {
+		// No catalog entry maps to (9999, "zz"): the brand's effective market is
+		// the sentinel. A localizable run must still stamp "global" (no 500) and
+		// still tell the provider to scrape the deployment's configured location
+		// (no change to the actual scrape).
+		vi.stubEnv("DATAFORSEO_LOCATION_CODE", "9999");
+		vi.stubEnv("DATAFORSEO_LANGUAGE_CODE", "zz");
+		const brand = makeBrand({ defaultMarketKey: null });
+		const effectiveMarket = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey });
+		const runSpy = vi.fn(async () => NON_MENTIONING_RESULT);
+
+		await runModelIteration({
+			promptId: "prompt_1",
+			promptValue: "best widgets",
+			brand,
+			competitorsList,
+			config: { model: "google-ai-overview", provider: "dataforseo", webSearch: true },
+			providerImpl: makeProvider(runSpy),
+			runIndex: 1,
+			effectiveMarket,
+		});
+
+		expect(runSpy).toHaveBeenCalledWith(
+			"google-ai-overview",
+			"best widgets",
+			expect.objectContaining({ market: { locationCode: 9999, languageCode: "zz" } }),
+		);
+		expect(insertedPromptRuns[0]).toMatchObject({ marketKey: "global" });
+	});
 });

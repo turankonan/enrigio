@@ -63,7 +63,20 @@ describe("resolveBrandMarketState", () => {
 	it("returns every catalog market as an option", () => {
 		const result = resolveBrandMarketState("tr-TR", true);
 
-		expect(result.options.map((m) => m.key)).toEqual(["tr-TR", "de-DE", "en-GB", "en-US"]);
+		expect(result.options.map((m) => m.key)).toEqual(["tr-TR", "en-TR", "de-DE", "en-GB", "en-US"]);
+	});
+
+	it("does not throw when the effective market is unresolvable, and surfaces the global sentinel", () => {
+		resolveEffectiveMarket.mockReturnValue({
+			key: "global",
+			countryCode: "",
+			languageCode: "en",
+			locationCode: 9999,
+		});
+
+		const result = resolveBrandMarketState(null, true);
+
+		expect(result.marketKey).toBe("global");
 	});
 });
 

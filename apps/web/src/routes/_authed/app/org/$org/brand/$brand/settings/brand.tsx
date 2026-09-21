@@ -63,7 +63,10 @@ function MarketPicker() {
 			<Label htmlFor="market">{t("settings.market.label")}</Label>
 			<Select value={marketKey} onValueChange={handleChange} disabled={!market.editable || saving}>
 				<SelectTrigger id="market" className="w-64">
-					<SelectValue />
+					{/* A brand's stored/effective market can fall outside the catalog
+					    (unresolvable deployment env, legacy data) — the placeholder
+					    covers that instead of rendering a blank trigger. */}
+					<SelectValue placeholder={t("settings.market.choose")} />
 				</SelectTrigger>
 				<SelectContent>
 					{market.options.map((option) => (
