@@ -275,7 +275,33 @@ a:hover { color: #1f7a3d; }
   <p style="margin: 0; font-size: 30px; line-height: 1.5; color: #a3a3a3; max-width: 60ch">Query Fan-Out, motorların içeride kullandığı arama ifadelerini verir — doğrudan motorların kullandığı ifadelerden oluşturulan bir içerik anahtar kelime listesi.</p>
 </section>
 
-<section data-label="Maliyet" data-screen-label="13" data-speaker-notes="Bu demonun gerçek maliyeti: 5 prompt, 170 değerlendirme, günlük ≈1,40 dolar. Prompt başına ≈8,50 dolar/ay." style="background: #fafafa; color: #32373c; font-family: Cabin, ui-sans-serif, sans-serif; padding: 100px 120px 90px; box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 80px">
+<section data-label="Site hazırlığı" data-screen-label="13" data-speaker-notes="Yeni özellik: AXO. Yapay zekânın zaten atıf verdiği kendi sayfalarınızı okunabilirlik açısından denetler ve Fırsatlar'a yeni bir 'Site hazırlığı' kategorisi ekler. Demoda canlı çalıştı." style="background: #fafafa; color: #32373c; font-family: Cabin, ui-sans-serif, sans-serif; padding: 100px 120px 90px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
+  <span style="font-size: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: #277a33; font-weight: 600">Yeni · Site hazırlığı</span>
+  <h2 style="font-family: Ubuntu, sans-serif; font-weight: 700; font-size: 76px; line-height: 1.1; letter-spacing: -0.02em; margin: 0; max-width: 30ch; text-wrap: pretty">Yapay zekânın atıf verdiği kendi sayfalarınızı denetliyoruz</h2>
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px">
+    <div style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 44px; display: flex; flex-direction: column; gap: 18px">
+      <span style="font-family: Ubuntu, sans-serif; font-weight: 700; font-size: 34px; color: #277a33">01</span>
+      <span style="font-family: Ubuntu, sans-serif; font-weight: 500; font-size: 36px; line-height: 1.25">Ne denetlenir</span>
+      <span style="font-size: 29px; line-height: 1.45; color: #525252">schema.org işaretlemesi, meta açıklama, başlık yapısı ve robots — GPTBot, ClaudeBot gibi motorların erişimi.</span>
+    </div>
+    <div style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 44px; display: flex; flex-direction: column; gap: 18px">
+      <span style="font-family: Ubuntu, sans-serif; font-weight: 700; font-size: 34px; color: #277a33">02</span>
+      <span style="font-family: Ubuntu, sans-serif; font-weight: 500; font-size: 36px; line-height: 1.25">Nasıl puanlanır</span>
+      <span style="font-size: 29px; line-height: 1.45; color: #525252">Her sayfa, izlenen sorulara göre yapay zekâ ile ilgililik açısından puanlanır.</span>
+    </div>
+    <div style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 44px; display: flex; flex-direction: column; gap: 18px">
+      <span style="font-family: Ubuntu, sans-serif; font-weight: 700; font-size: 34px; color: #277a33">03</span>
+      <span style="font-family: Ubuntu, sans-serif; font-weight: 500; font-size: 36px; line-height: 1.25">Çıktı</span>
+      <span style="font-size: 29px; line-height: 1.45; color: #525252">Fırsatlar'da yeni "Site hazırlığı" önerileri — öncelik ve beklenen etkiyle birlikte.</span>
+    </div>
+  </div>
+  <div style="background: #ffffff; border: 2px solid #39b54a; border-radius: 20px; padding: 38px 44px; display: flex; flex-direction: column; gap: 14px">
+    <span style="font-size: 26px; letter-spacing: 0.06em; text-transform: uppercase; color: #277a33; font-weight: 600">Rigosis örneği</span>
+    <span style="font-size: 34px; line-height: 1.4">Yüksek öncelikli öneri: OpenText SMAX vaka ve ITSM sayfalarına schema.org işaretlemesi ve meta açıklama ekleyin — yapay zekânın bu sayfaları okuyup alıntılaması kolaylaşır.</span>
+  </div>
+</section>
+
+<section data-label="Maliyet" data-screen-label="14" data-speaker-notes="Bu demonun gerçek maliyeti: 5 prompt, 170 değerlendirme, günlük ≈1,40 dolar. Prompt başına ≈8,50 dolar/ay." style="background: #fafafa; color: #32373c; font-family: Cabin, ui-sans-serif, sans-serif; padding: 100px 120px 90px; box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 80px">
   <div style="display: flex; flex-direction: column; gap: 34px">
     <span style="font-size: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: #277a33; font-weight: 600">Maliyet</span>
     <h2 style="font-family: Ubuntu, sans-serif; font-weight: 700; font-size: 72px; line-height: 1.1; letter-spacing: -0.02em; margin: 0; text-wrap: pretty">Ölçüm ucuz, ölçmemek pahalı</h2>
@@ -310,7 +336,7 @@ a:hover { color: #1f7a3d; }
   </div>
 </section>
 
-<section data-label="Türkçe" data-screen-label="14" data-speaker-notes="Arayüz Türkçe, sorular da Türkiye'den sorulur. Panel çevirileri kademeli olarak devreye alınıyor." style="background: #fafafa; color: #32373c; font-family: Cabin, ui-sans-serif, sans-serif; padding: 100px 120px 90px; box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 80px; align-items: center">
+<section data-label="Türkçe" data-screen-label="15" data-speaker-notes="Arayüz Türkçe, sorular da Türkiye'den sorulur. Panel çevirileri kademeli olarak devreye alınıyor." style="background: #fafafa; color: #32373c; font-family: Cabin, ui-sans-serif, sans-serif; padding: 100px 120px 90px; box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 80px; align-items: center">
   <div style="display: flex; flex-direction: column; gap: 34px">
     <span style="font-size: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: #277a33; font-weight: 600">Yerelleştirme</span>
     <h2 style="font-family: Ubuntu, sans-serif; font-weight: 700; font-size: 72px; line-height: 1.1; letter-spacing: -0.02em; margin: 0; text-wrap: pretty">Varsayılan dil Türkçe</h2>
@@ -322,7 +348,30 @@ a:hover { color: #1f7a3d; }
   </div>
 </section>
 
-<section data-label="Kapanış" data-screen-label="15" data-speaker-notes="Teklif: markanızla bir pilot. Beş prompt, yedi motor, bir hafta sonra ilk iş listesi." style="background: #32373c; color: #ffffff; font-family: Cabin, ui-sans-serif, sans-serif; padding: 110px 120px 90px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative">
+<section data-label="Değerlendirme pazarı" data-screen-label="16" data-speaker-notes="Yeni özellik: konum artık dağıtım geneli değil marka bazında. Her marka kendi ülke+dil pazarını seçer; değerlendirmeler ona göre yerelleşir, panolar ona göre süzülür. Tek raporda çok pazarlı karşılaştırma yol haritasında ve tasarlandı." style="background: #fafafa; color: #32373c; font-family: Cabin, ui-sans-serif, sans-serif; padding: 100px 120px 90px; box-sizing: border-box; display: flex; flex-direction: column; gap: 44px">
+  <span style="font-size: 28px; letter-spacing: 0.08em; text-transform: uppercase; color: #277a33; font-weight: 600">Yeni · Pazar</span>
+  <h2 style="font-family: Ubuntu, sans-serif; font-weight: 700; font-size: 76px; line-height: 1.1; letter-spacing: -0.02em; margin: 0; max-width: 30ch; text-wrap: pretty">Her marka kendi değerlendirme pazarını seçer</h2>
+  <p style="margin: 0; font-size: 34px; line-height: 1.5; color: #525252; max-width: 56ch">Konum artık dağıtım geneli değil, marka bazında. Her marka kendi ülke ve dil pazarını seçer; değerlendirmeler o pazarda çalışır ve panolar o pazara göre süzülür.</p>
+  <div style="display: flex; flex-wrap: wrap; gap: 18px">
+    <span style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 999px; padding: 18px 32px; font-size: 30px; font-weight: 500">Türkiye · Türkçe</span>
+    <span style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 999px; padding: 18px 32px; font-size: 30px; font-weight: 500">Türkiye · İngilizce</span>
+    <span style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 999px; padding: 18px 32px; font-size: 30px; font-weight: 500">Almanya · Almanca</span>
+    <span style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 999px; padding: 18px 32px; font-size: 30px; font-weight: 500">Birleşik Krallık · İngilizce</span>
+    <span style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 999px; padding: 18px 32px; font-size: 30px; font-weight: 500">ABD · İngilizce</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 44px; align-items: start">
+    <div style="background: #ffffff; border: 1px solid #e5e5e5; border-radius: 20px; padding: 44px; display: flex; flex-direction: column; gap: 18px">
+      <span style="font-size: 26px; letter-spacing: 0.06em; text-transform: uppercase; color: #277a33; font-weight: 600">Bugün · Canlı</span>
+      <span style="font-size: 34px; line-height: 1.45; color: #32373c">Marka bazında pazar: yerelleşmiş değerlendirme ve o pazara göre süzülen panolar.</span>
+    </div>
+    <div style="background: #ffffff; border: 2px solid #39b54a; border-radius: 20px; padding: 44px; display: flex; flex-direction: column; gap: 18px">
+      <span style="font-size: 26px; letter-spacing: 0.06em; text-transform: uppercase; color: #277a33; font-weight: 600">Yakında · Tasarlandı</span>
+      <span style="font-size: 34px; line-height: 1.45; color: #32373c">Tek raporda çok pazarlı karşılaştırma (Türkiye vs Almanya vs Birleşik Krallık), çevrilmiş soru varyantlarıyla.</span>
+    </div>
+  </div>
+</section>
+
+<section data-label="Kapanış" data-screen-label="17" data-speaker-notes="Teklif: markanızla bir pilot. Beş prompt, yedi motor, bir hafta sonra ilk iş listesi." style="background: #32373c; color: #ffffff; font-family: Cabin, ui-sans-serif, sans-serif; padding: 110px 120px 90px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; position: relative">
   <div style="position: absolute; right: -200px; top: -200px; width: 700px; height: 700px; border-radius: 999px; border: 3px solid #39b54a; opacity: 0.25"></div>
   <div style="position: absolute; right: -80px; top: -110px; width: 460px; height: 460px; border-radius: 999px; border: 3px solid #39b54a; opacity: 0.4"></div>
   <div style="display: flex; align-items: center; gap: 20px; position: relative">
