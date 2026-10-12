@@ -1,0 +1,31 @@
+<!-- @dsCard height=288 -->
+<!--
+Derivation:
+blocks: brand-green 256×168 slab bleeding off the top (sides = space-8 multiples), primary 128×168 bleeding off the right, secondary 64×192 tint band, foreground 96×64 satellite; corners rx = radius-lg.
+arrangement: staggered stack right of x=480, big green slab leading — green is the identity color the UI spends sparingly.
+pattern: literal motif row — "Echo" → concentric arcs radiating from the primary block; 3 arcs at space-6 pitch (24/48/72px), stroked in primary. Chosen because the product's name and mark are the echo.
+scales: pitch space-6, corners radius-lg, gaps space-4; name 72px Ubuntu (display) ink, tagline 13px muted.
+-->
+<div style="position:relative;width:960px;height:288px">
+	<svg width="960" height="288" viewBox="0 0 960 288" aria-hidden="true" style="position:absolute;inset:0">
+		<style>
+			.brand { fill: var(--brand-green); }
+			.primary { fill: var(--primary); }
+			.fg { fill: var(--foreground); }
+			.tint { fill: var(--secondary); }
+			rect { rx: var(--radius-lg); }
+			.arc { fill: none; stroke: var(--primary); stroke-width: 3; }
+		</style>
+		<rect class="tint" x="496" y="96" width="64" height="192" />
+		<rect class="brand" x="576" y="-12" width="256" height="180" />
+		<rect class="primary" x="848" y="120" width="128" height="168" />
+		<rect class="fg" x="576" y="208" width="96" height="64" />
+		<path class="arc" d="M 824 192 A 24 24 0 0 0 848 216" />
+		<path class="arc" d="M 800 192 A 48 48 0 0 0 848 240" />
+		<path class="arc" d="M 776 192 A 72 72 0 0 0 848 264" />
+	</svg>
+	<div style="position:absolute;left:48px;bottom:40px;max-width:440px">
+		<div style="font:700 72px/0.95 var(--font-display);letter-spacing:-0.02em;color:var(--foreground)">AnswerEcho</div>
+		<div style="font:400 13px/18px var(--font-sans);color:var(--muted-foreground);margin-top:8px">AI answer-engine visibility, measured.</div>
+	</div>
+</div>

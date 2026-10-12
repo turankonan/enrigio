@@ -1,0 +1,29 @@
+<!-- @dsCard group="Forms" height=170 subtitle="Static rendition" -->
+<div class="col">
+	<div class="field">
+		<label class="lbl" for="brand">Brand name</label>
+		<input class="input" id="brand" value="Rigosis" />
+	</div>
+	<div class="field">
+		<label class="lbl" for="prompt">Tracked prompt</label>
+		<input class="input" id="prompt" placeholder="best AEO platform for agencies" />
+	</div>
+	<div class="field">
+		<label class="lbl" for="locked">API key</label>
+		<input class="input" id="locked" value="••••••••" disabled />
+	</div>
+</div>
+<style>
+	.col { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); max-width: 360px; font-family: var(--font-sans); }
+	.field { display: flex; flex-direction: column; gap: var(--space-1); }
+	.lbl { font: 500 14px/14px var(--font-sans); color: var(--foreground); }
+	.input {
+		font: 400 14px/20px var(--font-sans);
+		height: 36px; padding: 0 var(--space-3);
+		background: transparent; color: var(--foreground);
+		border: 1px solid var(--input); border-radius: var(--radius-md);
+	}
+	.input::placeholder { color: var(--muted-foreground); }
+	.input:focus-visible { outline: 2px solid var(--ring); outline-offset: -1px; border-color: var(--ring); }
+	.input:disabled { opacity: 0.5; background: var(--muted); }
+</style>

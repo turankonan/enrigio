@@ -1,0 +1,26 @@
+<!-- @dsCard group="Actions" height=120 subtitle="Static rendition" -->
+<div class="row">
+	<button class="btn primary">New prompt</button>
+	<button class="btn secondary">Export</button>
+	<button class="btn outline">Cancel</button>
+	<button class="btn ghost">Learn more</button>
+	<button class="btn destructive">Delete brand</button>
+	<button class="btn primary" disabled>Running…</button>
+</div>
+<style>
+	.row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-4); font-family: var(--font-sans); }
+	.btn {
+		font: 500 14px/1 var(--font-sans);
+		padding: 0 var(--space-4); height: 36px;
+		border-radius: var(--radius-md); border: 1px solid transparent;
+		cursor: pointer;
+	}
+	.btn:disabled { opacity: 0.5; cursor: default; }
+	.btn:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+	.primary { background: var(--primary); color: var(--primary-foreground); }
+	.secondary { background: var(--secondary); color: var(--secondary-foreground); }
+	.outline { background: var(--background); color: var(--foreground); border-color: var(--input); }
+	.ghost { background: transparent; color: var(--foreground); }
+	.ghost:hover { background: var(--accent); }
+	.destructive { background: var(--destructive); color: #ffffff; }
+</style>

@@ -1,0 +1,22 @@
+<!-- @dsCard group="Status" height=100 subtitle="Static rendition" -->
+<div class="row">
+	<span class="badge default">Mentioned</span>
+	<span class="badge secondary">Neutral</span>
+	<span class="badge outline">GPT-4o</span>
+	<span class="badge destructive">Not cited</span>
+	<span class="badge success">▲ Cited</span>
+</div>
+<style>
+	.row { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; padding: var(--space-4); font-family: var(--font-sans); }
+	.badge {
+		font: 500 12px/16px var(--font-sans);
+		padding: 2px var(--space-2);
+		border-radius: var(--radius-sm); border: 1px solid transparent;
+		white-space: nowrap;
+	}
+	.default { background: var(--primary); color: var(--primary-foreground); }
+	.secondary { background: var(--secondary); color: var(--secondary-foreground); }
+	.outline { color: var(--foreground); border-color: var(--border); }
+	.destructive { background: var(--destructive); color: #ffffff; }
+	.success { background: var(--secondary); color: var(--primary); }
+</style>
