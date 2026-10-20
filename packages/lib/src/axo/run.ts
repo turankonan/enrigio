@@ -53,7 +53,7 @@ type PageReport = SiteAuditReport["pages"][number];
  * because `hostMatchesAllowlist` is an exact match and does not strip "www."
  * itself (see `net/hostname` docs).
  */
-function buildAllowHosts(website: string, additionalDomains: string[]): string[] {
+export function buildAllowHosts(website: string, additionalDomains: string[]): string[] {
 	const hosts = new Set<string>();
 	for (const raw of [website, ...additionalDomains]) {
 		const apex = extractDomain(raw);

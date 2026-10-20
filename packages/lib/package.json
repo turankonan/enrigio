@@ -44,7 +44,10 @@
 		"./usage": "./src/usage/cost.ts",
 		"./net/hostname": "./src/net/hostname.ts",
 		"./net/safe-fetch": "./src/net/safe-fetch.ts",
-		"./axo": "./src/axo/index.ts"
+		"./axo": "./src/axo/index.ts",
+		"./keywords": "./src/keywords/index.ts",
+		"./keywords/match": "./src/keywords/match.ts",
+		"./keywords/types": "./src/keywords/types.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^4.0.49",
