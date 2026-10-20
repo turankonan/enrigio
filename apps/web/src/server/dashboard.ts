@@ -6,7 +6,7 @@ import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { getEffectiveBrandedStatus } from "@workspace/lib/tag-utils";
 import { and, count, eq } from "drizzle-orm";
 import { z } from "zod";
-import { requireBrandSession } from "@/lib/auth/helpers";
+import { requireAuthSession, requireBrandSession, requireOrgAccess } from "@/lib/auth/helpers";
 import { applyPerPromptCitationLVCF, applyPerPromptLVCF, generateDateRange } from "@/lib/chart-utils";
 import {
 	type CitationCategory,
@@ -21,7 +21,7 @@ import {
 	getPerPromptDailyCitationStats,
 	getPerPromptVisibilityTimeSeries,
 } from "@/lib/postgres-read";
-import { getTimezoneLookbackRange, resolveTimezone } from "@/lib/timezone-utils";
+import { getTimezoneLookbackRange, resolveTimezone, shiftDateStr } from "@/lib/timezone-utils";
 
 interface VisibilityTimeSeriesPoint {
 	date: string;
@@ -193,4 +193,65 @@ export const getDashboardSummaryFn = createServerFn({ method: "GET" })
 			citationTimeSeries,
 			lastUpdatedAt,
 		};
+	});
+
+export interface OrgBrandScore {
+	brandId: string;
+	/** Mention rate over the last 30 days, 0–100, null before the first run. */
+	score: number | null;
+	/** Same rate over the 30 days before that. */
+	previousScore: number | null;
+	totalRuns: number;
+	/** Runs that mentioned the brand, derived from the rounded rate. */
+	mentionedRuns: number;
+	promptsWithMention: number;
+	totalPrompts: number;
+}
+
+const SCORE_WINDOW_DAYS = 30;
+
+export const getOrgBrandScoresFn = createServerFn({ method: "GET" })
+	.validator(z.object({ organizationId: z.string(), timezone: z.string().default("UTC") }))
+	.handler(async ({ data }): Promise<OrgBrandScore[]> => {
+		const session = await requireAuthSession();
+		await requireOrgAccess(session.user.id, data.organizationId);
+		const timezone = resolveTimezone(data.timezone);
+		const today = new Date().toLocaleDateString("en-CA", { timeZone: timezone });
+		const current = { from: shiftDateStr(today, { days: -(SCORE_WINDOW_DAYS - 1) }), to: today };
+		const previous = {
+			from: shiftDateStr(today, { days: -(2 * SCORE_WINDOW_DAYS - 1) }),
+			to: shiftDateStr(today, { days: -SCORE_WINDOW_DAYS }),
+		};
+
+		const brandRows = await db
+			.select({ id: brands.id, defaultMarketKey: brands.defaultMarketKey })
+			.from(brands)
+			.where(and(eq(brands.organizationId, data.organizationId), eq(brands.onboarded, true)));
+
+		// ponytail: two summary queries per brand; add one org-wide rollup query past ~20 brands.
+		return Promise.all(
+			brandRows.map(async (brand) => {
+				const marketKey = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey }).key;
+				const enabled = await db
+					.select({ id: prompts.id })
+					.from(prompts)
+					.where(and(eq(prompts.brandId, brand.id), eq(prompts.enabled, true)));
+				const promptIds = enabled.map((row) => row.id);
+				const [[now], [before]] = await Promise.all([
+					getDashboardSummary(brand.id, current.from, current.to, timezone, promptIds, marketKey),
+					getDashboardSummary(brand.id, previous.from, previous.to, timezone, promptIds, marketKey),
+				]);
+				const totalRuns = now?.total_runs ?? 0;
+				const score = totalRuns > 0 ? now.avg_visibility : null;
+				return {
+					brandId: brand.id,
+					score,
+					previousScore: before?.total_runs ? before.avg_visibility : null,
+					totalRuns,
+					mentionedRuns: score === null ? 0 : Math.round((totalRuns * score) / 100),
+					promptsWithMention: now?.prompts_with_mention ?? 0,
+					totalPrompts: now?.total_prompts ?? 0,
+				};
+			}),
+		);
 	});
