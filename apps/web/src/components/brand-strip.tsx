@@ -42,7 +42,10 @@ export function BrandStrip({
 	scores: Record<string, BrandStripScore>;
 }) {
 	return (
-		<nav aria-label={t("brand-strip.label")} className="flex min-w-0 flex-1 snap-x gap-2 overflow-x-auto py-2">
+		<nav
+			aria-label={t("brand-strip.label")}
+			className="order-last flex min-w-0 basis-full snap-x gap-2 overflow-x-auto py-2 md:order-none md:py-1 md:flex-1 md:basis-auto"
+		>
 			{organization.brands.map((brand) => {
 				const active = brand.id === currentBrandId;
 				return (
