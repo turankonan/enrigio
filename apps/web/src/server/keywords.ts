@@ -32,6 +32,23 @@ function isOnCooldown(attempt: KeywordCheck, force: boolean): boolean {
 	return false;
 }
 
+const singletonKey = (brandId: string) => `keywords-${brandId}`;
+
+/** A job waiting in pg-boss has no `keyword_checks` row yet, but the user should still see it as running. */
+async function hasQueuedJob(brandId: string): Promise<boolean> {
+	try {
+		const boss = await getBoss();
+		const jobs = await boss.findJobs("check-keywords", { key: singletonKey(brandId), queued: true });
+		// A job left waiting by a stopped worker should not keep the card spinning forever.
+		return jobs.some(
+			(job) => Date.now() - new Date(job.createdOn).getTime() < KEYWORD_CHECK_RUNNING_STALE_MINUTES * MINUTE_MS,
+		);
+	} catch (error) {
+		console.error(`Failed to look up queued keyword checks for brand ${brandId}:`, error);
+		return false;
+	}
+}
+
 export async function maybeEnqueueKeywordCheck(
 	brandId: string,
 	opts: { force?: boolean } = {},
@@ -41,17 +58,18 @@ export async function maybeEnqueueKeywordCheck(
 
 	try {
 		const boss = await getBoss();
-		await boss.send(
+		// The queue is `stately`: while this brand already has a job waiting, send resolves to null
+		// and that waiting job (which reads the keywords when it starts) covers this request.
+		const jobId = await boss.send(
 			"check-keywords",
 			{ brandId },
 			{
-				singletonKey: `keywords-${brandId}`,
-				singletonSeconds: KEYWORD_CHECK_RUNNING_STALE_MINUTES * 60,
+				singletonKey: singletonKey(brandId),
 				retryLimit: 0,
 				expireInSeconds: KEYWORD_CHECK_RUNNING_STALE_MINUTES * 60,
 			},
 		);
-		return { enqueued: true };
+		return { enqueued: jobId !== null };
 	} catch (error) {
 		console.error(`Failed to enqueue keyword check for brand ${brandId}:`, error);
 		return { enqueued: false };
@@ -74,5 +92,6 @@ export async function readKeywordCheck(brandId: string): Promise<KeywordCheckVie
 		attempt?.status === "failed" && (!latest || attempt.createdAt > latest.createdAt)
 			? (attempt.report.failureSummary ?? "The check failed.")
 			: null;
-	return { latest, running: isRunning(attempt), failure: failedAfterLatest };
+	const running = isRunning(attempt) || (await hasQueuedJob(brandId));
+	return { latest, running, failure: failedAfterLatest };
 }

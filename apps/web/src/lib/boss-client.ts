@@ -60,6 +60,9 @@ export async function getBoss(): Promise<PgBoss> {
 			expireInSeconds: 60 * 15,
 		});
 		await boss.createQueue("check-keywords", {
+			// One waiting job per brand: a second request while one waits joins it. Throttling
+			// with singletonSeconds would instead drop requests made soon after a check completed.
+			policy: "stately",
 			retryLimit: 0,
 			expireInSeconds: 60 * 10,
 		});

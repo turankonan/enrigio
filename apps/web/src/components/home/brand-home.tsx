@@ -24,7 +24,7 @@ export function BrandHome({ brand, organization }: { brand: BrandWithPrompts; or
 			/>
 			<NextStepsCard />
 			<KeywordsCard key={brand.keywords.join("\n")} brand={brand} update={updateKeywords} />
-			<KeywordMatchCard hasKeywords={brand.keywords.length > 0} />
+			<KeywordMatchCard keywords={brand.keywords} />
 			<EnginesCard />
 		</div>
 	);

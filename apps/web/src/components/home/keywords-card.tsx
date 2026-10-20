@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import { HomeCard } from "@/components/home/home-card";
 import type { useUpdateBrandKeywords } from "@/hooks/use-brand-keywords";
 import { t } from "@/lib/i18n";
-import { MAX_KEYWORD_LENGTH, MAX_KEYWORDS } from "@/server/keywords-fn";
+import { MAX_KEYWORD_LENGTH, MAX_KEYWORDS } from "@/lib/keyword-limits";
 
 const SUGGESTION_COUNT = 10;
 
@@ -22,7 +22,7 @@ export function KeywordsCard({
 	const suggestions = useMemo(() => {
 		const taken = new Set(draft.map((k) => k.toLowerCase()));
 		return [...new Set(brand.prompts.flatMap((p) => p.tags ?? []))]
-			.filter((tag) => !taken.has(tag.toLowerCase()))
+			.filter((tag) => tag.length <= MAX_KEYWORD_LENGTH && !taken.has(tag.toLowerCase()))
 			.slice(0, SUGGESTION_COUNT);
 	}, [brand.prompts, draft]);
 
