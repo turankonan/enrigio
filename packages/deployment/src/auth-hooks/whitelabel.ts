@@ -6,13 +6,13 @@
  *
  * Auth0 is authoritative over who belongs where, not over which orgs exist:
  * orgs are created by the admin API (`POST /api/v1/brands`) before their users
- * sign in, so an `answerecho_orgs` entry with no row here is skipped.
+ * sign in, so an `enrigio_orgs` entry with no row here is skipped.
  *
  * Data flow:
  * 1. User logs in via Auth0 SSO -> better-auth creates user + session
  * 2. provisionUser fires (before session cookie is set)
  * 3. Fetches app_metadata from Auth0 Management API
- * 4. Reconciles memberships against answerecho_orgs
+ * 4. Reconciles memberships against enrigio_orgs
  * 5. Sets user admin role and report generator access flags
  * 6. Mutates the user object so the session cookie has correct data
  */
@@ -23,28 +23,28 @@ import { ManagementClient } from "auth0";
 import { z } from "zod";
 
 interface Auth0AppMetadata {
-	answerecho_orgs: Array<{ id: string; name: string }>;
-	answerecho_report_generator_access?: boolean;
-	answerecho_admin?: boolean;
+	enrigio_orgs: Array<{ id: string; name: string }>;
+	enrigio_report_generator_access?: boolean;
+	enrigio_admin?: boolean;
 }
 
 let managementClient: ManagementClient | null = null;
 
 const Auth0AppMetadataSchema = z.object({
-	answerecho_orgs: z.array(
+	enrigio_orgs: z.array(
 		z.object({
 			id: z.string().min(1),
 			name: z.string().min(1),
 		}),
 	),
-	answerecho_report_generator_access: z.boolean().optional(),
-	answerecho_admin: z.boolean().optional(),
+	enrigio_report_generator_access: z.boolean().optional(),
+	enrigio_admin: z.boolean().optional(),
 });
 
 const REVOKED_METADATA: Auth0AppMetadata = {
-	answerecho_orgs: [],
-	answerecho_report_generator_access: false,
-	answerecho_admin: false,
+	enrigio_orgs: [],
+	enrigio_report_generator_access: false,
+	enrigio_admin: false,
 };
 
 function getManagementClient(): ManagementClient {
@@ -112,11 +112,11 @@ export async function syncAuth0User(
 	console.log(`[auth0-sync] Syncing user=${userId}`);
 	const metadata = await fetchAuth0AppMetadata(auth0UserId);
 
-	await syncOrganizations(userId, metadata.answerecho_orgs);
+	await syncOrganizations(userId, metadata.enrigio_orgs);
 
 	const flags = {
-		role: metadata.answerecho_admin ? "admin" : "user",
-		hasReportGeneratorAccess: metadata.answerecho_report_generator_access ?? false,
+		role: metadata.enrigio_admin ? "admin" : "user",
+		hasReportGeneratorAccess: metadata.enrigio_report_generator_access ?? false,
 	};
 	await updateUserFlags(userId, flags);
 

@@ -1,4 +1,4 @@
-# AnswerEcho — end-to-end mechanics (worked with the Rigosis brand)
+# Enrigio — end-to-end mechanics (worked with the Rigosis brand)
 
 How the platform turns a single URL (`rigosis.com`) into a daily measurement of
 how AI answer engines mention, rank, and cite a brand — every stage, the code
@@ -9,7 +9,7 @@ Companion diagrams (open in a browser):
 - `docs/architecture/prompt-evaluation.html` — the per-prompt evaluation trace
 
 > **About the Rigosis example.** "Rigosis" is two things in this repo: the
-> product's own whitelabel brand ("AnswerEcho by Rigosis", green `#39b54a`,
+> product's own whitelabel brand ("Enrigio by Rigosis", green `#39b54a`,
 > docs at rigosis.com) **and** the canonical *tracked brand* used in the demo.
 > The concrete numbers below come from a real demo run captured in
 > `docs/how-to/HOW-TO.md` (2026-09-17, `answerecho-demo.onrender.com`). There is
@@ -413,7 +413,7 @@ Then: act → daily runs re-measure → watch the per-prompt trend lines move.
 Separate from the dashboard's server functions. Base `/api/v1`, **Bearer token**
 auth (`apps/web/src/lib/auth/api-auth.ts`): either an **instance admin key**
 (`ADMIN_API_KEYS` env, unrestricted) or an **organization key**
-(`answerecho_…`, verified by better-auth, scoped `read`/`write`, org/brand
+(`enrigio_…`, verified by better-auth, scoped `read`/`write`, org/brand
 restricted, rate-limited via `X-RateLimit-*`). OpenAPI 3.1.1 spec in
 `packages/api-spec/src/openapi.json`; docs UI at `/api/v1/docs`.
 

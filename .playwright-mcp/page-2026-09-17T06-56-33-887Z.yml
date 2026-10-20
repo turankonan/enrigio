@@ -1,7 +1,7 @@
 - generic [ref=f2e109]:
   - link "Go to your organizations" [ref=f2e111] [cursor=pointer]:
     - /url: /app
-    - generic [ref=f2e112]: AnswerEcho
+    - generic [ref=f2e112]: Enrigio
   - generic [ref=f2e114]:
     - generic [ref=f2e115]:
       - generic [ref=f2e116]: Create a new brand

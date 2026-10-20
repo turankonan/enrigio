@@ -2,7 +2,7 @@
  * The pitch shown beside the sign-in and sign-up forms in local and cloud mode.
  *
  * Sign-in is the highest-intent page either deployment has, so it carries the
- * argument for the product: what AnswerEcho does and which engines it reaches.
+ * argument for the product: what Enrigio does and which engines it reaches.
  * No borrowed social proof — we don't ship someone else's customers or badges.
  *
  * Demo and whitelabel deliberately never see this. A demo visitor has already
@@ -16,10 +16,10 @@ import { ModelIcon } from "@workspace/ui/brand/model-icon";
 import type { ReactNode } from "react";
 import { t } from "@/lib/i18n";
 
-/** Everything AnswerEcho reaches, named — the coverage claim is the product. */
+/** Everything Enrigio reaches, named — the coverage claim is the product. */
 const ENGINES = [...platformTierMembers("scraped"), ...platformTierMembers("api")];
 
-const DOCS_URL = "https://www.rigosis.com/answerecho/docs";
+const DOCS_URL = "https://www.rigosis.com/enrigio/docs";
 
 const PITCH = {
 	headline: t("sales-panel.headline"),
@@ -88,7 +88,7 @@ export function SalesFooterLinks({ source: _source }: { source: ReferralSource }
 				{t("sales-panel.docs")}
 			</a>
 			<p>
-				AnswerEcho <span className="opacity-60">{t("sales-panel.by-rigosis")}</span>
+				Enrigio <span className="opacity-60">{t("sales-panel.by-rigosis")}</span>
 			</p>
 		</div>
 	);

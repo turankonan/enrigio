@@ -1,4 +1,4 @@
-# AnswerEcho architecture — calculations and external services
+# Enrigio architecture — calculations and external services
 
 How a prompt becomes a visibility score, exactly where each number comes from,
 and every external service the system talks to. Backed by a knowledge graph of

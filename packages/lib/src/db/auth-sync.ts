@@ -25,7 +25,7 @@ type AuthSyncTransaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
  * users never contend.
  */
 async function lockUserMemberships(tx: AuthSyncTransaction, userId: string): Promise<void> {
-	await tx.execute(sql`select pg_advisory_xact_lock(hashtext('answerecho-user-memberships'), hashtext(${userId}))`);
+	await tx.execute(sql`select pg_advisory_xact_lock(hashtext('enrigio-user-memberships'), hashtext(${userId}))`);
 }
 
 export async function ensureMembership(userId: string, orgId: string, role = "member"): Promise<void> {

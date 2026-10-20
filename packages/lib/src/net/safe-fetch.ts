@@ -73,7 +73,7 @@ const DEFAULT_TIMEOUT_MS = 10_000;
 const DEFAULT_MAX_REDIRECTS = 5;
 const DEFAULT_ALLOW_PORTS = [80, 443];
 const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
-const USER_AGENT = "AnswerEchoSiteAudit/1.0 (+https://answerecho.ai/site-audit-bot)";
+const USER_AGENT = "EnrigioSiteAudit/1.0 (+https://enrigio.ai/site-audit-bot)";
 
 // Built on node:net's BlockList (native CIDR matching, incl. automatic
 // IPv4-mapped-IPv6 normalization when checked with family "ipv6") rather

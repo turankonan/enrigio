@@ -1,14 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { deploymentOpenApiSpec } from "../openapi";
 
-const ANSWERECHO = { name: "AnswerEcho", url: "https://app.answerecho.com" };
+const ENRIGIO = { name: "Enrigio", url: "https://app.enrigio.com" };
 const AGENCY = { name: "Acme Visibility", url: "https://visibility.acme.com" };
 
 describe("deploymentOpenApiSpec", () => {
 	it("answers with the host the spec was fetched from", () => {
-		const spec = deploymentOpenApiSpec(ANSWERECHO, "https://app.answerecho.com");
+		const spec = deploymentOpenApiSpec(ENRIGIO, "https://app.enrigio.com");
 
-		expect(spec.servers).toEqual([{ url: "https://app.answerecho.com/api/v1", description: "AnswerEcho API" }]);
+		expect(spec.servers).toEqual([{ url: "https://app.enrigio.com/api/v1", description: "Enrigio API" }]);
 	});
 
 	it("does not leak the vendor into a whitelabel deployment", () => {
@@ -23,7 +23,7 @@ describe("deploymentOpenApiSpec", () => {
 	});
 
 	it("serves a self-hosted instance its own address, port and all", () => {
-		const spec = deploymentOpenApiSpec({ name: "AnswerEcho", url: "http://localhost:3000" }, "http://localhost:3000");
+		const spec = deploymentOpenApiSpec({ name: "Enrigio", url: "http://localhost:3000" }, "http://localhost:3000");
 
 		expect(spec.servers?.[0].url).toBe("http://localhost:3000/api/v1");
 	});
@@ -32,14 +32,14 @@ describe("deploymentOpenApiSpec", () => {
 	// request landed, and a stale one must not send callers somewhere they
 	// cannot reach.
 	it("takes the server from the request even when the configured URL differs", () => {
-		const spec = deploymentOpenApiSpec(ANSWERECHO, "https://staging.answerecho.com");
+		const spec = deploymentOpenApiSpec(ENRIGIO, "https://staging.enrigio.com");
 
-		expect(spec.servers?.[0].url).toBe("https://staging.answerecho.com/api/v1");
-		expect(spec.info.contact).toEqual(ANSWERECHO);
+		expect(spec.servers?.[0].url).toBe("https://staging.enrigio.com/api/v1");
+		expect(spec.info.contact).toEqual(ENRIGIO);
 	});
 
 	it("leaves the operations alone", () => {
-		const spec = deploymentOpenApiSpec(ANSWERECHO, "https://app.answerecho.com");
+		const spec = deploymentOpenApiSpec(ENRIGIO, "https://app.enrigio.com");
 
 		expect(Object.keys(spec.paths as object)).toContain("/brands");
 	});

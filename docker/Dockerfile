@@ -1,4 +1,4 @@
-# AnswerEcho 
+# Enrigio 
 # Supports: web app (Nitro server) and worker
 
 # Base stage with Node.js
@@ -72,16 +72,16 @@ ENV NODE_ENV=production
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 answerecho
+RUN adduser --system --uid 1001 enrigio
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 # Copy Nitro output - this is the entire server bundle
-COPY --from=web-build --chown=answerecho:nodejs /app/apps/web/.output ./.output
+COPY --from=web-build --chown=enrigio:nodejs /app/apps/web/.output ./.output
 
-USER answerecho
+USER enrigio
 
 EXPOSE 3000
 ENV PORT=3000

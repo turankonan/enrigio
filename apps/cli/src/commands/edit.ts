@@ -10,7 +10,7 @@ export async function runEdit(target: string, options: DirOption): Promise<void>
 	if (target === "env") {
 		filePath = path.join(configDir, ".env");
 	} else if (target === "compose") {
-		filePath = path.join(configDir, "answerecho.yaml");
+		filePath = path.join(configDir, "enrigio.yaml");
 	} else {
 		throw new Error(`Unknown edit target: ${target}. Use \`env\` or \`compose\`.`);
 	}
@@ -33,5 +33,5 @@ export async function runEdit(target: string, options: DirOption): Promise<void>
 		child.on("error", (err) => reject(err));
 	});
 
-	log.info("Restart the stack with `answerecho compose up -d` to apply changes.");
+	log.info("Restart the stack with `enrigio compose up -d` to apply changes.");
 }

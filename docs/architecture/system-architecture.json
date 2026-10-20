@@ -2,7 +2,7 @@
   "schema_version": 1,
   "diagram_type": "architecture",
   "meta": {
-    "title": "AnswerEcho — System Architecture",
+    "title": "Enrigio — System Architecture",
     "output": "system-architecture.html",
     "quality_profile": "showcase",
     "views": [
@@ -15,7 +15,7 @@
     { "id": "users", "type": "external", "label": "Dashboard & Clients", "sublabel": "Browser · REST · MCP", "pos": [40, 90], "size": [160, 60] },
     { "id": "auth", "type": "security", "label": "better-auth", "sublabel": "orgs · API keys · OAuth", "pos": [40, 300], "size": [150, 60] },
     { "id": "billing", "type": "external", "label": "Stripe · Auth0", "sublabel": "billing · SSO", "pos": [40, 500], "size": [150, 60] },
-    { "id": "web", "type": "frontend", "label": "AnswerEcho Web", "sublabel": "TanStack Start :3000", "tag": "server fns + REST + MCP", "pos": [235, 300], "size": [150, 60] },
+    { "id": "web", "type": "frontend", "label": "Enrigio Web", "sublabel": "TanStack Start :3000", "tag": "server fns + REST + MCP", "pos": [235, 300], "size": [150, 60] },
     { "id": "queue", "type": "messagebus", "label": "pg-boss Queues", "sublabel": "process-prompt · reports", "pos": [430, 150], "size": [160, 60] },
     { "id": "db", "type": "database", "label": "PostgreSQL", "sublabel": "Drizzle · RLS", "pos": [430, 470], "size": [160, 60] },
     { "id": "worker", "type": "backend", "label": "Worker", "sublabel": "pg-boss consumer + cron", "tag": "Provider Registry", "pos": [640, 300], "size": [155, 60] },

@@ -2,7 +2,7 @@
 
 _Last updated: 2026-09-21_
 
-Where AnswerEcho stands against the capability gap Maya raised (and the five customer
+Where Enrigio stands against the capability gap Maya raised (and the five customer
 comments behind it, see `docs/CUSTOMER-FEEDBACK-REVIEW.md`). This tracks what has shipped,
 what is deployed and verified live, and the one real feature still open.
 

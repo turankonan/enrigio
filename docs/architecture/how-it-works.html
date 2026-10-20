@@ -1,6 +1,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How AnswerEcho Works</title>
+<title>How Enrigio Works</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -251,7 +251,7 @@
 
 <header class="top">
   <div class="wrap">
-    <span class="logo"><span class="dot"></span>AnswerEcho <small>· by Rigosis</small></span>
+    <span class="logo"><span class="dot"></span>Enrigio <small>· by Rigosis</small></span>
     <nav>
       <a href="#prepare">Questions</a>
       <a href="#track">Tracking</a>
@@ -267,7 +267,7 @@
     <div class="eyebrow">How the platform works · end to end</div>
     <h1>Measuring how <span class="hl">AI answers</span> talk about your brand.</h1>
     <p class="lede">
-      AnswerEcho asks the AI engines people actually use — ChatGPT, Gemini, Perplexity,
+      Enrigio asks the AI engines people actually use — ChatGPT, Gemini, Perplexity,
       Google AI Overviews, Claude — the questions your customers ask, then measures how
       often they mention you, who they mention instead, and which sources they trust.
       Every day, automatically. Here's the whole machine, no code required.
@@ -299,7 +299,7 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">01</span><h2>The AI prepares the questions</h2></div>
     <p class="sec-sub">
-      You never write the prompts yourself. You give AnswerEcho a website; it reads the page,
+      You never write the prompts yourself. You give Enrigio a website; it reads the page,
       searches the web to verify what the company does, and proposes the search-style questions
       real people would type. For <b>rigosis.com</b> it came back with <b>20 suggestions</b>
       about ITSM consulting and OpenText SMAX partnerships. You keep the ones that matter.
@@ -371,7 +371,7 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">03</span><h2>How it decides "you were mentioned"</h2></div>
     <p class="sec-sub">
-      No magic. AnswerEcho reads each answer as plain text and checks whether your name, a nickname,
+      No magic. Enrigio reads each answer as plain text and checks whether your name, a nickname,
       or your domain appears anywhere in it — and does the same for every competitor. Simple and
       robust, because AI writes prose, not tidy labels.
     </p>
@@ -457,7 +457,7 @@
       <div class="card">
         <span class="step-badge">◎</span>
         <h3>Discover competitors from answers</h3>
-        <p>AnswerEcho re-reads the stored answers and suggests every rival the engines named — each with
+        <p>Enrigio re-reads the stored answers and suggests every rival the engines named — each with
         a quote as evidence. On the Rigosis data it surfaced <b>15 candidates</b> including Konsalt (28 runs)
         and Kafein (9) that a manual read had missed. Five were configured, so the next run produced an
         honest Share of Voice.</p>
@@ -535,12 +535,12 @@
   <div class="wrap">
     <div class="sec-head"><span class="sec-num">08</span><h2>Under the hood — the real API calls</h2></div>
     <p class="sec-sub">
-      For engineers: the exact endpoints AnswerEcho calls for each engine, with the request it sends for a
+      For engineers: the exact endpoints Enrigio calls for each engine, with the request it sends for a
       Rigosis prompt. Location code <b>2792 = Turkey</b> (the Rigosis market); language <code>tr</code>.
     </p>
     <div class="api-note">
       <b>How to read these.</b> The endpoints and request bodies are exactly what the app sends (built in the
-      provider code). Response bodies are <b>trimmed to the fields AnswerEcho actually reads</b> — real responses
+      provider code). Response bodies are <b>trimmed to the fields Enrigio actually reads</b> — real responses
       are much larger. These are representative of the Rigosis run, not literal captured wire logs (the demo
       keeps no request logs).
     </div>
@@ -601,7 +601,7 @@
 }</pre>
         </div>
       </div>
-      <div class="reads">AnswerEcho reads <code>items[].markdown</code> as the answer → it contains “rigosis” ⇒ <b>brand mentioned</b>. Each <code>references[]</code> entry becomes a citation row.</div>
+      <div class="reads">Enrigio reads <code>items[].markdown</code> as the answer → it contains “rigosis” ⇒ <b>brand mentioned</b>. Each <code>references[]</code> entry becomes a citation row.</div>
     </div>
 
     <!-- 2. DataForSEO ChatGPT scraper -->
@@ -786,7 +786,7 @@
       <a href="prompt-evaluation.html">▸ Prompt-evaluation sequence diagram</a>
       <a href="end-to-end-with-rigosis.md">▸ Full technical write-up (with file references)</a>
     </div>
-    A plain-language explainer of AnswerEcho by Rigosis. Numbers from the demo run captured 2026-09-17.
+    A plain-language explainer of Enrigio by Rigosis. Numbers from the demo run captured 2026-09-17.
   </div>
 </footer>
 

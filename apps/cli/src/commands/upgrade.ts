@@ -29,7 +29,7 @@ async function confirmStaleCli(cliVersion: string, assumeYes: boolean | undefine
 
 	log.warn(`Your CLI (${cliVersion}) is behind the latest published version (${latestCli}).`);
 	log.info("Recommended: upgrade the CLI first, then rerun this command:");
-	console.log(`  ${pc.bold("npm install -g @answerecho/cli@latest")}`);
+	console.log(`  ${pc.bold("npm install -g @enrigio/cli@latest")}`);
 	const proceed = assumeYes
 		? true
 		: await p.confirm({
@@ -38,7 +38,7 @@ async function confirmStaleCli(cliVersion: string, assumeYes: boolean | undefine
 			});
 	assertNotCancelled(proceed);
 	if (!proceed) {
-		p.cancel("Upgrade cancelled. Upgrade the CLI and rerun `answerecho upgrade`.");
+		p.cancel("Upgrade cancelled. Upgrade the CLI and rerun `enrigio upgrade`.");
 		process.exit(0);
 	}
 }
@@ -96,9 +96,9 @@ async function applyUpgradeMigrations(
 		await runMigrations(plan, ctx);
 	} catch (error) {
 		log.error(`Migration failed: ${error instanceof Error ? error.message : String(error)}`);
-		log.info("Your config version was left unchanged. Fix the issue and rerun `answerecho upgrade`.");
+		log.info("Your config version was left unchanged. Fix the issue and rerun `enrigio upgrade`.");
 		if (wasRunning) {
-			log.info("The stack was stopped for the upgrade. Restart with `answerecho compose up -d` after fixing.");
+			log.info("The stack was stopped for the upgrade. Restart with `enrigio compose up -d` after fixing.");
 		}
 		process.exit(1);
 	}
@@ -106,7 +106,7 @@ async function applyUpgradeMigrations(
 
 async function restartAfterUpgrade(configDir: string, wasRunning: boolean): Promise<void> {
 	if (!wasRunning) {
-		log.info("Stack was stopped before upgrade — leaving it stopped. Start with `answerecho compose up -d`.");
+		log.info("Stack was stopped before upgrade — leaving it stopped. Start with `enrigio compose up -d`.");
 		return;
 	}
 	log.step("Starting services...");
@@ -122,13 +122,13 @@ async function restartAfterUpgrade(configDir: string, wasRunning: boolean): Prom
 }
 export async function runUpgrade(options: UpgradeOptions, cliVersion: string): Promise<void> {
 	printBanner();
-	p.intro(pc.bold("Upgrading AnswerEcho"));
+	p.intro(pc.bold("Upgrading Enrigio"));
 
 	await confirmStaleCli(cliVersion, options.yes);
 
 	// ── Resolve config + the version it was last rendered with ───────────
 	const configDir = await resolveConfigDir(options.dir);
-	const composePath = path.join(configDir, "answerecho.yaml");
+	const composePath = path.join(configDir, "enrigio.yaml");
 	const detectedVersion = await readRenderedVersion(composePath);
 	const fromVersion = detectedVersion ?? cliVersion;
 	if (!semver.valid(fromVersion)) {
@@ -138,7 +138,7 @@ export async function runUpgrade(options: UpgradeOptions, cliVersion: string): P
 	if (semver.gt(fromVersion, cliVersion)) {
 		log.warn(`Your deployment (${fromVersion}) is newer than this CLI (${cliVersion}).`);
 		log.info("Upgrade the CLI to match, then rerun:");
-		console.log(`  ${pc.bold("npm install -g @answerecho/cli@latest")}`);
+		console.log(`  ${pc.bold("npm install -g @enrigio/cli@latest")}`);
 		process.exit(1);
 	}
 
@@ -178,7 +178,7 @@ export async function runUpgrade(options: UpgradeOptions, cliVersion: string): P
 
 	// ── Pull new images (dev builds from source, so nothing to pull) ─────
 	if (isDev) {
-		log.info("Dev mode detected — rebuild with `answerecho compose build` to apply the new version.");
+		log.info("Dev mode detected — rebuild with `enrigio compose build` to apply the new version.");
 	} else {
 		log.step("Pulling images...");
 		await runDockerCompose(configDir, ["pull"]);

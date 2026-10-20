@@ -78,7 +78,7 @@ function AuthorizePage() {
 
 	if (!client) {
 		return (
-			<FullPageCard title="Connect to AnswerEcho" subtitle="This client isn't registered with this instance.">
+			<FullPageCard title="Connect to Enrigio" subtitle="This client isn't registered with this instance.">
 				<Alert variant="destructive">
 					<AlertDescription>
 						Continuing will not work — start the connection from your MCP client again.
@@ -89,10 +89,7 @@ function AuthorizePage() {
 	}
 
 	return (
-		<FullPageCard
-			title="Connect to AnswerEcho"
-			subtitle={`${label} is asking to read and manage your AnswerEcho data.`}
-		>
+		<FullPageCard title="Connect to Enrigio" subtitle={`${label} is asking to read and manage your Enrigio data.`}>
 			<div className="w-full space-y-4">
 				{error && (
 					<Alert variant="destructive">
@@ -122,7 +119,7 @@ function AuthorizePage() {
 				{client.loopbackOnly && (
 					<Alert>
 						<AlertDescription>
-							This client runs on your computer, so AnswerEcho can't tell which program is asking. Continue only if you
+							This client runs on your computer, so Enrigio can't tell which program is asking. Continue only if you
 							just started this from a client you trust.
 						</AlertDescription>
 					</Alert>

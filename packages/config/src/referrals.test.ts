@@ -20,10 +20,10 @@ describe("referral links", () => {
 	});
 
 	it("points each destination at its own page", () => {
-		expect(marketingUrl("/docs", "cloud-signin")).toBe("https://www.answerecho.com/docs?ref=cloud-signin");
-		expect(cloudSignupUrl("cloud-signin")).toBe("https://app.answerecho.com/auth/register?ref=cloud-signin");
-		expect(cloudPricingUrl("cloud-signin")).toBe("https://www.answerecho.com/pricing?ref=cloud-signin");
-		expect(bookDemoUrl("cloud-signin")).toBe("https://cal.com/jrhizor/answerecho?ref=cloud-signin");
-		expect(demoSiteUrl("cloud-signin")).toBe("https://demo.answerecho.com/?ref=cloud-signin");
+		expect(marketingUrl("/docs", "cloud-signin")).toBe("https://www.enrigio.com/docs?ref=cloud-signin");
+		expect(cloudSignupUrl("cloud-signin")).toBe("https://app.enrigio.com/auth/register?ref=cloud-signin");
+		expect(cloudPricingUrl("cloud-signin")).toBe("https://www.enrigio.com/pricing?ref=cloud-signin");
+		expect(bookDemoUrl("cloud-signin")).toBe("https://cal.com/jrhizor/enrigio?ref=cloud-signin");
+		expect(demoSiteUrl("cloud-signin")).toBe("https://demo.enrigio.com/?ref=cloud-signin");
 	});
 });

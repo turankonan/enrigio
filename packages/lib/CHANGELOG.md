@@ -21,7 +21,7 @@
 
 ### Minor Changes
 
-- c9142f7: AnswerEcho now serves a full external API and an MCP server. `/api/v1` covers brands, prompts, competitors, reports, analytics, models, tags, and opportunities. `/api/mcp` connects Claude Code, Codex, Cursor, OpenCode, and VS Code, either by signing in from the client or with an API key. Keys belong to an organization and are issued read-only or read-write from Settings, which now also has API and MCP pages describing your own deployment.
+- c9142f7: Enrigio now serves a full external API and an MCP server. `/api/v1` covers brands, prompts, competitors, reports, analytics, models, tags, and opportunities. `/api/mcp` connects Claude Code, Codex, Cursor, OpenCode, and VS Code, either by signing in from the client or with an API key. Keys belong to an organization and are issued read-only or read-write from Settings, which now also has API and MCP pages describing your own deployment.
 
 ### Patch Changes
 
@@ -34,7 +34,7 @@
 
 ### Minor Changes
 
-- 78593b9: Adds support for [AnswerEcho Cloud](https://app.answerecho.com/).
+- 78593b9: Adds support for [Enrigio Cloud](https://app.enrigio.com/).
 
 ### Patch Changes
 
@@ -47,7 +47,7 @@
 - 78593b9: The account menu lists every organization (not just brands) you belong to.
 - f87d2e2: Dashboard URLs now include the organization and the brand — `/app/org/{organization}/brand/{brand}`.
 - 58ff775: Keep a brand's prompts editable when it already holds more than the prompt limit.
-- 1f46b62: Fix broken docs link in `answerecho init` and the LLMs settings page.
+- 1f46b62: Fix broken docs link in `enrigio init` and the LLMs settings page.
 - 1c4d39c: Support "GitHub Flavored Markdown" on prompt detail pages. LLM responses now render tables, strikethroughs, and URL autolinks more correctly.
 - 78593b9: Self-hosted deployments can set `RUNS_PER_PROMPT` to change how many times each run samples a platform, trading sampling confidence against provider spend.
 - 78593b9: Self-hosted deployments now show each tracked platform's estimated cost on the LLMs settings page, plus which providers to configure for the platforms they aren't tracking yet.
@@ -89,7 +89,7 @@
 
 ### Patch Changes
 
-- 91de584: IMPORTANT BUGFIX: Fixed OpenAI response retrieval that broke in v0.2.15, which caused repeated (but billable) failures. If you are collecting data from the direct OpenAI API using AnswerEcho, please update immediately.
+- 91de584: IMPORTANT BUGFIX: Fixed OpenAI response retrieval that broke in v0.2.15, which caused repeated (but billable) failures. If you are collecting data from the direct OpenAI API using Enrigio, please update immediately.
   - @workspace/config@0.2.16
 
 ## 0.2.15
@@ -134,7 +134,7 @@
 
 - 7990382: BrightData: prefer `answer_text_markdown` over `answer_text` when extracting response text, so prompt responses render with markdown formatting in the UI.
 - edf97d4: Add Mistral as a direct API provider. Set `MISTRAL_API_KEY` and target via `mistral:mistral-api:<model>[:online]`.
-- 7cba46d: License AnswerEcho under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
+- 7cba46d: License Enrigio under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
 - 839b98b: Brand onboarding is now a single screen: paste a website and review the suggested products, competitors (with their own domains and aliases), additional brand domains, aliases, and tagged starter prompts before saving. Powered by whichever direct LLM API you've configured (OpenRouter, Anthropic, OpenAI, or Mistral) with web search.
 
 ## 0.2.4
@@ -156,7 +156,7 @@
 
 ### Patch Changes
 
-- adf7642: CLI `answerecho init` now walks through each provider one at a time.
+- adf7642: CLI `enrigio init` now walks through each provider one at a time.
 
 ## 0.2.0
 

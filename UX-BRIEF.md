@@ -1,8 +1,8 @@
-# UX brief — Rigosis branding for AnswerEcho
+# UX brief — Rigosis branding for Enrigio
 
 ## Objective
 
-Reskin the AnswerEcho dashboard (forked Elmo UI) so it reads as a Rigosis
+Reskin the Enrigio dashboard (forked Elmo UI) so it reads as a Rigosis
 product: name, logo, color, type, and the shareable surfaces (reports, OG
 images, emails) — without redesigning layout or flows.
 
@@ -23,20 +23,20 @@ entirely.
 
 ## Voice
 
-Product name is **AnswerEcho**, attributed as "AnswerEcho by Rigosis" on the
+Product name is **Enrigio**, attributed as "Enrigio by Rigosis" on the
 login screen, report footers, and email footers. UI copy stays as-is.
 
 ## Scope, in priority order
 
 **P1 — identity (blocks the demo)**
-1. `packages/config/src/constants.ts` — `ANSWERECHO_BRAND_COLOR` and
-   `ANSWERECHO_THEME_COLOR` → `#39b54a`; `ANSWERECHO_BRAND_FONT` → `Ubuntu`
+1. `packages/config/src/constants.ts` — `ENRIGIO_BRAND_COLOR` and
+   `ENRIGIO_THEME_COLOR` → `#39b54a`; `ENRIGIO_BRAND_FONT` → `Ubuntu`
    (add `@fontsource/ubuntu`, drop `@fontsource/titan-one`).
 2. `apps/web/scripts/generate-brand-icons.tsx` — swap the embedded Titan One
    WOFF2 for Ubuntu Bold, regenerate every icon in `apps/web/public/icons/`
    (favicon, apple-touch, maskable set). Simple mark: lowercase "a" or an
    echo/soundwave glyph on the green.
-3. `apps/web/src/components/logo.tsx` — wordmark "AnswerEcho" in Ubuntu Bold,
+3. `apps/web/src/components/logo.tsx` — wordmark "Enrigio" in Ubuntu Bold,
    ink `#32373c`, green accent on the "Echo" half or the mark.
 4. Primary action color in the web app theme (shadcn `--primary`) → action
    green; verify focus rings and links follow.
@@ -45,7 +45,7 @@ login screen, report footers, and email footers. UI copy stays as-is.
 5. `packages/og/` — OG images for shareable reports: new mark, green accent.
 6. `apps/web/scripts/generate-brand-kit.tsx` + `apps/web/src/stories/brand-kit.stories.tsx` — regenerate.
 7. `packages/deployment/src/email-templates.ts` — sender name/branding
-   ("AnswerEcho by Rigosis").
+   ("Enrigio by Rigosis").
 8. `DEFAULT_CHART_COLORS` (constants.ts) — replace only slot 1 (`#2563eb` →
    a green that keeps the documented color-blind separation; test the first
    four under protanopia/deuteranopia before committing — hue order there is
@@ -58,9 +58,9 @@ login screen, report footers, and email footers. UI copy stays as-is.
    Rigosis value prop; do not ship someone else's social proof.
 10. `CRISP_WEBSITE_ID` (constants.ts) — upstream's support-chat ID. Replace
     with a Rigosis Crisp ID or remove the widget.
-11. `PROVIDERS_DOCS_URL` / `API_DOCS_URL` now point at `answerecho.com`,
+11. `PROVIDERS_DOCS_URL` / `API_DOCS_URL` now point at `enrigio.com`,
     which we don't own — repoint to wherever docs will live (e.g.
-    `rigosis.com/answerecho/docs`) or hide the links until docs exist.
+    `rigosis.com/enrigio/docs`) or hide the links until docs exist.
 
 ## Accessibility rules
 
@@ -80,5 +80,5 @@ per-customer branding; this brief only sets the product default.
 ## Definition of done
 
 Login page, sidebar, favicon/browser tab, a shared report link, and one
-transactional email all show AnswerEcho/Rigosis identity with zero Elmo
+transactional email all show Enrigio/Rigosis identity with zero Elmo
 visual remnants, in light and dark mode.

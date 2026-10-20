@@ -1,7 +1,7 @@
 /**
  * CLI Driver for E2E Tests
  *
- * Drives `answerecho init --dev` through a real PTY by wrapping the CLI in
+ * Drives `enrigio init --dev` through a real PTY by wrapping the CLI in
  * script(1). script(1) is preinstalled on Ubuntu (util-linux) and macOS
  * (BSD), so we avoid native addons / node-gyp / prebuild-binary forks.
  *
@@ -9,10 +9,10 @@
  * to the child's stdin, so we exercise the same interactive wizard a
  * human user would see.
  *
- * The CLI writes config to `~/.answerecho`. To redirect that to a test-local
+ * The CLI writes config to `~/.enrigio`. To redirect that to a test-local
  * directory without polluting the runner's real home, we set HOME on the
  * child process so `os.homedir()` resolves to the parent of <config-dir>.
- * The supplied <config-dir> must therefore end in `.answerecho`.
+ * The supplied <config-dir> must therefore end in `.enrigio`.
  *
  * Usage: tsx cli-driver.ts <config-dir> <repo-root>
  */
@@ -27,8 +27,8 @@ if (!configDir || !repoRoot) {
 	process.exit(1);
 }
 
-if (path.basename(configDir) !== ".answerecho") {
-	console.error(`config-dir must end in ".answerecho" (got ${configDir})`);
+if (path.basename(configDir) !== ".enrigio") {
+	console.error(`config-dir must end in ".enrigio" (got ${configDir})`);
 	process.exit(1);
 }
 

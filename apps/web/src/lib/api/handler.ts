@@ -101,7 +101,7 @@ const WRITE_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 /** Stamped on every handler here, so the conformance test can ask a route what
  * it wired up rather than grep for the call. */
-const API_HANDLER = Symbol.for("answerecho.api.handler");
+const API_HANDLER = Symbol.for("enrigio.api.handler");
 
 export interface ApiHandlerMeta {
 	kind: "endpoint" | "method-guard";

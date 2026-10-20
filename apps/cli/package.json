@@ -1,5 +1,5 @@
 {
-	"name": "@answerecho/cli",
+	"name": "@enrigio/cli",
 	"version": "0.4.2",
 	"license": "MIT",
 	"keywords": [
@@ -20,7 +20,7 @@
 		"ai-visibility"
 	],
 	"bin": {
-		"answerecho": "dist/index.js"
+		"enrigio": "dist/index.js"
 	},
 	"files": [
 		"dist",

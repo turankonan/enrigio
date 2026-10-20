@@ -1,17 +1,17 @@
 #!/usr/bin/env tsx
 /**
- * Generates the AnswerEcho brand kit as a zip of PNGs using Takumi (JSX → PNG).
+ * Generates the Enrigio brand kit as a zip of PNGs using Takumi (JSX → PNG).
  *
- * Output: apps/web/answerecho-brand-kit.zip
+ * Output: apps/web/enrigio-brand-kit.zip
  *
  *   Icons (square, the mark):
- *     answerecho-icon-{size}.png              Transparent background
- *     answerecho-icon-white-{size}.png        White background
- *     answerecho-icon-dark-{size}.png         Dark background
- *     answerecho-icon-maskable-{size}.png     Maskable/PWA (white bg, safe-zone padding)
+ *     enrigio-icon-{size}.png              Transparent background
+ *     enrigio-icon-white-{size}.png        White background
+ *     enrigio-icon-dark-{size}.png         Dark background
+ *     enrigio-icon-maskable-{size}.png     Maskable/PWA (white bg, safe-zone padding)
  *
- *   Logos ("AnswerEcho" wordmark, sm/md/lg × 3 backgrounds):
- *     answerecho-logo[-white|-dark]-{sm|md|lg}.png
+ *   Logos ("Enrigio" wordmark, sm/md/lg × 3 backgrounds):
+ *     enrigio-logo[-white|-dark]-{sm|md|lg}.png
  *
  *   OG images (1200×630):
  *     og-default.png                    Default Open Graph image
@@ -27,7 +27,7 @@ import { createWriteStream, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ANSWERECHO_BRAND_COLOR, ANSWERECHO_INK_COLOR, DEFAULT_APP_NAME } from "@workspace/config/constants";
+import { DEFAULT_APP_NAME, ENRIGIO_BRAND_COLOR, ENRIGIO_INK_COLOR } from "@workspace/config/constants";
 import { renderOgPng } from "@workspace/og/rasterize";
 import { OG_HEIGHT, OG_WIDTH, renderOgImage } from "@workspace/og/render";
 import { ZipArchive } from "archiver";
@@ -35,10 +35,10 @@ import { ZipArchive } from "archiver";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
-const BRAND_COLOR = ANSWERECHO_BRAND_COLOR;
-const INK = ANSWERECHO_INK_COLOR;
+const BRAND_COLOR = ENRIGIO_BRAND_COLOR;
+const INK = ENRIGIO_INK_COLOR;
 const SITE_URL = "https://www.rigosis.com";
-const OUTPUT_ZIP = resolve(__dirname, "../answerecho-brand-kit.zip");
+const OUTPUT_ZIP = resolve(__dirname, "../enrigio-brand-kit.zip");
 
 // ---------------------------------------------------------------------------
 // Fonts
@@ -134,7 +134,7 @@ function MaskableIcon({ size }: { size: number }) {
 }
 
 // ---------------------------------------------------------------------------
-// Logo — "AnswerEcho" wordmark with equal padding on all sides
+// Logo — "Enrigio" wordmark with equal padding on all sides
 // ---------------------------------------------------------------------------
 
 function Logo({ bg, fontSize }: { bg?: string; fontSize: number }) {
@@ -150,7 +150,7 @@ function Logo({ bg, fontSize }: { bg?: string; fontSize: number }) {
 }
 
 // ---------------------------------------------------------------------------
-// PatternBanner — repeating "AnswerEcho" wordmark at an angle, wrapping-paper style.
+// PatternBanner — repeating "Enrigio" wordmark at an angle, wrapping-paper style.
 // ---------------------------------------------------------------------------
 
 function PatternBanner({
@@ -200,7 +200,7 @@ function PatternBanner({
 						marginRight: gap,
 					}}
 				>
-					AnswerEcho
+					Enrigio
 				</div>,
 			);
 		}
@@ -259,13 +259,13 @@ const iconSizes = [16, 32, 64, 128, 256, 512];
 console.log("Icons:");
 for (const v of iconVariants) {
 	for (const size of iconSizes) {
-		await addFile(`icons/answerecho-icon${v.suffix}-${size}.png`, render(<Icon bg={v.bg} size={size} />, size, size));
+		await addFile(`icons/enrigio-icon${v.suffix}-${size}.png`, render(<Icon bg={v.bg} size={size} />, size, size));
 	}
 }
 
 console.log("\nIcons — Maskable (PWA):");
 for (const size of [64, 128, 256, 512]) {
-	await addFile(`icons/answerecho-icon-maskable-${size}.png`, render(<MaskableIcon size={size} />, size, size));
+	await addFile(`icons/enrigio-icon-maskable-${size}.png`, render(<MaskableIcon size={size} />, size, size));
 }
 
 // Logos — two-tone wordmark, colors follow the background
@@ -285,7 +285,7 @@ const logoSizes = [
 for (const bg of logoBgs) {
 	for (const sz of logoSizes) {
 		await addFile(
-			`logos/answerecho-logo${bg.suffix}-${sz.label}.png`,
+			`logos/enrigio-logo${bg.suffix}-${sz.label}.png`,
 			render(<Logo bg={bg.bg} fontSize={sz.fontSize} />, sz.w, sz.h),
 		);
 	}
@@ -338,4 +338,4 @@ await done;
 
 const zipSize = readFileSync(OUTPUT_ZIP).length;
 const kb = (zipSize / 1024).toFixed(1);
-console.log(`\n✅ answerecho-brand-kit.zip (${kb} KB, ${files.length} files) → ${OUTPUT_ZIP}`);
+console.log(`\n✅ enrigio-brand-kit.zip (${kb} KB, ${files.length} files) → ${OUTPUT_ZIP}`);

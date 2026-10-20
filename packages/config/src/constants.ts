@@ -9,8 +9,8 @@
  * NOTE: Whitelabel mode does NOT use these defaults - all values must be
  * provided via environment variables.
  */
-export const DEFAULT_APP_NAME = "AnswerEcho";
-export const DEFAULT_APP_ICON = "/icons/answerecho-icon.svg";
+export const DEFAULT_APP_NAME = "Enrigio";
+export const DEFAULT_APP_ICON = "/icons/enrigio-icon.svg";
 export const DEFAULT_APP_URL = "http://localhost:3000/";
 
 /**
@@ -18,26 +18,26 @@ export const DEFAULT_APP_URL = "http://localhost:3000/";
  * Per-provider anchors are appended to it, so it has to stay the page itself
  * rather than the docs index.
  */
-export const PROVIDERS_DOCS_URL = "https://www.rigosis.com/answerecho/docs/providers";
+export const PROVIDERS_DOCS_URL = "https://www.rigosis.com/enrigio/docs/providers";
 
 /** The public docs, for the hosted product. In the app itself the API and MCP
  * pages document the deployment the viewer is signed in to. */
-export const API_DOCS_URL = "https://www.rigosis.com/answerecho/docs/api";
+export const API_DOCS_URL = "https://www.rigosis.com/enrigio/docs/api";
 
 /**
- * AnswerEcho brand constants — used for icon generation, manifest, and the brand kit.
+ * Enrigio brand constants — used for icon generation, manifest, and the brand kit.
  */
-export const ANSWERECHO_BRAND_COLOR = "#39b54a"; // Rigosis green — fills only, never carries white text (2.9:1)
-export const ANSWERECHO_BRAND_FONT = "Ubuntu";
-export const ANSWERECHO_THEME_COLOR = "#39b54a";
-export const ANSWERECHO_BACKGROUND_COLOR = "#ffffff";
+export const ENRIGIO_BRAND_COLOR = "#39b54a"; // Rigosis green — fills only, never carries white text (2.9:1)
+export const ENRIGIO_BRAND_FONT = "Ubuntu";
+export const ENRIGIO_THEME_COLOR = "#39b54a";
+export const ENRIGIO_BACKGROUND_COLOR = "#ffffff";
 /** Ink — headings, wordmark, and the glyph on the green mark. */
-export const ANSWERECHO_INK_COLOR = "#32373c";
+export const ENRIGIO_INK_COLOR = "#32373c";
 /** Darkened brand green for interactive elements; 5.4:1 with white, passes AA. */
-export const ANSWERECHO_ACTION_COLOR = "#277a33";
+export const ENRIGIO_ACTION_COLOR = "#277a33";
 
 /**
- * Default chart colors for the AnswerEcho product.
+ * Default chart colors for the Enrigio product.
  *
  * 11 base hues (Observable + Tableau, anchored to the brand green) expanded
  * into 55 colors across five lightness tiers: base → dark → light →

@@ -14,10 +14,10 @@ import { resetMockAuthClient, setMockSsoError } from "./_mocks/auth-client";
 import { type ClientConfig, setMockClientConfig } from "./_mocks/config-client";
 import { setMockRouteContext } from "./_mocks/tanstack-router";
 
-const answerechoConfig: ClientConfig = {
+const enrigioConfig: ClientConfig = {
 	mode: "local",
 	features: { readOnly: false, showOptimizeButton: false, canCreateBrands: true },
-	branding: { name: "AnswerEcho", chartColors: DEFAULT_CHART_COLORS.map((c) => c) },
+	branding: { name: "Enrigio", chartColors: DEFAULT_CHART_COLORS.map((c) => c) },
 	analytics: {},
 	defaultDelayHours: 24,
 	canRegister: true,
@@ -57,8 +57,8 @@ export default {
 	decorators: [
 		(Story) => {
 			resetMockAuthClient();
-			setMockClientConfig(answerechoConfig);
-			setMockRouteContext({ clientConfig: answerechoConfig });
+			setMockClientConfig(enrigioConfig);
+			setMockRouteContext({ clientConfig: enrigioConfig });
 			return <Shell>{<Story />}</Shell>;
 		},
 	],

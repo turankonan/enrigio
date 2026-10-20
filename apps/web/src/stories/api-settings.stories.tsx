@@ -6,7 +6,7 @@ import { setMockRouteContext } from "./_mocks/tanstack-router";
 
 const ApiSettingsPage = (Route as unknown as { options: { component: ComponentType } }).options.component;
 
-function load(appName = "AnswerEcho", appUrl = "https://app.answerecho.com/", readOnly = false) {
+function load(appName = "Enrigio", appUrl = "https://app.enrigio.com/", readOnly = false) {
 	setMockRouteContext({ clientConfig: { branding: { name: appName, url: appUrl }, features: { readOnly } } });
 }
 
@@ -55,13 +55,13 @@ export const Whitelabel: Story = {
 		const canvas = within(canvasElement);
 		await expect(await canvas.findByText("Programmatic interface for Acme Visibility.")).toBeVisible();
 		// Nothing on the page names the vendor.
-		await expect(canvas.queryByText(/answerecho/i)).toBeNull();
+		await expect(canvas.queryByText(/enrigio/i)).toBeNull();
 	},
 };
 
 export const ReadOnlyDeployment: Story = {
 	render: () => {
-		load("AnswerEcho", "https://app.answerecho.com/", true);
+		load("Enrigio", "https://app.enrigio.com/", true);
 		return <ApiSettingsPage />;
 	},
 	play: async ({ canvasElement }) => {

@@ -1,6 +1,6 @@
 {
   "version": "1",
-  "name": "answerecho-api-e2e",
+  "name": "enrigio-api-e2e",
   "type": "collection",
   "ignore": ["node_modules", ".git"]
 }

@@ -2,7 +2,7 @@
 
 > Status: revised after two review rounds; pending final approval before the implementation plan.
 > Phase 0 (sentiment, in-answer rank, coverage, opportunities-as-plan) is shipped. This is
-> Phase 1 — the Maya website-audit pillar AnswerEcho does not yet have.
+> Phase 1 — the Maya website-audit pillar Enrigio does not yet have.
 >
 > **v3 changelog (round 2):** explicit lib/worker/web ownership split + full queue options;
 > connection-pinned SSRF (not just pre-resolution); dropped the non-existent Opportunities

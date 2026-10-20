@@ -1,8 +1,8 @@
 # Rigosis rebrand — implementation plan
 
-Sources: `AnswerEcho Rebrand.dc.html` (design sheet, authoritative for values),
+Sources: `Enrigio Rebrand.dc.html` (design sheet, authoritative for values),
 `UX-BRIEF.md` (scope). Decisions taken 2026-09-17: Crisp widget **removed**,
-docs links → **rigosis.com path**, login pitch → **AnswerEcho-specific copy**.
+docs links → **rigosis.com path**, login pitch → **Enrigio-specific copy**.
 
 ## Final tokens (from the sheet — supersede the brief where they differ)
 
@@ -18,8 +18,8 @@ docs links → **rigosis.com path**, login pitch → **AnswerEcho-specific copy*
 ## Steps — one commit each, in order
 
 1. **Brand constants + fonts** — `packages/config/src/constants.ts`:
-   `ANSWERECHO_BRAND_COLOR`/`ANSWERECHO_THEME_COLOR` → `#39b54a`,
-   `ANSWERECHO_BRAND_FONT` → `"Ubuntu"`. Add `@fontsource/ubuntu` (+ Cabin if
+   `ENRIGIO_BRAND_COLOR`/`ENRIGIO_THEME_COLOR` → `#39b54a`,
+   `ENRIGIO_BRAND_FONT` → `"Ubuntu"`. Add `@fontsource/ubuntu` (+ Cabin if
    used in-app), drop `@fontsource/titan-one`. Old packages, so
    `minimumReleaseAge` won't block.
 2. **Icons** — `apps/web/scripts/generate-brand-icons.tsx`: embed Ubuntu Bold
@@ -36,18 +36,18 @@ docs links → **rigosis.com path**, login pitch → **AnswerEcho-specific copy*
 5. **Login** — `apps/web/src/components/auth/sales-panel.tsx`: replace
    customer logos + G2 badge with the pitch line
    *"See how AI answers talk about your brand."* and footer
-   *"AnswerEcho by Rigosis"*. Then delete
+   *"Enrigio by Rigosis"*. Then delete
    `packages/ui/src/brand/customers.tsx` / `g2-rating.tsx` if nothing else
    imports them.
 6. **Crisp removal** — delete `apps/web/src/lib/crisp.ts` + its call sites and
    tests, drop `CRISP_WEBSITE_ID` from constants.
-7. **Docs links** — `PROVIDERS_DOCS_URL` → `https://www.rigosis.com/answerecho/docs/providers`,
-   `API_DOCS_URL` → `https://www.rigosis.com/answerecho/docs/api`.
+7. **Docs links** — `PROVIDERS_DOCS_URL` → `https://www.rigosis.com/enrigio/docs/providers`,
+   `API_DOCS_URL` → `https://www.rigosis.com/enrigio/docs/api`.
    (404 until published — accepted 2026-09-17.)
 8. **OG images** — `packages/og/src/render.tsx`: ink ground, ring texture,
    all-white wordmark, 1200×630 per the sheet's "Shared report & OG" frame.
 9. **Email** — `packages/deployment/src/email-templates.ts`: sender + footer
-   "AnswerEcho by Rigosis", humanist font fallback stack.
+   "Enrigio by Rigosis", humanist font fallback stack.
 10. **Chart slot 1** — `DEFAULT_CHART_COLORS[0]` → `#1f7a3d`, slots 2+
     untouched. Gate on CVD check (below) before merging.
 

@@ -170,10 +170,10 @@ export interface OgHeaderOptions {
 
 /** Wordmark (or whitelabel icon + name) on the left, optional label pill on the right. */
 export function OgHeader({ appName, iconDataUri, label }: OgHeaderOptions) {
-	const isAnswerEcho = appName === DEFAULT_APP_NAME;
+	const isEnrigio = appName === DEFAULT_APP_NAME;
 	return (
 		<div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 60 }}>
-			{isAnswerEcho ? (
+			{isEnrigio ? (
 				// All-white wordmark on the ink ground, per the brand sheet.
 				<div
 					style={{
@@ -185,7 +185,7 @@ export function OgHeader({ appName, iconDataUri, label }: OgHeaderOptions) {
 						letterSpacing: -1,
 					}}
 				>
-					AnswerEcho
+					Enrigio
 				</div>
 			) : (
 				<div style={{ display: "flex", alignItems: "center" }}>
@@ -238,8 +238,8 @@ function hostOf(url: string | undefined): string | undefined {
 }
 
 export function renderOgImage({ appName, title, description, accentColors, iconDataUri, label, url }: OgImageOptions) {
-	const isAnswerEcho = appName === DEFAULT_APP_NAME;
-	const colors = isAnswerEcho ? ACCENT_COLORS : (accentColors?.filter(Boolean).slice(0, 4) ?? []);
+	const isEnrigio = appName === DEFAULT_APP_NAME;
+	const colors = isEnrigio ? ACCENT_COLORS : (accentColors?.filter(Boolean).slice(0, 4) ?? []);
 	const heading = title || DEFAULT_TAGLINE;
 	const fontSize = titleFontSize(heading);
 	const short = fontSize >= 80;

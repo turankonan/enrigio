@@ -6,7 +6,7 @@ import wordmarkFont from "@fontsource/ubuntu/files/ubuntu-latin-700-normal.woff2
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { createRootRouteWithContext, HeadContent, Outlet, ScriptOnce, Scripts } from "@tanstack/react-router";
-import { ANSWERECHO_THEME_COLOR, DEFAULT_APP_ICON } from "@workspace/config/constants";
+import { DEFAULT_APP_ICON, ENRIGIO_THEME_COLOR } from "@workspace/config/constants";
 import type { MissingEnvVar } from "@workspace/config/env";
 import type { DeploymentMode } from "@workspace/config/types";
 import { useEffect } from "react";
@@ -54,14 +54,14 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 		}
 
 		const hasCustomIcon = Boolean(branding?.icon && branding.icon !== DEFAULT_APP_ICON);
-		const appName = branding?.name || "AnswerEcho";
-		const themeColor = hasCustomIcon ? "#000000" : ANSWERECHO_THEME_COLOR;
+		const appName = branding?.name || "Enrigio";
+		const themeColor = hasCustomIcon ? "#000000" : ENRIGIO_THEME_COLOR;
 		const appUrl = branding?.url ? branding.url.replace(/\/$/, "") : undefined;
 
 		const title = `${appName} - AI Search Optimization`;
 		const description = "Track and optimize your brand's visibility across AI models.";
 		// Don't pass `title` to /api/og — the renderer already shows the brand
-		// (AnswerEcho logo or whitelabel icon + name), so a "Brand - AI Search Optimization"
+		// (Enrigio logo or whitelabel icon + name), so a "Brand - AI Search Optimization"
 		// title would render redundantly. Pages that override og:image can supply
 		// a page-specific title via the query param.
 		const ogImageParams = new URLSearchParams({ description });
@@ -117,7 +117,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 				{ rel: "stylesheet", href: appCss },
 				{ rel: "manifest", href: "/api/manifest" },
 				// Whitelabel uses its own icon URL for both favicon and iOS touch;
-				// AnswerEcho default uses the committed SVG + opaque 180×180 PNG.
+				// Enrigio default uses the committed SVG + opaque 180×180 PNG.
 				...(hasCustomIcon && branding?.icon
 					? [
 							{ rel: "icon", type: "image/png", href: branding.icon },
@@ -126,9 +126,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 					: [
 							// Icons live under /icons/ (not the root) so browsers' default
 							// probes for /favicon.ico and /apple-touch-icon.png 404 on
-							// whitelabel deployments instead of picking up AnswerEcho assets.
-							{ rel: "icon", type: "image/svg+xml", href: "/icons/answerecho-icon.svg" },
-							{ rel: "icon", type: "image/png", sizes: "96x96", href: "/icons/answerecho-icon-96.png" },
+							// whitelabel deployments instead of picking up Enrigio assets.
+							{ rel: "icon", type: "image/svg+xml", href: "/icons/enrigio-icon.svg" },
+							{ rel: "icon", type: "image/png", sizes: "96x96", href: "/icons/enrigio-icon-96.png" },
 							{ rel: "icon", type: "image/x-icon", href: "/icons/favicon.ico" },
 							{ rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
 						]),

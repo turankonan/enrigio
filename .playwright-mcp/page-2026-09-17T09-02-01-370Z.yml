@@ -1,9 +1,9 @@
 - generic [ref=f12e2]:
   - generic [ref=f12e4]:
-    - generic [ref=f12e5]: AnswerEcho
+    - generic [ref=f12e5]: Enrigio
     - generic [ref=f12e8]:
       - heading "Tekrar hoş geldiniz" [level=1] [ref=f12e9]
-      - paragraph [ref=f12e10]: AnswerEcho kurulumunuzda oturum açın.
+      - paragraph [ref=f12e10]: Enrigio kurulumunuzda oturum açın.
       - generic [ref=f12e12]:
         - generic [ref=f12e13]:
           - generic [ref=f12e14]: E-posta
@@ -15,8 +15,8 @@
         - button "Oturum aç" [ref=f12e20] [cursor=pointer]
     - generic [ref=f12e21]:
       - link "Belgeler" [ref=f12e22] [cursor=pointer]:
-        - /url: https://www.rigosis.com/answerecho/docs
-      - paragraph [ref=f12e23]: AnswerEcho Rigosis tarafından
+        - /url: https://www.rigosis.com/enrigio/docs
+      - paragraph [ref=f12e23]: Enrigio Rigosis tarafından
   - complementary [ref=f12e24]:
     - generic [ref=f12e26]:
       - heading "Yapay zekâ yanıtlarının markanız hakkında nasıl konuştuğunu görün." [level=2] [ref=f12e27]

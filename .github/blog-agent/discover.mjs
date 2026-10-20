@@ -7,7 +7,7 @@ const DEFAULT_LOOKBACK_DAYS = 7;
 const DEFAULT_MAX_CANDIDATES = 60;
 const REQUEST_TIMEOUT_MS = 30_000;
 const OXYLABS_TIMEOUT_MS = 180_000;
-const USER_AGENT = "AnswerEcho editorial research bot (+https://www.answerecho.com/)";
+const USER_AGENT = "Enrigio editorial research bot (+https://www.enrigio.com/)";
 
 const NEWS_QUERIES = [
 	'"answer engine optimization" OR "generative engine optimization"',

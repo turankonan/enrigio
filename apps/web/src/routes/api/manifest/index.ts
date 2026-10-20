@@ -3,13 +3,13 @@
  *
  * Generates a manifest.json tailored to the current deployment mode:
  *   - Whitelabel: single 128×128 icon from the configured icon URL
- *   - Local/Demo (AnswerEcho): static SVG icons committed to public/icons/
+ *   - Local/Demo (Enrigio): static SVG icons committed to public/icons/
  *
  * Branding values (name, theme color, etc.) are read from server config
  * so they stay in sync with the rest of the app.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { ANSWERECHO_BACKGROUND_COLOR, ANSWERECHO_THEME_COLOR, DEFAULT_APP_ICON } from "@workspace/config/constants";
+import { DEFAULT_APP_ICON, ENRIGIO_BACKGROUND_COLOR, ENRIGIO_THEME_COLOR } from "@workspace/config/constants";
 import { getDeployment } from "@workspace/deployment";
 
 interface ManifestIcon {
@@ -35,38 +35,38 @@ function buildManifest(): object {
 			},
 		];
 	} else {
-		// AnswerEcho-only assets — never reference these from the whitelabel branch.
+		// Enrigio-only assets — never reference these from the whitelabel branch.
 		icons = [
 			{
-				src: "/icons/answerecho-icon.svg",
+				src: "/icons/enrigio-icon.svg",
 				sizes: "any",
 				type: "image/svg+xml",
 			},
 			{
-				src: "/icons/answerecho-icon-maskable.svg",
+				src: "/icons/enrigio-icon-maskable.svg",
 				sizes: "any",
 				type: "image/svg+xml",
 				purpose: "maskable",
 			},
 			// PWA installers on Android/Chrome require concrete PNG sizes.
 			{
-				src: "/icons/answerecho-icon-192.png",
+				src: "/icons/enrigio-icon-192.png",
 				sizes: "192x192",
 				type: "image/png",
 			},
 			{
-				src: "/icons/answerecho-icon-512.png",
+				src: "/icons/enrigio-icon-512.png",
 				sizes: "512x512",
 				type: "image/png",
 			},
 			{
-				src: "/icons/answerecho-icon-maskable-192.png",
+				src: "/icons/enrigio-icon-maskable-192.png",
 				sizes: "192x192",
 				type: "image/png",
 				purpose: "maskable",
 			},
 			{
-				src: "/icons/answerecho-icon-maskable-512.png",
+				src: "/icons/enrigio-icon-maskable-512.png",
 				sizes: "512x512",
 				type: "image/png",
 				purpose: "maskable",
@@ -74,7 +74,7 @@ function buildManifest(): object {
 		];
 	}
 
-	const themeColor = hasCustomIcon ? "#000000" : ANSWERECHO_THEME_COLOR;
+	const themeColor = hasCustomIcon ? "#000000" : ENRIGIO_THEME_COLOR;
 
 	return {
 		short_name: branding.name,
@@ -84,7 +84,7 @@ function buildManifest(): object {
 		scope: "/",
 		display: "standalone",
 		theme_color: themeColor,
-		background_color: ANSWERECHO_BACKGROUND_COLOR,
+		background_color: ENRIGIO_BACKGROUND_COLOR,
 	};
 }
 

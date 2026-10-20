@@ -4,7 +4,7 @@ import { refreshHeaderVersion, renderedByHeader, repinImages } from "./compose-p
 import type { PostgresMode } from "./config.js";
 import { indentBlock } from "./util.js";
 
-// Rewrites `answerecho/answerecho-*:<tag>` image tags in place, preserving any manual
+// Rewrites `enrigio/enrigio-*:<tag>` image tags in place, preserving any manual
 // edits the user made to the compose file, then refreshes the version header.
 export async function repinComposeImages(composePath: string, version: string): Promise<void> {
 	const contents = await fs.readFile(composePath, "utf8");
@@ -80,7 +80,7 @@ export function buildComposeYaml(options: {
 		}),
 	);
 
-	const lines = [renderedByHeader(options.version), "", "name: answerecho", "", "services:"];
+	const lines = [renderedByHeader(options.version), "", "name: enrigio", "", "services:"];
 	lines.push(...services.map((service) => indentBlock(service, 2)));
 
 	if (volumes.size > 0) {
@@ -100,7 +100,7 @@ function buildPostgresService(): string {
 		"  environment:",
 		"    POSTGRES_USER: postgres",
 		"    POSTGRES_PASSWORD: postgres",
-		"    POSTGRES_DB: answerecho",
+		"    POSTGRES_DB: enrigio",
 		"  volumes:",
 		// PostgreSQL 18 puts PGDATA in a version-specific child directory and
 		// declares its volume at this parent. Mounting the child path can silently
@@ -132,12 +132,12 @@ function buildDbMigrateService(options: {
 			"    target: migrate",
 		);
 	} else {
-		lines.push(`  image: answerecho/answerecho-db-migrate:${options.version}`);
+		lines.push(`  image: enrigio/enrigio-db-migrate:${options.version}`);
 	}
 
 	lines.push(
 		"  environment:",
-		"    - DATABASE_URL=postgres://postgres:postgres@postgres:5432/answerecho",
+		"    - DATABASE_URL=postgres://postgres:postgres@postgres:5432/enrigio",
 		"  depends_on:",
 		"    postgres:",
 		"      condition: service_healthy",
@@ -166,7 +166,7 @@ function buildWebService(options: {
 			"      DEPLOYMENT_MODE: local",
 		);
 	} else {
-		lines.push(`  image: answerecho/answerecho-web:${options.version}`);
+		lines.push(`  image: enrigio/enrigio-web:${options.version}`);
 	}
 
 	lines.push("  env_file:", "    - path: .env", "      required: true", "  ports:", `    - "${options.port}:3000"`);
@@ -201,7 +201,7 @@ function buildWorkerService(options: {
 			"      DEPLOYMENT_MODE: local",
 		);
 	} else {
-		lines.push(`  image: answerecho/answerecho-worker:${options.version}`);
+		lines.push(`  image: enrigio/enrigio-worker:${options.version}`);
 	}
 
 	lines.push("  env_file:", "    - path: .env", "      required: true");

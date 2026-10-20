@@ -9,7 +9,7 @@
  * GitHub shortens and Discord does not.
  *
  * Usage:
- *   REPO=answerecho/answerecho node scripts/discord-release-payload.mjs 0.2.1 release-notes.md
+ *   REPO=enrigio/enrigio node scripts/discord-release-payload.mjs 0.2.1 release-notes.md
  *
  * Missing or empty notes degrade to a link-only announcement rather than
  * failing the release.
@@ -44,7 +44,7 @@ if (!version || !repo) {
 }
 
 const releaseUrl = `https://github.com/${repo}/releases/tag/v${version}`;
-const header = `🚀 **AnswerEcho v${version}** is out!`;
+const header = `🚀 **Enrigio v${version}** is out!`;
 
 /**
  * Cut to `max` characters without splitting a surrogate pair — release notes
@@ -62,7 +62,7 @@ function truncate(text, max) {
  * GitHub renders a bare pull request URL as `#123` and Discord does not, which
  * leaves every bullet trailing 40 characters of noise. Webhook messages honour
  * `[text](url)`, so shorten them the same way — but only for this repository,
- * since `#123` in an AnswerEcho announcement reads as an AnswerEcho pull request.
+ * since `#123` in an Enrigio announcement reads as an Enrigio pull request.
  */
 function maskPullLinks(line) {
   return line.replace(

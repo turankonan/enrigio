@@ -15,9 +15,9 @@ function databaseUrl(name: string): string {
 }
 
 // The env override lets CI workflows pass their own credentials (e.g.
-// `answerecho`/`answerecho` for the scheduling-policy job's postgres service) — the first
+// `enrigio`/`enrigio` for the scheduling-policy job's postgres service) — the first
 // one to set DATABASE_URL in a given step wins.
-export const DATABASE_URL = process.env.DATABASE_URL ?? databaseUrl("answerecho");
+export const DATABASE_URL = process.env.DATABASE_URL ?? databaseUrl("enrigio");
 
 // Must match ADMIN_API_KEYS in the CI-patched .env (.github/workflows/e2e.yaml)
 // and bruno/environments/local.bru.
@@ -120,21 +120,21 @@ export interface ApiKeyFixture {
 
 export const API_KEYS = {
   orgFull: {
-    token: "answerecho_e2e_org_full",
+    token: "enrigio_e2e_org_full",
     name: "E2E org key (full)",
     organizationId: TEST_BRAND_ID,
     scopes: API_SCOPES,
     brandIds: null,
   },
   orgReadOnly: {
-    token: "answerecho_e2e_org_readonly",
+    token: "enrigio_e2e_org_readonly",
     name: "E2E org key (read-only)",
     organizationId: TEST_BRAND_ID,
     scopes: ["read"],
     brandIds: null,
   },
   orgNoScopes: {
-    token: "answerecho_e2e_org_no_scopes",
+    token: "enrigio_e2e_org_no_scopes",
     name: "E2E org key (no scopes)",
     organizationId: TEST_BRAND_ID,
     scopes: [],
@@ -142,28 +142,28 @@ export const API_KEYS = {
   },
   /** What a forged restriction looks like: the intersection empties it. */
   orgForgedRestriction: {
-    token: "answerecho_e2e_org_forged_restriction",
+    token: "enrigio_e2e_org_forged_restriction",
     name: "E2E org key (forged restriction)",
     organizationId: TEST_BRAND_ID,
     scopes: API_SCOPES,
     brandIds: [NIKE_BRAND_ID],
   },
   nikeFull: {
-    token: "answerecho_e2e_nike_full",
+    token: "enrigio_e2e_nike_full",
     name: "E2E Nike key (full)",
     organizationId: NIKE_ORG_ID,
     scopes: API_SCOPES,
     brandIds: null,
   },
   nikeNarrow: {
-    token: "answerecho_e2e_nike_narrow",
+    token: "enrigio_e2e_nike_narrow",
     name: "E2E Nike key (one brand)",
     organizationId: NIKE_ORG_ID,
     scopes: API_SCOPES,
     brandIds: [NIKE_BRAND_ID],
   },
   expired: {
-    token: "answerecho_e2e_expired",
+    token: "enrigio_e2e_expired",
     name: "E2E org key (expired)",
     organizationId: TEST_BRAND_ID,
     scopes: API_SCOPES,
@@ -171,21 +171,21 @@ export const API_KEYS = {
     expiresInMs: -60_000,
   },
   capped: {
-    token: "answerecho_e2e_capped",
+    token: "enrigio_e2e_capped",
     name: "E2E capped key",
     organizationId: CAPPED_ORG_ID,
     scopes: API_SCOPES,
     brandIds: null,
   },
   unpaid: {
-    token: "answerecho_e2e_unpaid",
+    token: "enrigio_e2e_unpaid",
     name: "E2E unpaid key",
     organizationId: UNPAID_ORG_ID,
     scopes: API_SCOPES,
     brandIds: null,
   },
   disabled: {
-    token: "answerecho_e2e_disabled",
+    token: "enrigio_e2e_disabled",
     name: "E2E org key (revoked)",
     organizationId: TEST_BRAND_ID,
     scopes: API_SCOPES,
@@ -216,10 +216,10 @@ export const API_KEYS = {
  * deployed, and is the one ordering the workflow still keeps.
  */
 const MODE_STACKS = {
-  local: { port: 1515, database: "answerecho" },
-  cloud: { port: 1516, database: "answerecho_cloud" },
-  whitelabel: { port: 1517, database: "answerecho_whitelabel" },
-  demo: { port: 1518, database: "answerecho" },
+  local: { port: 1515, database: "enrigio" },
+  cloud: { port: 1516, database: "enrigio_cloud" },
+  whitelabel: { port: 1517, database: "enrigio_whitelabel" },
+  demo: { port: 1518, database: "enrigio" },
 } as const;
 
 export const DEPLOYMENT_MODES = ["local", "cloud", "whitelabel", "demo"] as const;
@@ -251,10 +251,10 @@ export function authStatePath(mode: DeploymentMode): string {
 }
 
 /**
- * The generated deployment config `answerecho init --dev` writes. Read for the
+ * The generated deployment config `enrigio init --dev` writes. Read for the
  * BETTER_AUTH_SECRET the whitelabel setup needs to mint a session cookie.
  */
-export const GENERATED_ENV_PATH = path.join(E2E_DIR, ".answerecho", ".env");
+export const GENERATED_ENV_PATH = path.join(E2E_DIR, ".enrigio", ".env");
 
 /**
  * Whitelabel branding, mirroring `web-whitelabel` in e2e/modes.yaml. Kept here
@@ -284,6 +284,6 @@ export const CLOUD_SIGNUP = {
 
 /** The shared credentials a demo deployment advertises on its login page. */
 export const DEMO_CREDENTIALS = {
-  email: "demo@answerecho.com",
+  email: "demo@enrigio.com",
   password: "demo",
 } as const;

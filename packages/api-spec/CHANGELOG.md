@@ -12,7 +12,7 @@ No changes in this release.
 
 ### Minor Changes
 
-- c9142f7: AnswerEcho now serves a full external API and an MCP server. `/api/v1` covers brands, prompts, competitors, reports, analytics, models, tags, and opportunities. `/api/mcp` connects Claude Code, Codex, Cursor, OpenCode, and VS Code, either by signing in from the client or with an API key. Keys belong to an organization and are issued read-only or read-write from Settings, which now also has API and MCP pages describing your own deployment.
+- c9142f7: Enrigio now serves a full external API and an MCP server. `/api/v1` covers brands, prompts, competitors, reports, analytics, models, tags, and opportunities. `/api/mcp` connects Claude Code, Codex, Cursor, OpenCode, and VS Code, either by signing in from the client or with an API key. Keys belong to an organization and are issued read-only or read-write from Settings, which now also has API and MCP pages describing your own deployment.
 
 ### Patch Changes
 
@@ -60,7 +60,7 @@ No changes in this release.
 
 ### Patch Changes
 
-- 7cba46d: License AnswerEcho under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
+- 7cba46d: License Enrigio under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
 
 ## 0.2.4
 

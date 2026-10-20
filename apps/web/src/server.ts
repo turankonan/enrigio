@@ -18,14 +18,14 @@ const strictTransportSecurity =
 const SECURITY_HEADERS: Record<string, string> = {
 	"Content-Security-Policy": [
 		"default-src 'self'",
-		"script-src 'self' 'unsafe-inline' https://*.clarity.ms https://var.answerecho.com",
+		"script-src 'self' 'unsafe-inline' https://*.clarity.ms https://var.enrigio.com",
 		"style-src 'self' 'unsafe-inline'",
 		"img-src 'self' data: https: https://c.bing.com",
 		"font-src 'self' data:",
 		"media-src 'self'",
 		"worker-src 'self' blob:",
 		"frame-src 'self'",
-		"connect-src 'self' https://var.answerecho.com https://*.sentry.io https://*.clarity.ms https://c.bing.com",
+		"connect-src 'self' https://var.enrigio.com https://*.sentry.io https://*.clarity.ms https://c.bing.com",
 		"object-src 'none'",
 		"frame-ancestors 'none'",
 		"base-uri 'self'",

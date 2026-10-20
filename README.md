@@ -1,6 +1,6 @@
-# AnswerEcho
+# Enrigio
 
-AnswerEcho is Rigosis' AI visibility platform (Answer Engine Optimization). It
+Enrigio is Rigosis' AI visibility platform (Answer Engine Optimization). It
 tracks how AI answer engines — ChatGPT, Claude, Perplexity, Gemini, Google AI
 Overviews — mention, cite, and describe brands, so you can benchmark
 competitors and grow visibility in AI answers.
@@ -25,6 +25,6 @@ conventions: [AGENTS.md](AGENTS.md). Demo deployment (Render + Neon):
 ```sh
 nvm use 24
 pnpm install
-pnpm answerecho init --dev   # interactive local setup wizard
+pnpm enrigio init --dev   # interactive local setup wizard
 pnpm dev
 ```
