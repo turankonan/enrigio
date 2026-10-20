@@ -36,5 +36,6 @@ function DashboardPage() {
 
 	if (!brand) return null;
 	if (!brand.onboarded) return <ResearchBrandData brandId={brandId} clientConfig={context.clientConfig} />;
-	return <BrandHome brand={brand} organization={organization} />;
+	// The router keeps this component mounted across brand switches; keying drops drafts and mutation state.
+	return <BrandHome key={brand.id} brand={brand} organization={organization} />;
 }
