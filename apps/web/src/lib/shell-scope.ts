@@ -7,6 +7,8 @@ export type ShellSection = "brand" | "organization" | "admin" | "account";
 declare module "@tanstack/react-router" {
 	interface StaticDataRouteOption {
 		shell?: ShellSection;
+		/** Home-style pages draw their own heading, so the breadcrumb header stays off. */
+		bareHeader?: boolean;
 	}
 }
 

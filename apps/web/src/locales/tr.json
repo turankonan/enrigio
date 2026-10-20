@@ -1078,5 +1078,12 @@
 	"google-shopping-card.tooltip": "Google AI Mode’un sorgularınıza yanıt verirken gösterdiği ürün kartları. Her birinin yanındaki sayı, o kartın sonuçlarda kaç kez göründüğünü belirtir (benzersiz ürün değil, kart gösterimi). Yukarıdaki atıf dağılımından ayrı tutulur.",
 	"google-shopping-card.search-queries": "Arama sorguları",
 	"content-gaps-card.tooltip": "Rakiplerin atıf aldığı ancak markanızın almadığı sorgular — atıf varlığınızı artırma fırsatları.",
-	"content-gaps-card.description": "Rakiplerin atıf aldığı ancak markanızın almadığı sorgular"
+	"content-gaps-card.description": "Rakiplerin atıf aldığı ancak markanızın almadığı sorgular",
+	"home.band_low": "Düşük",
+	"home.band_ok": "Orta",
+	"home.band_good": "İyi",
+	"top-bar.advanced": "Gelişmiş",
+	"brand-strip.label": "Markalarınız",
+	"brand-strip.add": "Marka ekle",
+	"brand-strip.setting_up": "Hazırlanıyor"
 }

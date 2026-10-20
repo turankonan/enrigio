@@ -1082,5 +1082,8 @@
 	"google-shopping-card.search-queries": "Search queries",
 	"content-gaps-card.tooltip": "Prompts where competitors are cited but your brand isn't — opportunities to improve your citation presence.",
 	"content-gaps-card.description": "Prompts where competitors are cited but your brand isn't",
-	"top-bar.advanced": "Advanced"
+	"top-bar.advanced": "Advanced",
+	"brand-strip.label": "Your brands",
+	"brand-strip.add": "Add brand",
+	"brand-strip.setting_up": "Setting up"
 }

@@ -9,12 +9,12 @@
  * lib/shell-scope.ts.
  */
 
-import { createFileRoute, Outlet, redirect, useRouteContext } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useMatches, useRouteContext } from "@tanstack/react-router";
 import type { ClientConfig } from "@workspace/config/types";
 import { useEffect, useRef } from "react";
-import { AppShell, PageContent } from "@/components/app-shell";
-import { AppSidebar } from "@/components/app-sidebar";
+import { PageContent } from "@/components/app-shell";
 import { SiteHeader } from "@/components/site-header";
+import { TopBar } from "@/components/top-bar";
 import { useShellScope } from "@/hooks/use-shell-scope";
 import { identifyUser, setPersonProperties } from "@/lib/posthog";
 import { viewerQuery } from "@/lib/viewer/queries";
@@ -63,20 +63,25 @@ function AuthedLayout() {
 
 function Shell() {
 	const scope = useShellScope();
+	const bareHeader = useMatches({ select: (matches) => matches.some((match) => match.staticData.bareHeader) });
 
 	if (!scope) return <Outlet />;
 
 	return (
-		<AppShell sidebar={<AppSidebar {...scope} />} header={<SiteHeader />}>
+		<div className="flex min-h-svh flex-col bg-background">
+			<TopBar scope={scope} />
 			{scope.section === "account" ? (
 				<div className="flex flex-1 flex-col">
 					<Outlet />
 				</div>
 			) : (
-				<PageContent>
-					<Outlet />
-				</PageContent>
+				<>
+					{!bareHeader && <SiteHeader />}
+					<PageContent>
+						<Outlet />
+					</PageContent>
+				</>
 			)}
-		</AppShell>
+		</div>
 	);
 }
