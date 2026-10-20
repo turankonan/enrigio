@@ -59,6 +59,10 @@ export async function getBoss(): Promise<PgBoss> {
 			// written and cached — the gap doesn't strand anything.
 			expireInSeconds: 60 * 15,
 		});
+		await boss.createQueue("check-keywords", {
+			retryLimit: 0,
+			expireInSeconds: 60 * 10,
+		});
 
 		bossInstance = boss;
 		return boss;

@@ -67,6 +67,10 @@ async function main() {
 		// written and cached — the gap doesn't strand anything.
 		expireInSeconds: 60 * 15, // 15 minute timeout
 	});
+	await boss.createQueue("check-keywords", {
+		retryLimit: 0,
+		expireInSeconds: 60 * 10,
+	});
 	await boss.createQueue("schedule-maintenance", {
 		retryLimit: 3,
 		retryDelay: 300, // 5 minutes between retries
