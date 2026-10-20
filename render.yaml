@@ -3,7 +3,7 @@
 # Setup walkthrough: DEMO.md
 services:
   - type: web
-    name: answerecho-demo
+    name: enrigio
     runtime: node
     plan: free
     region: frankfurt

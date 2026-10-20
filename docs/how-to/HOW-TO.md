@@ -1,7 +1,7 @@
 # Enrigio — how to use it
 
 A walkthrough of the full flow, captured live on the demo
-([answerecho-demo.onrender.com](https://answerecho-demo.onrender.com)) on
+([enrigio.onrender.com](https://enrigio.onrender.com)) on
 2026-09-17 with the Rigosis brand. Every screenshot below is from that real
 session — real evaluations against ChatGPT, Google AI Overviews, Google AI
 Mode, Gemini, Perplexity, Claude, and GPT.

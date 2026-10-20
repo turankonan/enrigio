@@ -12,7 +12,7 @@ Companion diagrams (open in a browser):
 > product's own whitelabel brand ("Enrigio by Rigosis", green `#39b54a`,
 > docs at rigosis.com) **and** the canonical *tracked brand* used in the demo.
 > The concrete numbers below come from a real demo run captured in
-> `docs/how-to/HOW-TO.md` (2026-09-17, `answerecho-demo.onrender.com`). There is
+> `docs/how-to/HOW-TO.md` (2026-09-17, `enrigio.onrender.com`). There is
 > **no seed script** that inserts a Rigosis brand — the E2E seeder
 > (`e2e/seed.ts`) uses generic "Test Organization"/Nike data. Rigosis is created
 > by hand through the onboarding flow described here.
