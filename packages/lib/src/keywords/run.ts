@@ -8,6 +8,7 @@ import { safeFetch } from "../net/safe-fetch";
 import { matchKeywords } from "./match";
 import { pageTextFromHtml } from "./page-text";
 import type { KeywordCheckReport, PageText } from "./types";
+import { uniqueCanonicalUrls } from "./url";
 
 const MAX_PAGES = 10;
 
@@ -42,7 +43,7 @@ export async function runKeywordCheck(brandId: string): Promise<string> {
 		const lang = resolveEffectiveMarket({ defaultMarketKey: brand.defaultMarketKey }).languageCode;
 		const allowHosts = buildAllowHosts(brand.website, brand.additionalDomains);
 		const selection = await selectAuditPages(brandId);
-		const urls = [...new Set([brand.website, ...selection.targets.map((t) => t.url)])].slice(0, MAX_PAGES);
+		const urls = uniqueCanonicalUrls([brand.website, ...selection.targets.map((t) => t.url)]).slice(0, MAX_PAGES);
 
 		const fetched = await Promise.all(
 			urls.map(async (url) => {
