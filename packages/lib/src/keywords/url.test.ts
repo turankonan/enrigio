@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { uniqueCanonicalUrls } from "./url";
+import { uniqueCanonicalUrls, withScheme } from "./url";
 
 describe("uniqueCanonicalUrls", () => {
 	it("treats a bare origin and its trailing-slash form as one page", () => {
@@ -11,5 +11,15 @@ describe("uniqueCanonicalUrls", () => {
 
 	it("drops values that are not valid URLs", () => {
 		expect(uniqueCanonicalUrls(["not a url", "https://x.com/a"])).toEqual(["https://x.com/a"]);
+	});
+});
+
+describe("withScheme", () => {
+	it("assumes https for a bare domain so the homepage is still fetched", () => {
+		expect(uniqueCanonicalUrls([withScheme("x.com")])).toEqual(["https://x.com/"]);
+	});
+
+	it("keeps an explicit scheme", () => {
+		expect(withScheme("http://x.com/shop")).toBe("http://x.com/shop");
 	});
 });

@@ -1364,6 +1364,6 @@ export async function getModelCompetitorMentions(
 		SELECT t.model, t.runs, t.brand_mentioned_count, comp.competitor, coalesce(comp.competitor_count, 0)::int AS competitor_count
 		FROM totals t
 		LEFT JOIN comp ON comp.model = t.model
-		ORDER BY t.model, competitor_count DESC
+		ORDER BY t.model, competitor_count DESC, competitor
 	`);
 }

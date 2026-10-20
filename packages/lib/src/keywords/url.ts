@@ -10,3 +10,9 @@ export function uniqueCanonicalUrls(raw: string[]): string[] {
 	}
 	return [...seen];
 }
+
+/** Brand websites may be stored as bare domains; the web app's validator assumes https for those too. */
+export function withScheme(website: string): string {
+	const trimmed = website.trim();
+	return trimmed.startsWith("http://") || trimmed.startsWith("https://") ? trimmed : `https://${trimmed}`;
+}

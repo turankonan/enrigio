@@ -1,5 +1,5 @@
 ---
-"@workspace/web": minor
+"@workspace/web": patch
 "@workspace/worker": patch
 "@workspace/lib": patch
 ---
