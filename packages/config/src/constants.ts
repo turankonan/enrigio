@@ -27,19 +27,19 @@ export const API_DOCS_URL = "https://www.rigosis.com/enrigio/docs/api";
 /**
  * Enrigio brand constants — used for icon generation, manifest, and the brand kit.
  */
-export const ENRIGIO_BRAND_COLOR = "#39b54a"; // Rigosis green — fills only, never carries white text (2.9:1)
+export const ENRIGIO_BRAND_COLOR = "#2B2BD9";
 export const ENRIGIO_BRAND_FONT = "Ubuntu";
-export const ENRIGIO_THEME_COLOR = "#39b54a";
-export const ENRIGIO_BACKGROUND_COLOR = "#ffffff";
-/** Ink — headings, wordmark, and the glyph on the green mark. */
-export const ENRIGIO_INK_COLOR = "#32373c";
-/** Darkened brand green for interactive elements; 5.4:1 with white, passes AA. */
-export const ENRIGIO_ACTION_COLOR = "#277a33";
+export const ENRIGIO_THEME_COLOR = "#2B2BD9";
+export const ENRIGIO_BACKGROUND_COLOR = "#F5F5FA";
+/** Night — headings and body text. */
+export const ENRIGIO_INK_COLOR = "#0B0B1A";
+/** Indigo — buttons, links, focus ring; 8:1 on white. */
+export const ENRIGIO_ACTION_COLOR = "#2B2BD9";
 
 /**
  * Default chart colors for the Enrigio product.
  *
- * 11 base hues (Observable + Tableau, anchored to the brand green) expanded
+ * 11 base hues (Observable + Tableau, anchored to the brand indigo) expanded
  * into 55 colors across five lightness tiers: base → dark → light →
  * muted → deep. This keeps harmony (same hue families throughout) while
  * supporting charts with many series. Whitelabel deployments override
@@ -52,8 +52,8 @@ export const ENRIGIO_ACTION_COLOR = "#277a33";
  */
 export const DEFAULT_CHART_COLORS = [
 	// Base
-	"#1f7a3d",
-	"#efb118",
+	"#2b2bd9",
+	"#ff7a3d",
 	"#ff8ab7",
 	"#9c6b4e",
 	"#7cb342",
@@ -64,8 +64,8 @@ export const DEFAULT_CHART_COLORS = [
 	"#ff725c",
 	"#38b2ac",
 	// Dark
-	"#14582b",
-	"#bb8807",
+	"#1b1ba8",
+	"#cc5a1f",
 	"#fa478c",
 	"#714932",
 	"#58842a",

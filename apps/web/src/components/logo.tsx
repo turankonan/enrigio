@@ -9,7 +9,7 @@ interface LogoProps extends ComponentPropsWithoutRef<"div"> {
 	textClassName?: string;
 }
 
-/** Whether the Ubuntu wordmark renders — drives the font preload in `__root.tsx`. */
+/** Whether the Enrigio lockup renders — drives the wordmark font preload in `__root.tsx`. */
 export function usesWordmarkFont(branding: { icon?: string; name?: string } | undefined) {
 	const hasCustomBranding =
 		Boolean(branding?.icon && branding?.name) &&
@@ -23,12 +23,8 @@ export function Logo({ className, iconClassName, textClassName, ...props }: Logo
 
 	if (usesWordmarkFont(branding)) {
 		return (
-			<div {...props} className={cn("flex items-center gap-2", className)}>
-				<span
-					className={cn("font-ubuntu text-2xl font-bold tracking-tight text-[#32373c] dark:text-white", textClassName)}
-				>
-					Answer<span className="text-[#277a33] dark:text-[#4ade80]">Echo</span>
-				</span>
+			<div {...props} className={cn("flex items-center", className)}>
+				<img src="/brand/enrigio-horizontal.svg" alt={DEFAULT_APP_NAME} className={cn("h-7 w-auto", iconClassName)} />
 			</div>
 		);
 	}

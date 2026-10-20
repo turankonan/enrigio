@@ -4,7 +4,7 @@
 import { DEFAULT_APP_NAME } from "@workspace/config/constants";
 import type { ReactNode } from "react";
 
-export const ACCENT_COLORS = ["#39b54a", "#4ade80", "#277a33", "#1f7a3d"];
+export const ACCENT_COLORS = ["#2B2BD9", "#FF7A3D", "#8F8FE8", "#1B1BA8"];
 export const DEFAULT_TAGLINE = "AI Search Optimization";
 export const DEFAULT_DESCRIPTION = "Track and optimize your brand's visibility across AI models.";
 
@@ -14,7 +14,7 @@ export const OG_HEIGHT = 630;
 const PADDING = 64;
 
 /** Ink ground from the brand sheet; all card text is white or white-alpha. */
-const INK = "#32373c";
+const INK = "#0B0B1A";
 const WHITE = "#ffffff";
 const WHITE_72 = "rgba(255,255,255,0.72)";
 const WHITE_55 = "rgba(255,255,255,0.55)";
