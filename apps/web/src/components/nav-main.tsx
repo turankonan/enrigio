@@ -1,5 +1,4 @@
-import type { Icon } from "@phosphor-icons/react";
-import { Link, type LinkProps, useLocation, useRouter } from "@tanstack/react-router";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import {
 	SidebarGroup,
 	SidebarGroupLabel,
@@ -9,18 +8,7 @@ import {
 	useSidebar,
 } from "@workspace/ui/components/sidebar";
 import { activeNavHref } from "@/lib/nav-active";
-
-export interface NavItem {
-	title: string;
-	link: LinkProps;
-	icon?: Icon;
-	exact?: boolean;
-}
-
-export interface NavGroup {
-	label: string;
-	items: NavItem[];
-}
+import type { NavGroup } from "@/lib/nav-links";
 
 export function NavMain({ groups }: { groups: NavGroup[] }) {
 	const router = useRouter();

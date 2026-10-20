@@ -1,5 +1,5 @@
 import { ChartLine, FileText, Table, Wrench } from "@phosphor-icons/react";
-import type { NavItem } from "@/components/nav-main";
+import type { NavItem } from "@/lib/nav-links";
 
 export function adminNavItems({
 	isAdmin,

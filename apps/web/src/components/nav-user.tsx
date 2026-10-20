@@ -23,13 +23,13 @@ import {
 	DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@workspace/ui/components/sidebar";
-import type { NavItem } from "@/components/nav-main";
 import { OrganizationRowIcon } from "@/components/organization-row-icon";
 import { useAuth } from "@/hooks/use-auth";
 import { useBrandId } from "@/hooks/use-brand-id";
 import { useBranding, useDeploymentFeatures } from "@/hooks/use-deployment-features";
 import { useOrganizations } from "@/hooks/use-organizations";
 import { t } from "@/lib/i18n";
+import type { NavItem } from "@/lib/nav-links";
 import { organizationTree } from "@/lib/organizations/tree";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 import { resetPostHog } from "@/lib/posthog";
