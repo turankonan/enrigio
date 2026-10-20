@@ -86,11 +86,11 @@ describe("openai-api web queries", () => {
 	}
 
 	it("reports the query the provider-run search actually issued", async () => {
-		aiMock.generateText.mockResolvedValue(searchResult({ type: "search", query: "answerecho aeo" }));
+		aiMock.generateText.mockResolvedValue(searchResult({ type: "search", query: "enrigio aeo" }));
 
 		const res = await openaiApi.run("chatgpt", "prompt", { webSearch: true, version: "gpt-5-mini" });
 
-		expect(res.webQueries).toEqual(["answerecho aeo"]);
+		expect(res.webQueries).toEqual(["enrigio aeo"]);
 	});
 
 	it("reports every query when the search fans out", async () => {

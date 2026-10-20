@@ -179,7 +179,7 @@ function BillingSettingsPage() {
 				)}
 				<p className="text-sm text-muted-foreground">
 					Need more brands, any other models, higher numbers of samples, SSO, white label, or custom limits?{" "}
-					<a className="underline" href="mailto:hello@answerecho.com?subject=AnswerEcho%20Cloud%20custom%20plan">
+					<a className="underline" href="mailto:hello@enrigio.com?subject=Enrigio%20Cloud%20custom%20plan">
 						{t("settings.billing.custom_plan_link")}
 					</a>
 					.

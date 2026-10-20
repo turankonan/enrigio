@@ -226,7 +226,7 @@ Groups marked *(cloud-only — skip for the demo)* never render in local mode.
 | Please verify your email first — we just sent you a new verification link. | |
 | Welcome back | |
 | Check in on your AI visibility. | |
-| Sign in to your AnswerEcho instance. | |
+| Sign in to your Enrigio instance. | |
 | Continue with Google | |
 | or | |
 | you@example.com | |
@@ -279,15 +279,15 @@ Groups marked *(cloud-only — skip for the demo)* never render in local mode.
 | Nothing to authorize | |
 | Start the connection from your MCP client. | |
 | This link is missing the client it was meant to authorize. | |
-| Connect to AnswerEcho | |
+| Connect to Enrigio | |
 | This client isn't registered with this instance. | |
 | Continuing will not work — start the connection from your MCP client again. | |
-| {label} is asking to read and manage your AnswerEcho data. | |
+| {label} is asking to read and manage your Enrigio data. | |
 | Client | |
 | Identity | |
 | Unverified — it named itself | |
 | Sends you back to | |
-| This client runs on your computer, so AnswerEcho can't tell which program is asking. Continue only if you just started this from a client you trust. | |
+| This client runs on your computer, so Enrigio can't tell which program is asking. Continue only if you just started this from a client you trust. | |
 | Its name and callback address come from a document it publishes at {publisherHost}. | |
 | It will act as you, in the workspaces you belong to. Revoke it by signing out of the client or removing its access from your account. | |
 | Connecting… | |

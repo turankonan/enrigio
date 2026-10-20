@@ -1,4 +1,4 @@
-# AnswerEcho — how to use it
+# Enrigio — how to use it
 
 A walkthrough of the full flow, captured live on the demo
 ([answerecho-demo.onrender.com](https://answerecho-demo.onrender.com)) on
@@ -22,7 +22,7 @@ from it.
 
 ## 3. Let the AI analyze the brand
 
-Click **Analyze brand** and AnswerEcho researches the website with web search
+Click **Analyze brand** and Enrigio researches the website with web search
 (≈1 minute). For rigosis.com it came back with 20 prompt suggestions matched
 to the actual business — ITSM consulting in Turkey, OpenText SMAX
 partnerships, plus brand prompts like "rigosis alternative". Untick what you

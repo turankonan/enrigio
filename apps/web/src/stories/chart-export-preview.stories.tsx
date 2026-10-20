@@ -66,7 +66,7 @@ function generateChartData(days: number) {
 const defaultClientConfig: ClientConfig = {
 	mode: "local",
 	features: { readOnly: false, showOptimizeButton: false, canCreateBrands: true },
-	branding: { name: "AnswerEcho", chartColors: DEFAULT_CHART_COLORS },
+	branding: { name: "Enrigio", chartColors: DEFAULT_CHART_COLORS },
 	analytics: {},
 };
 
@@ -96,7 +96,7 @@ export default {
 	title: "Chart Export Preview",
 } satisfies Meta;
 
-export const AnswerEchoDefault = () => {
+export const EnrigioDefault = () => {
 	setupMocks();
 	const data = generateChartData(30);
 	const branding = { isWhitelabel: false, chartColors: DEFAULT_CHART_COLORS };
@@ -104,7 +104,7 @@ export const AnswerEchoDefault = () => {
 	return (
 		<MockRouteContextProvider value={{ clientConfig: defaultClientConfig }}>
 			<div className="p-6 space-y-8">
-				<Section label="Default (AnswerEcho) — standard prompt">
+				<Section label="Default (Enrigio) — standard prompt">
 					<ExportPreview
 						promptName="What are the best running shoes for marathon training?"
 						visibility={80}
@@ -116,7 +116,7 @@ export const AnswerEchoDefault = () => {
 					/>
 				</Section>
 
-				<Section label="Default (AnswerEcho) — long prompt name (should truncate)">
+				<Section label="Default (Enrigio) — long prompt name (should truncate)">
 					<ExportPreview
 						promptName="What are the best running shoes for long distance marathon training on trails and roads with good arch support and cushioning for heavy runners who overpronate?"
 						visibility={55}
@@ -128,7 +128,7 @@ export const AnswerEchoDefault = () => {
 					/>
 				</Section>
 
-				<Section label="Default (AnswerEcho) — high visibility">
+				<Section label="Default (Enrigio) — high visibility">
 					<ExportPreview
 						promptName="Best trail running shoes 2025"
 						visibility={95}

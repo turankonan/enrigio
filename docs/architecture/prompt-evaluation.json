@@ -2,7 +2,7 @@
   "schema_version": 1,
   "diagram_type": "sequence",
   "meta": {
-    "title": "AnswerEcho — Prompt Evaluation & Citation Tracking",
+    "title": "Enrigio — Prompt Evaluation & Citation Tracking",
     "output": "prompt-evaluation.html",
     "viewBox": [1060, 900],
     "column_fit": "spread",

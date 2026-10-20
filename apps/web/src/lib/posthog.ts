@@ -1,6 +1,6 @@
 import posthog from "posthog-js";
 
-const POSTHOG_HOST = "https://var.answerecho.com";
+const POSTHOG_HOST = "https://var.enrigio.com";
 
 let initialized = false;
 

@@ -86,7 +86,7 @@ test.describe("Whitelabel sign-in is SSO only", () => {
 });
 
 test.describe("Whitelabel branding", () => {
-  test("the partner name and icon replace the AnswerEcho wordmark", async ({ page }) => {
+  test("the partner name and icon replace the Enrigio wordmark", async ({ page }) => {
     await page.goto(`${brandUrl()}`);
 
     await expect(page.getByText(WHITELABEL.appName).first()).toBeVisible({ timeout: 30_000 });
@@ -94,16 +94,16 @@ test.describe("Whitelabel branding", () => {
       "src",
       WHITELABEL.appIcon,
     );
-    await expect(page.getByText("answerecho", { exact: true })).toHaveCount(0);
+    await expect(page.getByText("enrigio", { exact: true })).toHaveCount(0);
   });
 
-  test("AnswerEcho's version and project links are hidden", async ({ page }) => {
+  test("Enrigio's version and project links are hidden", async ({ page }) => {
     await page.goto(`${brandUrl()}`);
     await expect(page.locator(`a[href="${brandUrl()}"][data-sidebar="menu-button"]`)).toBeVisible({
       timeout: 30_000,
     });
-    await expect(page.locator('a[href="https://github.com/answerecho/answerecho"]')).toHaveCount(0);
-    await expect(page.locator('a[href="https://www.answerecho.com/"]')).toHaveCount(0);
+    await expect(page.locator('a[href="https://github.com/enrigio/enrigio"]')).toHaveCount(0);
+    await expect(page.locator('a[href="https://www.enrigio.com/"]')).toHaveCount(0);
   });
 
   test("the web manifest carries the partner icon", async ({ request }) => {

@@ -423,7 +423,7 @@ export const CloudHidesCostEstimates: Story = {
 
 /**
  * Self-hosted instances rarely configure everything, so the page names what else
- * AnswerEcho can track and which provider account each one needs, linking straight to
+ * Enrigio can track and which provider account each one needs, linking straight to
  * that provider's section of the setup guide.
  */
 export const SelfHostedSuggestsMorePlatforms: Story = {

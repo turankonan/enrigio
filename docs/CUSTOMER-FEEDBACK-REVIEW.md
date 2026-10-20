@@ -1,6 +1,6 @@
 # Customer feedback review — capabilities, gaps, and next steps
 
-Review of five customer comments against the actual AnswerEcho codebase, with a
+Review of five customer comments against the actual Enrigio codebase, with a
 verified assessment of an earlier ChatGPT analysis. Every claim below was
 checked against source (file references included) rather than taken on faith.
 
@@ -125,7 +125,7 @@ per-evaluation storage and in-report comparison.
 
 ## Draft customer response
 
-> AnswerEcho lets you enter customer-specific question sets individually or in
+> Enrigio lets you enter customer-specific question sets individually or in
 > bulk and evaluates them repeatedly across the configured AI platforms. It
 > produces both a consolidated AI Visibility score and separate results per
 > question and per LLM.
@@ -135,7 +135,7 @@ per-evaluation storage and in-report comparison.
 > brand appears in 210 responses, overall visibility is 40%. We also report by
 > question, by LLM, and as coverage — e.g. "visible in 9 of 15 questions."
 >
-> AnswerEcho analyzes citations and competing brands and turns the findings into
+> Enrigio analyzes citations and competing brands and turns the findings into
 > prioritized recommendations spanning content creation, existing-content
 > improvement, third-party outreach, and relevant community channels.
 >
@@ -145,7 +145,7 @@ per-evaluation storage and in-report comparison.
 > Perplexity); the direct model APIs answer without a country context.
 > Consolidated and separate multi-country results would be an enhancement.
 >
-> AnswerEcho measures and improves organic visibility. It does not provide paid
+> Enrigio measures and improves organic visibility. It does not provide paid
 > placement inside LLM answers or guarantee inclusion. If AI platforms expose
 > formal advertising inventory, sponsored visibility would be measured
 > separately from organic.

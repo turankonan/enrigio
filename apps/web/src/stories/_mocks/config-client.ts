@@ -58,7 +58,7 @@ let _config: ClientConfig = {
 		canCreateBrands: false,
 	},
 	branding: {
-		name: "AnswerEcho",
+		name: "Enrigio",
 		chartColors: DEFAULT_CHART_COLORS,
 	},
 	analytics: {},

@@ -22,11 +22,11 @@ import { invitationEmail, passwordResetEmail, verificationEmail } from "../email
  * Gates cloud self-serve signup while the mode is still being hardened. Entry
  * forms:
  *   - exact address — "alice@partner.com"
- *   - domain suffix — "@answerecho.com" admits any address at that domain
+ *   - domain suffix — "@enrigio.com" admits any address at that domain
  *   - "*" — opens signup to everyone (the public-launch escape hatch)
  * An empty allowlist denies everyone, so cloud fails closed until configured.
  * Matching is case-insensitive; a domain entry matches the whole domain only,
- * never a lookalike suffix ("@answerecho.com" rejects "x@evil-answerecho.com").
+ * never a lookalike suffix ("@enrigio.com" rejects "x@evil-enrigio.com").
  */
 function evaluateSignupAllowed(email: string, allowlist: readonly string[]): "allow" | "deny" {
 	const entries = allowlist.map((entry) => entry.trim().toLowerCase()).filter(Boolean);

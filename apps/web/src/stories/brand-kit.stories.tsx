@@ -1,8 +1,8 @@
 /**
- * Brand Kit story — previews all AnswerEcho brand assets in one place.
+ * Brand Kit story — previews all Enrigio brand assets in one place.
  *
  * Sections:
- *  1. Logo — text logo ("AnswerEcho" in Ubuntu) and whitelabel variant
+ *  1. Logo — text logo ("Enrigio" in Ubuntu) and whitelabel variant
  *  2. Icon — the mark at various sizes (16, 32, 64, 128, 256)
  *  3. Maskable Icon — for adaptive/PWA contexts
  *  4. Color Palette — brand color, theme colors, and chart palette
@@ -15,7 +15,7 @@ import { setMockRouteContext } from "./_mocks/tanstack-router";
 
 const BRAND_COLOR = "#39b54a";
 
-const answerechoConfig: ClientConfig = {
+const enrigioConfig: ClientConfig = {
 	mode: "local",
 	features: {
 		readOnly: false,
@@ -23,7 +23,7 @@ const answerechoConfig: ClientConfig = {
 		canCreateBrands: true,
 	},
 	branding: {
-		name: "AnswerEcho",
+		name: "Enrigio",
 		chartColors: DEFAULT_CHART_COLORS.map((c) => c),
 	},
 	analytics: {},
@@ -77,16 +77,16 @@ function ColorSwatch({ color, label }: { color: string; label: string }) {
 // Stories
 // ---------------------------------------------------------------------------
 
-/** Full AnswerEcho brand kit — logo, icons, colors, typography */
-export const AnswerEchoBrandKit = () => {
-	setMockClientConfig(answerechoConfig);
-	setMockRouteContext({ clientConfig: answerechoConfig });
+/** Full Enrigio brand kit — logo, icons, colors, typography */
+export const EnrigioBrandKit = () => {
+	setMockClientConfig(enrigioConfig);
+	setMockRouteContext({ clientConfig: enrigioConfig });
 
 	const iconSizes = [16, 32, 64, 128, 256];
 
 	return (
 		<div className="p-8 max-w-4xl mx-auto space-y-2">
-			<h1 className="text-2xl font-bold text-foreground mb-8">AnswerEcho Brand Kit</h1>
+			<h1 className="text-2xl font-bold text-foreground mb-8">Enrigio Brand Kit</h1>
 
 			{/* Logo */}
 			<Section title="Logo">
@@ -119,8 +119,8 @@ export const AnswerEchoBrandKit = () => {
 										style={{ minWidth: Math.max(size + 16, 48), minHeight: Math.max(size + 16, 48) }}
 									>
 										<img
-											src="/icons/answerecho-icon.svg"
-											alt={`AnswerEcho icon ${size}px`}
+											src="/icons/enrigio-icon.svg"
+											alt={`Enrigio icon ${size}px`}
 											width={size}
 											height={size}
 											style={{ width: size, height: size }}
@@ -143,8 +143,8 @@ export const AnswerEchoBrandKit = () => {
 										style={{ minWidth: Math.max(size + 16, 48), minHeight: Math.max(size + 16, 48) }}
 									>
 										<img
-											src="/icons/answerecho-icon.svg"
-											alt={`AnswerEcho icon ${size}px on dark`}
+											src="/icons/enrigio-icon.svg"
+											alt={`Enrigio icon ${size}px on dark`}
 											width={size}
 											height={size}
 											style={{ width: size, height: size }}
@@ -167,8 +167,8 @@ export const AnswerEchoBrandKit = () => {
 						<div key={size} className="flex flex-col items-center gap-2">
 							<div className="border rounded-lg overflow-hidden flex items-center justify-center">
 								<img
-									src="/icons/answerecho-icon-maskable.svg"
-									alt={`AnswerEcho maskable icon ${size}px`}
+									src="/icons/enrigio-icon-maskable.svg"
+									alt={`Enrigio maskable icon ${size}px`}
 									width={size}
 									height={size}
 									style={{ width: size, height: size }}
@@ -185,8 +185,8 @@ export const AnswerEchoBrandKit = () => {
 							style={{ width: 128, height: 128 }}
 						>
 							<img
-								src="/icons/answerecho-icon-maskable.svg"
-								alt="AnswerEcho maskable icon circular crop"
+								src="/icons/enrigio-icon-maskable.svg"
+								alt="Enrigio maskable icon circular crop"
 								width={128}
 								height={128}
 								style={{ width: 128, height: 128 }}

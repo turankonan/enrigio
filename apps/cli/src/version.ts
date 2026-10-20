@@ -15,7 +15,7 @@ export async function getPackageVersion(): Promise<string> {
 
 export async function fetchLatestCliVersion(): Promise<string | null> {
 	try {
-		const response = await fetch("https://registry.npmjs.org/@answerecho/cli/latest");
+		const response = await fetch("https://registry.npmjs.org/@enrigio/cli/latest");
 		if (!response.ok) {
 			return null;
 		}
@@ -32,6 +32,6 @@ export async function maybeNotifyNewVersion(currentVersion: string): Promise<voi
 		return;
 	}
 	if (semver.valid(currentVersion) && semver.lt(currentVersion, latest)) {
-		log.warn(`New CLI version available (${latest}). Run: npm install -g @answerecho/cli@latest`);
+		log.warn(`New CLI version available (${latest}). Run: npm install -g @enrigio/cli@latest`);
 	}
 }

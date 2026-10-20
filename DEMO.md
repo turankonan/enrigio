@@ -13,7 +13,7 @@ Neon hosts Postgres. Blueprint: `render.yaml`.
 1. Push this repo to GitHub, then [dashboard.render.com](https://dashboard.render.com) → **New → Blueprint** → pick the repo. Render reads `render.yaml`.
 2. Fill the prompted secrets:
    - `DATABASE_URL` — the Neon pooled string
-   - `ANSWERECHO_ENCRYPTION_KEY` — output of `openssl rand -base64 32`
+   - `ENRIGIO_ENCRYPTION_KEY` — output of `openssl rand -base64 32`
    - `ANTHROPIC_API_KEY`, `OPENAI_API_KEY` — real keys (evaluations need them)
    - `DATAFORSEO_LOGIN` / `DATAFORSEO_PASSWORD` — required: DataForSEO is the
      demo's scraper for ChatGPT, Google AI Overviews/AI Mode, Gemini, and

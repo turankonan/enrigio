@@ -150,7 +150,7 @@ export function DemoLogin({ destination = "/app" }: { destination?: string }) {
 		setLoading(true);
 
 		try {
-			const result = await authClient.signIn.email({ email: "demo@answerecho.com", password: "demo" });
+			const result = await authClient.signIn.email({ email: "demo@enrigio.com", password: "demo" });
 			if (result.error) {
 				setError(result.error.message ?? t("auth.login.invalid-credentials"));
 				setLoading(false);
@@ -329,7 +329,7 @@ function DemoCredentialsCallout() {
 				<dl className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-amber-900/90 dark:text-amber-100/80">
 					<div className="flex items-center gap-1.5">
 						<dt className="opacity-70">Email</dt>
-						<dd className="rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px]">demo@answerecho.com</dd>
+						<dd className="rounded bg-amber-500/15 px-1.5 py-0.5 font-mono text-[11px]">demo@enrigio.com</dd>
 					</div>
 					<div className="flex items-center gap-1.5">
 						<dt className="opacity-70">Password</dt>

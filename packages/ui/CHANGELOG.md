@@ -56,7 +56,7 @@ No changes in this release.
 
 ### Patch Changes
 
-- 7cba46d: License AnswerEcho under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
+- 7cba46d: License Enrigio under the MIT License. Add Code of Conduct, Contributing guide, Security policy, and a lightweight CLA process.
 
 ## 0.2.4
 

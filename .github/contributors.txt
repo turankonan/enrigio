@@ -1,9 +1,9 @@
 # ─────────────────────────────────────────────────────────────────────
-# AnswerEcho Contributor License Agreement — Signature Registry
+# Enrigio Contributor License Agreement — Signature Registry
 # ─────────────────────────────────────────────────────────────────────
 #
 # Each line below is the GitHub username of a contributor who has signed
-# the AnswerEcho Contributor License Agreement (CLA).
+# the Enrigio Contributor License Agreement (CLA).
 #
 # By opening a pull request that adds your GitHub username to this file,
 # you agree to be bound by the terms of the CLA in respect of all
@@ -11,7 +11,7 @@
 # Software, LLC.
 #
 # Read the CLA before signing:
-#   https://github.com/answerecho/answerecho/blob/main/CLA.md
+#   https://github.com/enrigio/enrigio/blob/main/CLA.md
 #
 # Format:
 #   - one GitHub username per line, lowercase, no leading "@"

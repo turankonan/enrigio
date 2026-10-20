@@ -160,7 +160,7 @@ export function createAuth(options?: CreateAuthOptions) {
 			// from a browser.
 			apiKey({
 				references: "organization",
-				defaultPrefix: "answerecho_",
+				defaultPrefix: "enrigio_",
 				enableMetadata: true,
 				// Stamped onto each key at creation, so raising it does nothing for
 				// keys already issued.

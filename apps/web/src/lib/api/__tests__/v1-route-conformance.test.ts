@@ -108,8 +108,8 @@ describe("/api/v1 route conformance", () => {
 					method.toLowerCase()
 				];
 				documented[method] = {
-					scopes: [...((operation?.["x-answerecho-scopes"] as string[] | undefined) ?? [])].sort(),
-					adminOnly: operation?.["x-answerecho-admin-only"] === true,
+					scopes: [...((operation?.["x-enrigio-scopes"] as string[] | undefined) ?? [])].sort(),
+					adminOnly: operation?.["x-enrigio-admin-only"] === true,
 				};
 				enforced[method] = { scopes: [...meta.scopes].sort(), adminOnly: meta.adminOnly };
 			}
