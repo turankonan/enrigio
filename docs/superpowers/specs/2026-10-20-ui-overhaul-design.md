@@ -174,8 +174,8 @@ sorted by `brandRate` desc. Leaderboard reuses `getShareOfVoiceFn` with an optio
   Chart slot 1 → indigo, slot 2 → night at 60 %, slots 3+ unchanged. The `.dark` block is left in place
   but untouched (no toggle exists).
 - Font: import `@fontsource/geist-sans` (400/500/600/700) and `@fontsource/geist-mono` in `styles.css`
-  and define `--font-geist-sans` / `--font-geist-mono`, which `--font-sans` already references. Remove the
-  Ubuntu `@font-face`, preload and `@fontsource/ubuntu` dependency; delete `usesWordmarkFont`.
+  and define `--font-geist-sans` / `--font-geist-mono`, which `--font-sans` already references.
+  The Ubuntu face stays for the OG image and chart export wordmark; the app itself no longer uses it.
 - `packages/config/src/constants.ts`: `ENRIGIO_BRAND_COLOR` / `ENRIGIO_THEME_COLOR` → `#2B2BD9`,
   `ENRIGIO_BRAND_FONT` → `"Geist Sans"`.
 - Assets copied from the kit into `apps/web/public/brand/` (horizontal colour, horizontal white,
