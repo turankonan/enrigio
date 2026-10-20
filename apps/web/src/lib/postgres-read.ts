@@ -9,6 +9,7 @@ import { parseModelFilter } from "@workspace/config/model-filter";
 import { db } from "@workspace/lib/db/db";
 import { getAllProviders } from "@workspace/lib/providers";
 import { type SQL, sql } from "drizzle-orm";
+import type { ModelCompetitorMentionRow } from "@/lib/engine-comparison";
 import {
 	type FanoutBreakdownRow,
 	type FanoutModelTotalRow,
@@ -1329,5 +1330,40 @@ export async function getFanoutPromptTotals(
 			${modelFilter(model, { alias: "pr" })}
 			${marketScope(effectiveMarketKey, "pr")}
 		GROUP BY pr.prompt_id
+	`);
+}
+
+/** Per engine: run totals, brand mentions, and one row per competitor name mentioned. */
+export async function getModelCompetitorMentions(
+	brandId: string,
+	fromDate: string,
+	toDate: string,
+	timezone: string,
+	enabledPromptIds: string[] | undefined,
+	effectiveMarketKey: string,
+): Promise<ModelCompetitorMentionRow[]> {
+	if (!enabledPromptIds?.length) return [];
+	return queryPg<ModelCompetitorMentionRow>(sql`
+		WITH runs AS (
+			SELECT model, brand_mentioned, competitors_mentioned
+			FROM prompt_runs
+			WHERE brand_id = ${brandId}
+				${dateFilter(fromDate, toDate, timezone)}
+				${promptIdFilter(enabledPromptIds)}
+				${marketScope(effectiveMarketKey)}
+		),
+		totals AS (
+			SELECT model, count(*)::int AS runs, count(*) FILTER (WHERE brand_mentioned)::int AS brand_mentioned_count
+			FROM runs GROUP BY model
+		),
+		comp AS (
+			SELECT model, name AS competitor, count(*)::int AS competitor_count
+			FROM runs, unnest(competitors_mentioned) AS name
+			GROUP BY model, name
+		)
+		SELECT t.model, t.runs, t.brand_mentioned_count, comp.competitor, coalesce(comp.competitor_count, 0)::int AS competitor_count
+		FROM totals t
+		LEFT JOIN comp ON comp.model = t.model
+		ORDER BY t.model, competitor_count DESC
 	`);
 }
