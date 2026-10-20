@@ -176,6 +176,13 @@
       "when": 1789912255327,
       "tag": "0024_safe_tarantula",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792527153401,
+      "tag": "0025_brand_keywords",
+      "breakpoints": true
     }
   ]
 }

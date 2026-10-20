@@ -28,6 +28,7 @@ export * from "./schema-auth";
 export const reportStatusEnum = pgEnum("report_status", ["pending", "processing", "completed", "failed"]);
 export const runSentimentEnum = pgEnum("run_sentiment", ["positive", "neutral", "negative"]);
 export const siteAuditStatusEnum = pgEnum("site_audit_status", ["running", "completed", "failed"]);
+export const keywordCheckStatusEnum = pgEnum("keyword_check_status", ["running", "completed", "failed"]);
 
 export const brands = pgTable(
 	"brands",
@@ -43,6 +44,8 @@ export const brands = pgTable(
 		delayOverrideHours: integer("delay_override_hours"),
 		enabledModels: text("enabled_models").array(),
 		defaultMarketKey: text("default_market_key"),
+		/** Up to 20 user-written phrases describing the business; matched against the site by the keyword check. */
+		keywords: text("keywords").array().notNull().default([]),
 		// Hard tenancy scope. Every brand belongs to exactly one better-auth
 		// organization; org membership (the `member` table) is the access-control
 		// mechanism. Brand and organization ids are independent, so billing and
@@ -227,6 +230,22 @@ export const siteAudits = pgTable(
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 	},
 	(t) => ({ brandCreatedIdx: index("site_audits_brand_created_idx").on(t.brandId, t.createdAt) }),
+).enableRLS();
+
+// One row per keyword↔website check, append-only like site_audits; the Home reads the latest completed row.
+export const keywordChecks = pgTable(
+	"keyword_checks",
+	{
+		id: uuid("id").defaultRandom().primaryKey().notNull(),
+		brandId: text("brand_id")
+			.references(() => brands.id)
+			.notNull(),
+		status: keywordCheckStatusEnum("status").notNull(),
+		report: json("report").notNull(),
+		startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+	},
+	(t) => ({ brandCreatedIdx: index("keyword_checks_brand_created_idx").on(t.brandId, t.createdAt) }),
 ).enableRLS();
 
 // One row per generated Opportunities report, per brand — append-only history
