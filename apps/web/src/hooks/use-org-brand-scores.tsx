@@ -16,5 +16,5 @@ export function useOrgBrandScores(organizationId: string | undefined) {
 		staleTime: 60_000,
 		placeholderData: (prev) => prev,
 	});
-	return { data: query.data, isLoading: query.isLoading, error: query.error };
+	return { data: query.data, isLoading: query.isLoading, error: query.error, refetch: query.refetch };
 }

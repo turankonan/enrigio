@@ -3,15 +3,20 @@ import { Button } from "@workspace/ui/components/button";
 import { TagsInput } from "@workspace/ui/components/tags-input";
 import { useMemo, useState } from "react";
 import { HomeCard } from "@/components/home/home-card";
-import { useUpdateBrandKeywords } from "@/hooks/use-brand-keywords";
+import type { useUpdateBrandKeywords } from "@/hooks/use-brand-keywords";
 import { t } from "@/lib/i18n";
 import { MAX_KEYWORD_LENGTH, MAX_KEYWORDS } from "@/server/keywords-fn";
 
 const SUGGESTION_COUNT = 10;
 
-export function KeywordsCard({ brand }: { brand: BrandWithPrompts }) {
+export function KeywordsCard({
+	brand,
+	update,
+}: {
+	brand: BrandWithPrompts;
+	update: ReturnType<typeof useUpdateBrandKeywords>;
+}) {
 	const [draft, setDraft] = useState<string[]>(brand.keywords);
-	const update = useUpdateBrandKeywords(brand.id);
 	const dirty = draft.join("\n") !== brand.keywords.join("\n");
 
 	const suggestions = useMemo(() => {
@@ -66,7 +71,7 @@ export function KeywordsCard({ brand }: { brand: BrandWithPrompts }) {
 					{update.isSuccess && !dirty && (
 						<span className="text-sm text-muted-foreground">{t("home.keywords_saved")}</span>
 					)}
-					{update.isError && <span className="text-sm text-destructive">{t("home.card_error")}</span>}
+					{update.isError && <span className="text-sm text-destructive">{t("home.keywords_save_failed")}</span>}
 				</div>
 			</div>
 		</HomeCard>

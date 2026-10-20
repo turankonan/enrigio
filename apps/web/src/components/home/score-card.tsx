@@ -1,10 +1,12 @@
 import { ArrowDown, ArrowUp } from "@phosphor-icons/react";
 import { cn } from "@workspace/ui/lib/utils";
+import { useEffect } from "react";
 import { BandPill } from "@/components/home/band-pill";
 import { HomeCard } from "@/components/home/home-card";
 import { TrendChart } from "@/components/trend-chart";
 import { useDashboardSummary } from "@/hooks/use-dashboard-summary";
 import { t } from "@/lib/i18n";
+import { setPersonProperties } from "@/lib/posthog";
 import { scoreBand } from "@/lib/score-band";
 import type { OrgBrandScore } from "@/server/dashboard";
 
@@ -18,18 +20,27 @@ export function ScoreCard({
 	brandName,
 	entry,
 	loading,
+	error,
+	onRetry,
 }: {
 	brandName: string;
 	entry: OrgBrandScore | undefined;
 	loading: boolean;
+	error?: unknown;
+	onRetry?: () => void;
 }) {
 	const summary = useDashboardSummary(undefined, "1m");
+	const totalPrompts = entry?.totalPrompts;
+	// Analytics consumers segment on this person property.
+	useEffect(() => {
+		if (typeof totalPrompts === "number") setPersonProperties({ active_prompt_count: totalPrompts });
+	}, [totalPrompts]);
 	const band = scoreBand(entry?.score);
 	const delta =
 		entry && entry.score !== null && entry.previousScore !== null ? entry.score - entry.previousScore : null;
 
 	return (
-		<HomeCard title={t("home.score_title")} loading={loading}>
+		<HomeCard title={t("home.score_title")} loading={loading} error={error} onRetry={onRetry}>
 			{!entry || entry.score === null ? (
 				<p className="text-muted-foreground">{t("home.score_pending")}</p>
 			) : (

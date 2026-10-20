@@ -1114,6 +1114,7 @@
 	"home.keywords_save": "Anahtar kelimeleri kaydet",
 	"home.keywords_saving": "Kaydediliyor…",
 	"home.keywords_saved": "Kaydedildi",
+	"home.keywords_save_failed": "Anahtar kelimeleriniz kaydedilemedi. Tekrar deneyin.",
 	"home.match_title": "Web siteniz ve anahtar kelimeleriniz eşleşiyor mu?",
 	"home.match_description": "Yapay zekâ asistanları işletmeleri web sitelerindeki kelimelerle tanımlar. Eksik anahtar kelimeler en kolay kazanımlardır.",
 	"home.match_headline": "{total} anahtar kelimenin {present} tanesi sitenizde bulundu",

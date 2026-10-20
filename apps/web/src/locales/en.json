@@ -1114,6 +1114,7 @@
 	"home.keywords_save": "Save keywords",
 	"home.keywords_saving": "Saving…",
 	"home.keywords_saved": "Saved",
+	"home.keywords_save_failed": "We couldn't save your keywords. Try again.",
 	"home.match_title": "Do your website and keywords match?",
 	"home.match_description": "AI assistants describe businesses using the words on their websites. Missing keywords are the easiest wins.",
 	"home.match_headline": "{present} of {total} keywords found on your site",
