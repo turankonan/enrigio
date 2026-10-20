@@ -92,7 +92,7 @@ export function AppSidebar({ section, organization, brand }: AppSidebarProps) {
 				<NavMain groups={groups} />
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser showOrganizations={section !== "account"} adminItems={section === "admin" ? [] : adminItems} />
+				<NavUser />
 				<NavAppInfo />
 			</SidebarFooter>
 		</Sidebar>
