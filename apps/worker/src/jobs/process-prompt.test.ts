@@ -36,6 +36,7 @@ function makeBrand(overrides: Partial<Brand> = {}): Brand {
 		website: "https://acme.example",
 		additionalDomains: [],
 		aliases: [],
+		keywords: [],
 		enabled: true,
 		onboarded: true,
 		delayOverrideHours: null,
