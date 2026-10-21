@@ -1,6 +1,6 @@
 import type { BrandWithPrompts } from "@workspace/lib/db/schema";
 import { cn } from "@workspace/ui/lib/utils";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type ClipboardEvent, useEffect, useMemo, useRef, useState } from "react";
 import { HomeCard } from "@/components/home/home-card";
 import type { useUpdateBrandKeywords } from "@/hooks/use-brand-keywords";
 import { t } from "@/lib/i18n";
@@ -20,6 +20,9 @@ export function KeywordsCard({
 	const [keywords, setKeywords] = useState<string[]>(brand.keywords);
 	const [draft, setDraft] = useState("");
 	const latest = useRef(keywords);
+	const inputRef = useRef<HTMLInputElement>(null);
+	// Focus moves after the next render, once the input's disabled state reflects the new list.
+	const refocus = useRef(false);
 	const full = keywords.length >= MAX_KEYWORDS;
 
 	// Local state is the source of truth while saves are in flight; once the last one settles, adopt the
@@ -36,6 +39,12 @@ export function KeywordsCard({
 		const timer = setTimeout(() => update.reset(), SAVED_VISIBLE_MS);
 		return () => clearTimeout(timer);
 	}, [update.isSuccess, update.reset]);
+
+	useEffect(() => {
+		if (!refocus.current) return;
+		refocus.current = false;
+		if (inputRef.current && !inputRef.current.disabled) inputRef.current.focus();
+	});
 
 	const suggestions = useMemo(() => {
 		const taken = new Set(keywords.map((k) => k.toLowerCase()));
@@ -56,6 +65,19 @@ export function KeywordsCard({
 		if (!v || full) return;
 		save([...latest.current, v]);
 		setDraft("");
+		refocus.current = true;
+	};
+	const remove = (keyword: string) => {
+		save(latest.current.filter((x) => x !== keyword));
+		refocus.current = true;
+	};
+	const onPaste = (e: ClipboardEvent<HTMLInputElement>) => {
+		const text = e.clipboardData.getData("text");
+		const parts = text.split(/[\n,]+/);
+		if (parts.length < 2) return;
+		e.preventDefault();
+		const pasted = parts.map((p) => p.trim().slice(0, MAX_KEYWORD_LENGTH)).filter(Boolean);
+		if (pasted.length && !full) save([...latest.current, ...pasted]);
 	};
 
 	const status = update.isPending
@@ -96,7 +118,7 @@ export function KeywordsCard({
 						{k}
 						<button
 							type="button"
-							onClick={() => save(latest.current.filter((x) => x !== k))}
+							onClick={() => remove(k)}
 							aria-label={t("home.keywords_remove", { keyword: k })}
 							className="flex size-5 items-center justify-center rounded-full text-sm leading-none hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 						>
@@ -105,7 +127,10 @@ export function KeywordsCard({
 					</span>
 				))}
 				<input
+					ref={inputRef}
 					value={draft}
+					maxLength={MAX_KEYWORD_LENGTH}
+					onPaste={onPaste}
 					onChange={(e) => setDraft(e.target.value)}
 					onKeyDown={(e) => {
 						if (e.key === "Enter" && !e.nativeEvent.isComposing) {
@@ -136,12 +161,24 @@ export function KeywordsCard({
 					</div>
 				</div>
 			)}
-			<span
-				aria-live="polite"
-				className={cn("min-h-[18px] text-[13px]", update.isError ? "text-destructive" : "text-muted-foreground")}
-			>
-				{status}
-			</span>
+			<div className="flex min-h-[18px] items-center gap-2.5">
+				<span
+					aria-live="polite"
+					className={cn("text-[13px]", update.isError ? "text-band-low-foreground" : "text-muted-foreground")}
+				>
+					{status}
+				</span>
+				{update.isError && (
+					// Retries the latest list directly: save() would skip it as unchanged, since the failed list is already local.
+					<button
+						type="button"
+						onClick={() => update.mutate(latest.current)}
+						className="h-7 rounded-lg border bg-card px-2.5 text-[13px] font-medium hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+					>
+						{t("home.try_again")}
+					</button>
+				)}
+			</div>
 		</HomeCard>
 	);
 }

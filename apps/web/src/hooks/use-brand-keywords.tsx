@@ -9,6 +9,9 @@ export function useUpdateBrandKeywords(brandId?: string) {
 	const queryClient = useQueryClient();
 	const router = useRouter();
 	return useMutation({
+		// Every save sends the whole list, so saves must land in the order they were made or an older list
+		// can overwrite a newer one; a shared scope makes TanStack Query run them one at a time.
+		scope: { id: `brand-keywords:${resolvedBrandId ?? ""}` },
 		mutationFn: (keywords: string[]) => updateBrandKeywordsFn({ data: { brandId: resolvedBrandId!, keywords } }),
 		onSuccess: async (result) => {
 			if (result.enqueued) markKeywordCheckQueued(queryClient, resolvedBrandId ?? "");
