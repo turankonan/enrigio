@@ -23,8 +23,13 @@ export function Logo({ className, iconClassName, textClassName, ...props }: Logo
 
 	if (usesWordmarkFont(branding)) {
 		return (
-			<div {...props} className={cn("flex items-center", className)}>
-				<img src="/brand/enrigio-horizontal.svg" alt={DEFAULT_APP_NAME} className={cn("h-7 w-auto", iconClassName)} />
+			<div {...props} className={cn("flex items-center gap-2.5", className)}>
+				<img src="/brand/enrigio-mark.svg" alt="" className={cn("size-[34px]", iconClassName)} />
+				<span
+					className={cn("text-[22px] font-semibold leading-none tracking-[-0.02em] text-foreground", textClassName)}
+				>
+					{DEFAULT_APP_NAME.toLowerCase()}
+				</span>
 			</div>
 		);
 	}

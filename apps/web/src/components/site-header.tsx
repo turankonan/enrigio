@@ -33,7 +33,7 @@ export function SiteHeader() {
 	const crumbs = useBreadcrumbs();
 
 	return (
-		<header className="bg-background md:sticky md:top-16 z-10 flex h-12 shrink-0 items-center border-b">
+		<header className="bg-background md:sticky md:top-[84px] z-10 flex h-12 shrink-0 items-center border-b">
 			<div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
 				<Breadcrumb className="-ml-2">
 					<BreadcrumbList className="gap-0.5 sm:gap-1">

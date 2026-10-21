@@ -11,7 +11,7 @@ export function TopBar({ scope }: { scope: ShellScope }) {
 	const { data: scores } = useOrgBrandScores(scope.organization?.id);
 	return (
 		<header className="sticky top-0 z-20 border-b bg-card">
-			<div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 px-4 py-2 md:h-16 md:flex-nowrap md:py-0 md:px-6">
+			<div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-x-5 px-4 py-3 md:h-[84px] md:flex-nowrap md:px-6 md:py-0">
 				{/* The gate redirects /app straight back, so a link there goes nowhere. */}
 				{scope.section === "account" ? (
 					<Logo />

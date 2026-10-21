@@ -2,7 +2,6 @@ import {
 	ArrowSquareOut,
 	ArrowsClockwise,
 	Briefcase,
-	CaretUpDown,
 	Check,
 	GearSix,
 	Plus,
@@ -13,7 +12,6 @@ import {
 import { Link } from "@tanstack/react-router";
 import { authClient } from "@workspace/lib/auth/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
-import { Button } from "@workspace/ui/components/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -29,6 +27,7 @@ import { useBrandId } from "@/hooks/use-brand-id";
 import { useBranding, useDeploymentFeatures } from "@/hooks/use-deployment-features";
 import { useOrganizations } from "@/hooks/use-organizations";
 import { t } from "@/lib/i18n";
+import { initials } from "@/lib/initials";
 import { organizationTree } from "@/lib/organizations/tree";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 import { resetPostHog } from "@/lib/posthog";
@@ -53,21 +52,23 @@ export function NavUser() {
 		<DropdownMenu>
 			<DropdownMenuTrigger
 				render={
-					<Button
-						variant="ghost"
-						size="sm"
+					<button
+						type="button"
 						aria-label={t("nav-user.account-and-organizations")}
-						className="h-10 gap-2 rounded-full pl-1 pr-2 data-popup-open:bg-accent"
+						className="flex size-10 items-center justify-center rounded-full border bg-card text-sm font-semibold text-primary hover:bg-muted data-popup-open:bg-muted"
 					/>
 				}
 			>
-				<Avatar className="size-8 rounded-full">
-					<AvatarImage src={user.picture} alt={user.name} />
-					<AvatarFallback className="rounded-full bg-primary/10 text-primary">
-						<User className="size-4" />
-					</AvatarFallback>
-				</Avatar>
-				<CaretUpDown className="size-4 opacity-70" />
+				{user.picture ? (
+					<Avatar className="size-10 rounded-full">
+						<AvatarImage src={user.picture} alt={user.name} />
+						<AvatarFallback className="rounded-full bg-card text-primary">
+							{initials(user.name, user.email)}
+						</AvatarFallback>
+					</Avatar>
+				) : (
+					initials(user.name, user.email)
+				)}
 			</DropdownMenuTrigger>
 			<DropdownMenuContent className="min-w-64 rounded-lg" align="end" sideOffset={8}>
 				{/* Base UI wires the label to its group, so it has to sit inside one. */}

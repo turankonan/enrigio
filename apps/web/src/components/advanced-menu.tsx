@@ -1,4 +1,4 @@
-import { CaretDown, SlidersHorizontal } from "@phosphor-icons/react";
+import { CaretDown } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -7,10 +7,8 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
-import { Fragment } from "react";
 import { useDeploymentFeatures } from "@/hooks/use-deployment-features";
 import { useViewer } from "@/hooks/use-route-context";
 import { t } from "@/lib/i18n";
@@ -26,25 +24,32 @@ export function AdvancedMenu({ scope }: { scope: ShellScope }) {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger render={<Button variant="outline" size="sm" className="gap-1.5" />}>
-				<SlidersHorizontal className="size-4" />
+			<DropdownMenuTrigger
+				render={<Button variant="outline" className="h-10 gap-2 rounded-[10px] px-3.5 text-sm font-medium" />}
+			>
 				{t("top-bar.advanced")}
-				<CaretDown className="size-3.5 opacity-70" />
+				<CaretDown className="size-3" />
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end" sideOffset={8} className="min-w-60">
-				{groups.map((group, index) => (
-					<Fragment key={group.label}>
-						{index > 0 && <DropdownMenuSeparator />}
-						<DropdownMenuGroup>
-							<DropdownMenuLabel className="text-muted-foreground text-xs">{group.label}</DropdownMenuLabel>
-							{group.items.map((item) => (
-								<DropdownMenuItem key={item.title} render={<Link {...item.link} />} className="cursor-pointer">
-									{item.icon && <item.icon className="size-4" />}
-									{item.title}
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuGroup>
-					</Fragment>
+			<DropdownMenuContent
+				align="end"
+				sideOffset={8}
+				className="grid w-[520px] max-w-[calc(100vw-2rem)] grid-cols-1 gap-[18px] rounded-[14px] p-[18px] sm:grid-cols-3"
+			>
+				{groups.map((group) => (
+					<DropdownMenuGroup key={group.label} className="flex flex-col gap-0.5">
+						<DropdownMenuLabel className="px-2 pb-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+							{group.label}
+						</DropdownMenuLabel>
+						{group.items.map((item) => (
+							<DropdownMenuItem
+								key={item.title}
+								render={<Link {...item.link} />}
+								className="cursor-pointer rounded-lg px-2 py-[7px] text-sm data-highlighted:bg-muted data-highlighted:text-primary"
+							>
+								{item.title}
+							</DropdownMenuItem>
+						))}
+					</DropdownMenuGroup>
 				))}
 			</DropdownMenuContent>
 		</DropdownMenu>
