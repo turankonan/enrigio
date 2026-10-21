@@ -270,6 +270,20 @@ export const brandOpportunities = pgTable(
 	}),
 ).enableRLS();
 
+// A dismissed next step, keyed by normalised title because reports carry no ids.
+export const opportunityDismissals = pgTable(
+	"opportunity_dismissals",
+	{
+		id: uuid("id").defaultRandom().primaryKey().notNull(),
+		brandId: text("brand_id")
+			.references(() => brands.id)
+			.notNull(),
+		opportunityKey: text("opportunity_key").notNull(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+	},
+	(t) => ({ brandKeyIdx: uniqueIndex("opportunity_dismissals_brand_key_idx").on(t.brandId, t.opportunityKey) }),
+).enableRLS();
+
 export type BrandOpportunity = typeof brandOpportunities.$inferSelect;
 export type NewBrandOpportunity = typeof brandOpportunities.$inferInsert;
 

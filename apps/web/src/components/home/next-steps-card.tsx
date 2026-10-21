@@ -23,7 +23,7 @@ const PRIORITY: Record<string, TranslationKey> = {
 export function NextStepsCard() {
 	const params = useBrandParams();
 	const { data, isLoading, error, refetch } = useOpportunities();
-	const steps = pickNextSteps(data?.report?.opportunities ?? []);
+	const steps = pickNextSteps(data?.report?.opportunities ?? [], []);
 
 	return (
 		<HomeCard
