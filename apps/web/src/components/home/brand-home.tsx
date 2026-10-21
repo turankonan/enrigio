@@ -23,7 +23,7 @@ export function BrandHome({ brand, organization }: { brand: BrandWithPrompts; or
 				onRetry={() => scores.refetch()}
 			/>
 			<NextStepsCard />
-			<KeywordsCard key={brand.keywords.join("\n")} brand={brand} update={updateKeywords} />
+			<KeywordsCard brand={brand} update={updateKeywords} />
 			<KeywordMatchCard keywords={brand.keywords} />
 			<EnginesCard />
 		</div>

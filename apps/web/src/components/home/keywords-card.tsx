@@ -1,10 +1,10 @@
 import type { BrandWithPrompts } from "@workspace/lib/db/schema";
 import { cn } from "@workspace/ui/lib/utils";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { HomeCard } from "@/components/home/home-card";
 import type { useUpdateBrandKeywords } from "@/hooks/use-brand-keywords";
 import { t } from "@/lib/i18n";
-import { dedupeKeywords, MAX_KEYWORD_LENGTH, MAX_KEYWORDS } from "@/lib/keyword-limits";
+import { dedupeKeywords, keywordsDiffer, MAX_KEYWORD_LENGTH, MAX_KEYWORDS } from "@/lib/keyword-limits";
 
 const SUGGESTION_COUNT = 10;
 const SHOW_SUGGESTIONS_BELOW = 8;
@@ -19,7 +19,16 @@ export function KeywordsCard({
 }) {
 	const [keywords, setKeywords] = useState<string[]>(brand.keywords);
 	const [draft, setDraft] = useState("");
+	const latest = useRef(keywords);
 	const full = keywords.length >= MAX_KEYWORDS;
+
+	// Local state is the source of truth while saves are in flight; once the last one settles, adopt the
+	// server's list so any normalisation it applied shows up. A failed save keeps the user's edits.
+	useEffect(() => {
+		if (update.isPending || update.isError || !keywordsDiffer(brand.keywords, latest.current)) return;
+		latest.current = brand.keywords;
+		setKeywords(brand.keywords);
+	}, [brand.keywords, update.isPending, update.isError]);
 
 	// "Saved" is a moment, not a state: clear it so the next change starts from a quiet line.
 	useEffect(() => {
@@ -37,13 +46,15 @@ export function KeywordsCard({
 
 	const save = (next: string[]) => {
 		const list = dedupeKeywords(next).slice(0, MAX_KEYWORDS);
+		if (list.join("\n") === latest.current.join("\n")) return;
+		latest.current = list;
 		setKeywords(list);
 		update.mutate(list);
 	};
 	const add = (value: string) => {
 		const v = value.trim().slice(0, MAX_KEYWORD_LENGTH);
 		if (!v || full) return;
-		save([...keywords, v]);
+		save([...latest.current, v]);
 		setDraft("");
 	};
 
@@ -85,9 +96,9 @@ export function KeywordsCard({
 						{k}
 						<button
 							type="button"
-							onClick={() => save(keywords.filter((x) => x !== k))}
+							onClick={() => save(latest.current.filter((x) => x !== k))}
 							aria-label={t("home.keywords_remove", { keyword: k })}
-							className="flex size-5 items-center justify-center rounded-full text-sm leading-none hover:bg-card"
+							className="flex size-5 items-center justify-center rounded-full text-sm leading-none hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 						>
 							×
 						</button>
@@ -97,7 +108,7 @@ export function KeywordsCard({
 					value={draft}
 					onChange={(e) => setDraft(e.target.value)}
 					onKeyDown={(e) => {
-						if (e.key === "Enter") {
+						if (e.key === "Enter" && !e.nativeEvent.isComposing) {
 							e.preventDefault();
 							add(draft);
 						}

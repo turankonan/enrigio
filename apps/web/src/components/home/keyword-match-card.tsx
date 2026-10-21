@@ -84,6 +84,19 @@ function Row({ result, group }: { result: KeywordResult; group: (typeof GROUPS)[
 	);
 }
 
+function CheckAgainButton({ running, onClick }: { running: boolean; onClick: () => void }) {
+	return (
+		<button
+			type="button"
+			className="h-8 rounded-lg border bg-card px-3 text-[13px] font-medium hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+			disabled={running}
+			onClick={onClick}
+		>
+			{running ? t("home.match_checking") : t("home.match_check_again")}
+		</button>
+	);
+}
+
 function Results({
 	latest,
 	failure,
@@ -134,16 +147,9 @@ function Results({
 					</div>
 				);
 			})}
-			<div className="flex items-center gap-3 pt-1 text-[13px] text-muted-foreground">
+			<div className="flex flex-wrap items-center gap-3 pt-1 text-[13px] text-muted-foreground">
 				{t("home.match_checked", { ago: relative(new Date(latest.createdAt)) })} ·{" "}
-				<button
-					type="button"
-					className="h-8 rounded-lg border bg-card px-3 text-[13px] font-medium hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
-					disabled={running || requesting}
-					onClick={onCheckAgain}
-				>
-					{running ? t("home.match_checking") : t("home.match_check_again")}
-				</button>
+				<CheckAgainButton running={running || requesting} onClick={onCheckAgain} />
 			</div>
 		</div>
 	);
@@ -188,8 +194,13 @@ function Body({
 			/>
 		);
 	}
-	if (check?.failure && !running) {
-		return <p className="text-sm text-muted-foreground">{t("home.match_failed")}</p>;
+	if (!running) {
+		return (
+			<div className="flex flex-col items-start gap-3">
+				{check?.failure && <p className="text-sm text-muted-foreground">{t("home.match_failed")}</p>}
+				<CheckAgainButton running={requesting} onClick={onCheckAgain} />
+			</div>
+		);
 	}
 	return (
 		<div className="flex flex-col gap-2.5 py-2">
