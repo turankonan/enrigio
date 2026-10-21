@@ -1158,15 +1158,18 @@
 	"home.match_detail_weak": "Şu sayfanın metninde bir kez bulundu:",
 	"home.match_checked": "{ago} kontrol edildi",
 	"home.engines_title": "Yapay zekâ motorları ve rakipler",
-	"home.engines_description": "Nerede güçlüsünüz, nerede zayıfsınız ve kim önde.",
-	"home.engines_full": "Tüm döküm",
+	"home.engines_full": "Tam döküm →",
 	"home.engines_empty": "Henüz kayıtlı yanıt yok. Sonuçlar ilk çalıştırmadan sonra görünür.",
 	"home.engines_engine": "Motor",
 	"home.engines_you": "Siz",
 	"home.engines_top_rival": "En güçlü rakip",
-	"home.engines_no_rival": "Anılan rakip yok",
 	"home.engines_lead": "Öndesiniz",
 	"home.engines_close": "Yakın",
 	"home.engines_behind": "Onlar önde",
-	"home.engines_leaderboard": "Genel ses payı"
+	"home.engines_leaderboard": "Yapay zekâ asistanlarının en çok andığı",
+	"home.engines_status": "Durum",
+	"home.engines_add_competitors": "Rakip ekle",
+	"home.engines_filter_label": "Sıralamayı motora göre filtrele",
+	"home.engines_all": "Tüm motorlar",
+	"home.site_this_month": "{host} · bu ay"
 }

@@ -1158,15 +1158,18 @@
 	"home.match_detail_weak": "Found once, in body text on",
 	"home.match_checked": "Checked {ago}",
 	"home.engines_title": "AI engines and competitors",
-	"home.engines_description": "Where you are strong, where you are weak, and who is ahead.",
-	"home.engines_full": "Full breakdown",
+	"home.engines_full": "Full breakdown →",
 	"home.engines_empty": "No answers recorded yet. Results appear after the first run.",
 	"home.engines_engine": "Engine",
 	"home.engines_you": "You",
 	"home.engines_top_rival": "Top rival",
-	"home.engines_no_rival": "No rival mentioned",
 	"home.engines_lead": "You lead",
 	"home.engines_close": "Close",
 	"home.engines_behind": "They lead",
-	"home.engines_leaderboard": "Overall share of voice"
+	"home.engines_leaderboard": "Who AI assistants mention most",
+	"home.engines_status": "Status",
+	"home.engines_add_competitors": "Add competitors",
+	"home.engines_filter_label": "Filter leaderboard by engine",
+	"home.engines_all": "All engines",
+	"home.site_this_month": "{host} · this month"
 }
