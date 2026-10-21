@@ -88,7 +88,7 @@ function CheckAgainButton({ running, onClick }: { running: boolean; onClick: () 
 	return (
 		<button
 			type="button"
-			className="h-8 rounded-lg border bg-card px-3 text-[13px] font-medium hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+			className="h-8 rounded-lg border bg-card px-3 text-[13px] font-medium hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-60"
 			disabled={running}
 			onClick={onClick}
 		>

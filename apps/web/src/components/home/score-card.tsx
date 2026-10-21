@@ -61,37 +61,43 @@ export function ScoreCard({
 			loading={loading}
 			error={error}
 			onRetry={onRetry}
-			className="md:grid md:grid-cols-[minmax(180px,220px)_minmax(0,1fr)] md:items-center md:gap-8 md:py-7"
+			labelledBy={loading || error ? undefined : "home-score"}
+			className="md:py-7"
 		>
-			<div role="img" aria-label={`${score ?? "—"}% · ${t(BAND_LABEL[band ?? "none"])}`}>
-				<ScoreRing pct={score}>
-					<span className="text-[52px] font-semibold leading-none tracking-[-0.04em] tabular-nums">
-						{score === null ? "—" : `${score}%`}
-					</span>
-					<BandPill band={band ?? "none"} />
-				</ScoreRing>
-			</div>
-			<div className="flex min-w-0 flex-col gap-3.5">
-				<h2 className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
-					{t("home.score_title")}
-				</h2>
-				<p className="text-[22px] font-medium leading-[1.35] tracking-[-0.01em] text-pretty">
-					{t("home.score_sentence_before", { brand: brandName })}{" "}
-					<strong className="font-bold">
-						{t("home.score_of", { mentioned: entry?.mentionedRuns ?? 0, total: entry?.totalRuns ?? 0 })}
-					</strong>{" "}
-					{t("home.score_sentence_after")}{" "}
-					<strong className={cn("font-bold", DELTA_INK[delta.kind])}>
-						{t(DELTA_KEY[delta.kind], { points: delta.points })}
-					</strong>
-					.
-				</p>
-				<p className="text-[15px] text-muted-foreground">
-					{t("home.score_coverage", { seen: entry?.promptsWithMention ?? 0, total: entry?.totalPrompts ?? 0 })}
-				</p>
-				<div className="mt-1 flex items-end gap-4">
-					<Sparkline values={series} className="h-11 w-full max-w-[420px]" />
-					<span className="whitespace-nowrap text-xs text-muted-foreground">{t("home.last_30_days")}</span>
+			<div className="flex flex-col gap-3.5 md:grid md:grid-cols-[minmax(180px,220px)_minmax(0,1fr)] md:items-center md:gap-8">
+				<div
+					role="img"
+					aria-label={score === null ? t(BAND_LABEL[band ?? "none"]) : `${score}% · ${t(BAND_LABEL[band ?? "none"])}`}
+				>
+					<ScoreRing pct={score}>
+						<span className="text-[52px] font-semibold leading-none tracking-[-0.04em] tabular-nums">
+							{score === null ? "—" : `${score}%`}
+						</span>
+						<BandPill band={band ?? "none"} />
+					</ScoreRing>
+				</div>
+				<div className="flex min-w-0 flex-col gap-3.5">
+					<h2 id="home-score" className="text-[13px] font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+						{t("home.score_title")}
+					</h2>
+					<p className="text-[22px] font-medium leading-[1.35] tracking-[-0.01em] text-pretty">
+						{t("home.score_sentence_before", { brand: brandName })}{" "}
+						<strong className="font-bold">
+							{t("home.score_of", { mentioned: entry?.mentionedRuns ?? 0, total: entry?.totalRuns ?? 0 })}
+						</strong>{" "}
+						{t("home.score_sentence_after")}{" "}
+						<strong className={cn("font-bold", DELTA_INK[delta.kind])}>
+							{t(DELTA_KEY[delta.kind], { points: delta.points })}
+						</strong>
+						.
+					</p>
+					<p className="text-[15px] text-muted-foreground">
+						{t("home.score_coverage", { seen: entry?.promptsWithMention ?? 0, total: entry?.totalPrompts ?? 0 })}
+					</p>
+					<div className="mt-1 flex items-end gap-4">
+						<Sparkline values={series} className="h-11 w-full max-w-[420px]" />
+						<span className="whitespace-nowrap text-xs text-muted-foreground">{t("home.last_30_days")}</span>
+					</div>
 				</div>
 			</div>
 		</HomeCard>

@@ -8,6 +8,7 @@ import { t } from "@/lib/i18n";
 export function HomeCard({
 	title,
 	titleId,
+	labelledBy,
 	description,
 	action,
 	loading,
@@ -18,6 +19,8 @@ export function HomeCard({
 }: {
 	title?: string;
 	titleId?: string;
+	/** Id of a heading inside `children`, for cards that render their own heading instead of `title`. */
+	labelledBy?: string;
 	description?: string;
 	action?: ReactNode;
 	loading?: boolean;
@@ -28,7 +31,7 @@ export function HomeCard({
 }) {
 	return (
 		<section
-			aria-labelledby={title ? titleId : undefined}
+			aria-labelledby={title ? titleId : labelledBy}
 			className={cn("flex min-w-0 flex-col gap-3.5 rounded-2xl border bg-card p-6 md:px-8", className)}
 		>
 			{title && (

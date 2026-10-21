@@ -55,7 +55,7 @@ export function NavUser() {
 					<button
 						type="button"
 						aria-label={t("nav-user.account-and-organizations")}
-						className="flex size-10 items-center justify-center rounded-full border bg-card text-sm font-semibold text-primary hover:bg-muted data-popup-open:bg-muted"
+						className="flex size-10 items-center justify-center rounded-full border bg-card text-sm font-semibold text-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary data-popup-open:bg-muted"
 					/>
 				}
 			>

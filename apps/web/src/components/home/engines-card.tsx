@@ -101,7 +101,7 @@ export function EnginesCard({ hasCompetitors }: { hasCompetitors: boolean }) {
 								value={model}
 								onChange={(e) => setModel(e.target.value)}
 								aria-label={t("home.engines_filter_label")}
-								className="h-8 rounded-lg border bg-card px-2.5 text-[13px]"
+								className="h-8 rounded-lg border bg-card px-2.5 text-[13px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 							>
 								<option value="all">{t("home.engines_all")}</option>
 								{rows.map((row) => (
