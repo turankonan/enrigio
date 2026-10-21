@@ -111,6 +111,9 @@ export function advancedGroups(
 		);
 	}
 
+	const reportsEnabled = features?.reportGeneration ?? true;
+	const admin = adminNavItems({ ...viewer, reportsEnabled });
+
 	if (org) {
 		const params = orgLinkParams(org);
 		const items: NavItem[] = [
@@ -135,9 +138,10 @@ export function advancedGroups(
 			{ title: t("app-sidebar.api"), link: { to: "/app/org/$org/settings/api", params }, icon: Code },
 			{ title: t("app-sidebar.mcp"), link: { to: "/app/org/$org/settings/mcp", params }, icon: PlugsConnected },
 		);
-		const reportsEnabled = features?.reportGeneration ?? true;
-		items.push(...adminNavItems({ ...viewer, reportsEnabled }));
+		items.push(...admin);
 		groups.push({ label: t("top-bar.group_organisation"), items });
+	} else if (admin.length > 0) {
+		groups.push({ label: t("settings.members.role_admin"), items: admin });
 	}
 
 	return groups;

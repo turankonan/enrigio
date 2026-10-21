@@ -42,7 +42,7 @@ export function AdvancedMenu({ scope }: { scope: ShellScope }) {
 						</DropdownMenuLabel>
 						{group.items.map((item) => (
 							<DropdownMenuItem
-								key={item.title}
+								key={`${item.link.to}:${item.title}`}
 								render={<Link {...item.link} />}
 								className="cursor-pointer rounded-lg px-2 py-[7px] text-sm data-highlighted:bg-muted data-highlighted:text-primary"
 							>
