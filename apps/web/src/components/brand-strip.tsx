@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { brandLinkParams, orgLinkParams } from "@workspace/lib/app-urls";
 import { cn } from "@workspace/ui/lib/utils";
+import { SiteIcon } from "@/components/site-icon";
 import { t } from "@/lib/i18n";
 import type { OrganizationSummary } from "@/lib/organizations/types";
 import { scoreDelta } from "@/lib/score-delta";
@@ -9,9 +10,6 @@ export interface BrandStripScore {
 	score: number | null;
 	previousScore: number | null;
 }
-
-// The mock's tile palette, cycled by position so neighbouring brands differ.
-const TINTS = ["#2b2bd9", "#0b0b1a", "#52526b", "#1f1fa8", "#3a3a52"];
 
 function DeltaText({ entry }: { entry: BrandStripScore }) {
 	const delta = scoreDelta(entry.score, entry.previousScore);
@@ -62,7 +60,7 @@ export function BrandStrip({
 			aria-label={t("brand-strip.label")}
 			className="order-last flex min-w-0 basis-full gap-2.5 overflow-x-auto px-0.5 py-1 [scrollbar-width:none] md:order-none md:flex-1 md:basis-auto"
 		>
-			{organization.brands.map((brand, index) => {
+			{organization.brands.map((brand) => {
 				const active = brand.id === currentBrandId;
 				return (
 					<Link
@@ -75,13 +73,7 @@ export function BrandStrip({
 							active ? "border-primary shadow-[0_0_0_1px_var(--primary)]" : "border-border",
 						)}
 					>
-						<span
-							className="flex size-7 shrink-0 items-center justify-center rounded-lg text-[13px] font-semibold text-white"
-							style={{ background: TINTS[index % TINTS.length] }}
-							aria-hidden
-						>
-							{brand.name.trim()[0]?.toLocaleUpperCase() ?? "?"}
-						</span>
+						<SiteIcon domain={brand.website} size="md" className="rounded-lg" />
 						<span className="flex min-w-0 flex-col gap-[3px]">
 							<span className="max-w-40 truncate text-sm font-medium">{brand.name}</span>
 							<ScoreLine onboarded={brand.onboarded} entry={scores[brand.id]} />
