@@ -1,8 +1,8 @@
-import { ArrowsClockwise, CheckCircle, Warning, XCircle } from "@phosphor-icons/react";
+import { Check, Circle, type Icon, Warning } from "@phosphor-icons/react";
 import type { KeywordCheck } from "@workspace/lib/keywords";
 import { overlapScore } from "@workspace/lib/keywords/match";
 import type { KeywordResult, KeywordStatus } from "@workspace/lib/keywords/types";
-import { Button } from "@workspace/ui/components/button";
+import { cn } from "@workspace/ui/lib/utils";
 import { BandPill } from "@/components/home/band-pill";
 import { HomeCard } from "@/components/home/home-card";
 import { useKeywordCheck, useRequestKeywordCheck } from "@/hooks/use-keyword-check";
@@ -11,12 +11,30 @@ import { keywordsDiffer } from "@/lib/keyword-limits";
 import { scoreBand } from "@/lib/score-band";
 import type { KeywordCheckView } from "@/server/keywords";
 
-const ORDER: KeywordStatus[] = ["missing", "weak", "found"];
-const STATUS: Record<KeywordStatus, { label: TranslationKey; icon: typeof CheckCircle; className: string }> = {
-	missing: { label: "home.match_missing", icon: XCircle, className: "text-rose-700" },
-	weak: { label: "home.match_weak", icon: Warning, className: "text-amber-700" },
-	found: { label: "home.match_found", icon: CheckCircle, className: "text-emerald-700" },
-};
+const GROUPS: { status: KeywordStatus; label: TranslationKey; word: TranslationKey; icon: Icon; className: string }[] =
+	[
+		{
+			status: "missing",
+			label: "home.match_missing",
+			word: "home.match_missing",
+			icon: Circle,
+			className: "text-band-low-foreground",
+		},
+		{
+			status: "weak",
+			label: "home.match_weak",
+			word: "home.match_weak",
+			icon: Warning,
+			className: "text-band-ok-foreground",
+		},
+		{
+			status: "found",
+			label: "home.match_found",
+			word: "home.match_found",
+			icon: Check,
+			className: "text-band-good-foreground",
+		},
+	];
 
 function relative(date: Date): string {
 	const days = Math.floor((Date.now() - date.getTime()) / 86_400_000);
@@ -25,55 +43,130 @@ function relative(date: Date): string {
 	return t("home.match_checked_days", { days });
 }
 
-function Row({ result }: { result: KeywordResult }) {
-	const meta = STATUS[result.status];
+function pageLabel(url: string): string {
+	try {
+		const u = new URL(url);
+		return `${u.hostname}${u.pathname === "/" ? "/" : u.pathname}`;
+	} catch {
+		return url;
+	}
+}
+
+function detailKey(r: KeywordResult): TranslationKey | null {
+	if (r.status === "missing") return null;
+	if (r.status === "weak") return "home.match_detail_weak";
+	return r.where === "heading" ? "home.match_detail_heading" : "home.match_detail_body";
+}
+
+function Row({ result, group }: { result: KeywordResult; group: (typeof GROUPS)[number] }) {
+	const detail = detailKey(result);
 	return (
-		<li className="flex items-center gap-3 py-2">
-			<meta.icon className={`size-5 shrink-0 ${meta.className}`} weight="fill" />
-			<span className="min-w-0 flex-1 truncate">{result.keyword}</span>
-			<span className={`text-sm ${meta.className}`}>{t(meta.label)}</span>
-			{result.url ? (
-				<a
-					href={result.url}
-					target="_blank"
-					rel="noreferrer"
-					className="max-w-48 truncate text-sm text-primary underline"
-				>
-					{new URL(result.url).pathname || "/"}
-				</a>
-			) : (
-				<span className="text-sm text-muted-foreground">{t("home.match_add_hint")}</span>
-			)}
+		<li className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-t border-divider py-[9px]">
+			<span className="text-[15px] font-medium">{result.keyword}</span>
+			<span
+				className={cn("inline-flex items-center gap-1.5 whitespace-nowrap text-[13px] font-semibold", group.className)}
+			>
+				<group.icon className="size-3.5" aria-hidden /> {t(group.word)}
+			</span>
+			<span className="col-span-full text-[13px] text-muted-foreground">
+				{detail && result.url ? (
+					<>
+						{t(detail)}{" "}
+						<a href={result.url} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+							{pageLabel(result.url)}
+						</a>
+					</>
+				) : (
+					t("home.match_add_hint")
+				)}
+			</span>
 		</li>
 	);
 }
 
-function Results({ latest, failure, stale }: { latest: KeywordCheck; failure: string | null; stale: boolean }) {
+function Results({
+	latest,
+	failure,
+	stale,
+	running,
+	requesting,
+	onCheckAgain,
+}: {
+	latest: KeywordCheck;
+	failure: string | null;
+	stale: boolean;
+	running: boolean;
+	requesting: boolean;
+	onCheckAgain: () => void;
+}) {
 	const results = latest.report.keywords;
 	const score = overlapScore(results);
 	const band = scoreBand(score);
 	const present = results.filter((r) => r.status !== "missing").length;
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="flex flex-col gap-3">
 			<div className="flex flex-wrap items-center gap-3">
-				<span className="text-3xl font-bold tabular-nums">{score ?? 0}%</span>
-				{band && <BandPill band={band} />}
-				<span className="text-muted-foreground">{t("home.match_headline", { present, total: results.length })}</span>
+				<span className="text-[28px] font-semibold tracking-[-0.03em] tabular-nums">
+					<strong className="font-bold">{t("home.match_found_of", { present, total: results.length })}</strong>{" "}
+					{t("home.match_headline_rest", { pct: score ?? 0 })}
+				</span>
+				<BandPill band={band ?? "none"} />
 			</div>
-			{failure && <p className="text-sm text-amber-800">{t("home.match_failed")}</p>}
+			<p className="text-sm leading-[1.45] text-muted-foreground">{t("home.match_description")}</p>
+			{failure && <p className="text-sm text-band-ok-foreground">{t("home.match_failed")}</p>}
 			{stale && <p className="text-sm text-muted-foreground">{t("home.match_stale")}</p>}
-			<ul className="divide-y">
-				{ORDER.flatMap((status) => results.filter((r) => r.status === status)).map((result) => (
-					<Row key={result.keyword} result={result} />
-				))}
-			</ul>
-			<p className="text-xs text-muted-foreground">{relative(new Date(latest.createdAt))}</p>
+			{GROUPS.map((group) => {
+				const rows = results.filter((r) => r.status === group.status);
+				if (rows.length === 0) return null;
+				return (
+					<div key={group.status}>
+						<div className="flex items-center gap-2 pb-1.5 pt-3 text-xs font-semibold uppercase tracking-[0.06em] text-muted-foreground">
+							{t(group.label)}{" "}
+							<span className="text-xs font-medium normal-case tracking-normal text-muted-foreground/70">
+								{rows.length}
+							</span>
+						</div>
+						<ul>
+							{rows.map((result) => (
+								<Row key={result.keyword} result={result} group={group} />
+							))}
+						</ul>
+					</div>
+				);
+			})}
+			<div className="flex items-center gap-3 pt-1 text-[13px] text-muted-foreground">
+				{t("home.match_checked", { ago: relative(new Date(latest.createdAt)) })} ·{" "}
+				<button
+					type="button"
+					className="h-8 rounded-lg border bg-card px-3 text-[13px] font-medium hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-60"
+					disabled={running || requesting}
+					onClick={onCheckAgain}
+				>
+					{running ? t("home.match_checking") : t("home.match_check_again")}
+				</button>
+			</div>
 		</div>
 	);
 }
 
-function Body({ keywords, check }: { keywords: string[]; check: KeywordCheckView | undefined }) {
-	if (keywords.length === 0) return <p className="text-muted-foreground">{t("home.match_no_keywords")}</p>;
+function Body({
+	keywords,
+	check,
+	requesting,
+	onCheckAgain,
+}: {
+	keywords: string[];
+	check: KeywordCheckView | undefined;
+	requesting: boolean;
+	onCheckAgain: () => void;
+}) {
+	if (keywords.length === 0) {
+		return (
+			<div className="rounded-xl border border-dashed border-(--dashed) p-7 text-center text-[15px] text-muted-foreground">
+				{t("home.match_no_keywords")}
+			</div>
+		);
+	}
 	const latest = check?.latest;
 	const running = check?.running ?? false;
 	// A report for an older keyword list would otherwise read as the answer for the current one.
@@ -84,37 +177,44 @@ function Body({ keywords, check }: { keywords: string[]; check: KeywordCheckView
 			keywords,
 		);
 	if (latest && !(stale && running)) {
-		return <Results latest={latest} failure={check?.failure ?? null} stale={stale} />;
+		return (
+			<Results
+				latest={latest}
+				failure={check?.failure ?? null}
+				stale={stale}
+				running={running}
+				requesting={requesting}
+				onCheckAgain={onCheckAgain}
+			/>
+		);
+	}
+	if (check?.failure && !running) {
+		return <p className="text-sm text-muted-foreground">{t("home.match_failed")}</p>;
 	}
 	return (
-		<p className="text-muted-foreground">
-			{check?.failure && !running ? t("home.match_failed") : t("home.match_pending")}
-		</p>
+		<div className="flex flex-col gap-2.5 py-2">
+			{["w-3/5", "w-4/5", "w-[45%]"].map((w) => (
+				<div key={w} className={cn("h-3.5 animate-pulse rounded-md bg-divider motion-reduce:animate-none", w)} />
+			))}
+			<p className="mt-1.5 text-sm text-muted-foreground">{t("home.match_pending")}</p>
+		</div>
 	);
 }
 
 export function KeywordMatchCard({ keywords }: { keywords: string[] }) {
 	const { data, isLoading, error, refetch } = useKeywordCheck();
 	const request = useRequestKeywordCheck();
-	const running = data?.running ?? false;
 
 	return (
 		<HomeCard
 			title={t("home.match_title")}
-			description={t("home.match_description")}
+			titleId="home-match"
+			description={undefined}
 			loading={isLoading}
 			error={error}
 			onRetry={() => refetch()}
-			action={
-				keywords.length > 0 && (
-					<Button variant="outline" size="sm" disabled={running || request.isPending} onClick={() => request.mutate()}>
-						<ArrowsClockwise className={`size-4 ${running ? "animate-spin" : ""}`} />
-						{running ? t("home.match_checking") : t("home.match_check_again")}
-					</Button>
-				)
-			}
 		>
-			<Body keywords={keywords} check={data} />
+			<Body keywords={keywords} check={data} requesting={request.isPending} onCheckAgain={() => request.mutate()} />
 		</HomeCard>
 	);
 }
