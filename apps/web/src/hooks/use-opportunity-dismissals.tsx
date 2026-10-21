@@ -22,7 +22,8 @@ export function useDismissOpportunity(brandId?: string) {
 	const key = dismissalsKey(resolvedBrandId ?? "");
 	return useMutation({
 		mutationFn: (title: string) => dismissOpportunityFn({ data: { brandId: resolvedBrandId!, title } }),
-		// The row disappears at once; the server list replaces the guess when it lands.
+		// The row disappears at once. The server list is merged in rather than swapped in, so a dismissal still in
+		// flight is not undone by an earlier response that predates it.
 		onMutate: async (title) => {
 			await queryClient.cancelQueries({ queryKey: key });
 			const previous = queryClient.getQueryData<string[]>(key) ?? [];
@@ -32,6 +33,7 @@ export function useDismissOpportunity(brandId?: string) {
 		onError: (_error, _title, context) => {
 			if (context) queryClient.setQueryData(key, context.previous);
 		},
-		onSuccess: (result) => queryClient.setQueryData(key, result.dismissed),
+		onSuccess: (result) =>
+			queryClient.setQueryData<string[]>(key, (prev) => [...new Set([...(prev ?? []), ...result.dismissed])]),
 	});
 }
