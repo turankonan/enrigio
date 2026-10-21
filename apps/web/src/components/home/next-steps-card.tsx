@@ -42,7 +42,7 @@ export function NextStepsCard() {
 			action={countText && <span className="text-sm text-muted-foreground">{countText}</span>}
 		>
 			{steps.length === 0 ? (
-				<div className="rounded-xl border border-dashed border-dashed p-7 text-center text-[15px] text-muted-foreground">
+				<div className="rounded-xl border border-dashed border-(--dashed) p-7 text-center text-[15px] text-muted-foreground">
 					{emptyText}
 				</div>
 			) : (
@@ -79,7 +79,8 @@ export function NextStepsCard() {
 							<button
 								type="button"
 								onClick={() => dismiss.mutate(step.title)}
-								disabled={dismiss.isPending}
+								disabled={dismiss.isPending && dismiss.variables === step.title}
+								aria-label={t("home.next_done_label", { title: step.title })}
 								className="h-9 whitespace-nowrap rounded-[10px] border bg-card px-3.5 text-sm font-medium hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 							>
 								{t("home.next_done")}

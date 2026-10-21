@@ -94,7 +94,7 @@ export function BrandStrip({
 					to="/app/org/$org/new"
 					params={orgLinkParams(organization)}
 					aria-label={t("brand-strip.add")}
-					className="flex size-[60px] shrink-0 items-center justify-center rounded-xl border border-dashed border-dashed text-[22px] leading-none text-muted-foreground hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+					className="flex size-[60px] shrink-0 items-center justify-center rounded-xl border border-dashed border-(--dashed) text-[22px] leading-none text-muted-foreground hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
 				>
 					+
 				</Link>

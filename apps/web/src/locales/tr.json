@@ -1116,6 +1116,7 @@
 	"home.next_top_one": "En önemli öneriniz",
 	"home.next_all_done": "Listedeki her şeyi yaptınız. Yeni öneriler bir sonraki kontrolden sonra gelir.",
 	"home.next_done": "Yapıldı olarak işaretle",
+	"home.next_done_label": "Yapıldı olarak işaretle: {title}",
 	"home.impact_high": "Yüksek etki",
 	"home.impact_medium": "Orta etki",
 	"home.impact_low": "Düşük etki",

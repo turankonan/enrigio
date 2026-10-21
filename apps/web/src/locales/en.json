@@ -1116,6 +1116,7 @@
 	"home.next_top_one": "Your top recommendation",
 	"home.next_all_done": "You've done everything on the list. New recommendations arrive after the next check.",
 	"home.next_done": "Mark done",
+	"home.next_done_label": "Mark done: {title}",
 	"home.impact_high": "High impact",
 	"home.impact_medium": "Medium impact",
 	"home.impact_low": "Low impact",
