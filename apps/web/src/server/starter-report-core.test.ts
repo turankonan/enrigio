@@ -70,7 +70,7 @@ describe("buildStarterReport", () => {
 		});
 		expect(report.answers.filter((a) => a.mentioned)).toHaveLength(2);
 		expect(new Set(report.answers.map((a) => a.model)).size).toBe(2);
-		expect(report.answers[0]!.excerpt.length).toBeLessThanOrEqual(600);
+		expect(report.answers[0]!.excerpt.length).toBeLessThanOrEqual(300);
 	});
 
 	it("reports accuracy only when something was assessed and lists missing sections", () => {
@@ -82,5 +82,21 @@ describe("buildStarterReport", () => {
 		});
 		expect(report.score.accuracy).toBeNull();
 		expect(missingSections).toEqual(["whyThem", "nextSteps"]);
+	});
+
+	it("scores only buyer questions, not branded ones", () => {
+		const { report } = buildStarterReport({
+			...base,
+			runs: [
+				run({ mentioned: true }),
+				run({ intent: "price" }),
+				run({ intent: null, mentioned: true, promptValue: "atlas fizyo reviews" }),
+				run({ intent: null, mentioned: true, promptValue: "atlas fizyo address" }),
+			],
+		});
+		expect(report.headline).toMatchObject({ mentionedRuns: 1, totalRuns: 2, mentionPercent: 50 });
+		expect(report.whoIsThere.find((w) => w.isYou)).toMatchObject({ count: 1 });
+		expect(report.answers.map((a) => a.promptValue)).not.toContain("atlas fizyo reviews");
+		expect(report.answers).toHaveLength(2);
 	});
 });

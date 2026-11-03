@@ -15,7 +15,7 @@ import { getFirstScanRivalCitations } from "@/lib/postgres-read";
 import { getFirstScanStatus } from "@/server/first-scan-core";
 import { resolveOpportunities } from "@/server/opportunities";
 
-const EXCERPT_CHARS = 600;
+const EXCERPT_CHARS = 300;
 const ANSWER_COUNT = 4;
 const WHO_LIMIT = 6;
 const STEPS_LIMIT = 3;
@@ -56,10 +56,12 @@ const pct = (part: number, whole: number) => (whole === 0 ? 0 : Math.round((part
 
 export function buildStarterReport(input: BuildInput): { report: StarterReport; missingSections: string[] } {
 	const { runs } = input;
-	const mentionedRuns = runs.filter((r) => r.mentioned).length;
+	// Branded prompts almost always name the brand, so they would inflate the score.
+	const buyer = runs.filter((r) => r.intent !== null);
+	const mentionedRuns = buyer.filter((r) => r.mentioned).length;
 
 	const rivalCounts = new Map<string, number>();
-	for (const r of runs) for (const c of r.competitorsMentioned) rivalCounts.set(c, (rivalCounts.get(c) ?? 0) + 1);
+	for (const r of buyer) for (const c of r.competitorsMentioned) rivalCounts.set(c, (rivalCounts.get(c) ?? 0) + 1);
 	const who = [...rivalCounts.entries()]
 		.map(([name, count]) => ({ name, count, isYou: false }))
 		.concat([{ name: input.brand.name, count: mentionedRuns, isYou: true }])
@@ -88,7 +90,7 @@ export function buildStarterReport(input: BuildInput): { report: StarterReport; 
 		isYours: yours.has(c.domain.toLowerCase().replace(/^www\./, "")),
 	}));
 
-	const answers = pickAnswers(runs).map((r) => ({
+	const answers = pickAnswers(buyer).map((r) => ({
 		promptValue: r.promptValue,
 		model: r.model,
 		mentioned: r.mentioned,
@@ -108,8 +110,13 @@ export function buildStarterReport(input: BuildInput): { report: StarterReport; 
 				location: input.brand.location,
 			},
 			engines: input.engines,
-			headline: { mentionedRuns, totalRuns: runs.length, mentionPercent: pct(mentionedRuns, runs.length), rivalsAhead },
-			score: { mentionPercent: pct(mentionedRuns, runs.length), byIntent, accuracy },
+			headline: {
+				mentionedRuns,
+				totalRuns: buyer.length,
+				mentionPercent: pct(mentionedRuns, buyer.length),
+				rivalsAhead,
+			},
+			score: { mentionPercent: pct(mentionedRuns, buyer.length), byIntent, accuracy },
 			whoIsThere: who,
 			whyThem,
 			nextSteps: (input.nextSteps ?? []).slice(0, STEPS_LIMIT),
@@ -225,8 +232,13 @@ export async function retryStarterReportSection(brandId: string, section: "nextS
 	const steps = opportunities?.report?.opportunities.map((o) => ({ title: o.title, why: o.why }));
 	if (!steps) return;
 	const report = { ...(existing.report as StarterReport), nextSteps: steps.slice(0, STEPS_LIMIT) };
+	const missingSections = existing.missingSections.filter((s) => s !== section);
 	await db
 		.update(starterReports)
-		.set({ report, missingSections: existing.missingSections.filter((s) => s !== section) })
+		.set({
+			report,
+			missingSections,
+			...(!existing.partial && missingSections.length === 0 ? { finalizedAt: new Date() } : {}),
+		})
 		.where(eq(starterReports.id, existing.id));
 }
