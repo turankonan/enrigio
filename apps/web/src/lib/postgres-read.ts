@@ -1538,3 +1538,27 @@ export async function getFirstScanFinishedPairs(firstScanId: string): Promise<Fi
 		FROM usage_events WHERE first_scan_id = ${firstScanId} AND event_type = 'prompt_run_failed'
 	`);
 }
+
+export interface FirstScanCitation {
+	domain: string;
+	count: number;
+}
+
+/**
+ * "Why them": the sources behind buyer answers that recommended a rival and
+ * not the brand. Branded prompts and answers that already name the brand are
+ * excluded, so the list is what the brand is losing to.
+ */
+export async function getFirstScanRivalCitations(firstScanId: string): Promise<FirstScanCitation[]> {
+	return queryPg<FirstScanCitation>(sql`
+		SELECT c.domain, count(*)::int AS count
+		FROM citations c
+		JOIN prompt_runs r ON r.id = c.prompt_run_id
+		JOIN prompts p ON p.id = r.prompt_id
+		WHERE r.first_scan_id = ${firstScanId}
+			AND r.brand_mentioned = false
+			AND cardinality(r.competitors_mentioned) > 0
+			AND p.intent IS NOT NULL
+		GROUP BY c.domain ORDER BY count DESC LIMIT 4
+	`);
+}
