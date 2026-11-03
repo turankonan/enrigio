@@ -9,7 +9,9 @@
 		"compare:onboarding": "tsx scripts/compare-onboarding.ts",
 		"generate:auth-schema": "bash scripts/generate-auth-schema.sh",
 		"verify:membership-dedupe": "tsx scripts/verify-membership-dedupe.ts",
-		"backfill:brand-markets": "tsx scripts/backfill-brand-markets.ts"
+		"backfill:brand-markets": "tsx scripts/backfill-brand-markets.ts",
+		"backtest:score-v2": "tsx scripts/backtest-score-v2.ts",
+		"backfill:prompt-intent": "tsx scripts/backfill-prompt-intent.ts"
 	},
 	"exports": {
 		"./db/db": "./src/db/db.ts",

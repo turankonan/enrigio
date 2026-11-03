@@ -90,3 +90,4 @@ apps/web/storybook-static/
 .readonlydb
 .pnpm-store/
 graphify-out/
+labels/
