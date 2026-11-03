@@ -2,7 +2,7 @@ import type { Brand, Competitor } from "@workspace/lib/db/schema";
 import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import type { Provider, ScrapeResult } from "@workspace/lib/providers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { runModelIteration } from "./process-prompt";
+import { RUN_TIMEOUT_MS, runModelIteration } from "./process-prompt";
 
 const insertedPromptRuns: Record<string, unknown>[] = [];
 
@@ -234,5 +234,38 @@ describe("runModelIteration accuracy claims", () => {
 		classifyMention.mockResolvedValue(null);
 		await iteration(true);
 		expect(insertedPromptRuns[0]?.accuracyClaims).toBeNull();
+	});
+});
+
+describe("runModelIteration hung provider", () => {
+	beforeEach(() => {
+		insertedPromptRuns.length = 0;
+		vi.useFakeTimers();
+	});
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
+	it("gives up on a provider call that never settles and saves nothing", async () => {
+		vi.spyOn(console, "error").mockImplementation(() => {});
+		const neverSettles = makeProvider(() => new Promise<ScrapeResult>(() => {}));
+		const pending = runModelIteration({
+			promptId: "prompt_1",
+			promptValue: "best widget makers",
+			brand: makeBrand(),
+			competitorsList,
+			config: { model: "chatgpt", provider: "openai-api", webSearch: true },
+			providerImpl: neverSettles,
+			runIndex: 1,
+			effectiveMarket: resolveEffectiveMarket({ defaultMarketKey: null }),
+			branded: false,
+		});
+		const outcome = pending.then(
+			() => "resolved",
+			(error: Error) => error.message,
+		);
+		await vi.advanceTimersByTimeAsync(RUN_TIMEOUT_MS + 1);
+		expect(await outcome).toMatch(/timed out/);
+		expect(insertedPromptRuns).toHaveLength(0);
 	});
 });

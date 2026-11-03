@@ -66,7 +66,27 @@ export interface ProcessPromptData {
 export const PROMPT_JOB_OPTIONS = {
 	retryLimit: 0,
 	expireInSeconds: 90 * 60,
+	// A worker that dies mid-job (deploy, free-plan sleep) leaves the job
+	// `active`; with a heartbeat pg-boss fails it within a couple of minutes
+	// instead of waiting for the 90-minute expiry, and maintenance reschedules.
+	heartbeatSeconds: 60,
 } as const;
+
+/**
+ * A provider call that never settles (a socket left half-open after a network
+ * reset) would otherwise hold its job slot until pg-boss expires the job.
+ */
+export const RUN_TIMEOUT_MS = 5 * 60 * 1000;
+
+// ponytail: races a timer; the underlying request is not cancelled. Thread an
+// AbortSignal through the providers if dangling requests ever matter.
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+	let timer: ReturnType<typeof setTimeout>;
+	const timeout = new Promise<never>((_, reject) => {
+		timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms);
+	});
+	return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
 
 interface PromptContext {
 	prompt: typeof prompts.$inferSelect;
@@ -337,13 +357,17 @@ export async function runModelIteration({
 	const runMarketKey = localizable ? effectiveMarket.key : GLOBAL_MARKET_KEY;
 
 	try {
-		const result = await providerImpl.run(config.model, promptValue, {
-			webSearch: config.webSearch,
-			version: config.version,
-			market: localizable
-				? { locationCode: effectiveMarket.locationCode, languageCode: effectiveMarket.languageCode }
-				: undefined,
-		});
+		const result = await withTimeout(
+			providerImpl.run(config.model, promptValue, {
+				webSearch: config.webSearch,
+				version: config.version,
+				market: localizable
+					? { locationCode: effectiveMarket.locationCode, languageCode: effectiveMarket.languageCode }
+					: undefined,
+			}),
+			RUN_TIMEOUT_MS,
+			`${config.provider}/${config.model} run`,
+		);
 
 		// `webQueries` is stored exactly as the provider reported it — engines do
 		// sometimes genuinely search the prompt verbatim, and that's real data. The
