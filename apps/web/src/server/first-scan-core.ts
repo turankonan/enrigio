@@ -1,5 +1,6 @@
 /** Plain functions with db access; server functions live in ./first-scan.ts. */
 import { MARKET_CATALOG } from "@workspace/config/markets";
+import { getDefaultDelayHours, getRunsPerPrompt } from "@workspace/lib/constants";
 import { db } from "@workspace/lib/db/db";
 import {
 	brands,
@@ -9,6 +10,7 @@ import {
 	prompts,
 	starterReports,
 } from "@workspace/lib/db/schema";
+import { getOrgEntitlements } from "@workspace/lib/entitlements";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { getBoss } from "@/lib/boss-client";
 import { dedupeAliases, dedupeDomains } from "@/lib/domain-categories";
@@ -312,6 +314,24 @@ export async function retryFirstScan(firstScanId: string): Promise<void> {
 		.update(firstScans)
 		.set({ status: "running" })
 		.where(and(eq(firstScans.id, firstScanId), inArray(firstScans.status, ["queued", "running"])));
+}
+
+/**
+ * Answers per prompt per engine per day once tracking runs, for the setup estimate. Mirrors the run policy:
+ * unmetered deployments run RUNS_PER_PROMPT times per firing at the brand cadence, plans at their own rate
+ * and replication, with an override that can only slow them down.
+ */
+export async function getSetupDefaults(brandId: string): Promise<{ runsPerDay: number }> {
+	const brand = await db.query.brands.findFirst({ where: eq(brands.id, brandId) });
+	if (!brand) throw new Error("Brand not found");
+	const entitlements = await getOrgEntitlements(brand.organizationId);
+	if (entitlements.unlimited) {
+		const delayHours = brand.delayOverrideHours ?? getDefaultDelayHours();
+		return { runsPerDay: (getRunsPerPrompt() * 24) / Math.max(1, delayHours) };
+	}
+	const planHours = 24 / Math.max(1, entitlements.standardRunsPerDay ?? 1);
+	const hours = Math.max(brand.delayOverrideHours ?? planHours, planHours);
+	return { runsPerDay: ((entitlements.replication ?? 1) * 24) / hours };
 }
 
 export async function openPartialFirstScan(firstScanId: string): Promise<void> {

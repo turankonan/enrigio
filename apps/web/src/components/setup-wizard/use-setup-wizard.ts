@@ -9,7 +9,7 @@ import {
 	type SetupDraft,
 	type SetupStep,
 } from "@/lib/setup-wizard";
-import { getLatestFirstScanFn, saveSetupDraftFn, startFirstScanFn } from "@/server/first-scan";
+import { getLatestFirstScanFn, getSetupDefaultsFn, saveSetupDraftFn, startFirstScanFn } from "@/server/first-scan";
 import { getAnalyzeBrandStatusFn, startAnalyzeBrandFn } from "@/server/onboarding";
 import { getModelPickerStateFn } from "@/server/platform-picks";
 
@@ -97,6 +97,10 @@ export function useSetupWizard(brand: WizardBrand) {
 		() => (picker.data?.available ?? []).map((o) => ({ model: o.model, label: getModelMeta(o.model).label })),
 		[picker.data],
 	);
+	const defaults = useQuery({
+		queryKey: ["setup-defaults", brand.id],
+		queryFn: () => getSetupDefaultsFn({ data: { brandId: brand.id } }),
+	});
 	const engineChoices = useMemo(
 		() => (available.length ? available.map((a) => a.model) : DEFAULT_ENGINES),
 		[available],
@@ -203,6 +207,7 @@ export function useSetupWizard(brand: WizardBrand) {
 	return {
 		phase,
 		available,
+		runsPerDay: defaults.data?.runsPerDay ?? null,
 		saved: saver.saved,
 		retryAnalysis,
 		continueByHand,

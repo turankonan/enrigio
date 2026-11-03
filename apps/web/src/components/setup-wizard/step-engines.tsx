@@ -11,7 +11,8 @@ interface Props {
 	onChange: (d: SetupDraft) => void;
 	onBack?: () => void;
 	available: { model: string; label: string }[];
-	runsPerDay: number;
+	/** Null until the server answers; the estimate waits for it rather than guess. */
+	runsPerDay: number | null;
 	onStart: () => Promise<void>;
 	startError: string | null;
 }
@@ -61,9 +62,11 @@ export function StepEngines({ draft, onChange, onBack, available, runsPerDay, on
 				})}
 			</div>
 
-			<p className="text-sm text-muted-foreground">
-				{t("setup.engines.estimate", { answers, monthly: monthlyAnswerEstimate(draft, runsPerDay) })}
-			</p>
+			{runsPerDay !== null && (
+				<p className="text-sm text-muted-foreground">
+					{t("setup.engines.estimate", { answers, monthly: monthlyAnswerEstimate(draft, runsPerDay) })}
+				</p>
+			)}
 			{none && <p className="text-sm text-destructive">{t("setup.engines.none")}</p>}
 			{startError && (
 				<Alert variant="destructive">

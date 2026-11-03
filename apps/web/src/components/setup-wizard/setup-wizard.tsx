@@ -10,9 +10,6 @@ import { StepSite } from "./step-site";
 import { Stepper } from "./stepper";
 import { useSetupWizard, type WizardBrand } from "./use-setup-wizard";
 
-// Matches the worker's RUNS_PER_PROMPT fallback; the estimate is informational.
-const RUNS_PER_DAY = 1;
-
 interface Props {
 	brand: WizardBrand;
 	onReport: () => void;
@@ -51,7 +48,7 @@ export function SetupWizard({ brand, onReport, onDashboard }: Props) {
 				<StepEngines
 					{...stepProps}
 					available={wizard.available}
-					runsPerDay={RUNS_PER_DAY}
+					runsPerDay={wizard.runsPerDay}
 					onBack={() => wizard.goto(draft, 3)}
 					onStart={() => wizard.start.mutateAsync(draft).then(() => undefined)}
 					startError={wizard.start.isError ? t("setup.engines.start_error") : null}

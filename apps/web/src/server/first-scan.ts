@@ -9,6 +9,7 @@ import { MAX_BUYER, MAX_RIVALS } from "@/lib/setup-wizard";
 import {
 	AlreadyStartedError,
 	getFirstScanStatus,
+	getSetupDefaults,
 	openPartialFirstScan,
 	retryFirstScan,
 	startFirstScan,
@@ -121,4 +122,11 @@ export const getLatestFirstScanFn = createServerFn({ method: "POST" })
 		await requireBrandSession(data.brandId);
 		const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.brandId, data.brandId) });
 		return scan ? { firstScanId: scan.id, status: scan.status } : null;
+	});
+
+export const getSetupDefaultsFn = createServerFn({ method: "POST" })
+	.validator(z.object({ brandId: z.string() }))
+	.handler(async ({ data }) => {
+		await requireBrandSession(data.brandId);
+		return getSetupDefaults(data.brandId);
 	});

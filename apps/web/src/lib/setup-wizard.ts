@@ -131,7 +131,8 @@ export function defaultEngines(available: string[]): string[] {
 
 export function monthlyAnswerEstimate(d: SetupDraft, runsPerDay: number): number {
 	const prompts = selectedBuyerCount(d) + d.questions.filter((q) => !isBuyer(q)).length;
-	return prompts * d.engines.length * 30 * runsPerDay;
+	// A cadence slower than daily gives a fractional daily rate.
+	return Math.round(prompts * d.engines.length * 30 * runsPerDay);
 }
 
 export function expectedPairs(promptIds: { id: string }[], engines: string[]): FirstScanExpectedPair[] {

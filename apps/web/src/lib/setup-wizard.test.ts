@@ -129,6 +129,8 @@ describe("estimates and pairs", () => {
 		const d = draftFromSuggestion(suggestion as never, ["chatgpt", "gemini"]);
 		expect(monthlyAnswerEstimate(d, 1)).toBe((12 + 3) * 2 * 30);
 		expect(monthlyAnswerEstimate(d, 4)).toBe((12 + 3) * 2 * 30 * 4);
+		// A brand sampled every two days with one run per firing.
+		expect(monthlyAnswerEstimate(d, 1 / 2)).toBe(450);
 	});
 	it("builds one pair per prompt per engine", () => {
 		expect(expectedPairs([{ id: "a" }, { id: "b" }], ["chatgpt", "gemini"])).toEqual([
