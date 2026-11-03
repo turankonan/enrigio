@@ -1,8 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Progress } from "@workspace/ui/components/progress";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { t } from "@/lib/i18n";
 import type { FirstScanStatus } from "@/server/first-scan";
 import { getFirstScanStatusFn, openPartialFirstScanFn, retryFirstScanFn } from "@/server/first-scan";
@@ -23,6 +23,16 @@ export function StepFirstScan({
 	onReport: () => void;
 	onDashboard: () => void;
 }) {
+	const queryClient = useQueryClient();
+	// The brand page picks this screen from the latest scan; a stale "running" would bring the user straight back.
+	const leaveForReport = useCallback(
+		() =>
+			queryClient
+				.invalidateQueries({ queryKey: ["first-scan-latest", brandId] })
+				.catch(() => {})
+				.then(onReport),
+		[queryClient, brandId, onReport],
+	);
 	const status = useQuery({
 		queryKey: ["first-scan", firstScanId],
 		queryFn: () => getFirstScanStatusFn({ data: { brandId, firstScanId } }),
@@ -35,7 +45,7 @@ export function StepFirstScan({
 	});
 	const openPartial = useMutation({
 		mutationFn: () => openPartialFirstScanFn({ data: { brandId, firstScanId } }),
-		onSuccess: () => onReport(),
+		onSuccess: leaveForReport,
 	});
 
 	const s = status.data;
@@ -44,9 +54,9 @@ export function StepFirstScan({
 	useEffect(() => {
 		if (s?.status === "complete" && !handedOff.current) {
 			handedOff.current = true;
-			onReport();
+			leaveForReport();
 		}
-	}, [s?.status, onReport]);
+	}, [s?.status, leaveForReport]);
 
 	if (!s) return null;
 	const finished = s.done + s.failed;
@@ -83,7 +93,7 @@ export function StepFirstScan({
 				</div>
 			)}
 			<div className="flex flex-wrap gap-2">
-				{s.reportReady && <Button onClick={onReport}>{t("setup.scan.open_report")}</Button>}
+				{s.reportReady && <Button onClick={leaveForReport}>{t("setup.scan.open_report")}</Button>}
 				<Button variant="ghost" onClick={onDashboard}>
 					{t("starter_report.dashboard")}
 				</Button>

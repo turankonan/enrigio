@@ -31,7 +31,6 @@ function DashboardPage() {
 		queryKey: ["first-scan-latest", brandId],
 		queryFn: () => getLatestFirstScanFn({ data: { brandId } }),
 		enabled: onboarded,
-		staleTime: Number.POSITIVE_INFINITY,
 	});
 
 	const openReport = () => {
