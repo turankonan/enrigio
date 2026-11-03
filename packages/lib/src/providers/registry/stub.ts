@@ -19,6 +19,9 @@ const CANNED_RESEARCH = {
 	additionalDomains: [] as string[],
 	aliases: ["Stub"],
 	competitors: [{ name: "Stub Competitor", domains: ["stub-competitor.example"], aliases: [] as string[] }],
+	sector: null,
+	location: null,
+	marketKey: null,
 	suggestedPrompts: [
 		{ prompt: "best stub widgets", tags: ["stub"] },
 		{ prompt: "stub brand alternative", tags: ["stub"] },

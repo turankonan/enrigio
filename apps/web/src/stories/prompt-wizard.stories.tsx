@@ -36,6 +36,9 @@ const RICH_SUGGESTION: OnboardingSuggestion = {
 		{ name: "Initech", domains: ["initech.com"], aliases: ["Initech Industries"] },
 		{ name: "Soylent", domains: ["soylent.com"], aliases: [] },
 	],
+	sector: null,
+	location: null,
+	marketKey: null,
 	suggestedPrompts: [
 		{ prompt: "best widgets", tags: ["best-of"], intent: null },
 		{ prompt: "best widgets for small business", tags: ["best-of", "use-case"], intent: null },
