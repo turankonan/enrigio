@@ -1,5 +1,7 @@
+import { lookup } from "node:dns/promises";
 import { Readability } from "@mozilla/readability";
 import { parseHTML } from "linkedom";
+import { isDisallowedAddress, safeFetch } from "./net/safe-fetch";
 
 const MAX_EXCERPT_LINES = 200;
 const JINA_TIMEOUT_MS = 30_000;
@@ -39,6 +41,11 @@ export async function getWebsiteExcerpt(url: string): Promise<string> {
 	// consistently.
 	const cleanUrl = url.startsWith("http") ? url : `https://${url}`;
 
+	if (!(await isPublicWebsite(cleanUrl))) {
+		console.warn(`[website-excerpt] refusing non-public url ${cleanUrl}`);
+		return "";
+	}
+
 	const sources = [
 		{ name: "jina", fetch: () => fromJina(cleanUrl) },
 		{ name: "readability", fetch: () => fromReadability(cleanUrl) },
@@ -58,6 +65,36 @@ export async function getWebsiteExcerpt(url: string): Promise<string> {
 
 	console.error(`[website-excerpt] all sources failed for ${cleanUrl}`);
 	return "";
+}
+
+/**
+ * Jina fetches on our behalf, so safeFetch's per-hop checks never see that
+ * request: refuse anything but a public http(s) host up front.
+ * Resolve-then-fetch, so a DNS rebind between the two is not covered by this
+ * gate; the direct path re-checks every hop through safeFetch.
+ */
+async function isPublicWebsite(url: string): Promise<boolean> {
+	let u: URL;
+	try {
+		u = new URL(url);
+	} catch {
+		return false;
+	}
+	if ((u.protocol !== "http:" && u.protocol !== "https:") || u.username || u.password) {
+		return false;
+	}
+	try {
+		const addresses = await lookup(u.hostname, { all: true });
+		return addresses.length > 0 && addresses.every((a) => !isDisallowedAddress(a.address));
+	} catch {
+		return false;
+	}
+}
+
+/** The site's own apex and www hosts; a redirect anywhere else is refused. */
+function allowedHosts(url: string): string[] {
+	const host = new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+	return [host, `www.${host}`];
 }
 
 /**
@@ -89,23 +126,18 @@ async function fromJina(url: string): Promise<string | null> {
  * can't isolate an article.
  */
 async function fromReadability(url: string): Promise<string | null> {
-	const response = await fetch(url, {
-		headers: {
-			"User-Agent": BROWSER_UA,
-			Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-		},
-		signal: AbortSignal.timeout(DIRECT_TIMEOUT_MS),
+	// A user-supplied URL must never reach a bare fetch: safeFetch refuses
+	// private, loopback, link-local and metadata addresses and re-checks every
+	// redirect hop against the allow-list.
+	const result = await safeFetch(url, {
+		allowHosts: allowedHosts(url),
+		accept: "html",
+		timeoutMs: DIRECT_TIMEOUT_MS,
 	});
-	if (!response.ok) {
+	if (result.status !== "ok" || !result.body?.trim()) {
 		return null;
 	}
-	if (!(response.headers.get("content-type") ?? "").includes("html")) {
-		return null;
-	}
-	const html = await response.text();
-	if (!html.trim()) {
-		return null;
-	}
+	const html = result.body;
 	const { document } = parseHTML(html);
 	const article = new Readability(document).parse();
 	const text = article?.textContent?.trim();
