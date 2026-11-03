@@ -7,7 +7,9 @@
 
 import { parseModelFilter } from "@workspace/config/model-filter";
 import { db } from "@workspace/lib/db/db";
+import type { PromptIntent } from "@workspace/lib/db/schema";
 import { getAllProviders } from "@workspace/lib/providers";
+import { RANK_WEIGHTS } from "@workspace/lib/score";
 import { type SQL, sql } from "drizzle-orm";
 import type { ModelCompetitorMentionRow } from "@/lib/engine-comparison";
 import {
@@ -241,6 +243,136 @@ export async function getDashboardSummary(
 			${marketScope(effectiveMarketKey)}
 	`);
 	return rows;
+}
+
+/** Same numbers as scoreV2(); the constant is the single source. */
+const RANK_WEIGHT_CASE = sql`CASE
+	WHEN NOT brand_mentioned THEN 0
+	WHEN brand_rank = 1 THEN ${RANK_WEIGHTS.rank1}::numeric
+	WHEN brand_rank = 2 THEN ${RANK_WEIGHTS.rank2}::numeric
+	WHEN brand_rank = 3 THEN ${RANK_WEIGHTS.rank3}::numeric
+	ELSE ${RANK_WEIGHTS.other}::numeric
+END`;
+
+export interface ScoreV2Summary {
+	total_runs: number;
+	score_v2: number | null;
+}
+
+export async function getScoreV2Summary(
+	brandId: string,
+	fromDate: string | null,
+	toDate: string | null,
+	timezone: string,
+	promptIds: string[],
+	effectiveMarketKey: string,
+): Promise<ScoreV2Summary> {
+	if (promptIds.length === 0) return { total_runs: 0, score_v2: null };
+	const [row] = await queryPg<ScoreV2Summary>(sql`
+		SELECT
+			count(*)::int AS total_runs,
+			round(avg(${RANK_WEIGHT_CASE}) * 100)::int AS score_v2
+		FROM prompt_runs
+		WHERE brand_id = ${brandId}
+			${dateFilter(fromDate, toDate, timezone)}
+			${promptIdFilter(promptIds)}
+			${marketScope(effectiveMarketKey)}
+	`);
+	return row ?? { total_runs: 0, score_v2: null };
+}
+
+export interface IntentScoreRow {
+	intent: PromptIntent;
+	prompt_count: number;
+	total_runs: number;
+	score_v2: number | null;
+}
+
+export async function getIntentScoreSummary(
+	brandId: string,
+	fromDate: string | null,
+	toDate: string | null,
+	timezone: string,
+	promptIds: string[],
+	effectiveMarketKey: string,
+): Promise<IntentScoreRow[]> {
+	if (promptIds.length === 0) return [];
+	return queryPg<IntentScoreRow>(sql`
+		WITH scoped_runs AS (
+			SELECT prompt_id, ${RANK_WEIGHT_CASE} AS weight
+			FROM prompt_runs
+			WHERE brand_id = ${brandId}
+				${dateFilter(fromDate, toDate, timezone)}
+				${promptIdFilter(promptIds)}
+				${marketScope(effectiveMarketKey)}
+		)
+		SELECT
+			p.intent AS intent,
+			count(DISTINCT p.id)::int AS prompt_count,
+			count(s.prompt_id)::int AS total_runs,
+			round(avg(s.weight) * 100)::int AS score_v2
+		FROM prompts p
+		LEFT JOIN scoped_runs s ON s.prompt_id = p.id
+		WHERE p.brand_id = ${brandId}
+			AND p.intent IS NOT NULL
+			AND p.id IN (${uuidList(promptIds)})
+		GROUP BY p.intent
+		ORDER BY p.intent
+	`);
+}
+
+export interface AccuracySummary {
+	branded_mentioned_runs: number;
+	assessed_runs: number;
+	/** Assessed runs with no contradicted claim (unsupported claims allowed). */
+	accurate_runs: number;
+	/** Assessed runs carrying at least one unsupported claim. Shown, never scored. */
+	unsupported_runs: number;
+	unrecognised_runs: number;
+}
+
+export async function getAccuracySummary(
+	brandId: string,
+	fromDate: string | null,
+	toDate: string | null,
+	timezone: string,
+	brandedPromptIds: string[],
+	effectiveMarketKey: string,
+): Promise<AccuracySummary> {
+	const empty = {
+		branded_mentioned_runs: 0,
+		assessed_runs: 0,
+		accurate_runs: 0,
+		unsupported_runs: 0,
+		unrecognised_runs: 0,
+	};
+	if (brandedPromptIds.length === 0) return empty;
+	const [row] = await queryPg<AccuracySummary>(sql`
+		SELECT
+			count(*) FILTER (WHERE brand_mentioned)::int AS branded_mentioned_runs,
+			count(*) FILTER (WHERE brand_mentioned AND accuracy_claims IS NOT NULL)::int AS assessed_runs,
+			count(*) FILTER (
+				WHERE brand_mentioned
+					AND accuracy_claims IS NOT NULL
+					AND NOT EXISTS (
+						SELECT 1 FROM jsonb_array_elements(accuracy_claims) c WHERE c->>'status' = 'contradicted'
+					)
+			)::int AS accurate_runs,
+			count(*) FILTER (
+				WHERE brand_mentioned
+					AND accuracy_claims IS NOT NULL
+					AND EXISTS (
+						SELECT 1 FROM jsonb_array_elements(accuracy_claims) c WHERE c->>'status' = 'unsupported'
+					)
+			)::int AS unsupported_runs,
+			count(*) FILTER (WHERE NOT brand_mentioned)::int AS unrecognised_runs
+		FROM prompt_runs
+		WHERE brand_id = ${brandId}
+			${dateFilter(fromDate, toDate, timezone)}
+			${promptIdFilter(brandedPromptIds)}
+			${marketScope(effectiveMarketKey)}
+	`);
+	return row ?? empty;
 }
 
 export interface PerPromptVisibilityPoint {
