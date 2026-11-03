@@ -164,8 +164,8 @@ describe("analyzeBrand", () => {
 			suggestedPrompts: [
 				// Tags are now free-form / brand-tailored. Normalize step lowercases
 				// + kebab-cases + dedupes + caps at 3 per prompt.
-				{ prompt: "Best Widgets", tags: ["Industrial Supplies", "Manufacturing"], intent: "discovery" },
-				{ prompt: "best widgets", tags: ["industrial-supplies"], intent: "discovery" }, // duplicate after lowercasing
+				{ prompt: "Best Widgets", tags: ["Industrial Supplies", "Manufacturing"], intent: null },
+				{ prompt: "best widgets", tags: ["industrial-supplies"], intent: null }, // duplicate after lowercasing
 				{
 					prompt: "acme alternative",
 					tags: ["alternatives", "industrial supplies", "buying guide", "extra-tag"],
@@ -194,7 +194,7 @@ describe("analyzeBrand", () => {
 		});
 
 		expect(result.suggestedPrompts).toEqual([
-			{ prompt: "best widgets", tags: ["industrial-supplies", "manufacturing"], intent: "discovery" },
+			{ prompt: "best widgets", tags: ["industrial-supplies", "manufacturing"], intent: null },
 			{
 				prompt: "acme alternative",
 				intent: null,
@@ -239,7 +239,7 @@ describe("analyzeBrand", () => {
 		expect(result.suggestedPrompts).toEqual([]);
 	});
 
-	it("caps competitors at the requested max", async () => {
+	it("caps competitors and prompts at the requested maxes", async () => {
 		(runStructuredResearchPrompt as any).mockResolvedValueOnce({
 			brandName: "Acme",
 			additionalDomains: [],
@@ -249,14 +249,19 @@ describe("analyzeBrand", () => {
 				domains: [`comp${i}.com`],
 				aliases: [],
 			})),
-			suggestedPrompts: [],
+			suggestedPrompts: Array.from({ length: 50 }, (_, i) => ({
+				prompt: `prompt ${i}`,
+				tags: ["best-of"],
+			})),
 		});
 
 		const result = await analyzeBrand({
 			website: "acme.com",
 			maxCompetitors: 3,
+			maxPrompts: 5,
 		});
 		expect(result.competitors).toHaveLength(3);
+		expect(result.suggestedPrompts).toHaveLength(5);
 	});
 });
 
@@ -277,7 +282,7 @@ describe("analyzeBrand prompt intent", () => {
 
 		const result = await analyzeBrand({ website: "acme.com", maxCompetitors: 0, maxPrompts: 10 });
 
-		expect(result.suggestedPrompts.map((p) => p.intent)).toEqual(["discovery", null]);
+		expect(result.suggestedPrompts.map((p) => p.intent)).toEqual(["discovery", null, null, null]);
 	});
 });
 
@@ -301,7 +306,7 @@ describe("analyzeBrand profile fields and question set", () => {
 			location: "Kadıköy, İstanbul",
 			marketKey: "xx-XX",
 		});
-		const out = await analyzeBrand({ website: "https://atlasfizyo.com" });
+		const out = await analyzeBrand({ website: "https://atlasfizyo.com", fixedQuestionSet: true });
 		expect(out.sector).toBe("fizyoterapi merkezi");
 		expect(out.location).toBe("Kadıköy, İstanbul");
 		expect(out.marketKey).toBeNull();
@@ -329,7 +334,11 @@ describe("analyzeBrand profile fields and question set", () => {
 				{ prompt: "atlas fizyo fiyat", tags: [], intent: null },
 			],
 		});
-		const out = await analyzeBrand({ website: "https://atlasfizyo.com", brandName: "Atlas Fizyo" });
+		const out = await analyzeBrand({
+			website: "https://atlasfizyo.com",
+			brandName: "Atlas Fizyo",
+			fixedQuestionSet: true,
+		});
 		const intents = out.suggestedPrompts.map((p) => p.intent);
 		expect(intents.filter((i) => i === "discovery")).toHaveLength(4);
 		expect(intents.filter((i) => i === "comparison")).toHaveLength(4);
@@ -353,5 +362,28 @@ describe("analyzeBrand profile fields and question set", () => {
 		});
 		await analyzeBrand({ website: "https://acme.example", language: "tr" });
 		expect(lastPrompt()).toContain("Turkish");
+	});
+
+	it("leaves the candidate pool alone unless the fixed set is requested", async () => {
+		const unbranded = (intent: string, n: number) =>
+			Array.from({ length: n }, (_, i) => ({ prompt: `${intent} q${i}`, tags: [], intent }));
+		const suggestedPrompts = [...unbranded("discovery", 6), ...unbranded("price", 5)];
+		const base = {
+			brandName: "Acme",
+			additionalDomains: [],
+			aliases: [],
+			competitors: [],
+			sector: null,
+			location: null,
+			marketKey: null,
+		};
+
+		mockLlm({ ...base, suggestedPrompts });
+		const all = await analyzeBrand({ website: "https://acme.example", maxPrompts: 84 });
+		expect(all.suggestedPrompts).toHaveLength(11);
+
+		mockLlm({ ...base, suggestedPrompts });
+		const capped = await analyzeBrand({ website: "https://acme.example", maxPrompts: 7 });
+		expect(capped.suggestedPrompts).toHaveLength(7);
 	});
 });

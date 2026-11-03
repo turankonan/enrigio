@@ -66,7 +66,7 @@ const promptSchema = z.object({
 		),
 });
 
-function buildSchema(args: { maxCompetitors: number }) {
+function buildSchema(args: { maxCompetitors: number; maxPrompts: number; fixedQuestionSet: boolean }) {
 	return z.object({
 		brandName: z
 			.string()
@@ -109,7 +109,9 @@ function buildSchema(args: { maxCompetitors: number }) {
 		suggestedPrompts: z
 			.array(promptSchema)
 			.describe(
-				`Exactly ${UNBRANDED_PER_INTENT * PROMPT_INTENTS.length} UNBRANDED buyer questions — ${UNBRANDED_PER_INTENT} for each intent: discovery (finding options, "best X", "which X"), comparison (X vs Y, what to look for), local ("near me", in <city>), price (cost, insurance, what's included) — followed by exactly ${BRANDED_COUNT} BRANDED questions that name the brand (trust/reviews, services/address, alternatives). Write them the way a real customer types into ChatGPT, in the language given in the prompt. ${TAG_GUIDANCE}`,
+				args.fixedQuestionSet
+					? `Exactly ${UNBRANDED_PER_INTENT * PROMPT_INTENTS.length} UNBRANDED buyer questions — ${UNBRANDED_PER_INTENT} for each intent: discovery (finding options, "best X", "which X"), comparison (X vs Y, what to look for), local ("near me", in <city>), price (cost, insurance, what's included) — followed by exactly ${BRANDED_COUNT} BRANDED questions that name the brand (trust/reviews, services/address, alternatives). Write them the way a real customer types into ChatGPT, in the language given in the prompt. ${TAG_GUIDANCE}`
+					: `Up to ${args.maxPrompts} suggested AI tracking prompts. IMPORTANT: the MAJORITY must be UNBRANDED — generic category/persona queries that do NOT contain the brand name (e.g. "best [category]", "best [category] for [persona]", "[category] vs alternatives", "where to buy [category]"). Only 3-5 should be branded (contain the brand name, e.g. "[brand] alternative", "is [brand] worth it"). The goal is to test whether AI models mention the brand organically in response to unbranded queries. ${TAG_GUIDANCE}`,
 			),
 	});
 }
@@ -155,6 +157,11 @@ export interface AnalyzeBrandOptions {
 	maxPrompts?: number;
 	/** BCP-47 language code the questions are written in; defaults to the site's language. */
 	language?: string;
+	/**
+	 * The setup wizard wants exactly 4 unbranded questions per intent plus 3
+	 * branded; reports want a large candidate pool capped only by `maxPrompts`.
+	 */
+	fixedQuestionSet?: boolean;
 }
 
 const DEFAULT_MAX_COMPETITORS = 10;
@@ -178,10 +185,12 @@ export interface AnalysisContext {
 	schema: ReturnType<typeof buildSchema>;
 	maxCompetitors: number;
 	maxPrompts: number;
+	fixedQuestionSet: boolean;
 }
 
 export async function buildAnalysisContext(options: AnalyzeBrandOptions): Promise<AnalysisContext> {
 	const { website, brandName, maxCompetitors = DEFAULT_MAX_COMPETITORS, maxPrompts = DEFAULT_MAX_PROMPTS } = options;
+	const fixedQuestionSet = options.fixedQuestionSet ?? false;
 
 	const normalizedWebsite = cleanDomain(website);
 	const analysisUrl = cleanUrl(website);
@@ -210,9 +219,10 @@ export async function buildAnalysisContext(options: AnalyzeBrandOptions): Promis
 		brandNameHint,
 		...(providedBrandName !== undefined && { providedBrandName }),
 		prompt,
-		schema: buildSchema({ maxCompetitors }),
+		schema: buildSchema({ maxCompetitors, maxPrompts, fixedQuestionSet }),
 		maxCompetitors,
 		maxPrompts,
+		fixedQuestionSet,
 	};
 }
 
@@ -225,6 +235,8 @@ export function normalizeAnalysisResult(raw: RawSuggestion, ctx: AnalysisContext
 		includeCompetitors: ctx.maxCompetitors > 0,
 		includePrompts: ctx.maxPrompts > 0,
 		maxCompetitors: ctx.maxCompetitors,
+		maxPrompts: ctx.maxPrompts,
+		fixedQuestionSet: ctx.fixedQuestionSet,
 	});
 }
 
@@ -338,8 +350,20 @@ function normalize(args: {
 	includeCompetitors: boolean;
 	includePrompts: boolean;
 	maxCompetitors: number;
+	maxPrompts: number;
+	fixedQuestionSet: boolean;
 }): OnboardingSuggestion {
-	const { raw, website, brandNameHint, providedBrandName, includeCompetitors, includePrompts, maxCompetitors } = args;
+	const {
+		raw,
+		website,
+		brandNameHint,
+		providedBrandName,
+		includeCompetitors,
+		includePrompts,
+		maxCompetitors,
+		maxPrompts,
+		fixedQuestionSet,
+	} = args;
 
 	// A caller-supplied name wins: it's what the user asked to track, and for a
 	// sub-brand the model tends to answer with the parent it recognises
@@ -364,12 +388,20 @@ function normalize(args: {
 		aliases,
 		competitors: includeCompetitors ? normalizeCompetitors(raw.competitors ?? [], ownedDomains, maxCompetitors) : [],
 		suggestedPrompts: includePrompts
-			? selectQuestionSet(normalizePrompts(raw.suggestedPrompts ?? [], Number.MAX_SAFE_INTEGER), brandName, website)
+			? finalizePrompts(raw.suggestedPrompts ?? [], { brandName, website, maxPrompts, fixedQuestionSet })
 			: [],
 		sector: raw.sector?.trim() || null,
 		location: raw.location?.trim() || null,
 		marketKey,
 	};
+}
+
+function finalizePrompts(
+	raw: RawSuggestion["suggestedPrompts"],
+	opts: { brandName: string; website: string; maxPrompts: number; fixedQuestionSet: boolean },
+): OnboardingPrompt[] {
+	if (!opts.fixedQuestionSet) return normalizePrompts(raw, opts.maxPrompts);
+	return selectQuestionSet(normalizePrompts(raw, Number.MAX_SAFE_INTEGER), opts.brandName, opts.website);
 }
 
 /** At most this many topic tags survive per suggested prompt. */
