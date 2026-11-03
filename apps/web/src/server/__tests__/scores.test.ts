@@ -32,7 +32,7 @@ vi.mock("@workspace/lib/db/db", () => ({
 	},
 }));
 
-const { computeAdminScoreRows } = await import("@/server/scores");
+const { computeAdminScoreRows } = await import("@/server/scores-core");
 
 describe("computeAdminScoreRows", () => {
 	beforeEach(() => {

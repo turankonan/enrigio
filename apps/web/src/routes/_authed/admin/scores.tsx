@@ -1,6 +1,6 @@
 /** /admin/scores - v1 beside v2, intent sub-scores and brand accuracy, with coverage. */
 import { createFileRoute } from "@tanstack/react-router";
-import { PROMPT_INTENTS } from "@workspace/lib/db/schema";
+import type { PromptIntent } from "@workspace/lib/db/schema";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
 import { useEffect, useState } from "react";
@@ -13,7 +13,11 @@ export const Route = createFileRoute("/_authed/admin/scores")({
 	component: ScoresPage,
 });
 
-const INTENT_LABEL: Record<(typeof PROMPT_INTENTS)[number], string> = {
+// Listed here rather than imported from the schema module: a runtime import of
+// it would pull drizzle and pg into the client bundle.
+const INTENTS = ["discovery", "comparison", "local", "price"] as const satisfies readonly PromptIntent[];
+
+const INTENT_LABEL: Record<PromptIntent, string> = {
 	discovery: "Discovery",
 	comparison: "Comparison",
 	local: "Local",
@@ -57,7 +61,7 @@ function ScoresPage() {
 							<TableHead>Runs · models</TableHead>
 							<TableHead>v1</TableHead>
 							<TableHead>v2 (cohort)</TableHead>
-							{PROMPT_INTENTS.map((i) => (
+							{INTENTS.map((i) => (
 								<TableHead key={i}>{INTENT_LABEL[i]}</TableHead>
 							))}
 							<TableHead>Classified</TableHead>
@@ -83,7 +87,7 @@ function ScoresPage() {
 								<TableCell>
 									{pct(r.v2)} <span className="text-muted-foreground">({r.cohortPrompts})</span>
 								</TableCell>
-								{PROMPT_INTENTS.map((i) => (
+								{INTENTS.map((i) => (
 									<TableCell key={i}>
 										{r.intents[i].promptCount === 0 ? "—" : pct(r.intents[i].score)}{" "}
 										<span className="text-muted-foreground">({r.intents[i].promptCount})</span>
