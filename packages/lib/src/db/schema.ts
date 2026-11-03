@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
 	boolean,
 	index,
@@ -7,6 +8,7 @@ import {
 	numeric,
 	pgEnum,
 	pgTable,
+	real,
 	smallint,
 	text,
 	timestamp,
@@ -29,6 +31,13 @@ export const reportStatusEnum = pgEnum("report_status", ["pending", "processing"
 export const runSentimentEnum = pgEnum("run_sentiment", ["positive", "neutral", "negative"]);
 export const siteAuditStatusEnum = pgEnum("site_audit_status", ["running", "completed", "failed"]);
 export const keywordCheckStatusEnum = pgEnum("keyword_check_status", ["running", "completed", "failed"]);
+export const firstScanStatusEnum = pgEnum("first_scan_status", ["queued", "running", "complete", "partial"]);
+
+/** One prompt × engine the first scan must produce. */
+export interface FirstScanExpectedPair {
+	promptId: string;
+	model: string;
+}
 
 export const PROMPT_INTENTS = ["discovery", "comparison", "local", "price"] as const;
 export type PromptIntent = (typeof PROMPT_INTENTS)[number];
@@ -56,6 +65,13 @@ export const brands = pgTable(
 		defaultMarketKey: text("default_market_key"),
 		/** Up to 20 user-written phrases describing the business; matched against the site by the keyword check. */
 		keywords: text("keywords").array().notNull().default([]),
+		/** From the setup analysis, e.g. "fizyoterapi merkezi". Editable in settings. */
+		sector: text("sector"),
+		/** City or region the business serves, from the setup analysis. */
+		location: text("location"),
+		// The wizard's unsaved state, so "continue later" resumes where the user
+		// left off; cleared when the first scan starts.
+		setupDraft: jsonb("setup_draft"),
 		// Hard tenancy scope. Every brand belongs to exactly one better-auth
 		// organization; org membership (the `member` table) is the access-control
 		// mechanism. Brand and organization ids are independent, so billing and
@@ -149,6 +165,9 @@ export const promptRuns = pgTable(
 		// unbranded prompt). An empty array is a positive "assessed, nothing
 		// contradicted" — never default this column.
 		accuracyClaims: jsonb("accuracy_claims").$type<AccuracyClaim[]>(),
+		// Set only on runs produced by a first scan; the starter report is built
+		// from exactly these rows.
+		firstScanId: uuid("first_scan_id"),
 		// Temporary cutover marker: 'legacy' means pre-cutover/unknown scope.
 		// 'global' is written only explicitly by app code for proven
 		// non-localizable prompts — never make it the default, or legacy rows
@@ -172,6 +191,7 @@ export const promptRuns = pgTable(
 			table.marketKey,
 			table.createdAt,
 		),
+		firstScanIdx: index("prompt_runs_first_scan_id_idx").on(table.firstScanId).where(sql`first_scan_id IS NOT NULL`),
 	}),
 ).enableRLS();
 
@@ -300,6 +320,45 @@ export const opportunityDismissals = pgTable(
 	(t) => ({ brandKeyIdx: uniqueIndex("opportunity_dismissals_brand_key_idx").on(t.brandId, t.opportunityKey) }),
 ).enableRLS();
 
+export const firstScans = pgTable("first_scans", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	// One first scan per brand: the unique index is what makes a double
+	// "start" click or two concurrent requests collapse into one scan.
+	brandId: text("brand_id")
+		.references(() => brands.id)
+		.notNull()
+		.unique(),
+	status: firstScanStatusEnum("status").notNull().default("queued"),
+	expected: jsonb("expected").$type<FirstScanExpectedPair[]>().notNull(),
+	startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
+	// Null until every job was handed to pg-boss; the status poll retries the
+	// enqueue while it is null.
+	enqueuedAt: timestamp("enqueued_at", { withTimezone: true }),
+	completedAt: timestamp("completed_at", { withTimezone: true }),
+}).enableRLS();
+
+export type FirstScan = typeof firstScans.$inferSelect;
+
+export const starterReports = pgTable("starter_reports", {
+	id: uuid("id").defaultRandom().primaryKey().notNull(),
+	brandId: text("brand_id")
+		.references(() => brands.id)
+		.notNull()
+		.unique(),
+	firstScanId: uuid("first_scan_id")
+		.references(() => firstScans.id)
+		.notNull(),
+	report: jsonb("report").notNull(),
+	/** finished ÷ expected pairs at build time, 0..1 */
+	coverage: real("coverage").notNull(),
+	partial: boolean("partial").notNull().default(false),
+	missingSections: text("missing_sections").array().notNull().default([]),
+	createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+	finalizedAt: timestamp("finalized_at", { withTimezone: true }),
+}).enableRLS();
+
+export type StarterReportRow = typeof starterReports.$inferSelect;
+
 export type BrandOpportunity = typeof brandOpportunities.$inferSelect;
 export type NewBrandOpportunity = typeof brandOpportunities.$inferInsert;
 
@@ -374,6 +433,7 @@ export const usageEvents = pgTable(
 		organizationId: text("organization_id").notNull(),
 		brandId: text("brand_id").notNull(),
 		promptId: uuid("prompt_id"),
+		firstScanId: uuid("first_scan_id"),
 		eventType: text("event_type").notNull(),
 		provider: text("provider"),
 		model: text("model"),
@@ -384,6 +444,7 @@ export const usageEvents = pgTable(
 	},
 	(table) => ({
 		orgCreatedIdx: index("usage_events_org_created_idx").on(table.organizationId, table.createdAt),
+		firstScanIdx: index("usage_events_first_scan_id_idx").on(table.firstScanId).where(sql`first_scan_id IS NOT NULL`),
 	}),
 ).enableRLS();
 
