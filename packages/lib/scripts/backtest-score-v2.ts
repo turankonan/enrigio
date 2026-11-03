@@ -194,8 +194,11 @@ async function runBacktest(client: Client): Promise<void> {
 		);
 		const runs = await loadRuns(client, brand.id, marketKey, since);
 		const analysis = analyseBrand(brand, prompts, runs, now);
-		if ("report" in analysis) reports.push(analysis.report);
-		else (skipped[analysis.skipped] ??= []).push(brand.name);
+		if ("report" in analysis) {
+			reports.push(analysis.report);
+		} else {
+			skipped[analysis.skipped] = [...(skipped[analysis.skipped] ?? []), brand.name];
+		}
 	}
 
 	console.table(reports.map(({ brandId, ...rest }) => rest));
