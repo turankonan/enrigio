@@ -6,6 +6,9 @@ import { runModelIteration } from "./process-prompt";
 
 const insertedPromptRuns: Record<string, unknown>[] = [];
 
+const classifyMention = vi.hoisted(() => vi.fn());
+vi.mock("@workspace/lib/mention-classify", () => ({ classifyMention }));
+
 vi.mock("@workspace/lib/db/db", async () => {
 	const schema = await vi.importActual<typeof import("@workspace/lib/db/schema")>("@workspace/lib/db/schema");
 	return {
@@ -84,6 +87,7 @@ describe("runModelIteration market stamping", () => {
 			providerImpl: makeProvider(runSpy),
 			runIndex: 1,
 			effectiveMarket,
+			branded: false,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith(
@@ -109,6 +113,7 @@ describe("runModelIteration market stamping", () => {
 			providerImpl: makeProvider(runSpy),
 			runIndex: 1,
 			effectiveMarket,
+			branded: false,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith("chatgpt", "best widgets", expect.objectContaining({ market: undefined }));
@@ -132,6 +137,7 @@ describe("runModelIteration market stamping", () => {
 			providerImpl: makeProvider(runSpy),
 			runIndex: 1,
 			effectiveMarket,
+			branded: false,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith(
@@ -162,6 +168,7 @@ describe("runModelIteration market stamping", () => {
 			providerImpl: makeProvider(runSpy),
 			runIndex: 1,
 			effectiveMarket,
+			branded: false,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith(
@@ -170,5 +177,62 @@ describe("runModelIteration market stamping", () => {
 			expect.objectContaining({ market: { locationCode: 9999, languageCode: "zz" } }),
 		);
 		expect(insertedPromptRuns[0]).toMatchObject({ marketKey: "global" });
+	});
+});
+
+const MENTIONING_RESULT: ScrapeResult = {
+	textContent: "Acme Corp is a solid choice; it is based in Berlin.",
+	rawOutput: {},
+	webQueries: [],
+	citations: [],
+	modelVersion: "test-model",
+};
+
+function iteration(branded: boolean) {
+	return runModelIteration({
+		promptId: "prompt_1",
+		promptValue: branded ? "is acme corp any good" : "best widget makers",
+		brand: makeBrand(),
+		competitorsList,
+		config: { model: "chatgpt", provider: "openai-api", webSearch: true },
+		providerImpl: makeProvider(async () => MENTIONING_RESULT),
+		runIndex: 1,
+		effectiveMarket: resolveEffectiveMarket({ defaultMarketKey: null }),
+		branded,
+	});
+}
+
+describe("runModelIteration accuracy claims", () => {
+	beforeEach(() => {
+		insertedPromptRuns.length = 0;
+		classifyMention.mockReset();
+	});
+
+	it("passes the brand profile for a branded prompt and stores the claims", async () => {
+		classifyMention.mockResolvedValue({
+			sentiment: "neutral",
+			brandRank: null,
+			claims: [{ claim: "based in Berlin", status: "unsupported" }],
+		});
+		await iteration(true);
+		expect(classifyMention).toHaveBeenCalledWith(
+			expect.objectContaining({
+				profile: expect.objectContaining({ name: "Acme Corp", website: "https://acme.example" }),
+			}),
+		);
+		expect(insertedPromptRuns[0]?.accuracyClaims).toEqual([{ claim: "based in Berlin", status: "unsupported" }]);
+	});
+
+	it("passes no profile for an unbranded prompt and stores null", async () => {
+		classifyMention.mockResolvedValue({ sentiment: "positive", brandRank: 2 });
+		await iteration(false);
+		expect(classifyMention.mock.calls[0]?.[0]).not.toHaveProperty("profile");
+		expect(insertedPromptRuns[0]?.accuracyClaims).toBeNull();
+	});
+
+	it("stores null when the classifier fails", async () => {
+		classifyMention.mockResolvedValue(null);
+		await iteration(true);
+		expect(insertedPromptRuns[0]?.accuracyClaims).toBeNull();
 	});
 });

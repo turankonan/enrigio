@@ -5,6 +5,7 @@ import { parseScrapeTargets } from "@workspace/config/scrape-targets";
 import { getDefaultDelayHours } from "@workspace/lib/constants";
 import { db } from "@workspace/lib/db/db";
 import {
+	type AccuracyClaim,
 	type Brand,
 	brands,
 	type Competitor,
@@ -16,7 +17,7 @@ import {
 } from "@workspace/lib/db/schema";
 import { getOrgEntitlements } from "@workspace/lib/entitlements";
 import { resolveEffectiveMarket } from "@workspace/lib/markets";
-import { classifyMention } from "@workspace/lib/mention-classify";
+import { type BrandProfile, classifyMention } from "@workspace/lib/mention-classify";
 import { analyzeMentions } from "@workspace/lib/mentions";
 import { getProvider, type ModelConfig, type Provider, resolveLocalizable } from "@workspace/lib/providers";
 import { failureBackoffHours } from "@workspace/lib/run-backoff";
@@ -30,6 +31,7 @@ import {
 	slowestIntervalHours,
 	targetKey,
 } from "@workspace/lib/run-policy";
+import { getEffectiveBrandedStatus } from "@workspace/lib/tag-utils";
 import type { Citation } from "@workspace/lib/text-extraction";
 import { estimateRunCostUsd } from "@workspace/lib/usage";
 import { and, eq, gt, sql } from "drizzle-orm";
@@ -216,6 +218,7 @@ async function savePromptRun(
 	competitorsMentioned: string[],
 	sentiment: "positive" | "neutral" | "negative" | null,
 	brandRank: number | null,
+	accuracyClaims: AccuracyClaim[] | null,
 	marketKey: string,
 ): Promise<{ id: string; createdAt: Date }> {
 	const [result] = await db
@@ -233,6 +236,7 @@ async function savePromptRun(
 			competitorsMentioned,
 			sentiment,
 			brandRank,
+			accuracyClaims,
 			marketKey,
 		})
 		.returning({ id: promptRuns.id, createdAt: promptRuns.createdAt });
@@ -294,6 +298,19 @@ async function recordUsageEvent(input: {
 	}
 }
 
+function brandProfileOption(brand: Brand, branded: boolean): { profile?: BrandProfile } {
+	if (!branded) return {};
+	return {
+		profile: {
+			name: brand.name,
+			website: brand.website,
+			additionalDomains: brand.additionalDomains ?? [],
+			aliases: brand.aliases ?? [],
+			keywords: brand.keywords ?? [],
+		},
+	};
+}
+
 export async function runModelIteration({
 	promptId,
 	promptValue,
@@ -303,6 +320,7 @@ export async function runModelIteration({
 	providerImpl,
 	runIndex,
 	effectiveMarket,
+	branded,
 }: {
 	promptId: string;
 	promptValue: string;
@@ -312,6 +330,7 @@ export async function runModelIteration({
 	providerImpl: Provider;
 	runIndex: number;
 	effectiveMarket: Market;
+	branded: boolean;
 }): Promise<void> {
 	const logPrefix = `[${config.model}_${runIndex}]`;
 	const localizable = resolveLocalizable(config);
@@ -345,12 +364,15 @@ export async function runModelIteration({
 		const recordedVersion = modelVersion ?? config.version ?? config.provider;
 
 		// Sentiment and in-answer rank are meaningless without a mention; skip the
-		// classifier (and its cost) unless the brand actually showed up.
+		// classifier (and its cost) unless the brand actually showed up. The profile
+		// goes along only for brand questions: those are the answers whose facts
+		// about the brand we score for accuracy.
 		const classification = brandMentioned
 			? await classifyMention({
 					answer: safeTextContent,
 					brandName: brand.name,
 					competitorNames: competitorsList.map((c) => c.name),
+					...brandProfileOption(brand, branded),
 				})
 			: null;
 
@@ -367,6 +389,7 @@ export async function runModelIteration({
 			competitorsMentioned,
 			classification?.sentiment ?? null,
 			classification?.brandRank ?? null,
+			classification?.claims ?? null,
 			runMarketKey,
 		);
 		console.log(`${logPrefix} Saved prompt run ${promptRunId}`);
@@ -493,6 +516,7 @@ async function processPrompt(
 				providerImpl,
 				runIndex: i + 1,
 				effectiveMarket,
+				branded: getEffectiveBrandedStatus(prompt.systemTags ?? [], prompt.tags ?? []).isBranded,
 			}),
 		);
 	});
