@@ -19,6 +19,8 @@ import { insertCompetitors, insertPrompts } from "@/server/onboarding-core";
 const ETA_MIN_SAMPLES = 5;
 const PARTIAL_MIN_COVERAGE = 0.5;
 const LATEST_LIMIT = 6;
+// No answer for this long with pairs still missing: the user is offered a retry or the partial report.
+const STALL_MS = 3 * 60 * 1000;
 
 export interface StartFirstScanInput {
 	brandId: string;
@@ -151,6 +153,8 @@ export interface FirstScanStatus {
 	etaSeconds: number | null;
 	/** Every expected pair has an outcome (success or failure). */
 	settled: boolean;
+	/** Pairs are missing and nothing has finished for a while, counted from the start when nothing has finished yet. */
+	stalled: boolean;
 	canOpenPartial: boolean;
 	reportReady: boolean;
 }
@@ -170,10 +174,10 @@ export function latestPerPair<T extends { promptId: string; model: string; creat
 
 export function computeStatus(args: {
 	expected: FirstScanExpectedPair[];
-	finished: { promptId: string; model: string; failed: boolean }[];
+	finished: { promptId: string; model: string; failed: boolean; finishedAt: Date }[];
 	startedAt: Date;
 	now: Date;
-}): Pick<FirstScanStatus, "done" | "failed" | "missing" | "etaSeconds" | "canOpenPartial" | "settled"> {
+}): Pick<FirstScanStatus, "done" | "failed" | "missing" | "etaSeconds" | "canOpenPartial" | "settled" | "stalled"> {
 	const wanted = new Set(args.expected.map(pairKey));
 	const seen = new Map<string, boolean>();
 	for (const f of args.finished) {
@@ -188,12 +192,14 @@ export function computeStatus(args: {
 	const missing = wanted.size - finishedCount;
 	const elapsed = (args.now.getTime() - args.startedAt.getTime()) / 1000;
 	const etaSeconds = finishedCount >= ETA_MIN_SAMPLES ? Math.round((elapsed / finishedCount) * missing) : null;
+	const lastProgressAt = Math.max(args.startedAt.getTime(), ...args.finished.map((f) => f.finishedAt.getTime()));
 	return {
 		done,
 		failed,
 		missing,
 		etaSeconds,
 		settled: missing === 0,
+		stalled: missing > 0 && args.now.getTime() - lastProgressAt > STALL_MS,
 		canOpenPartial: wanted.size > 0 && done / wanted.size >= PARTIAL_MIN_COVERAGE,
 	};
 }
@@ -207,7 +213,12 @@ export async function getFirstScanStatus(firstScanId: string): Promise<FirstScan
 	const finished = await getFirstScanFinishedPairs(firstScanId);
 	const counts = computeStatus({
 		expected: scan.expected,
-		finished: finished.map((f) => ({ promptId: f.prompt_id, model: f.model, failed: f.failed })),
+		finished: finished.map((f) => ({
+			promptId: f.prompt_id,
+			model: f.model,
+			failed: f.failed,
+			finishedAt: new Date(f.finished_at),
+		})),
 		startedAt: scan.startedAt,
 		now: new Date(),
 	});

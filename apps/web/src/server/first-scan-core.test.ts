@@ -6,6 +6,8 @@ vi.mock("@/lib/postgres-read", () => ({ getFirstScanFinishedPairs: vi.fn() }));
 
 const { computeStatus, latestPerPair } = await import("./first-scan-core");
 
+const T0 = new Date("2026-11-03T10:00:00Z");
+
 const expected = [
 	{ promptId: "a", model: "chatgpt" },
 	{ promptId: "a", model: "gemini" },
@@ -18,10 +20,10 @@ describe("computeStatus", () => {
 		const s = computeStatus({
 			expected,
 			finished: [
-				{ promptId: "a", model: "chatgpt", failed: false },
-				{ promptId: "a", model: "gemini", failed: true },
-				{ promptId: "b", model: "chatgpt", failed: true },
-				{ promptId: "b", model: "gemini", failed: true },
+				{ promptId: "a", model: "chatgpt", failed: false, finishedAt: T0 },
+				{ promptId: "a", model: "gemini", failed: true, finishedAt: T0 },
+				{ promptId: "b", model: "chatgpt", failed: true, finishedAt: T0 },
+				{ promptId: "b", model: "gemini", failed: true, finishedAt: T0 },
 			],
 			startedAt: new Date(),
 			now: new Date(),
@@ -33,10 +35,10 @@ describe("computeStatus", () => {
 		const s = computeStatus({
 			expected,
 			finished: [
-				{ promptId: "a", model: "chatgpt", failed: false },
-				{ promptId: "a", model: "chatgpt", failed: false }, // a retried duplicate
-				{ promptId: "a", model: "gemini", failed: true },
-				{ promptId: "zzz", model: "chatgpt", failed: false }, // not expected, ignored
+				{ promptId: "a", model: "chatgpt", failed: false, finishedAt: T0 },
+				{ promptId: "a", model: "chatgpt", failed: false, finishedAt: T0 }, // a retried duplicate
+				{ promptId: "a", model: "gemini", failed: true, finishedAt: T0 },
+				{ promptId: "zzz", model: "chatgpt", failed: false, finishedAt: T0 }, // not expected, ignored
 			],
 			startedAt: new Date("2026-11-03T10:00:00Z"),
 			now: new Date("2026-11-03T10:01:00Z"),
@@ -48,8 +50,8 @@ describe("computeStatus", () => {
 		const s = computeStatus({
 			expected,
 			finished: [
-				{ promptId: "a", model: "chatgpt", failed: true },
-				{ promptId: "a", model: "chatgpt", failed: false },
+				{ promptId: "a", model: "chatgpt", failed: true, finishedAt: T0 },
+				{ promptId: "a", model: "chatgpt", failed: false, finishedAt: T0 },
 			],
 			startedAt: new Date(),
 			now: new Date(),
@@ -59,13 +61,18 @@ describe("computeStatus", () => {
 
 	it("gives no ETA until five pairs have finished, then extrapolates from the average", () => {
 		const start = new Date("2026-11-03T10:00:00Z");
-		const four = Array.from({ length: 4 }, (_, i) => ({ promptId: "a", model: `m${i}`, failed: false }));
+		const four = Array.from({ length: 4 }, (_, i) => ({
+			promptId: "a",
+			model: `m${i}`,
+			failed: false,
+			finishedAt: T0,
+		}));
 		const big = Array.from({ length: 10 }, (_, i) => ({ promptId: "a", model: `m${i}` }));
 		expect(
 			computeStatus({ expected: big, finished: four, startedAt: start, now: new Date(start.getTime() + 40_000) })
 				.etaSeconds,
 		).toBeNull();
-		const five = [...four, { promptId: "a", model: "m4", failed: false }];
+		const five = [...four, { promptId: "a", model: "m4", failed: false, finishedAt: T0 }];
 		// 5 finished in 50 s → 10 s each → 5 remaining → 50 s
 		expect(
 			computeStatus({ expected: big, finished: five, startedAt: start, now: new Date(start.getTime() + 50_000) })
@@ -73,11 +80,23 @@ describe("computeStatus", () => {
 		).toBe(50);
 	});
 
+	it("calls a scan stalled when nothing has finished for three minutes, even before the first answer", () => {
+		const start = new Date("2026-11-03T10:00:00Z");
+		const at = (minutes: number) => new Date(start.getTime() + minutes * 60_000);
+		expect(computeStatus({ expected, finished: [], startedAt: start, now: at(2) }).stalled).toBe(false);
+		expect(computeStatus({ expected, finished: [], startedAt: start, now: at(4) }).stalled).toBe(true);
+		const one = [{ promptId: "a", model: "chatgpt", failed: false, finishedAt: at(3) }];
+		expect(computeStatus({ expected, finished: one, startedAt: start, now: at(5) }).stalled).toBe(false);
+		expect(computeStatus({ expected, finished: one, startedAt: start, now: at(7) }).stalled).toBe(true);
+		const all = expected.map((p) => ({ ...p, failed: false, finishedAt: at(1) }));
+		expect(computeStatus({ expected, finished: all, startedAt: start, now: at(30) }).stalled).toBe(false);
+	});
+
 	it("allows opening a partial report once half the pairs succeeded; failures do not count", () => {
 		const start = new Date();
-		const one = [{ promptId: "a", model: "chatgpt", failed: false }];
-		const oneAndFail = [...one, { promptId: "a", model: "gemini", failed: true }];
-		const two = [...one, { promptId: "a", model: "gemini", failed: false }];
+		const one = [{ promptId: "a", model: "chatgpt", failed: false, finishedAt: T0 }];
+		const oneAndFail = [...one, { promptId: "a", model: "gemini", failed: true, finishedAt: T0 }];
+		const two = [...one, { promptId: "a", model: "gemini", failed: false, finishedAt: T0 }];
 		expect(computeStatus({ expected, finished: one, startedAt: start, now: start }).canOpenPartial).toBe(false);
 		expect(computeStatus({ expected, finished: oneAndFail, startedAt: start, now: start }).canOpenPartial).toBe(false);
 		expect(computeStatus({ expected, finished: two, startedAt: start, now: start }).canOpenPartial).toBe(true);

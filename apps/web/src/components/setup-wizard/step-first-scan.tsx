@@ -9,8 +9,6 @@ import { getFirstScanStatusFn, openPartialFirstScanFn, retryFirstScanFn } from "
 import { Stepper } from "./stepper";
 
 const POLL_MS = 3000;
-// No answer for this long with pairs still missing: offer retry / partial.
-const STALL_MS = 3 * 60 * 1000;
 
 export function StepFirstScan({
 	brandId,
@@ -60,9 +58,8 @@ export function StepFirstScan({
 
 	if (!s) return null;
 	const finished = s.done + s.failed;
-	const lastAt = s.latest[0] ? new Date(s.latest[0].createdAt).getTime() : null;
-	const stalled = s.missing > 0 && lastAt !== null && Date.now() - lastAt > STALL_MS;
-	const needsAttention = s.status !== "complete" && s.status !== "partial" && (stalled || (s.settled && s.failed > 0));
+	const needsAttention =
+		s.status !== "complete" && s.status !== "partial" && (s.stalled || (s.settled && s.failed > 0));
 	const donePercent = s.expected === 0 ? 0 : Math.round((s.done * 100) / s.expected);
 
 	return (

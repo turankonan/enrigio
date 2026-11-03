@@ -1527,14 +1527,15 @@ export interface FirstScanFinishedPair {
 	prompt_id: string;
 	model: string;
 	failed: boolean;
+	finished_at: Date;
 }
 
 /** A pair is finished when a run was saved for it or a prompt_run_failed usage event was recorded for it. */
 export async function getFirstScanFinishedPairs(firstScanId: string): Promise<FirstScanFinishedPair[]> {
 	return queryPg<FirstScanFinishedPair>(sql`
-		SELECT prompt_id, model, false AS failed FROM prompt_runs WHERE first_scan_id = ${firstScanId}
-		UNION
-		SELECT prompt_id, model, true AS failed
+		SELECT prompt_id, model, false AS failed, created_at AS finished_at FROM prompt_runs WHERE first_scan_id = ${firstScanId}
+		UNION ALL
+		SELECT prompt_id, model, true AS failed, created_at AS finished_at
 		FROM usage_events WHERE first_scan_id = ${firstScanId} AND event_type = 'prompt_run_failed'
 	`);
 }
