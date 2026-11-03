@@ -16,10 +16,12 @@ export function StepFirstScan({
 	brandId,
 	firstScanId,
 	onReport,
+	onDashboard,
 }: {
 	brandId: string;
 	firstScanId: string;
 	onReport: () => void;
+	onDashboard: () => void;
 }) {
 	const status = useQuery({
 		queryKey: ["first-scan", firstScanId],
@@ -80,7 +82,12 @@ export function StepFirstScan({
 					)}
 				</div>
 			)}
-			{s.reportReady && <Button onClick={onReport}>{t("setup.scan.open_report")}</Button>}
+			<div className="flex flex-wrap gap-2">
+				{s.reportReady && <Button onClick={onReport}>{t("setup.scan.open_report")}</Button>}
+				<Button variant="ghost" onClick={onDashboard}>
+					{t("starter_report.dashboard")}
+				</Button>
+			</div>
 		</div>
 	);
 }

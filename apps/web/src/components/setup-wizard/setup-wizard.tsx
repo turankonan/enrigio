@@ -16,9 +16,10 @@ const RUNS_PER_DAY = 1;
 interface Props {
 	brand: WizardBrand;
 	onReport: () => void;
+	onDashboard: () => void;
 }
 
-export function SetupWizard({ brand, onReport }: Props) {
+export function SetupWizard({ brand, onReport, onDashboard }: Props) {
 	const wizard = useSetupWizard(brand);
 	const { phase } = wizard;
 
@@ -29,7 +30,9 @@ export function SetupWizard({ brand, onReport }: Props) {
 	}
 
 	if (phase.kind === "scanning") {
-		return <StepFirstScan brandId={brand.id} firstScanId={phase.firstScanId} onReport={onReport} />;
+		return (
+			<StepFirstScan brandId={brand.id} firstScanId={phase.firstScanId} onReport={onReport} onDashboard={onDashboard} />
+		);
 	}
 
 	const { draft } = phase;
