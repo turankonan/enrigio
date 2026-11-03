@@ -50,7 +50,7 @@ export const createBrandInputSchema = z.object({
 	domains: z.array(z.string()).min(1),
 	aliases: z.array(z.string()).optional(),
 	competitors: z.array(competitorInputSchema).optional(),
-	prompts: z.array(promptInputSchema).optional(),
+	prompts: z.array(promptInputSchema.omit({ intent: true })).optional(),
 	/** Omitted, an admin key provisions a new organization — the only way to
 	 * create one over the API. */
 	organizationId: z.string().min(1).optional(),
@@ -328,7 +328,6 @@ export async function createBrand(input: CreateBrandInput): Promise<BrandResult>
 				value: p.value,
 				tags: sanitizeUserTags(p.tags ?? []),
 				enabled: p.enabled ?? true,
-				intent: p.intent ?? null,
 			})),
 			dedupeAgainstExisting: false,
 			conn: tx,

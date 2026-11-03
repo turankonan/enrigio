@@ -21,7 +21,7 @@ vi.mock("@workspace/lib/entitlements", () => ({
 }));
 vi.mock("@/lib/job-scheduler", () => ({ createMultiplePromptJobSchedulers: async () => {} }));
 
-const { insertPrompts } = await import("@/server/onboarding-core");
+const { insertPrompts, createBrandInputSchema } = await import("@/server/onboarding-core");
 
 describe("insertPrompts intent", () => {
 	beforeEach(() => {
@@ -41,5 +41,18 @@ describe("insertPrompts intent", () => {
 		});
 
 		expect(inserted[0]?.map((r) => r.intent)).toEqual(["discovery", null]);
+	});
+});
+
+describe("public create-brand input", () => {
+	it("does not carry a prompt intent", () => {
+		const parsed = createBrandInputSchema.parse({
+			id: "acme",
+			name: "Acme",
+			domains: ["acme.example"],
+			prompts: [{ value: "best widgets", intent: "discovery" }],
+		});
+
+		expect(parsed.prompts?.[0]).not.toHaveProperty("intent");
 	});
 });
