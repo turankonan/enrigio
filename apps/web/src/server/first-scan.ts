@@ -2,7 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "@workspace/lib/db/db";
 import { brands, firstScans, PROMPT_INTENTS } from "@workspace/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireBrandSession } from "@/lib/auth/helpers";
 import { MAX_BUYER, MAX_RIVALS } from "@/lib/setup-wizard";
@@ -68,7 +68,11 @@ export const saveSetupDraftFn = createServerFn({ method: "POST" })
 	.validator(z.object({ brandId: z.string(), draft: draftSaveSchema }))
 	.handler(async ({ data }) => {
 		await requireBrandSession(data.brandId);
-		await db.update(brands).set({ setupDraft: data.draft }).where(eq(brands.id, data.brandId));
+		// A save that lands after the first scan started must not resurrect the draft that scan cleared.
+		await db
+			.update(brands)
+			.set({ setupDraft: data.draft })
+			.where(and(eq(brands.id, data.brandId), eq(brands.onboarded, false)));
 		return { ok: true as const };
 	});
 

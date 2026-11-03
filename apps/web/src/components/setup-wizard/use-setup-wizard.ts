@@ -31,18 +31,23 @@ export type Phase =
 
 const isDraft = (v: unknown): v is SetupDraft => !!v && typeof v === "object" && "questions" in v && "engines" in v;
 
-/** Draft persistence with a debounce; a pending save is flushed rather than lost when the wizard unmounts. */
+/**
+ * Draft persistence with a debounce; a pending save is flushed rather than lost when the wizard unmounts.
+ * `stop` holds saves while the first scan starts: its transaction clears the draft, and a late save would
+ * write it back.
+ */
 function useDraftSaver(brandId: string) {
 	const [saved, setSaved] = useState(false);
 	const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const pending = useRef<SetupDraft | null>(null);
+	const stopped = useRef(false);
 
 	const flush = useCallback(() => {
 		if (timer.current) clearTimeout(timer.current);
 		timer.current = null;
 		const draft = pending.current;
 		pending.current = null;
-		if (!draft) return;
+		if (!draft || stopped.current) return;
 		saveSetupDraftFn({ data: { brandId, draft } })
 			.then(() => setSaved(true))
 			.catch(() => {});
@@ -50,6 +55,7 @@ function useDraftSaver(brandId: string) {
 
 	const save = useCallback(
 		(draft: SetupDraft, immediate = false) => {
+			if (stopped.current) return;
 			setSaved(false);
 			pending.current = draft;
 			if (timer.current) clearTimeout(timer.current);
@@ -59,9 +65,20 @@ function useDraftSaver(brandId: string) {
 		[flush],
 	);
 
+	const stop = useCallback(() => {
+		stopped.current = true;
+		if (timer.current) clearTimeout(timer.current);
+		timer.current = null;
+		pending.current = null;
+	}, []);
+
+	const resume = useCallback(() => {
+		stopped.current = false;
+	}, []);
+
 	useEffect(() => flush, [flush]);
 
-	return { saved, save, flush };
+	return { saved, save, flush, stop, resume };
 }
 
 export function useSetupWizard(brand: WizardBrand) {
@@ -164,6 +181,12 @@ export function useSetupWizard(brand: WizardBrand) {
 
 	const start = useMutation({
 		mutationFn: (draft: SetupDraft) => startFirstScanFn({ data: { brandId: brand.id, draft } }),
+		onMutate: saver.stop,
+		// The scan did not start, so the draft is still the brand's only record of the edits.
+		onError: (_err, draft) => {
+			saver.resume();
+			saver.save(draft, true);
+		},
 		onSuccess: ({ firstScanId }) => setPhase({ kind: "scanning", firstScanId }),
 	});
 

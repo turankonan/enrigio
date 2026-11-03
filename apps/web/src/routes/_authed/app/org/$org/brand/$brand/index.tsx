@@ -40,6 +40,8 @@ function DashboardPage() {
 	if (!brand) return null;
 	// The router keeps this component mounted across brand switches; keying drops drafts and mutation state.
 	if (!brand.onboarded) return <SetupWizard key={brand.id} brand={brand} onReport={openReport} />;
+	// Hold the page until we know whether a first scan is still running, so the dashboard does not flash first.
+	if (latestScan.isPending) return null;
 	const scan = latestScan.data;
 	if (scan && (scan.status === "queued" || scan.status === "running")) {
 		return <StepFirstScan key={brand.id} brandId={brand.id} firstScanId={scan.firstScanId} onReport={openReport} />;

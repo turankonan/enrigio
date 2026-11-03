@@ -16,6 +16,9 @@ const MARKET_ITEMS: Record<string, string> = {
 	...Object.fromEntries(MARKET_CATALOG.map((m) => [m.key, m.key])),
 };
 
+const validateDomain = (value: string): true | string =>
+	cleanAndValidateDomain(value) ? true : t("settings.brand.invalid_domain", { value });
+
 interface Props {
 	draft: SetupDraft;
 	onChange: (d: SetupDraft) => void;
@@ -81,6 +84,7 @@ export function StepSite({ draft, onChange, onNext, onBack }: Props) {
 						searchPlaceholder={t("settings.brand.add_domain_placeholder")}
 						maxItems={10}
 						normalizeValue={(raw) => cleanAndValidateDomain(raw) ?? raw.trim()}
+						onValidate={validateDomain}
 					/>
 				</div>
 			</div>
