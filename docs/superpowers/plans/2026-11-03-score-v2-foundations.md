@@ -18,6 +18,7 @@
 - Score v2 weights: not mentioned 0; rank 1 → 1.0; rank 2 → 0.7; rank 3 → 0.5; rank ≥ 4 or null → 0.3. One constant, `packages/lib/src/score/v2.ts`.
 - v2 and sub-scores use **enabled unbranded prompts** only; branded status via `getEffectiveBrandedStatus(systemTags, tags)`.
 - Intent enum values: `discovery | comparison | local | price`. Null = unclassified.
+- v2 averages over runs, exactly as v1 does, so a platform sampled four times a day weighs four times one sampled once. Deliberate: the back-test isolates rank weighting. Do not normalise by prompt × model here.
 - No user-facing surface (Home, Prompts, reports, API v1, MCP) changes shape or value.
 - Commit subjects: plain imperative sentences, no prefixes. Commit after every task.
 - Comments explain why only. Mark deliberate shortcuts with a `// ponytail:` comment.
@@ -878,7 +879,7 @@ git commit -m "carry a buyer intent from brand analysis onto new prompts"
   ```ts
   interface ScoreV2Summary { total_runs: number; score_v2: number | null }
   interface IntentScoreRow { intent: PromptIntent; prompt_count: number; total_runs: number; score_v2: number | null }
-  interface AccuracySummary { branded_mentioned_runs: number; assessed_runs: number; accurate_runs: number; unrecognised_runs: number }
+  interface AccuracySummary { branded_mentioned_runs: number; assessed_runs: number; accurate_runs: number; unsupported_runs: number; unrecognised_runs: number }
   getScoreV2Summary(brandId, fromDate, toDate, timezone, promptIds: string[], marketKey): Promise<ScoreV2Summary>
   getIntentScoreSummary(brandId, fromDate, toDate, timezone, promptIds: string[], marketKey): Promise<IntentScoreRow[]>
   getAccuracySummary(brandId, fromDate, toDate, timezone, brandedPromptIds: string[], marketKey): Promise<AccuracySummary>
@@ -970,7 +971,10 @@ export async function getIntentScoreSummary(
 export interface AccuracySummary {
 	branded_mentioned_runs: number;
 	assessed_runs: number;
+	/** Assessed runs with no contradicted claim (unsupported claims allowed). */
 	accurate_runs: number;
+	/** Assessed runs carrying at least one unsupported claim. Shown, never scored. */
+	unsupported_runs: number;
 	unrecognised_runs: number;
 }
 
@@ -982,7 +986,7 @@ export async function getAccuracySummary(
 	brandedPromptIds: string[],
 	effectiveMarketKey: string,
 ): Promise<AccuracySummary> {
-	const empty = { branded_mentioned_runs: 0, assessed_runs: 0, accurate_runs: 0, unrecognised_runs: 0 };
+	const empty = { branded_mentioned_runs: 0, assessed_runs: 0, accurate_runs: 0, unsupported_runs: 0, unrecognised_runs: 0 };
 	if (brandedPromptIds.length === 0) return empty;
 	const [row] = await queryPg<AccuracySummary>(sql`
 		SELECT
@@ -995,6 +999,13 @@ export async function getAccuracySummary(
 						SELECT 1 FROM jsonb_array_elements(accuracy_claims) c WHERE c->>'status' = 'contradicted'
 					)
 			)::int AS accurate_runs,
+			count(*) FILTER (
+				WHERE brand_mentioned
+					AND accuracy_claims IS NOT NULL
+					AND EXISTS (
+						SELECT 1 FROM jsonb_array_elements(accuracy_claims) c WHERE c->>'status' = 'unsupported'
+					)
+			)::int AS unsupported_runs,
 			count(*) FILTER (WHERE NOT brand_mentioned)::int AS unrecognised_runs
 		FROM prompt_runs
 		WHERE brand_id = ${brandId}
@@ -1051,7 +1062,7 @@ git commit -m "add score v2, intent and accuracy read queries"
     v2: number | null; cohortPrompts: number;
     intents: Record<PromptIntent, { score: number | null; promptCount: number }>;
     classifiedPrompts: number; unbrandedPrompts: number;
-    accuracy: number | null; assessedRuns: number; accurateRuns: number;
+    noContradiction: number | null; assessedRuns: number; accurateRuns: number; unsupportedRuns: number;
     unrecognisedRuns: number;
   }
   getAdminScoreBreakdownFn(): Promise<AdminScoreRow[]>   // 30-day window, admin only
@@ -1103,6 +1114,7 @@ describe("computeAdminScoreRows", () => {
 			branded_mentioned_runs: 30,
 			assessed_runs: 10,
 			accurate_runs: 9,
+			unsupported_runs: 3,
 			unrecognised_runs: 4,
 		});
 		reads.getDistinctModelCount.mockResolvedValue(4);
@@ -1117,9 +1129,10 @@ describe("computeAdminScoreRows", () => {
 			cohortPrompts: 2,
 			classifiedPrompts: 1,
 			unbrandedPrompts: 2,
-			accuracy: 90,
+			noContradiction: 90,
 			assessedRuns: 10,
 			accurateRuns: 9,
+			unsupportedRuns: 3,
 			unrecognisedRuns: 4,
 			models: 4,
 		});
@@ -1130,15 +1143,16 @@ describe("computeAdminScoreRows", () => {
 		expect(reads.getAccuracySummary.mock.calls[0]?.[4]).toEqual(["p3"]);
 	});
 
-	it("reports null accuracy when nothing was assessed", async () => {
+	it("reports null when nothing was assessed", async () => {
 		reads.getAccuracySummary.mockResolvedValue({
 			branded_mentioned_runs: 5,
 			assessed_runs: 0,
 			accurate_runs: 0,
+			unsupported_runs: 0,
 			unrecognised_runs: 0,
 		});
 		const [row] = await computeAdminScoreRows("UTC");
-		expect(row.accuracy).toBeNull();
+		expect(row.noContradiction).toBeNull();
 	});
 });
 ```
@@ -1210,9 +1224,11 @@ export interface AdminScoreRow {
 	intents: Record<PromptIntent, { score: number | null; promptCount: number }>;
 	classifiedPrompts: number;
 	unbrandedPrompts: number;
-	accuracy: number | null;
+	/** accurate ÷ assessed, as a percentage. Null until something was assessed. */
+	noContradiction: number | null;
 	assessedRuns: number;
 	accurateRuns: number;
+	unsupportedRuns: number;
 	unrecognisedRuns: number;
 }
 
@@ -1260,9 +1276,11 @@ export async function computeAdminScoreRows(timezone: string): Promise<AdminScor
 				intents,
 				classifiedPrompts: unbranded.filter((p) => p.intent !== null).length,
 				unbrandedPrompts: unbranded.length,
-				accuracy: accuracy.assessed_runs > 0 ? Math.round((accuracy.accurate_runs / accuracy.assessed_runs) * 100) : null,
+				noContradiction:
+					accuracy.assessed_runs > 0 ? Math.round((accuracy.accurate_runs / accuracy.assessed_runs) * 100) : null,
 				assessedRuns: accuracy.assessed_runs,
 				accurateRuns: accuracy.accurate_runs,
+				unsupportedRuns: accuracy.unsupported_runs,
 				unrecognisedRuns: accuracy.unrecognised_runs,
 			};
 		}),
@@ -1357,9 +1375,11 @@ function ScoresPage() {
 				<h1 className="text-3xl font-bold tracking-tight">Scores</h1>
 				<p className="text-muted-foreground">
 					Last 30 days per brand. v1 is what users see today. v2 is the rank-weighted candidate over buyer prompts;
-					it replaces v1 only after the back-test passes. Accuracy covers brand questions only and, until the wizard
-					stores address, hours and services, can only catch a wrong name, website, parent company or line of
-					business.
+					it replaces v1 only after the back-test passes. "No contradiction" covers brand questions only: the share
+					of assessed answers that contradict none of the facts we hold, which until the wizard stores address,
+					hours and services are the name, aliases (including the parent company), website and domains, and the
+					owner's keywords. "Unsupported" counts answers that state something those facts neither confirm nor
+					deny; it is shown, never scored.
 				</p>
 			</div>
 			{error && <p className="text-destructive">{error}</p>}
@@ -1376,8 +1396,11 @@ function ScoresPage() {
 								<TableHead key={i}>{INTENT_LABEL[i]}</TableHead>
 							))}
 							<TableHead>Classified</TableHead>
-							<TableHead title="Accurate ÷ assessed brand-question runs. Identity facts only in this phase.">
-								Accuracy
+							<TableHead title="Assessed brand-question runs with no contradicted claim ÷ assessed. Identity facts only in this phase.">
+								No contradiction
+							</TableHead>
+							<TableHead title="Assessed runs with at least one claim the profile cannot confirm. Not scored.">
+								Unsupported
 							</TableHead>
 							<TableHead>Unrecognised</TableHead>
 						</TableRow>
@@ -1405,11 +1428,12 @@ function ScoresPage() {
 									{r.classifiedPrompts} / {r.unbrandedPrompts}
 								</TableCell>
 								<TableCell>
-									{pct(r.accuracy)}{" "}
+									{pct(r.noContradiction)}{" "}
 									<span className="text-muted-foreground">
 										({r.accurateRuns} / {r.assessedRuns})
 									</span>
 								</TableCell>
+								<TableCell>{r.unsupportedRuns}</TableCell>
 								<TableCell>{r.unrecognisedRuns}</TableCell>
 							</TableRow>
 						))}
@@ -1428,7 +1452,7 @@ Expected: clean; `routeTree.gen.ts` now lists `/admin/scores`.
 
 - [ ] **Step 4: Open the page**
 
-With the dev server running and an admin session, open `http://localhost:3000/admin/scores`. Expected: a table with one row per onboarded brand; every v2 and accuracy cell has a count beside it; brands with no assessed runs show "—" for accuracy.
+With the dev server running and an admin session, open `http://localhost:3000/admin/scores`. Expected: a table with one row per onboarded brand; every v2 and no-contradiction cell has a count beside it; brands with no assessed runs show "—" there.
 
 - [ ] **Step 5: Commit**
 
@@ -1572,19 +1596,36 @@ function analyseBrand(brand: BrandRow, prompts: PromptRow[], runs: RunRow[], now
 	const unbrandedIds = new Set(
 		prompts.filter((p) => !getEffectiveBrandedStatus(p.system_tags, p.tags).isBranded).map((p) => p.id),
 	);
-	const runsByPrompt = new Map<string, RunRow[]>();
-	for (const r of cur) {
-		if (!unbrandedIds.has(r.prompt_id)) continue;
-		runsByPrompt.set(r.prompt_id, [...(runsByPrompt.get(r.prompt_id) ?? []), r]);
-	}
-	const cohort = [...runsByPrompt.entries()].filter(([, rs]) => rs.length >= MIN_RUNS_PER_PROMPT);
-	if (cohort.length === 0) return null;
-	const cohortIds = new Set(cohort.map(([id]) => id));
-	const curCohort = cur.filter((r) => cohortIds.has(r.prompt_id));
-	const prevCohort = prev.filter((r) => cohortIds.has(r.prompt_id));
+	const group = (runs: RunRow[]) => {
+		const byPrompt = new Map<string, RunRow[]>();
+		for (const r of runs) {
+			if (!unbrandedIds.has(r.prompt_id)) continue;
+			byPrompt.set(r.prompt_id, [...(byPrompt.get(r.prompt_id) ?? []), r]);
+		}
+		return byPrompt;
+	};
+	const curByPrompt = group(cur);
+	const prevByPrompt = group(prev);
 
-	const perPromptV1 = cohort.map(([, rs]) => mentionRate(rs) ?? 0);
-	const perPromptV2 = cohort.map(([, rs]) => scoreV2(toScored(rs)) ?? 0);
+	// A prompt is in the cohort only when, on the models it ran on in BOTH
+	// windows, it has enough runs in each window. Pairs seen in one window only
+	// are dropped from both, so a prompt or model that came or went between
+	// windows cannot pose as a trend.
+	const cohort: { id: string; cur: RunRow[]; prev: RunRow[] }[] = [];
+	for (const [id, curRuns] of curByPrompt) {
+		const prevRuns = prevByPrompt.get(id) ?? [];
+		const models = new Set(curRuns.map((r) => r.model));
+		const paired = [...new Set(prevRuns.map((r) => r.model))].filter((m) => models.has(m));
+		const c = curRuns.filter((r) => paired.includes(r.model));
+		const pv = prevRuns.filter((r) => paired.includes(r.model));
+		if (c.length >= MIN_RUNS_PER_PROMPT && pv.length >= MIN_RUNS_PER_PROMPT) cohort.push({ id, cur: c, prev: pv });
+	}
+	if (cohort.length === 0) return null;
+	const curCohort = cohort.flatMap((c) => c.cur);
+	const prevCohort = cohort.flatMap((c) => c.prev);
+
+	const perPromptV1 = cohort.map((c) => mentionRate(c.cur) ?? 0);
+	const perPromptV2 = cohort.map((c) => scoreV2(toScored(c.cur)) ?? 0);
 
 	const v1Buyer = mentionRate(curCohort);
 	const v2 = scoreV2(toScored(curCohort));
@@ -1640,7 +1681,9 @@ async function runBacktest(client: Client): Promise<void> {
 			trendGap: r.trendGap as number,
 		}));
 	const result = verdict(rows);
-	console.log(`\nVerdict: ${result.outcome.toUpperCase()}`);
+	// Level gap is reported, never gated: every v2 weight is ≤ 1, so v2 sits
+	// below v1-buyer by design. The gate is ordering and trend, not level.
+	console.log(`\nVerdict: ${result.outcome.toUpperCase()} (level gap is informational)`);
 	for (const reason of result.reasons) console.log(`  - ${reason}`);
 	if (values.json) {
 		writeFileSync(values.json, JSON.stringify({ generatedAt: now.toISOString(), reports, verdict: result }, null, 2));
@@ -1846,8 +1889,10 @@ Expected: PASS.
 // packages/lib/scripts/backfill-prompt-intent.ts
 /**
  * One-off: give every enabled, unbranded prompt without an intent one of the
- * four buyer intents (or leave it null when none fits). Idempotent: rows with
- * an intent are never touched, so a second run finds nothing to do.
+ * four buyer intents (or leave it null when none fits). Safe to repeat but not
+ * free: rows with an intent are never touched, while prompts the model left
+ * null are selected and sent again on every run. Run it once; the dry run
+ * prints the bill first.
  *
  * Sends prompt text only, never answers. Prints the number of model calls it
  * will make and stops unless --yes is passed.

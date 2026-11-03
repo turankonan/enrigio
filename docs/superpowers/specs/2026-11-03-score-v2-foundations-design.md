@@ -84,13 +84,14 @@ Per brand that has runs on ≥ 4 distinct models over ≥ 30 days:
 1. Current window = last 30 days, previous window = the 30 before. Both windows are restricted to the brand's
    effective market and to the models present in **both** windows, so a pick or cadence change between windows
    cannot masquerade as a score change.
-2. Cohort = enabled unbranded prompts with ≥ 4 runs in the current window. Everything below uses this cohort for
-   both versions; "v1-buyer" is mention rate on the cohort, not the Home's all-prompt v1.
+2. Cohort = enabled unbranded prompts that, on the models they ran on in both windows, have ≥ 4 runs in each
+   window; runs on a model seen for that prompt in one window only are dropped. Everything below uses this
+   cohort for both versions; "v1-buyer" is mention rate on the cohort, not the Home's all-prompt v1.
 3. Per prompt: v1-buyer and v2, current window.
 4. Brand-level v1-buyer and v2, both windows. The Home's all-prompt v1 is printed beside them for reference only.
 5. Spearman rank correlation of per-prompt v1-buyer vs v2.
 6. Trend per version = current − previous. Direction: `up` if ≥ 3, `down` if ≤ −3, else `flat`.
-7. Level gap = v1-buyer − v2 (expected positive, since every weight ≤ 1); trend gap = |trend v1 − trend v2|.
+7. Level gap = v1-buyer − v2, reported only and never gated (every weight ≤ 1, so v2 sits below v1-buyer by design); trend gap = |trend v1 − trend v2|.
 
 Output: one row per brand (id, cohort size, runs, models, v1 all-prompt, v1-buyer, v2, Spearman, trends,
 directions, level gap, trend gap), then a verdict:
@@ -142,7 +143,7 @@ tag guidance already forbids goal-style tags, so intent does not collide with th
 - `getScoreV2Summary(brandId, from, to, timezone, promptIds, marketKey)` → `{ total_runs, score_v2 }` using a
   `CASE` over `brand_rank`, same filters as `getDashboardSummary`.
 - `getIntentScoreSummary(...)` → one row per intent, joining `prompts.intent`.
-- `getAccuracySummary(...)` → `{ branded_mentioned_runs, assessed_runs, accurate_runs, unrecognised_runs }`,
+- `getAccuracySummary(...)` → `{ branded_mentioned_runs, assessed_runs, accurate_runs, unsupported_runs, unrecognised_runs }`,
   where `assessed_runs` counts `accuracy_claims IS NOT NULL` and `accurate_runs` counts assessed runs with no
   element whose `status = 'contradicted'`.
 
@@ -153,7 +154,7 @@ returns v1, v2, sub-scores and accuracy for the current 30-day window. Admin-onl
 
 `packages/lib/scripts/backfill-prompt-intent.ts`: for enabled unbranded prompts with `intent IS NULL`, batches
 of 25 prompt texts per `runStructuredCompletionPrompt` call with the four-value schema plus `null` for "none of
-these", writes the result, idempotent (second run finds 0). Branded prompts are skipped: they are brand questions
+these", writes the result. Safe to repeat, not idempotent: prompts the model left null are re-sent on every run, so it is run once after the dry run prints the bill. Branded prompts are skipped: they are brand questions
 and never carry a buyer intent. Only prompt text is sent, never answers.
 
 Cost: one model call per 25 prompts. The script first prints the count of prompts it will classify and the
@@ -173,7 +174,8 @@ score so sparse data reads as sparse:
 | v2 | rank-weighted, with the cohort size (unbranded prompts with runs) |
 | Discovery / Comparison / Local / Price | sub-score with its prompt count, "—" when 0 prompts |
 | Classified | intent-tagged ÷ unbranded prompts |
-| Accuracy | % with `accurate ÷ assessed` beside it; "—" when assessed = 0 |
+| No contradiction | % with `accurate ÷ assessed` beside it; "—" when assessed = 0 |
+| Unsupported | assessed runs with at least one unsupported claim; shown, never scored |
 | Unrecognised | branded runs without a mention |
 
 Plain shadcn table, no charts, column help text on Accuracy stating the phase-0 profile is identity-only. Link
