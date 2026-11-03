@@ -278,6 +278,8 @@
 	"settings.brand.name_hint": "Markanızın adını girin",
 	"settings.brand.slug_label": "Marka URL Kimliği",
 	"settings.brand.website_hint": "Markanızın ana web sitesi",
+	"settings.brand.sector_label": "Sektör",
+	"settings.brand.location_label": "Konum",
 	"settings.brand.additional_domains_label": "Ek Alan Adları",
 	"settings.brand.additional_domains_tooltip": "Markanıza ait diğer alan adları (ör. blog.example.com, shop.example.com). Bu alan adlarından yapılan atıflar markanıza ait sayılır. Güncellemeler geçmiş verileri de etkiler; mevcut atıflar hemen yeniden sınıflandırılır.",
 	"settings.brand.add_domain_placeholder": "Alan adı ekle...",

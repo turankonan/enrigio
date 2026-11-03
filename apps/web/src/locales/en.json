@@ -278,6 +278,8 @@
 	"settings.brand.name_hint": "Enter your brand's name",
 	"settings.brand.slug_label": "Brand Slug",
 	"settings.brand.website_hint": "Your brand's primary website",
+	"settings.brand.sector_label": "Sector",
+	"settings.brand.location_label": "Location",
 	"settings.brand.additional_domains_label": "Additional Domains",
 	"settings.brand.additional_domains_tooltip": "Other domains your brand owns (e.g. blog.example.com, shop.example.com). Citations from these domains will be counted as your brand's citations. Updates retroactively — existing citations will be reclassified immediately.",
 	"settings.brand.add_domain_placeholder": "Add domain...",

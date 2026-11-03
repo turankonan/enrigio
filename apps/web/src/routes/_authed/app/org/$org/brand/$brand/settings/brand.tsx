@@ -147,6 +147,8 @@ function BrandSettingsPage() {
 		try {
 			const name = formData.get("name") as string;
 			const website = formData.get("website") as string;
+			const sector = formData.get("sector") as string;
+			const location = formData.get("location") as string;
 
 			const nextSlug = normalizeSlug(slug);
 			const slugMoved = nextSlug !== currentSlug;
@@ -155,6 +157,8 @@ function BrandSettingsPage() {
 					brandId: brand.id,
 					name,
 					website,
+					sector,
+					location,
 					...(slugMoved && { slug: nextSlug }),
 					additionalDomains,
 					aliases,
@@ -228,6 +232,22 @@ function BrandSettingsPage() {
 							disabled={isSubmitting}
 						/>
 						<p className="text-xs text-muted-foreground">{t("settings.brand.website_hint")}</p>
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="sector">{t("settings.brand.sector_label")}</Label>
+						<Input id="sector" name="sector" type="text" defaultValue={brand.sector ?? ""} disabled={isSubmitting} />
+					</div>
+
+					<div className="space-y-2">
+						<Label htmlFor="location">{t("settings.brand.location_label")}</Label>
+						<Input
+							id="location"
+							name="location"
+							type="text"
+							defaultValue={brand.location ?? ""}
+							disabled={isSubmitting}
+						/>
 					</div>
 
 					<div className="space-y-2">

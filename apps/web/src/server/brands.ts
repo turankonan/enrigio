@@ -346,6 +346,8 @@ export const updateBrandFn = createServerFn({ method: "POST" })
 			slug: z.string().trim().toLowerCase().max(MAX_SLUG_LENGTH).optional(),
 			additionalDomains: z.array(z.string()).optional(),
 			aliases: z.array(z.string()).optional(),
+			sector: z.string().trim().max(120).nullable().optional(),
+			location: z.string().trim().max(120).nullable().optional(),
 		}),
 	)
 	.handler(async ({ data }) => {
@@ -376,7 +378,13 @@ export const updateBrandFn = createServerFn({ method: "POST" })
 					}
 					return tx
 						.update(brands)
-						.set({ ...updateData, ...(data.slug !== undefined && { slug: data.slug }), updatedAt: new Date() })
+						.set({
+							...updateData,
+							...(data.slug !== undefined && { slug: data.slug }),
+							...(data.sector !== undefined && { sector: data.sector || null }),
+							...(data.location !== undefined && { location: data.location || null }),
+							updatedAt: new Date(),
+						})
 						.where(eq(brands.id, data.brandId))
 						.returning();
 				}),
