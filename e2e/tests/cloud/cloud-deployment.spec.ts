@@ -156,8 +156,10 @@ test.describe("Cloud features", () => {
 
   test("brands can be created from the UI", async ({ page }) => {
     await page.goto(`${organizationUrl()}/new`);
-    await expect(page.getByLabel("Brand Name")).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByLabel("Website")).toBeVisible();
+    await expect(page.getByLabel("Website")).toBeVisible({ timeout: 30_000 });
+    await page.getByLabel("Website").fill("cloud-new-brand.example.com");
+    await page.getByRole("button", { name: "Start", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "Reading your site" })).toBeVisible({ timeout: 30_000 });
   });
 
   test("another organization can be created", async ({ page }) => {
