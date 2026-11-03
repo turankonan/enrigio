@@ -1,6 +1,6 @@
 # Setup wizard and starter report (phase 1a) — design
 
-Date: 2026-11-03. Parent: `docs/ux-designer/PROPOSAL-web-app-board.md` (phase 1, split on 2026-11-03 into 1a
+Date: 2026-11-03 (rev 2, after review). Parent: `docs/ux-designer/PROPOSAL-web-app-board.md` (phase 1, split on 2026-11-03 into 1a
 and 1b). Board screens 1–5 of `docs/Enrigio Web App.html`. Builds on the phase 0 spec
 (`2026-11-03-score-v2-foundations-design.md`): intent, accuracy claims and the read queries exist.
 
@@ -28,9 +28,12 @@ share links. Those are phase 1b.
 /app/org/$org/brand/$brand/report   starter report, frozen snapshot; Home link
 ```
 
-"Sonra devam et" needs no persistence: the brand already exists with `onboarded = false`, so reopening the brand
-reopens the wizard at the step inferred from state (no analysis yet → step 1; analysis done → step 1 review; saved
-but first scan running → step 5; first scan done → report).
+**Continue later.** The brand exists with `onboarded = false`, and the wizard's working state (edited profile
+fields, question selections and custom questions, rival selections, engine selections, current step) is saved to
+`brands.setup_draft jsonb` by `saveSetupDraftFn` on every step change and, debounced 1 s, on every edit. Reopening
+the brand restores the draft and its step. Once the first scan starts the draft is cleared. If there is no draft:
+no analysis yet → step 1 (waiting); analysis done → step 1 review; first scan running → step 5; first scan done →
+report.
 
 ## 3. Screens and behaviour
 
@@ -62,8 +65,10 @@ but first scan running → step 5; first scan done → report).
   questions in total.
 - The board's per-question volume hint ("~2.400/ay") is **not shown** in 1a: there is no volume source wired (the
   DataForSEO keyword-volume API is the candidate, and that account is currently failing).
-- Footer: "{count} alıcı sorusu × {engines} motor × günlük = ayda yaklaşık {runs} cevap", computed from the current
-  selections at 1 run per engine per day.
+- Footer: "{buyer} alıcı + {brand} marka sorusu × {engines} motor × günlük = ayda yaklaşık {runs} cevap", with
+  runs = (buyer + brand) × engines × 30 × runs-per-day, where runs-per-day is what the deployment will actually
+  schedule for this brand (from the run policy: `standardRunsPerDay` in cloud, `RUNS_PER_PROMPT` otherwise). The
+  branded questions are included because they run and cost like any other.
 
 ### Step 3 — Rakipler
 
@@ -78,40 +83,54 @@ but first scan running → step 5; first scan done → report).
   → `available`), with the board's one-line descriptions keyed by engine id. Defaults on: chatgpt, gemini,
   google-ai-overview, perplexity when available; otherwise the first four available. Engines the plan does not
   include are shown disabled with the plan label (cloud only; a no-op in local mode).
-- Copy: "Kurulum bitince ilk tarama hemen başlar; yaklaşık {minutes} dakika sürer." with minutes =
-  `ceil(prompts × engines / 20)`, floor 1.
+- Copy: "Kurulum bitince ilk tarama hemen başlar; genellikle birkaç dakika sürer." No fixed duration is promised:
+  there is no measured first-scan throughput yet. Step 5 shows an estimate only once it can measure one (below).
 - Button: "İlk taramayı başlat".
 
 ### Step 5 — İlk tarama
 
-- On start, one server function `startFirstScanFn` does, in one transaction where possible: save name, sector,
-  location, market, aliases, domains; insert competitors; insert the selected buyer prompts with their intent and the
-  3 branded prompts (intent null); set `enabledModels`; set `onboarded = true` and `first_scan_started_at = now()`;
-  then enqueue one `process-prompt` job per prompt with `data: { promptId, firstScan: true }`.
-- Worker: a job with `firstScan: true` runs each due target **once** (replication 1) regardless of
-  `RUNS_PER_PROMPT` or the plan's replication, and then schedules the next regular run as today. Nothing else about
-  the run changes, so first-scan runs land in `prompt_runs` like any other.
-- Progress: `getFirstScanStatusFn(brandId)` returns `{ expected, done, failed, mentioned, missing, topRival,
-  latest: [...up to 5 of { model, prompt, excerpt, mentioned, rank }], complete }`. `expected` = enabled prompts ×
-  enabled engines at start; `done`/`failed` from `prompt_runs` and `usage_events` (type `prompt_run_failed`) created
-  after `first_scan_started_at`; `complete` = no `process-prompt` job for this brand's prompts with
-  `data.firstScan = true` in state created/active/retry. On `complete` the server function sets
-  `first_scan_completed_at` if null. The page polls every 3 s.
-- Screen copy per the board: "{done} / {expected} cevap alındı", "kalan ~{remaining}" (linear estimate from elapsed
-  per answer), the three counters (cevap alındı / cevapta yoksun / cevapta varsın), "en çok anılan rakip", the
-  "Son gelen cevaplar" list with "Sen yoksun" or "{rank}. sırada" badges. "Sayfayı kapatabilirsin" stays; the
-  "e-posta alırsın" promise is **dropped** in 1a (local mode cannot send email).
-- When complete: "Raporu aç" → `/app/org/$org/brand/$brand/report`. "Şimdiye kadarki sonuçları gör" → the Home.
+- **Scan record.** `startFirstScanFn` runs one transaction: save name, sector, location, market, aliases, domains;
+  insert competitors; insert the selected buyer prompts with intent and the 3 branded prompts (intent null); set
+  `enabledModels`; insert a `first_scans` row `{ id, brand_id, status: "queued", expected: [{promptId, model}],
+  started_at }` listing every prompt × engine pair the scan must produce; clear `setup_draft`; set
+  `onboarded = true` last. Nothing is enqueued inside the transaction.
+- **Enqueue, idempotently.** After commit, the same function enqueues one `process-prompt` job per prompt with
+  `data: { promptId, firstScanId }` and `singletonKey: first-scan-${promptId}`, then sets `first_scans.enqueued_at`.
+  If any enqueue throws, `enqueued_at` stays null; `getFirstScanStatusFn` re-runs the enqueue on its next call (the
+  singleton key makes re-sends harmless), so a queue hiccup delays the scan instead of losing it.
+- **Run identity.** `prompt_runs.first_scan_id` and `usage_events.first_scan_id` (nullable uuid). The worker copies
+  `firstScanId` from the job onto every run it saves and every `prompt_run_failed` event it records for that job.
+  A first-scan job runs each due target **once** (replication 1) regardless of `RUNS_PER_PROMPT` or the plan's
+  replication, targets limited to the scan's expected engines, and then schedules the next regular run as today.
+- **Completion.** `getFirstScanStatusFn(firstScanId)` returns `{ expected, done, failed, mentioned, missing,
+  topRival, latest: [...up to 5 of { model, prompt, excerpt, mentioned, rank }], etaSeconds, status }`. A pair is
+  *finished* when a `prompt_runs` row or a `prompt_run_failed` usage event carries this `first_scan_id` for that
+  prompt and model. `status` becomes `complete` when every expected pair is finished; the function then sets
+  `completed_at` and `status`. It becomes `partial` only through the user's "Raporu şimdiye kadarki sonuçlarla aç"
+  action, offered after 20 minutes with no new finished pair, and only when at least 50 % of pairs are finished;
+  below that the screen shows the failures and a "Tekrar dene" that re-enqueues the unfinished prompts. The page
+  polls every 3 s.
+- **Timing.** `etaSeconds` is null until 5 pairs have finished; after that it is (unfinished pairs) × (elapsed ÷
+  finished pairs). The screen shows "kalan ~{m} dk" only when `etaSeconds` is not null.
+- Screen copy per the board: "{done} / {expected} cevap alındı", the three counters (cevap alındı / cevapta yoksun /
+  cevapta varsın), "en çok anılan rakip", the "Son gelen cevaplar" list with "Sen yoksun" or "{rank}. sırada"
+  badges. "Sayfayı kapatabilirsin" stays; the "e-posta alırsın" promise is **dropped** in 1a (local mode cannot
+  send email).
+- When `complete` or `partial`: "Raporu aç" → `/app/org/$org/brand/$brand/report`. "Şimdiye kadarki sonuçları gör"
+  → the Home.
 
 ### Starter report
 
 - Route `/app/org/$org/brand/$brand/report` (authed). Loader calls `getStarterReportFn(brandId)`, which returns the
-  stored snapshot or, when none exists and the first scan is complete, builds and stores it once. Before the first
-  scan completes it redirects to the brand route (the wizard's step 5).
-- Snapshot table `starter_reports`: `id`, `brand_id` (unique), `report jsonb`, `created_at`. Frozen on purpose: the
-  report never changes after creation. Phase 1b adds the share token and the domain claim to this table.
-- Snapshot content, computed from first-scan runs only (`created_at` between `first_scan_started_at` and
-  `first_scan_completed_at`), all numbers taken at build time:
+  stored snapshot or, when none exists and the scan is `complete` or `partial`, builds and stores it. Before that it
+  redirects to the brand route (the wizard's step 5).
+- Snapshot table `starter_reports`: `id`, `brand_id` (unique), `first_scan_id`, `report jsonb`, `coverage` (finished
+  ÷ expected pairs), `partial boolean`, `missing_sections text[]`, `created_at`, `finalized_at`. The numbers are
+  frozen at build time and never recomputed. A report is **final** when `partial` is false and `missing_sections`
+  is empty; until then the page shows a banner ("Rapor eksik verilerle hazırlandı: {coverage}%" and/or "Öneriler
+  hazırlanamadı") and a "Yeniden dene" that rebuilds only the missing sections (opportunities) in place; a
+  rebuilt-complete report sets `finalized_at`. Phase 1b adds the share token and the domain claim here.
+- Snapshot content, computed from the runs carrying this `first_scan_id` only, all numbers taken at build time:
   1. **Headline**: "Müşterilerin sorduğu {buyer} sorunun {missing}'inde adın geçmiyor." + "{answers} cevap tarandı
      ({engine list}). Senin yerine en çok {topRival} öneriliyor." + the good-news line naming up to two buyer
      questions where the brand ranked 1–3.
@@ -137,15 +156,17 @@ but first scan running → step 5; first scan done → report).
 
 | Area | Change |
 |---|---|
-| `packages/lib/src/db/schema.ts` + migration | `brands.sector`, `brands.location`, `brands.first_scan_started_at`, `brands.first_scan_completed_at`; new `starter_reports` (`brand_id` unique). |
+| `packages/lib/src/db/schema.ts` + migration | `brands.sector`, `brands.location`, `brands.setup_draft jsonb`; new `first_scans` (`brand_id`, `status` enum queued/running/complete/partial, `expected jsonb`, `started_at`, `enqueued_at`, `completed_at`); `prompt_runs.first_scan_id`, `usage_events.first_scan_id` (nullable, FK); new `starter_reports` (`brand_id` unique, `first_scan_id`, `report jsonb`, `coverage`, `partial`, `missing_sections`, `created_at`, `finalized_at`). |
 | `packages/lib/src/onboarding/analyze.ts` | Schema fields `sector`, `location`, `marketKey`; prompts: 16 unbranded (4 per intent) + 3 branded, in the market language; `OnboardingSuggestion` gains the three fields. |
-| `apps/web/src/server/onboarding-core.ts` | `saveWizardOnboarding` → superseded by `startFirstScan` (same inserts, plus sector/location/market/enabledModels, `first_scan_started_at`, first-scan job enqueue). `createBrand` unchanged. |
-| `apps/web/src/server/onboarding.ts` | `startFirstScanFn`, `getFirstScanStatusFn`; `startAnalyzeBrandFn` also called from `/new`. |
+| `apps/web/src/server/onboarding-core.ts` | `saveWizardOnboarding` → superseded by `startFirstScan` (same inserts in one transaction, plus sector/location/market/enabledModels, the `first_scans` row, draft clear, `onboarded` last; enqueue after commit with retry). `createBrand` unchanged. |
+| `apps/web/src/server/onboarding.ts` | `saveSetupDraftFn`, `startFirstScanFn`, `getFirstScanStatusFn`, `retryFirstScanFn`, `openPartialFirstScanFn`; `startAnalyzeBrandFn` also called from `/new`. |
+| `packages/lib/src/website-excerpt.ts` | The direct-HTML fallback fetch goes through the existing `net/safe-fetch` (`safeFetch` with `allowHosts` = the site's apex and www), which already blocks private, loopback, link-local and metadata addresses and re-validates every redirect hop. Today it uses a bare `fetch`. The Jina path is an external proxy and stays. |
 | `apps/web/src/server/starter-report.ts` + `-core.ts` | `getStarterReportFn`; snapshot builder over `prompt_runs`, `citations`, competitors, opportunities, phase 0 accuracy query. |
-| `apps/web/src/lib/job-scheduler.ts`, `apps/worker/src/jobs/process-prompt.ts` | `firstScan` job flag → replication 1. |
+| `apps/web/src/lib/job-scheduler.ts`, `apps/worker/src/jobs/process-prompt.ts` | `firstScanId` job field → replication 1, targets limited to the scan's engines, `first_scan_id` stamped on runs and failure events. |
 | `apps/web/src/routes/_authed/app/org/$org/new.tsx` | URL-only entry. |
 | `apps/web/src/components/setup-wizard/*` | `SetupWizard` (stepper shell), `StepSite`, `StepQuestions`, `StepRivals`, `StepEngines`, `StepFirstScan`; replaces `PromptWizard` on the brand route. `prompt-wizard.tsx` is deleted once nothing imports it. |
-| `apps/web/src/routes/_authed/app/org/$org/brand/$brand/report.tsx` + `components/starter-report/*` | The report page. |
+| `apps/web/src/routes/_authed/app/org/$org/brand/$brand/report.tsx` + `components/starter-report/*` | The report page, partial banner, section retry. |
+| `apps/web/src/routes/_authed/app/org/$org/brand/$brand/settings/brand.tsx` | Sector and location fields, so step 1's "change these later in Settings" is true. |
 | `apps/web/src/locales/{en,tr}.json` | Every new string; Turkish copy from the board, English equivalents. |
 
 Untouched: Home, Prompts, Citations, settings, API v1, MCP, plans.
@@ -156,23 +177,30 @@ Untouched: Home, Prompts, Citations, settings, API v1, MCP, plans.
   also fill the fields by hand and continue (the analysis is a convenience, not a gate).
 - Analysis returns fewer than 16 unbranded or 3 branded prompts: show what came back; the min-10 rule still applies
   and the user can add their own.
-- `startFirstScanFn` fails after `onboarded = true` is written: it is written **last**, after prompts and
-  competitors, so a failed insert leaves the brand un-onboarded and the wizard reopens at step 5 with the error.
-- First scan: a run failure counts toward `done` as `failed` so the bar completes; `complete` never depends on
-  every run succeeding. If no job finishes within 20 minutes, the screen offers "Raporu şimdiye kadarki
-  sonuçlarla aç", which marks completion and builds the snapshot from what exists.
-- Report snapshot: built once; a failure to build (e.g. opportunities generation throws) returns the report without
-  section 5 and a "Öneriler hazırlanamadı" note, and the snapshot is still stored so the page is stable.
+- `startFirstScanFn`: the inserts, the scan row and `onboarded = true` are one transaction, so a failure leaves
+  the brand un-onboarded with its draft intact and the wizard reopens at step 5 with the error. Enqueue failures
+  after commit are retried by the status poll (section 3, step 5).
+- First scan: a run failure finishes its pair as `failed`, so the bar completes without every run succeeding.
+  A scan that stalls (no pair finished in 20 minutes) offers retry, or "open with what we have" at ≥ 50 % coverage,
+  which marks the scan `partial`.
+- Report snapshot: built from the scan's own runs; a section that fails to build (opportunities) is recorded in
+  `missing_sections`, the page shows the note and a retry, and the report is not final until it builds.
+- Website fetch: the analysis never fetches a user-supplied URL with a bare `fetch`; the direct fallback uses
+  `safeFetch`, which refuses private and metadata addresses and re-checks redirects.
 
 ## 6. Testing
 
 - Pure: question selection rules (preselect 12, min 10, max 16, custom add → intent), engine defaults, expected
   count and the monthly estimate, snapshot builder on fixture runs (headline numbers, sub-scores, who's-there order,
   why-them selection, 4-answer spread), wizard step inference from brand state.
-- Server functions with the stubbed db pattern: `startFirstScanFn` writes order (onboarded last) and enqueues one
-  job per prompt with `firstScan: true`; `getFirstScanStatusFn` counts and completion; `getStarterReportFn` builds
-  once then serves stored.
-- Worker: `firstScan` job runs replication 1 and still schedules the next run.
+- Server functions with the stubbed db pattern: `startFirstScanFn` transaction order and post-commit enqueue with
+  the retry path; `getFirstScanStatusFn` pair accounting (run or failure event), completion, eta null before 5
+  pairs; `openPartialFirstScanFn` refuses below 50 %; `getStarterReportFn` builds once then serves stored, records
+  a missing section, and the retry rebuilds only that section; `saveSetupDraftFn` round-trips the draft.
+- Worker: a job with `firstScanId` runs replication 1 on the scan's engines only, stamps `first_scan_id` on runs
+  and failure events, and still schedules the next run.
+- `website-excerpt`: the fallback refuses a private address and follows an allowed redirect (reuse the
+  `safe-fetch` test server pattern).
 - Analysis normaliser: new fields, unknown `marketKey` → null, exactly-16/3 handling.
 - End to end on production after deploy: add a brand through the wizard with the Playwright session, watch step 5
   complete, open the report.
