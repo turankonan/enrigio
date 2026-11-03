@@ -5,7 +5,7 @@ import { slugify } from "@workspace/lib/app-urls";
 import { db } from "@workspace/lib/db/db";
 import type { DbConnection } from "@workspace/lib/db/db-connection";
 import { ensureOrganization } from "@workspace/lib/db/provisioning";
-import { brands, competitors, prompts } from "@workspace/lib/db/schema";
+import { brands, competitors, PROMPT_INTENTS, type PromptIntent, prompts } from "@workspace/lib/db/schema";
 import { claimNewBrandSlug, findUnusedBrandSlug } from "@workspace/lib/db/unique-names";
 import { assertCanAddPrompts, assertCompetitorCap, getBrandOrganizationId } from "@workspace/lib/entitlements";
 import { computeSystemTags, sanitizeUserTags } from "@workspace/lib/tag-utils";
@@ -38,6 +38,7 @@ const promptInputSchema = z.object({
 	value: z.string().min(1),
 	tags: z.array(z.string()).optional().default([]),
 	enabled: z.boolean().optional().default(true),
+	intent: z.enum(PROMPT_INTENTS).nullable().optional(),
 });
 
 type CompetitorInput = z.infer<typeof competitorInputSchema>;
@@ -222,11 +223,11 @@ async function insertCompetitors(args: {
 	return toInsert.length;
 }
 
-async function insertPrompts(args: {
+export async function insertPrompts(args: {
 	brandId: string;
 	brandName: string;
 	website: string;
-	source: { value: string; tags: string[]; enabled: boolean }[];
+	source: { value: string; tags: string[]; enabled: boolean; intent?: PromptIntent | null }[];
 	dedupeAgainstExisting: boolean;
 	conn?: DbConnection;
 	/** The brand row may still be uncommitted, so a lookup would find nothing. */
@@ -249,6 +250,7 @@ async function insertPrompts(args: {
 		enabled: boolean;
 		tags: string[];
 		systemTags: string[];
+		intent: PromptIntent | null;
 	}> = [];
 	for (const p of args.source) {
 		const value = p.value.trim();
@@ -262,6 +264,7 @@ async function insertPrompts(args: {
 			enabled: p.enabled,
 			tags: p.tags,
 			systemTags: computeSystemTags(value, args.brandName, args.website),
+			intent: p.intent ?? null,
 		});
 	}
 	if (rows.length === 0) return [];
@@ -325,6 +328,7 @@ export async function createBrand(input: CreateBrandInput): Promise<BrandResult>
 				value: p.value,
 				tags: sanitizeUserTags(p.tags ?? []),
 				enabled: p.enabled ?? true,
+				intent: p.intent ?? null,
 			})),
 			dedupeAgainstExisting: false,
 			conn: tx,
@@ -401,6 +405,7 @@ export async function saveWizardOnboarding(input: WizardOnboardingInput): Promis
 			value: p.value,
 			tags: sanitizeUserTags(p.tags ?? []),
 			enabled: p.enabled ?? true,
+			intent: p.intent ?? null,
 		})),
 		dedupeAgainstExisting: true,
 	});

@@ -12,6 +12,7 @@
  * to communicate context + quality guidelines, not field-by-field shape.
  */
 import { z } from "zod";
+import { PROMPT_INTENTS, type PromptIntent } from "../db/schema";
 import { getWebsiteExcerpt } from "../website-excerpt";
 import { runStructuredResearchPrompt } from "./llm";
 import {
@@ -52,6 +53,12 @@ const promptSchema = z.object({
 	tags: z
 		.array(z.string())
 		.describe(`1-3 tags per prompt (ideally 1-2), drawn from the shared brand-tailored vocabulary. ${TAG_GUIDANCE}`),
+	intent: z
+		.enum(PROMPT_INTENTS)
+		.nullable()
+		.describe(
+			"Buyer intent of an UNBRANDED prompt: 'discovery' (finding options, e.g. 'best X'), 'comparison' (X vs Y, alternatives), 'local' (near me, in <city>), 'price' (cost, pricing). Null for branded prompts or when none fits.",
+		),
 });
 
 function buildSchema(args: { maxCompetitors: number; maxPrompts: number }) {
@@ -95,6 +102,7 @@ export interface OnboardingCompetitor {
 export interface OnboardingPrompt {
 	prompt: string;
 	tags: string[];
+	intent: PromptIntent | null;
 }
 
 export interface OnboardingSuggestion {
@@ -371,6 +379,8 @@ function normalizePrompts(raw: RawSuggestion["suggestedPrompts"], maxPrompts: nu
 		prompts.push({
 			prompt,
 			tags: uniqueLowercase((suggestion.tags ?? []).map(toKebabCase).filter(Boolean)).slice(0, MAX_PROMPT_TAGS),
+			// The model can return an off-list value despite the schema.
+			intent: PROMPT_INTENTS.includes(suggestion.intent as PromptIntent) ? (suggestion.intent as PromptIntent) : null,
 		});
 	}
 

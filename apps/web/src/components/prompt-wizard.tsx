@@ -172,7 +172,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 					}),
 				),
 				prompts: suggestion.suggestedPrompts.map((p) =>
-					newPromptEntry({ value: p.prompt, tags: p.tags, enabled: true }),
+					newPromptEntry({ value: p.prompt, tags: p.tags, intent: p.intent, enabled: true }),
 				),
 			});
 			setPhase("review");
@@ -224,7 +224,7 @@ export default function PromptWizard({ onComplete }: PromptWizardProps) {
 
 			const promptsPayload = data.prompts
 				.filter((p) => p.enabled && p.value.trim())
-				.map((p) => ({ value: p.value.trim(), tags: p.tags, enabled: true }));
+				.map((p) => ({ value: p.value.trim(), tags: p.tags, intent: p.intent ?? null, enabled: true }));
 
 			await updateOnboardedBrandFn({
 				data: {

@@ -21,6 +21,7 @@ import {
 } from "@workspace/config/plans";
 import { describeSkipped, parseBulkPrompts } from "@workspace/lib/bulk-prompts";
 import { MAX_PROMPTS } from "@workspace/lib/constants";
+import type { PromptIntent } from "@workspace/lib/db/schema";
 import { ModelIcon } from "@workspace/ui/brand/model-icon";
 import { Button } from "@workspace/ui/components/button";
 import { Checkbox } from "@workspace/ui/components/checkbox";
@@ -44,6 +45,7 @@ export interface EditablePrompt {
 	tags: string[];
 	systemTags: string[];
 	premiumModels: string[];
+	intent?: PromptIntent | null;
 }
 
 export interface PremiumAllowance {
@@ -59,6 +61,7 @@ export function newPromptEntry(partial?: Partial<EditablePrompt>): EditablePromp
 		tags: partial?.tags ?? [],
 		systemTags: partial?.systemTags ?? [],
 		premiumModels: partial?.premiumModels ?? [],
+		intent: partial?.intent ?? null,
 		...(partial?.id ? { id: partial.id } : {}),
 	};
 }

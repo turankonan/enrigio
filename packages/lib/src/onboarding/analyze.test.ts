@@ -164,9 +164,13 @@ describe("analyzeBrand", () => {
 			suggestedPrompts: [
 				// Tags are now free-form / brand-tailored. Normalize step lowercases
 				// + kebab-cases + dedupes + caps at 3 per prompt.
-				{ prompt: "Best Widgets", tags: ["Industrial Supplies", "Manufacturing"] },
-				{ prompt: "best widgets", tags: ["industrial-supplies"] }, // duplicate after lowercasing
-				{ prompt: "acme alternative", tags: ["alternatives", "industrial supplies", "buying guide", "extra-tag"] },
+				{ prompt: "Best Widgets", tags: ["Industrial Supplies", "Manufacturing"], intent: null },
+				{ prompt: "best widgets", tags: ["industrial-supplies"], intent: null }, // duplicate after lowercasing
+				{
+					prompt: "acme alternative",
+					tags: ["alternatives", "industrial supplies", "buying guide", "extra-tag"],
+					intent: null,
+				},
 			],
 		});
 
@@ -190,9 +194,10 @@ describe("analyzeBrand", () => {
 		});
 
 		expect(result.suggestedPrompts).toEqual([
-			{ prompt: "best widgets", tags: ["industrial-supplies", "manufacturing"] },
+			{ prompt: "best widgets", tags: ["industrial-supplies", "manufacturing"], intent: null },
 			{
 				prompt: "acme alternative",
+				intent: null,
 				// "industrial supplies" → "industrial-supplies", capped at 3 (extra-tag dropped)
 				tags: ["alternatives", "industrial-supplies", "buying-guide"],
 			},
@@ -257,5 +262,26 @@ describe("analyzeBrand", () => {
 		});
 		expect(result.competitors).toHaveLength(3);
 		expect(result.suggestedPrompts).toHaveLength(5);
+	});
+});
+
+describe("analyzeBrand prompt intent", () => {
+	it("keeps a valid intent and nulls anything else the model returns", async () => {
+		(runStructuredResearchPrompt as any).mockResolvedValueOnce({
+			brandName: "Acme",
+			additionalDomains: [],
+			aliases: [],
+			competitors: [],
+			suggestedPrompts: [
+				{ prompt: "best widgets", tags: [], intent: "discovery" },
+				{ prompt: "widgets near me", tags: [], intent: "somewhere" },
+				{ prompt: "is acme good", tags: [], intent: null },
+				{ prompt: "widgets cost", tags: [] },
+			],
+		});
+
+		const result = await analyzeBrand({ website: "acme.com", maxCompetitors: 0, maxPrompts: 10 });
+
+		expect(result.suggestedPrompts.map((p) => p.intent)).toEqual(["discovery", null, null, null]);
 	});
 });
