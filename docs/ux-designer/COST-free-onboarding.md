@@ -112,10 +112,11 @@ Fixed on 2026-11-03 (after the first version of this note):
   classifier succeed in production. The $200 credit now carries brand analysis, the classifier and the backfill.
 - The Anthropic provider re-ran every request whose single allowed search was exhausted (`max_uses_exceeded`), paying
   the search fee and ~12k tokens twice; 7 of the first 10 Claude runs did this. Removed in `7ac09642`.
-- 10 pg-boss jobs had sat in state `active` since 2 Nov after the free-plan worker went to sleep mid-run; the
-  maintenance job counts them as pending, so those prompts (all of Rigosis) never ran again. Reset by hand; the
-  worker needs a stale-active sweep (pg-boss `expire_seconds` is 5400 s but nothing expires them while the service
-  sleeps).
+- Ten Rigosis jobs sat in state `active` for 48 minutes with no runs. Root cause: provider calls had no timeout,
+  so OpenAI requests caught in a network reset at 11:58 UTC never settled and held their jobs until pg-boss's
+  90-minute expiry (a deploy killed the instance first). Fixed in `main` after `e14c84ce`: every provider call is
+  capped at 5 minutes and prompt jobs carry a 60 s heartbeat, so a dead worker's jobs are failed and rescheduled
+  within minutes instead of 90.
 
 
 - **DataForSEO has returned "An unexpected server error occurred" on every call since 18 Sep 2026** (5,400+
