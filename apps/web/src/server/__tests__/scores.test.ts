@@ -16,7 +16,10 @@ vi.mock("@workspace/lib/db/db", () => ({
 	db: {
 		query: {
 			brands: {
-				findMany: async () => [{ id: "b1", name: "Acme", defaultMarketKey: "tr-TR", onboarded: true }],
+				findMany: async () => [
+					{ id: "b1", name: "Acme", defaultMarketKey: "tr-TR", onboarded: true },
+					{ id: "b2", name: "Empty", defaultMarketKey: "tr-TR", onboarded: true },
+				],
 			},
 			prompts: {
 				findMany: async () => [
@@ -81,5 +84,34 @@ describe("computeAdminScoreRows", () => {
 		});
 		const [row] = await computeAdminScoreRows("UTC");
 		expect(row.noContradiction).toBeNull();
+	});
+
+	it("returns nulls rather than throwing for a brand without data", async () => {
+		reads.getDashboardSummary.mockResolvedValue([]);
+		reads.getScoreV2Summary.mockResolvedValue({ total_runs: 0, score_v2: null });
+		reads.getIntentScoreSummary.mockResolvedValue([]);
+		reads.getAccuracySummary.mockResolvedValue({
+			branded_mentioned_runs: 0,
+			assessed_runs: 0,
+			accurate_runs: 0,
+			unsupported_runs: 0,
+			unrecognised_runs: 0,
+		});
+		reads.getDistinctModelCount.mockResolvedValue(0);
+		const rows = await computeAdminScoreRows("UTC");
+		const row = rows.find((r) => r.brandId === "b2");
+		expect(row).toMatchObject({
+			v1: null,
+			v2: null,
+			noContradiction: null,
+			cohortPrompts: 0,
+			classifiedPrompts: 0,
+			totalRuns: 0,
+			models: 0,
+		});
+		for (const intent of Object.values(row?.intents ?? {})) {
+			expect(intent).toEqual({ score: null, promptCount: 0 });
+		}
+		expect(Object.keys(row?.intents ?? {}).length).toBeGreaterThan(0);
 	});
 });
