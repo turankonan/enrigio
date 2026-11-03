@@ -48,7 +48,8 @@ tokens are estimated, not measured. Whether the model actually invoked web searc
 | Perplexity via DataForSEO LLM Responses, live | $0.0006 + ≈ $0.006 | **≈ $0.007** |
 | Google AI Overview via organic SERP, live | flat | **≈ $0.002** |
 | Google AI Mode, live | flat | **$0.004** |
-| Claude Sonnet 5 grounded (Pro) | 12.4k × $2/M + 1.3k × $10/M + $0.01 | **≈ $0.048** |
+| Claude Sonnet 5 grounded (Pro) | 12.7k × $2/M + 1.2k × $10/M + $0.01 (measured again 2026-11-03 12:45 after the key fix) | **≈ $0.047** |
+| Classifier on Claude Haiku 5.5 (production since 12:42) | ≈1k input $0.0001 + ≈100–200 output $0.0001 | **≈ $0.0002**; returns 1–4 claims per branded answer instead of gpt-5-mini's 10, and found the first real contradiction |
 | Classifier, unbranded answer | ≈1k input $0.00025 + ≈50 output $0.0001 | **≈ $0.0004** |
 | Classifier, branded answer (claims) | ≈1k input + ≈350 output + reasoning | **≈ $0.0015** |
 | Brand analysis | 1–3 searches + ≈10k input + ≈3k output | **≈ $0.02–0.05** |
@@ -105,6 +106,17 @@ Premium Claude (Pro engine) adds ≈ $0.048 per prompt per day per the metered s
 order of $30.
 
 ## 8. Operational findings that change the numbers
+
+Fixed on 2026-11-03 (after the first version of this note):
+- New Anthropic key set on Render with `ONBOARDING_LLM_TARGET=claude:anthropic-api`; Claude runs and the Haiku
+  classifier succeed in production. The $200 credit now carries brand analysis, the classifier and the backfill.
+- The Anthropic provider re-ran every request whose single allowed search was exhausted (`max_uses_exceeded`), paying
+  the search fee and ~12k tokens twice; 7 of the first 10 Claude runs did this. Removed in `7ac09642`.
+- 10 pg-boss jobs had sat in state `active` since 2 Nov after the free-plan worker went to sleep mid-run; the
+  maintenance job counts them as pending, so those prompts (all of Rigosis) never ran again. Reset by hand; the
+  worker needs a stale-active sweep (pg-boss `expire_seconds` is 5400 s but nothing expires them while the service
+  sleeps).
+
 
 - **DataForSEO has returned "An unexpected server error occurred" on every call since 18 Sep 2026** (5,400+
   failures per endpoint in 30 days, zero successes). Until that is fixed, none of the DataForSEO prices above can be
