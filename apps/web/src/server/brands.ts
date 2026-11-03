@@ -279,7 +279,7 @@ export const createBrandFn = createServerFn({ method: "POST" })
 export const createBrandInOrgFn = createServerFn({ method: "POST" })
 	.validator(
 		z.object({
-			brandName: z.string().min(1).max(100),
+			brandName: z.string().trim().min(1).max(100).optional(),
 			website: z.string().min(1),
 			organizationId: z.string(),
 			/** Platform picks from the creation wizard; omitted → plan defaults. */
@@ -299,7 +299,8 @@ export const createBrandInOrgFn = createServerFn({ method: "POST" })
 			throw new Error(urlValidation.error);
 		}
 
-		const trimmedName = data.brandName.trim();
+		// The wizard asks for a URL only; the analysis proposes the real name next.
+		const trimmedName = data.brandName?.trim() || new URL(urlValidation.formattedUrl).hostname.replace(/^www\./, "");
 		if (!trimmedName) {
 			throw new Error("Brand name must be a non-empty string");
 		}

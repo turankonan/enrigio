@@ -4,7 +4,6 @@ import { Input } from "@workspace/ui/components/input";
 import { Label } from "@workspace/ui/components/label";
 import { useState } from "react";
 import FullPageCard from "@/components/full-page-card";
-import { PlatformSelectionStep } from "@/components/platform-selection-step";
 import { useOrganizationsChanged } from "@/hooks/use-organizations";
 import { useOrganizationParams } from "@/hooks/use-route-params";
 import { validateWebsiteUrl } from "@/lib/brand-website";
@@ -13,87 +12,49 @@ import { trackEvent } from "@/lib/posthog";
 import { pageHead } from "@/lib/route-head";
 import { useWriteErrorMessage } from "@/lib/write-errors";
 import { createBrandInOrgFn } from "@/server/brands";
-import { getOnboardingPlatformStateFn, type OnboardingPlatformState } from "@/server/platform-picks";
+import { startAnalyzeBrandFn } from "@/server/onboarding";
 
 export const Route = createFileRoute("/_authed/app/org/$org/new")({
-	staticData: { crumb: t("new_brand.crumb") },
+	staticData: { crumb: t("setup.crumb") },
 	loader: ({ context }) => {
-		const { brandCreation, name, id } = context.organization;
+		const { brandCreation, id } = context.organization;
 		if (brandCreation.kind === "not-offered") {
 			throw redirect({ to: "/app/org/$org", params: { org: context.organization.slug } });
 		}
-		return {
-			organizationId: id,
-			organizationName: name,
-			blocked: brandCreation.kind === "denied" ? brandCreation : null,
-		};
+		return { organizationId: id, blocked: brandCreation.kind === "denied" ? brandCreation : null };
 	},
-	head: pageHead({ description: t("new_brand.head_description") }),
+	head: pageHead({ description: t("setup.head_description") }),
 	component: NewBrandPage,
 });
 
 function NewBrandPage() {
-	const { organizationId, organizationName, blocked } = Route.useLoaderData();
+	const { organizationId, blocked } = Route.useLoaderData();
 	const organizationParams = useOrganizationParams();
-	const [step, setStep] = useState<"details" | "platforms">("details");
-	const [details, setDetails] = useState({ brandName: "", website: "" });
-	const [platformState, setPlatformState] = useState<NonNullable<OnboardingPlatformState> | null>(null);
-	const [selected, setSelected] = useState<Set<string>>(new Set());
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
 	const organizationsChanged = useOrganizationsChanged();
 	const navigate = useNavigate();
 	const writeError = useWriteErrorMessage();
 
-	const createBrand = async (brandName: string, website: string, enabledModels: string[] | null) => {
-		setIsLoading(true);
-		setError("");
-
-		try {
-			const { brandSlug } = await createBrandInOrgFn({
-				data: {
-					brandName,
-					website,
-					organizationId,
-					...(enabledModels && enabledModels.length > 0 && { enabledModels }),
-				},
-			});
-			trackEvent("brand_created", { has_website: Boolean(website) });
-
-			await organizationsChanged(() =>
-				navigate({ to: "/app/org/$org/brand/$brand", params: { ...organizationParams, brand: brandSlug } }),
-			);
-		} catch (err) {
-			setError(writeError(err, t("new_brand.create_error")));
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-	const handleDetailsSubmit = async (formData: FormData) => {
-		const brandName = (formData.get("brandName") as string)?.trim() ?? "";
-		const website = (formData.get("website") as string)?.trim() ?? "";
-		setError("");
-
+	const submit = async (formData: FormData) => {
+		const website = ((formData.get("website") as string) ?? "").trim();
 		const validation = validateWebsiteUrl(website);
 		if (!validation.isValid) {
 			setError(validation.error);
 			return;
 		}
-
 		setIsLoading(true);
+		setError("");
 		try {
-			const state = await getOnboardingPlatformStateFn({ data: { organizationId } });
-			if (!state) {
-				await createBrand(brandName, website, null);
-				return;
-			}
-			setDetails({ brandName, website });
-			setPlatformState(state);
-			setSelected(new Set(state.defaultSelected));
-			setStep("platforms");
+			const { brandSlug, brandId } = await createBrandInOrgFn({ data: { website, organizationId } });
+			trackEvent("brand_created", { has_website: true });
+			// Fire-and-forget: the wizard polls the status and offers a retry.
+			startAnalyzeBrandFn({ data: { brandId, website } }).catch(() => {});
+			await organizationsChanged(() =>
+				navigate({ to: "/app/org/$org/brand/$brand", params: { ...organizationParams, brand: brandSlug } }),
+			);
 		} catch (err) {
-			setError(err instanceof Error ? err.message : t("new_brand.platforms_read_error"));
+			setError(writeError(err, t("setup.new.error")));
 		} finally {
 			setIsLoading(false);
 		}
@@ -117,61 +78,30 @@ function NewBrandPage() {
 		);
 	}
 
-	if (step === "platforms" && platformState) {
-		return (
-			<FullPageCard title={`Create ${details.brandName}`} subtitle={t("new_brand.platforms_subtitle")}>
-				<PlatformSelectionStep
-					state={platformState}
-					selected={selected}
-					onSelectedChange={setSelected}
-					disabled={isLoading}
-					error={error}
-					onBack={() => setStep("details")}
-					onSubmit={() => createBrand(details.brandName, details.website, [...selected])}
-					submitLabel={isLoading ? t("new_organization.creating") : t("new_brand.submit")}
-				/>
-			</FullPageCard>
-		);
-	}
-
 	return (
-		<FullPageCard
-			title={t("new_brand.title")}
-			subtitle={`Start tracking a brand in ${organizationName}`}
-			showBackButton
-		>
-			<form action={handleDetailsSubmit} className="space-y-4">
+		<FullPageCard title={t("setup.new.title")} subtitle={t("setup.new.subtitle")}>
+			<form action={submit} className="space-y-4">
 				<div className="space-y-2">
-					<Label htmlFor="brandName">{t("new_brand.name_label")}</Label>
-					<Input
-						id="brandName"
-						name="brandName"
-						type="text"
-						placeholder={t("new_organization.name_placeholder")}
-						required
-						disabled={isLoading}
-						defaultValue={details.brandName}
-					/>
-				</div>
-
-				<div className="space-y-2">
-					<Label htmlFor="website">{t("new_brand.website_label")}</Label>
+					<Label htmlFor="website">{t("setup.new.website_label")}</Label>
 					<Input
 						id="website"
 						name="website"
 						type="text"
-						placeholder={t("new_brand.website_placeholder")}
+						placeholder={t("setup.new.website_placeholder")}
+						autoFocus
 						required
 						disabled={isLoading}
-						defaultValue={details.website}
 					/>
 				</div>
-
 				{error && <p className="text-sm text-destructive">{error}</p>}
-
-				<Button type="submit" className="w-full" disabled={isLoading}>
-					{isLoading ? t("new_organization.creating") : t("new_brand.continue")}
-				</Button>
+				<div className="flex gap-2">
+					<Button type="submit" disabled={isLoading}>
+						{t("setup.new.submit")}
+					</Button>
+					<Link to="/app/org/$org" params={organizationParams} className={buttonVariants({ variant: "ghost" })}>
+						{t("setup.back")}
+					</Link>
+				</div>
 			</form>
 		</FullPageCard>
 	);
