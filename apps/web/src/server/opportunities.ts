@@ -698,19 +698,60 @@ export async function resolveOpportunities(brandId: string, timezone = "UTC"): P
 	const latestAuditId = latestAudit?.id ?? null;
 	if (latest && !isReportStale(latest, latestAuditId)) return serveStored();
 
-	const digest = await buildDigest(brandId, timezone, latestAudit);
-	if (!digest) {
-		if (latest) return serveStored();
-		return { report: null, reason: "insufficient-data", generatedFor: null, lastEvaluatedAt, model: null };
+	// A stale report is still a report: serve it now and refresh behind the
+	// page, so the Home never waits on a model call once a brand has one.
+	if (latest) {
+		refreshInBackground(brandId, timezone, latestAudit, latestAuditId);
+		return serveStored();
 	}
 
+	const digest = await buildDigest(brandId, timezone, latestAudit);
+	if (!digest) {
+		return { report: null, reason: "insufficient-data", generatedFor: null, lastEvaluatedAt, model: null };
+	}
+	const generated = await generateFromDigest(brandId, digest, latestAuditId);
+	if (!generated) throw new Error("Failed to generate a valid opportunities report");
+	return generated;
+}
+
+// ponytail: in-process guard, so one instance never generates the same brand
+// twice at once; make it a pg-boss singleton job if the web tier ever scales out.
+const refreshing = new Set<string>();
+
+function refreshInBackground(
+	brandId: string,
+	timezone: string,
+	latestAudit: Awaited<ReturnType<typeof getLatestCompletedAudit>>,
+	latestAuditId: string | null,
+): void {
+	if (refreshing.has(brandId)) return;
+	refreshing.add(brandId);
+	generate(brandId, timezone, latestAudit, latestAuditId)
+		.catch((err) => console.error(`[opportunities] background refresh failed for brand ${brandId}:`, err))
+		.finally(() => refreshing.delete(brandId));
+}
+
+/** Build the digest, call the model and store the result; null when there is
+ * not enough data or the model never produced a schema-valid report. */
+async function generate(
+	brandId: string,
+	timezone: string,
+	latestAudit: Awaited<ReturnType<typeof getLatestCompletedAudit>>,
+	latestAuditId: string | null,
+): Promise<OpportunitiesResponse | null> {
+	const digest = await buildDigest(brandId, timezone, latestAudit);
+	if (!digest) return null;
+	return generateFromDigest(brandId, digest, latestAuditId);
+}
+
+async function generateFromDigest(
+	brandId: string,
+	digest: Digest,
+	latestAuditId: string | null,
+): Promise<OpportunitiesResponse | null> {
 	const prompt = `${GUIDANCE}\n\n=== BRAND DATA ===\n${digest.text}\n\n=== TASK ===\n${TASK}`;
 	const generated = await generateValidReport(prompt);
-	if (!generated) {
-		// No schema-valid report; serve the last good one if there is one.
-		if (latest) return serveStored();
-		throw new Error("Failed to generate a valid opportunities report");
-	}
+	if (!generated) return null;
 
 	const report = enrichReport(generated.report, digest);
 	const [savedReport] = await db

@@ -78,13 +78,25 @@ describe("resolveOpportunities — audit staleness", () => {
 		expect(result.report).toEqual(dbState.latest.report);
 	});
 
-	it("regenerates when a newer completed audit exists, even within the time-based freshness window", async () => {
+	it("serves the stored report at once and regenerates behind it when a newer completed audit exists", async () => {
 		dbState.latest = storedReport({ siteAuditId: "audit-old", createdAt: new Date() });
 		getLatestCompletedAudit.mockResolvedValue(completedAudit("audit-new"));
 
-		await resolveOpportunities(BRAND_ID);
+		const result = await resolveOpportunities(BRAND_ID);
 
-		expect(resolveFilteredPrompts).toHaveBeenCalledWith(BRAND_ID, {});
+		expect(result.report).toEqual(dbState.latest.report);
+		await vi.waitFor(() => expect(resolveFilteredPrompts).toHaveBeenCalledWith(BRAND_ID, {}));
+	});
+
+	it("starts one background refresh for a brand, however many pages ask while it runs", async () => {
+		dbState.latest = storedReport({ siteAuditId: "audit-old", createdAt: new Date() });
+		getLatestCompletedAudit.mockResolvedValue(completedAudit("audit-new"));
+		let release: () => void = () => {};
+		resolveFilteredPrompts.mockImplementation(() => new Promise<never[]>((resolve) => { release = () => resolve([]); }));
+
+		await Promise.all([resolveOpportunities(BRAND_ID), resolveOpportunities(BRAND_ID), resolveOpportunities(BRAND_ID)]);
+		await vi.waitFor(() => expect(resolveFilteredPrompts).toHaveBeenCalledTimes(1));
+		release();
 	});
 
 	it("treats a never-audited brand's null audit id and a stored report's null siteAuditId as equal (no churn)", async () => {
