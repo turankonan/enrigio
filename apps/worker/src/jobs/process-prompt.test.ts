@@ -2,9 +2,10 @@ import type { Brand, Competitor } from "@workspace/lib/db/schema";
 import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import type { Provider, ScrapeResult } from "@workspace/lib/providers";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RUN_TIMEOUT_MS, runModelIteration } from "./process-prompt";
+import { firstScanTargets, RUN_TIMEOUT_MS, runModelIteration } from "./process-prompt";
 
 const insertedPromptRuns: Record<string, unknown>[] = [];
+const insertedUsageEvents: Record<string, unknown>[] = [];
 
 const classifyMention = vi.hoisted(() => vi.fn());
 vi.mock("@workspace/lib/mention-classify", () => ({ classifyMention }));
@@ -19,7 +20,11 @@ vi.mock("@workspace/lib/db/db", async () => {
 						insertedPromptRuns.push(vals);
 						return { returning: async () => [{ id: "run_1", createdAt: new Date("2026-01-01T00:00:00Z") }] };
 					}
-					// usage_events / citations inserts: no further chaining needed for a
+					if (table === schema.usageEvents) {
+						insertedUsageEvents.push(vals);
+						return Promise.resolve(undefined);
+					}
+					// citations inserts: no further chaining needed for a
 					// non-mentioning, citation-free result.
 					return Promise.resolve(undefined);
 				},
@@ -91,6 +96,7 @@ describe("runModelIteration market stamping", () => {
 			runIndex: 1,
 			effectiveMarket,
 			branded: false,
+			firstScanId: null,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith(
@@ -117,6 +123,7 @@ describe("runModelIteration market stamping", () => {
 			runIndex: 1,
 			effectiveMarket,
 			branded: false,
+			firstScanId: null,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith("chatgpt", "best widgets", expect.objectContaining({ market: undefined }));
@@ -141,6 +148,7 @@ describe("runModelIteration market stamping", () => {
 			runIndex: 1,
 			effectiveMarket,
 			branded: false,
+			firstScanId: null,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith(
@@ -172,6 +180,7 @@ describe("runModelIteration market stamping", () => {
 			runIndex: 1,
 			effectiveMarket,
 			branded: false,
+			firstScanId: null,
 		});
 
 		expect(runSpy).toHaveBeenCalledWith(
@@ -202,6 +211,7 @@ function iteration(branded: boolean) {
 		runIndex: 1,
 		effectiveMarket: resolveEffectiveMarket({ defaultMarketKey: null }),
 		branded,
+		firstScanId: null,
 	});
 }
 
@@ -262,6 +272,7 @@ describe("runModelIteration hung provider", () => {
 			runIndex: 1,
 			effectiveMarket: resolveEffectiveMarket({ defaultMarketKey: null }),
 			branded: false,
+			firstScanId: null,
 		});
 		const outcome = pending.then(
 			() => "resolved",
@@ -270,5 +281,71 @@ describe("runModelIteration hung provider", () => {
 		await vi.advanceTimersByTimeAsync(RUN_TIMEOUT_MS + 1);
 		expect(await outcome).toMatch(/timed out/);
 		expect(insertedPromptRuns).toHaveLength(0);
+	});
+});
+
+describe("first scan runs", () => {
+	beforeEach(() => {
+		insertedPromptRuns.length = 0;
+		classifyMention.mockReset();
+		classifyMention.mockResolvedValue({ sentiment: "neutral", brandRank: 2 });
+	});
+
+	it("stamps the scan id on the saved run", async () => {
+		await runModelIteration({
+			promptId: "prompt_1",
+			promptValue: "best widget makers",
+			brand: makeBrand(),
+			competitorsList,
+			config: { model: "chatgpt", provider: "openai-api", webSearch: true },
+			providerImpl: makeProvider(async () => MENTIONING_RESULT),
+			runIndex: 1,
+			effectiveMarket: resolveEffectiveMarket({ defaultMarketKey: null }),
+			branded: false,
+			firstScanId: "scan-1",
+		});
+		expect(insertedPromptRuns[0]?.firstScanId).toBe("scan-1");
+	});
+
+	it("stamps the scan id on a failure event when the run fails", async () => {
+		vi.spyOn(console, "error").mockImplementation(() => {});
+		const failing = makeProvider(async () => {
+			throw new Error("boom");
+		});
+		await expect(
+			runModelIteration({
+				promptId: "prompt_1",
+				promptValue: "best widget makers",
+				brand: makeBrand(),
+				competitorsList,
+				config: { model: "chatgpt", provider: "openai-api", webSearch: true },
+				providerImpl: failing,
+				runIndex: 1,
+				effectiveMarket: resolveEffectiveMarket({ defaultMarketKey: null }),
+				branded: false,
+				firstScanId: "scan-1",
+			}),
+		).rejects.toThrow("boom");
+		expect(insertedUsageEvents.at(-1)).toMatchObject({ eventType: "prompt_run_failed", firstScanId: "scan-1" });
+	});
+});
+
+describe("firstScanTargets", () => {
+	it("keeps only the scan's engines for this prompt and runs each once", () => {
+		const targets = [
+			{ config: { model: "chatgpt", provider: "openai-api", webSearch: true }, replication: 5 },
+			{ config: { model: "gemini", provider: "dataforseo", webSearch: true }, replication: 5 },
+			{ config: { model: "claude", provider: "anthropic-api", webSearch: true }, replication: 5 },
+		];
+		const expected = [
+			{ promptId: "p1", model: "chatgpt" },
+			{ promptId: "p1", model: "gemini" },
+			{ promptId: "p2", model: "claude" },
+		];
+		const out = firstScanTargets(targets as never, expected, "p1");
+		expect(out.map((t) => [t.config.model, t.replication])).toEqual([
+			["chatgpt", 1],
+			["gemini", 1],
+		]);
 	});
 });

@@ -11,6 +11,8 @@ import {
 	type Competitor,
 	citations,
 	competitors,
+	type FirstScanExpectedPair,
+	firstScans,
 	promptRuns,
 	prompts,
 	usageEvents,
@@ -45,6 +47,8 @@ export interface ProcessPromptData {
 	cadenceHours?: number;
 	/** Cycles in a row where every run failed, carried forward to size the backoff. */
 	consecutiveFailures?: number;
+	/** Set on jobs enqueued by a first scan: run once per scan engine and tag the rows. */
+	firstScanId?: string;
 }
 
 /**
@@ -240,6 +244,7 @@ async function savePromptRun(
 	brandRank: number | null,
 	accuracyClaims: AccuracyClaim[] | null,
 	marketKey: string,
+	firstScanId: string | null,
 ): Promise<{ id: string; createdAt: Date }> {
 	const [result] = await db
 		.insert(promptRuns)
@@ -258,6 +263,7 @@ async function savePromptRun(
 			brandRank,
 			accuracyClaims,
 			marketKey,
+			firstScanId,
 		})
 		.returning({ id: promptRuns.id, createdAt: promptRuns.createdAt });
 
@@ -299,6 +305,7 @@ async function recordUsageEvent(input: {
 	promptId: string;
 	eventType: "prompt_run" | "prompt_run_failed";
 	config: ModelConfig;
+	firstScanId?: string | null;
 }): Promise<void> {
 	try {
 		const cost = estimateRunCostUsd(input.config.provider, input.config.webSearch);
@@ -312,6 +319,7 @@ async function recordUsageEvent(input: {
 			webSearchEnabled: input.config.webSearch,
 			units: 1,
 			estimatedCostUsd: cost === null ? null : cost.toFixed(6),
+			firstScanId: input.firstScanId ?? null,
 		});
 	} catch (error) {
 		console.error("Failed to record usage event:", error);
@@ -341,6 +349,7 @@ export async function runModelIteration({
 	runIndex,
 	effectiveMarket,
 	branded,
+	firstScanId,
 }: {
 	promptId: string;
 	promptValue: string;
@@ -351,6 +360,7 @@ export async function runModelIteration({
 	runIndex: number;
 	effectiveMarket: Market;
 	branded: boolean;
+	firstScanId: string | null;
 }): Promise<void> {
 	const logPrefix = `[${config.model}_${runIndex}]`;
 	const localizable = resolveLocalizable(config);
@@ -415,6 +425,7 @@ export async function runModelIteration({
 			classification?.brandRank ?? null,
 			classification?.claims ?? null,
 			runMarketKey,
+			firstScanId,
 		);
 		console.log(`${logPrefix} Saved prompt run ${promptRunId}`);
 
@@ -425,6 +436,7 @@ export async function runModelIteration({
 			promptId,
 			eventType: "prompt_run",
 			config,
+			firstScanId,
 		});
 	} catch (error) {
 		// A single run's failure doesn't fail the job, so report it here to keep
@@ -448,9 +460,52 @@ export async function runModelIteration({
 			promptId,
 			eventType: "prompt_run_failed",
 			config,
+			firstScanId,
 		});
 		throw error;
 	}
+}
+
+/**
+ * A first scan answers every chosen engine exactly once: the scan row lists
+ * which engines this prompt owes, and replication is forced to 1 whatever the
+ * plan or RUNS_PER_PROMPT would run on a normal day.
+ */
+export function firstScanTargets<T extends { config: { model: string }; replication: number }>(
+	targets: T[],
+	expected: FirstScanExpectedPair[],
+	promptId: string,
+): T[] {
+	const models = new Set(expected.filter((p) => p.promptId === promptId).map((p) => p.model));
+	return targets.filter((t) => models.has(t.config.model)).map((t) => ({ ...t, replication: 1 }));
+}
+
+/**
+ * A first-scan cycle takes the scan's engines with no due-check; any other
+ * cycle (or one whose scan row is gone) takes what is due on cadence.
+ * `activeScanId` is what to stamp on the cycle's rows.
+ */
+async function selectCycleTargets(
+	promptId: string,
+	plan: PromptRunPlan,
+	firstScanId: string | null,
+	runMarketKeyFor: (config: ModelConfig) => string,
+): Promise<{ dueTargets: PromptRunPlan["targets"]; activeScanId: string | null }> {
+	const scan = firstScanId ? await db.query.firstScans.findFirst({ where: eq(firstScans.id, firstScanId) }) : undefined;
+	if (firstScanId && !scan) {
+		console.error(`First scan ${firstScanId} not found for prompt ${promptId}; running as a normal cycle`);
+	}
+
+	if (scan) {
+		await db
+			.update(firstScans)
+			.set({ status: "running" })
+			.where(and(eq(firstScans.id, scan.id), eq(firstScans.status, "queued")));
+		return { dueTargets: firstScanTargets(plan.targets, scan.expected, promptId), activeScanId: scan.id };
+	}
+
+	const lastRuns = await getLastRunsByTargetKey(promptId, slowestIntervalHours(plan.targets));
+	return { dueTargets: selectDueTargets(plan.targets, lastRuns, new Date(), runMarketKeyFor), activeScanId: null };
 }
 
 /**
@@ -462,6 +517,7 @@ async function processPrompt(
 	promptId: string,
 	scrapeConfigs: ModelConfig[],
 	consecutiveFailures: number,
+	firstScanId: string | null,
 ): Promise<void> {
 	console.log(`Processing prompt ${promptId}`);
 
@@ -500,10 +556,9 @@ async function processPrompt(
 	const runMarketKeyFor = (config: ModelConfig) =>
 		resolveLocalizable(config) ? effectiveMarket.key : GLOBAL_MARKET_KEY;
 
-	const lastRuns = await getLastRunsByTargetKey(promptId, slowestIntervalHours(plan.targets));
-	const dueTargets = selectDueTargets(plan.targets, lastRuns, new Date(), runMarketKeyFor);
+	const { dueTargets, activeScanId } = await selectCycleTargets(promptId, plan, firstScanId, runMarketKeyFor);
 
-	if (dueTargets.length === 0) {
+	if (activeScanId === null && dueTargets.length === 0) {
 		// Fired early (expedite, duplicate send): everything is fresh. Keep the
 		// prompt going without spending anything.
 		console.log(`Prompt ${promptId}: no targets due yet, rescheduling in ${plan.rescheduleHours}h`);
@@ -541,6 +596,7 @@ async function processPrompt(
 				runIndex: i + 1,
 				effectiveMarket,
 				branded: getEffectiveBrandedStatus(prompt.systemTags ?? [], prompt.tags ?? []).isBranded,
+				firstScanId: activeScanId,
 			}),
 		);
 	});
@@ -589,6 +645,11 @@ export async function processPromptJob(jobs: Job<ProcessPromptData>[]): Promise<
 
 	// pg-boss v12 passes an array of jobs - process each one
 	for (const job of jobs) {
-		await processPrompt(job.data.promptId, scrapeConfigs, job.data.consecutiveFailures ?? 0);
+		await processPrompt(
+			job.data.promptId,
+			scrapeConfigs,
+			job.data.consecutiveFailures ?? 0,
+			job.data.firstScanId ?? null,
+		);
 	}
 }
