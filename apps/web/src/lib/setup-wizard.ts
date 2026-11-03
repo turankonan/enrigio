@@ -39,6 +39,8 @@ export const MAX_BUYER = 16;
 export const PRESELECT_PER_INTENT = 3;
 export const MAX_RIVALS = 5;
 export const DEFAULT_ENGINES = ["chatgpt", "gemini", "google-ai-overview", "perplexity"];
+// Mirrors PROMPT_INTENTS without importing the schema at runtime, which would pull drizzle into the client bundle.
+export const INTENT_ORDER: PromptIntent[] = ["discovery", "comparison", "local", "price"];
 
 export const isBuyer = (q: DraftQuestion) => q.intent !== null;
 
