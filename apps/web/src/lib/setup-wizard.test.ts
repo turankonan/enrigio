@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
 	addCustomQuestion,
+	addCustomRival,
 	canContinueFromQuestions,
 	defaultEngines,
 	draftFromSuggestion,
@@ -89,6 +90,28 @@ describe("rivals and engines", () => {
 		const d = draftFromSuggestion(suggestion as never, ["chatgpt"]);
 		const x = toggleRival(d, 5);
 		expect(x.rivals.filter((r) => r.selected)).toHaveLength(5);
+	});
+	it("never selects a rival without a website, since the scan could not track it", () => {
+		const competitors = [
+			{ name: "No Site", domains: [], aliases: [] },
+			...Array.from({ length: 6 }, (_, i) => ({ name: `Marka ${i}`, domains: [`marka${i}.com`], aliases: [] })),
+		];
+		const d = draftFromSuggestion({ ...suggestion, competitors } as never, ["chatgpt"]);
+		expect(d.rivals.filter((r) => r.selected).map((r) => r.name)).toEqual([
+			"Marka 0",
+			"Marka 1",
+			"Marka 2",
+			"Marka 3",
+			"Marka 4",
+		]);
+		const freed = toggleRival(d, 1);
+		expect(toggleRival(freed, 0).rivals[0].selected).toBe(false);
+		expect(addCustomRival(freed, "Yeni Rakip", "  ")).toBe(freed);
+		expect(addCustomRival(freed, "Yeni Rakip", "yenirakip.com").rivals.at(-1)).toMatchObject({
+			name: "Yeni Rakip",
+			site: "yenirakip.com",
+			selected: true,
+		});
 	});
 	it("tops the preferred engines up to four from whatever else is available", () => {
 		expect(defaultEngines(["claude", "copilot", "qwen", "mistral", "grok"])).toEqual([

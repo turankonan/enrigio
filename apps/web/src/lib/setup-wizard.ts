@@ -63,14 +63,21 @@ export function draftFromSuggestion(s: OnboardingSuggestion, availableModels: st
 			additionalDomains: s.additionalDomains,
 		},
 		questions,
-		rivals: s.competitors.map((c, i) => ({
-			name: c.name,
-			site: c.domains[0] ?? "",
-			selected: i < MAX_RIVALS,
-			custom: false,
-		})),
+		rivals: preselectRivals(s.competitors.map((c) => ({ name: c.name, site: c.domains[0] ?? "", custom: false }))),
 		engines: defaultEngines(availableModels),
 	};
+}
+
+// A rival is scanned by its site; one without a site would be dropped when the scan starts.
+const hasSite = (r: { site: string }) => r.site.trim() !== "";
+
+function preselectRivals(rivals: Omit<DraftRival, "selected">[]): DraftRival[] {
+	let picked = 0;
+	return rivals.map((r) => {
+		const selected = hasSite(r) && picked < MAX_RIVALS;
+		if (selected) picked++;
+		return { ...r, selected };
+	});
 }
 
 export function selectedBuyerCount(d: SetupDraft): number {
@@ -105,13 +112,13 @@ export function addCustomQuestion(d: SetupDraft, text: string, intent: PromptInt
 export function toggleRival(d: SetupDraft, index: number): SetupDraft {
 	const r = d.rivals[index];
 	if (!r) return d;
-	if (!r.selected && d.rivals.filter((x) => x.selected).length >= MAX_RIVALS) return d;
+	if (!r.selected && (!hasSite(r) || d.rivals.filter((x) => x.selected).length >= MAX_RIVALS)) return d;
 	return { ...d, rivals: d.rivals.map((x, i) => (i === index ? { ...x, selected: !x.selected } : x)) };
 }
 
 export function addCustomRival(d: SetupDraft, name: string, site: string): SetupDraft {
 	const n = name.trim();
-	if (!n || d.rivals.filter((x) => x.selected).length >= MAX_RIVALS) return d;
+	if (!n || !hasSite({ site }) || d.rivals.filter((x) => x.selected).length >= MAX_RIVALS) return d;
 	return { ...d, rivals: [...d.rivals, { name: n, site: site.trim(), selected: true, custom: true }] };
 }
 

@@ -36,16 +36,21 @@ export function StepRivals({ draft, onChange, onNext, onBack }: Props) {
 			<div className="space-y-2">
 				{draft.rivals.map((rival, index) => {
 					const id = `setup-rival-${index}`;
+					const siteless = !rival.site.trim();
 					return (
 						<label key={id} htmlFor={id} className="flex items-center gap-3 text-sm">
 							<Checkbox
 								id={id}
 								checked={rival.selected}
-								disabled={!rival.selected && atMax}
+								disabled={!rival.selected && (atMax || siteless)}
 								onCheckedChange={() => onChange(toggleRival(draft, index))}
 							/>
 							<span>{rival.name}</span>
-							{rival.site && <span className="text-muted-foreground">{rival.site}</span>}
+							{siteless ? (
+								<span className="text-muted-foreground">{t("setup.rivals.site_required")}</span>
+							) : (
+								<span className="text-muted-foreground">{rival.site}</span>
+							)}
 						</label>
 					);
 				})}
@@ -74,7 +79,7 @@ export function StepRivals({ draft, onChange, onNext, onBack }: Props) {
 					disabled={atMax}
 					onChange={(e) => setSite(e.target.value)}
 				/>
-				<Button type="submit" variant="outline" disabled={atMax || !name.trim()}>
+				<Button type="submit" variant="outline" disabled={atMax || !name.trim() || !site.trim()}>
 					{t("setup.rivals.add")}
 				</Button>
 			</form>
