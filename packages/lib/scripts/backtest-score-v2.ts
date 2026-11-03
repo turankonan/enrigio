@@ -13,7 +13,7 @@ import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { Client } from "pg";
 import { resolveEffectiveMarket } from "../src/markets/effective";
-import { direction, scoreV2, spearman, type VerdictRow, verdict } from "../src/score";
+import { type Direction, direction, scoreV2, spearman, type VerdictRow, verdict } from "../src/score";
 import { getEffectiveBrandedStatus } from "../src/tag-utils";
 import { extractTextContent } from "../src/text-extraction";
 
@@ -39,6 +39,8 @@ const { values } = parseArgs({
 const WINDOW_DAYS = 30;
 const MIN_MODELS = 4;
 const MIN_RUNS_PER_PROMPT = 4;
+// Spearman over fewer prompts is noise, so such a brand cannot qualify.
+const MIN_COHORT_PROMPTS = 3;
 
 interface BrandRow {
 	id: string;
@@ -75,8 +77,8 @@ interface BrandReport {
 	spearman: number | null;
 	trendV1: number | null;
 	trendV2: number | null;
-	directionV1: string;
-	directionV2: string;
+	directionV1: Direction | "n/a";
+	directionV2: Direction | "n/a";
 	levelGap: number | null;
 	trendGap: number | null;
 }
@@ -126,14 +128,16 @@ function buildCohort(cur: RunRow[], prev: RunRow[], unbrandedIds: Set<string>): 
 	return cohort;
 }
 
-function analyseBrand(brand: BrandRow, prompts: PromptRow[], runs: RunRow[], now: Date): BrandReport | null {
+type Analysis = { report: BrandReport } | { skipped: "too few shared models" | "too few cohort prompts" };
+
+function analyseBrand(brand: BrandRow, prompts: PromptRow[], runs: RunRow[], now: Date): Analysis {
 	const cutoff = new Date(now.getTime() - WINDOW_DAYS * 864e5);
 	const current = runs.filter((r) => r.created_at >= cutoff);
 	const previous = runs.filter((r) => r.created_at < cutoff);
 	// Only models seen in both windows, so a pick change cannot pose as a score change.
 	const modelsBefore = new Set(previous.map((r) => r.model));
 	const shared = [...new Set(current.map((r) => r.model))].filter((m) => modelsBefore.has(m));
-	if (shared.length < MIN_MODELS) return null;
+	if (shared.length < MIN_MODELS) return { skipped: "too few shared models" };
 	const inShared = (r: RunRow) => shared.includes(r.model);
 	const cur = current.filter(inShared);
 
@@ -141,7 +145,7 @@ function analyseBrand(brand: BrandRow, prompts: PromptRow[], runs: RunRow[], now
 		prompts.filter((p) => !getEffectiveBrandedStatus(p.system_tags, p.tags).isBranded).map((p) => p.id),
 	);
 	const cohort = buildCohort(cur, previous.filter(inShared), unbrandedIds);
-	if (cohort.length === 0) return null;
+	if (cohort.length < MIN_COHORT_PROMPTS) return { skipped: "too few cohort prompts" };
 	const curCohort = cohort.flatMap((c) => c.cur);
 	const prevCohort = cohort.flatMap((c) => c.prev);
 
@@ -154,7 +158,7 @@ function analyseBrand(brand: BrandRow, prompts: PromptRow[], runs: RunRow[], now
 	const trendV2 = delta(v2, scoreV2(toScored(prevCohort)));
 	const gap = delta(trendV1, trendV2);
 
-	return {
+	const report: BrandReport = {
 		brandId: brand.id,
 		name: brand.name,
 		cohortPrompts: cohort.length,
@@ -171,6 +175,7 @@ function analyseBrand(brand: BrandRow, prompts: PromptRow[], runs: RunRow[], now
 		levelGap: delta(v1Buyer, v2),
 		trendGap: gap === null ? null : Math.abs(gap),
 	};
+	return { report };
 }
 
 async function runBacktest(client: Client): Promise<void> {
@@ -180,6 +185,7 @@ async function runBacktest(client: Client): Promise<void> {
 		"SELECT id, name, default_market_key FROM brands WHERE onboarded AND enabled",
 	);
 	const reports: BrandReport[] = [];
+	const skipped: Record<string, string[]> = {};
 	for (const brand of brandRows) {
 		const marketKey = resolveEffectiveMarket({ defaultMarketKey: brand.default_market_key }).key;
 		const { rows: prompts } = await client.query<PromptRow>(
@@ -187,19 +193,18 @@ async function runBacktest(client: Client): Promise<void> {
 			[brand.id],
 		);
 		const runs = await loadRuns(client, brand.id, marketKey, since);
-		const report = analyseBrand(brand, prompts, runs, now);
-		if (report) reports.push(report);
+		const analysis = analyseBrand(brand, prompts, runs, now);
+		if ("report" in analysis) reports.push(analysis.report);
+		else (skipped[analysis.skipped] ??= []).push(brand.name);
 	}
 
 	console.table(reports.map(({ brandId, ...rest }) => rest));
-	const rows: VerdictRow[] = reports
-		.filter((r) => r.trendGap !== null)
-		.map((r) => ({
-			spearman: r.spearman,
-			directionV1: r.directionV1 as VerdictRow["directionV1"],
-			directionV2: r.directionV2 as VerdictRow["directionV2"],
-			trendGap: r.trendGap as number,
-		}));
+	for (const [reason, names] of Object.entries(skipped)) console.log(`Skipped (${reason}): ${names.join(", ")}`);
+	const rows: VerdictRow[] = [];
+	for (const r of reports) {
+		if (r.trendGap === null || r.directionV1 === "n/a" || r.directionV2 === "n/a") continue;
+		rows.push({ spearman: r.spearman, directionV1: r.directionV1, directionV2: r.directionV2, trendGap: r.trendGap });
+	}
 	const result = verdict(rows);
 	// Level gap is reported, never gated: every v2 weight is ≤ 1, so v2 sits
 	// below v1-buyer by design. The gate is ordering and trend, not level.
