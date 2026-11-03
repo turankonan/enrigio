@@ -113,12 +113,20 @@ export function useSetupWizard(brand: WizardBrand) {
 			setPhase({ kind: "editing", draft: brand.setupDraft });
 			return;
 		}
+		// A brand can reach the wizard with no analysis job (the enqueue after creation is fire-and-forget), and
+		// polling alone would wait out the whole timeout. Starting one is a no-op while a job is in flight; a
+		// finished or failed job is left for the poll to report rather than paid for again.
+		const analyze = async () => {
+			const status = await getAnalyzeBrandStatusFn({ data: { brandId: brand.id } }).catch(() => null);
+			if (status?.status === "pending") {
+				await startAnalyzeBrandFn({ data: { brandId: brand.id, website: brand.website } }).catch(() => {});
+			}
+			setPhase({ kind: "analyzing", failed: false });
+		};
 		getLatestFirstScanFn({ data: { brandId: brand.id } })
-			.then((scan) =>
-				setPhase(scan ? { kind: "scanning", firstScanId: scan.firstScanId } : { kind: "analyzing", failed: false }),
-			)
-			.catch(() => setPhase({ kind: "analyzing", failed: false }));
-	}, [phase.kind, picker.isPending, brand.id, brand.setupDraft]);
+			.then((scan) => (scan ? setPhase({ kind: "scanning", firstScanId: scan.firstScanId }) : analyze()))
+			.catch(analyze);
+	}, [phase.kind, picker.isPending, brand.id, brand.setupDraft, brand.website]);
 
 	const analyzing = phase.kind === "analyzing" && !phase.failed;
 	const analysis = useQuery({
