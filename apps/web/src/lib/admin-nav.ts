@@ -1,4 +1,4 @@
-import { ChartLine, FileText, Table, Wrench } from "@phosphor-icons/react";
+import { ChartLine, FileText, Gauge, Table, Wrench } from "@phosphor-icons/react";
 import type { NavItem } from "@/lib/nav-links";
 
 export function adminNavItems({
@@ -19,5 +19,6 @@ export function adminNavItems({
 		...(reportsEnabled ? [reports] : []),
 		{ title: "Workflows", link: { to: "/admin/workflows" }, icon: ChartLine },
 		{ title: "Tools", link: { to: "/admin/tools" }, icon: Wrench },
+		{ title: "Scores", link: { to: "/admin/scores" }, icon: Gauge },
 	];
 }

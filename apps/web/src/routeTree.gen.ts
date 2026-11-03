@@ -27,6 +27,7 @@ import { Route as DotwellKnownOauthProtectedResourceIndexRouteImport } from './r
 import { Route as DotwellKnownOauthProtectedResourceSplatRouteImport } from './routes/[.]well-known/oauth-protected-resource/$'
 import { Route as AuthedAcceptInvitationInvitationIdRouteImport } from './routes/_authed/accept-invitation/$invitationId'
 import { Route as AuthedAdminIndexRouteImport } from './routes/_authed/admin/index'
+import { Route as AuthedAdminScoresRouteImport } from './routes/_authed/admin/scores'
 import { Route as AuthedAdminToolsRouteImport } from './routes/_authed/admin/tools'
 import { Route as AuthedAdminWorkflowsRouteImport } from './routes/_authed/admin/workflows'
 import { Route as AuthedAppIndexRouteImport } from './routes/_authed/app/index'
@@ -186,6 +187,11 @@ const AuthedAcceptInvitationInvitationIdRoute =
 const AuthedAdminIndexRoute = AuthedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthedAdminRoute,
+} as any)
+const AuthedAdminScoresRoute = AuthedAdminScoresRouteImport.update({
+  id: '/scores',
+  path: '/scores',
   getParentRoute: () => AuthedAdminRoute,
 } as any)
 const AuthedAdminToolsRoute = AuthedAdminToolsRouteImport.update({
@@ -572,6 +578,7 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-authorization-server/$': typeof DotwellKnownOauthAuthorizationServerSplatRoute
   '/.well-known/oauth-protected-resource/$': typeof DotwellKnownOauthProtectedResourceSplatRoute
   '/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
+  '/admin/scores': typeof AuthedAdminScoresRoute
   '/admin/tools': typeof AuthedAdminToolsRoute
   '/admin/workflows': typeof AuthedAdminWorkflowsRoute
   '/app/new': typeof AuthedAppNewRoute
@@ -654,6 +661,7 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-authorization-server/$': typeof DotwellKnownOauthAuthorizationServerSplatRoute
   '/.well-known/oauth-protected-resource/$': typeof DotwellKnownOauthProtectedResourceSplatRoute
   '/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
+  '/admin/scores': typeof AuthedAdminScoresRoute
   '/admin/tools': typeof AuthedAdminToolsRoute
   '/admin/workflows': typeof AuthedAdminWorkflowsRoute
   '/app/new': typeof AuthedAppNewRoute
@@ -738,6 +746,7 @@ export interface FileRoutesById {
   '/.well-known/oauth-authorization-server/$': typeof DotwellKnownOauthAuthorizationServerSplatRoute
   '/.well-known/oauth-protected-resource/$': typeof DotwellKnownOauthProtectedResourceSplatRoute
   '/_authed/accept-invitation/$invitationId': typeof AuthedAcceptInvitationInvitationIdRoute
+  '/_authed/admin/scores': typeof AuthedAdminScoresRoute
   '/_authed/admin/tools': typeof AuthedAdminToolsRoute
   '/_authed/admin/workflows': typeof AuthedAdminWorkflowsRoute
   '/_authed/app/new': typeof AuthedAppNewRoute
@@ -825,6 +834,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-authorization-server/$'
     | '/.well-known/oauth-protected-resource/$'
     | '/accept-invitation/$invitationId'
+    | '/admin/scores'
     | '/admin/tools'
     | '/admin/workflows'
     | '/app/new'
@@ -907,6 +917,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-authorization-server/$'
     | '/.well-known/oauth-protected-resource/$'
     | '/accept-invitation/$invitationId'
+    | '/admin/scores'
     | '/admin/tools'
     | '/admin/workflows'
     | '/app/new'
@@ -990,6 +1001,7 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-authorization-server/$'
     | '/.well-known/oauth-protected-resource/$'
     | '/_authed/accept-invitation/$invitationId'
+    | '/_authed/admin/scores'
     | '/_authed/admin/tools'
     | '/_authed/admin/workflows'
     | '/_authed/app/new'
@@ -1224,6 +1236,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthedAdminIndexRouteImport
+      parentRoute: typeof AuthedAdminRoute
+    }
+    '/_authed/admin/scores': {
+      id: '/_authed/admin/scores'
+      path: '/scores'
+      fullPath: '/admin/scores'
+      preLoaderRoute: typeof AuthedAdminScoresRouteImport
       parentRoute: typeof AuthedAdminRoute
     }
     '/_authed/admin/tools': {
@@ -1692,12 +1711,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthedAdminRouteChildren {
+  AuthedAdminScoresRoute: typeof AuthedAdminScoresRoute
   AuthedAdminToolsRoute: typeof AuthedAdminToolsRoute
   AuthedAdminWorkflowsRoute: typeof AuthedAdminWorkflowsRoute
   AuthedAdminIndexRoute: typeof AuthedAdminIndexRoute
 }
 
 const AuthedAdminRouteChildren: AuthedAdminRouteChildren = {
+  AuthedAdminScoresRoute: AuthedAdminScoresRoute,
   AuthedAdminToolsRoute: AuthedAdminToolsRoute,
   AuthedAdminWorkflowsRoute: AuthedAdminWorkflowsRoute,
   AuthedAdminIndexRoute: AuthedAdminIndexRoute,
