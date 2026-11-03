@@ -81,8 +81,13 @@ export async function classifyMention(input: {
 		// runStructuredCompletionPrompt is web-search OFF: a single completion over the
 		// context in the prompt, no tools, no agent loop. Returns { object, modelVersion }.
 		if (input.profile) {
-			const { object } = await runStructuredCompletionPrompt(prompt, claimsSchema);
-			return { sentiment: object.sentiment, brandRank: object.brandRank, claims: object.claims };
+			try {
+				const { object } = await runStructuredCompletionPrompt(prompt, claimsSchema);
+				return { sentiment: object.sentiment, brandRank: object.brandRank, claims: object.claims };
+			} catch (error) {
+				// Sentiment and rank are still worth keeping; with no claims the run stays "not assessed".
+				console.error("[mention-classify] claims classification failed, retrying without claims:", error);
+			}
 		}
 		const { object } = await runStructuredCompletionPrompt(prompt, baseSchema);
 		return { sentiment: object.sentiment, brandRank: object.brandRank };

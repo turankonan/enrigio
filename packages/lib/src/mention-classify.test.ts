@@ -55,4 +55,20 @@ describe("classifyMention", () => {
 		const out = await classifyMention({ answer: "Acme is first.", brandName: "Acme", competitorNames: [] });
 		expect(out).toEqual({ sentiment: "positive", brandRank: 1 });
 	});
+
+	it("keeps sentiment and rank, without claims, when only the claims call fails", async () => {
+		runStructuredCompletionPrompt.mockReset();
+		runStructuredCompletionPrompt
+			.mockRejectedValueOnce(new Error("schema mismatch"))
+			.mockResolvedValueOnce({ object: { sentiment: "negative", brandRank: 3 } });
+		const out = await classifyMention({
+			answer: "Acme is third.",
+			brandName: "Acme",
+			competitorNames: [],
+			profile: { name: "Acme", website: "acme.example", additionalDomains: [], aliases: [], keywords: [] },
+		});
+		expect(out).toEqual({ sentiment: "negative", brandRank: 3 });
+		expect(out).not.toHaveProperty("claims");
+		expect(runStructuredCompletionPrompt).toHaveBeenCalledTimes(2);
+	});
 });
