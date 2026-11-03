@@ -164,8 +164,8 @@ describe("analyzeBrand", () => {
 			suggestedPrompts: [
 				// Tags are now free-form / brand-tailored. Normalize step lowercases
 				// + kebab-cases + dedupes + caps at 3 per prompt.
-				{ prompt: "Best Widgets", tags: ["Industrial Supplies", "Manufacturing"], intent: null },
-				{ prompt: "best widgets", tags: ["industrial-supplies"], intent: null }, // duplicate after lowercasing
+				{ prompt: "Best Widgets", tags: ["Industrial Supplies", "Manufacturing"], intent: "discovery" },
+				{ prompt: "best widgets", tags: ["industrial-supplies"], intent: "discovery" }, // duplicate after lowercasing
 				{
 					prompt: "acme alternative",
 					tags: ["alternatives", "industrial supplies", "buying guide", "extra-tag"],
@@ -194,7 +194,7 @@ describe("analyzeBrand", () => {
 		});
 
 		expect(result.suggestedPrompts).toEqual([
-			{ prompt: "best widgets", tags: ["industrial-supplies", "manufacturing"], intent: null },
+			{ prompt: "best widgets", tags: ["industrial-supplies", "manufacturing"], intent: "discovery" },
 			{
 				prompt: "acme alternative",
 				intent: null,
@@ -239,7 +239,7 @@ describe("analyzeBrand", () => {
 		expect(result.suggestedPrompts).toEqual([]);
 	});
 
-	it("caps competitors and prompts at the requested maxes", async () => {
+	it("caps competitors at the requested max", async () => {
 		(runStructuredResearchPrompt as any).mockResolvedValueOnce({
 			brandName: "Acme",
 			additionalDomains: [],
@@ -249,19 +249,14 @@ describe("analyzeBrand", () => {
 				domains: [`comp${i}.com`],
 				aliases: [],
 			})),
-			suggestedPrompts: Array.from({ length: 50 }, (_, i) => ({
-				prompt: `prompt ${i}`,
-				tags: ["best-of"],
-			})),
+			suggestedPrompts: [],
 		});
 
 		const result = await analyzeBrand({
 			website: "acme.com",
 			maxCompetitors: 3,
-			maxPrompts: 5,
 		});
 		expect(result.competitors).toHaveLength(3);
-		expect(result.suggestedPrompts).toHaveLength(5);
 	});
 });
 
@@ -282,6 +277,81 @@ describe("analyzeBrand prompt intent", () => {
 
 		const result = await analyzeBrand({ website: "acme.com", maxCompetitors: 0, maxPrompts: 10 });
 
-		expect(result.suggestedPrompts.map((p) => p.intent)).toEqual(["discovery", null, null, null]);
+		expect(result.suggestedPrompts.map((p) => p.intent)).toEqual(["discovery", null]);
+	});
+});
+
+function mockLlm(raw: Record<string, unknown>) {
+	(runStructuredResearchPrompt as any).mockResolvedValueOnce(raw);
+}
+
+function lastPrompt(): string {
+	return vi.mocked(runStructuredResearchPrompt).mock.calls.at(-1)?.[0] as string;
+}
+
+describe("analyzeBrand profile fields and question set", () => {
+	it("returns sector, location and a catalog market key, nulling an unknown market", async () => {
+		mockLlm({
+			brandName: "Atlas Fizyo",
+			additionalDomains: [],
+			aliases: [],
+			competitors: [],
+			suggestedPrompts: [],
+			sector: "fizyoterapi merkezi",
+			location: "Kadıköy, İstanbul",
+			marketKey: "xx-XX",
+		});
+		const out = await analyzeBrand({ website: "https://atlasfizyo.com" });
+		expect(out.sector).toBe("fizyoterapi merkezi");
+		expect(out.location).toBe("Kadıköy, İstanbul");
+		expect(out.marketKey).toBeNull();
+	});
+
+	it("keeps at most 4 unbranded prompts per intent and at most 3 branded, unbranded first", async () => {
+		const unbranded = (intent: string, n: number) =>
+			Array.from({ length: n }, (_, i) => ({ prompt: `${intent} q${i}`, tags: [], intent }));
+		mockLlm({
+			brandName: "Atlas Fizyo",
+			additionalDomains: [],
+			aliases: [],
+			competitors: [],
+			sector: null,
+			location: null,
+			marketKey: "tr-TR",
+			suggestedPrompts: [
+				...unbranded("discovery", 6),
+				...unbranded("comparison", 4),
+				...unbranded("local", 2),
+				...unbranded("price", 5),
+				{ prompt: "atlas fizyo güvenilir mi", tags: [], intent: null },
+				{ prompt: "atlas fizyo adresi", tags: [], intent: null },
+				{ prompt: "atlas fizyo yorumlar", tags: [], intent: null },
+				{ prompt: "atlas fizyo fiyat", tags: [], intent: null },
+			],
+		});
+		const out = await analyzeBrand({ website: "https://atlasfizyo.com", brandName: "Atlas Fizyo" });
+		const intents = out.suggestedPrompts.map((p) => p.intent);
+		expect(intents.filter((i) => i === "discovery")).toHaveLength(4);
+		expect(intents.filter((i) => i === "comparison")).toHaveLength(4);
+		expect(intents.filter((i) => i === "local")).toHaveLength(2);
+		expect(intents.filter((i) => i === "price")).toHaveLength(4);
+		expect(intents.filter((i) => i === null)).toHaveLength(3);
+		expect(intents.indexOf(null)).toBe(14); // unbranded first
+		expect(out.marketKey).toBe("tr-TR");
+	});
+
+	it("tells the model which language to write the questions in", async () => {
+		mockLlm({
+			brandName: "Acme",
+			additionalDomains: [],
+			aliases: [],
+			competitors: [],
+			suggestedPrompts: [],
+			sector: null,
+			location: null,
+			marketKey: null,
+		});
+		await analyzeBrand({ website: "https://acme.example", language: "tr" });
+		expect(lastPrompt()).toContain("Turkish");
 	});
 });

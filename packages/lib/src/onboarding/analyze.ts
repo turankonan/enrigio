@@ -11,8 +11,10 @@
  * schema from it and hands it to the model, so the prompt itself only needs
  * to communicate context + quality guidelines, not field-by-field shape.
  */
+import { MARKET_CATALOG } from "@workspace/config/markets";
 import { z } from "zod";
 import { PROMPT_INTENTS, type PromptIntent } from "../db/schema";
+import { isPromptBranded } from "../tag-utils";
 import { getWebsiteExcerpt } from "../website-excerpt";
 import { runStructuredResearchPrompt } from "./llm";
 import {
@@ -23,6 +25,9 @@ import {
 	uniqueLowercase,
 	uniqueTrim,
 } from "./utils";
+
+export const UNBRANDED_PER_INTENT = 4;
+export const BRANDED_COUNT = 3;
 
 // Tags are free-form and brand-tailored: the LLM invents a small vocabulary
 // (≤5 distinct values) that's actually useful for filtering THIS brand's
@@ -61,7 +66,7 @@ const promptSchema = z.object({
 		),
 });
 
-function buildSchema(args: { maxCompetitors: number; maxPrompts: number }) {
+function buildSchema(args: { maxCompetitors: number }) {
 	return z.object({
 		brandName: z
 			.string()
@@ -78,6 +83,24 @@ function buildSchema(args: { maxCompetitors: number; maxPrompts: number }) {
 			.describe(
 				`Other names users use for this brand (abbreviations, parent-company names, common misspellings). ${ALIAS_GUIDANCE} Empty if none are commonly used.`,
 			),
+		sector: z
+			.string()
+			.nullable()
+			.describe(
+				'What the business is, in 2-5 words in the site\'s language (e.g. "fizyoterapi merkezi", "SaaS invoicing tool"). Null if unclear.',
+			),
+		location: z
+			.string()
+			.nullable()
+			.describe(
+				'The city or region the business serves, as written on the site (e.g. "Kadıköy, İstanbul"). Null for a global or online-only business.',
+			),
+		marketKey: z
+			.enum(MARKET_CATALOG.map((m) => m.key) as [string, ...string[]])
+			.nullable()
+			.describe(
+				"The market the site addresses, as language-country: pick from the allowed keys by the site's language and the country it serves. Null if none fits.",
+			),
 		competitors: z
 			.array(competitorSchema)
 			.describe(
@@ -86,7 +109,7 @@ function buildSchema(args: { maxCompetitors: number; maxPrompts: number }) {
 		suggestedPrompts: z
 			.array(promptSchema)
 			.describe(
-				`Up to ${args.maxPrompts} suggested AI tracking prompts. IMPORTANT: the MAJORITY must be UNBRANDED — generic category/persona queries that do NOT contain the brand name (e.g. "best [category]", "best [category] for [persona]", "[category] vs alternatives", "where to buy [category]"). Only 3-5 should be branded (contain the brand name, e.g. "[brand] alternative", "is [brand] worth it"). The goal is to test whether AI models mention the brand organically in response to unbranded queries. ${TAG_GUIDANCE}`,
+				`Exactly ${UNBRANDED_PER_INTENT * PROMPT_INTENTS.length} UNBRANDED buyer questions — ${UNBRANDED_PER_INTENT} for each intent: discovery (finding options, "best X", "which X"), comparison (X vs Y, what to look for), local ("near me", in <city>), price (cost, insurance, what's included) — followed by exactly ${BRANDED_COUNT} BRANDED questions that name the brand (trust/reviews, services/address, alternatives). Write them the way a real customer types into ChatGPT, in the language given in the prompt. ${TAG_GUIDANCE}`,
 			),
 	});
 }
@@ -112,6 +135,9 @@ export interface OnboardingSuggestion {
 	aliases: string[];
 	competitors: OnboardingCompetitor[];
 	suggestedPrompts: OnboardingPrompt[];
+	sector: string | null;
+	location: string | null;
+	marketKey: string | null;
 }
 
 export interface AnalyzeBrandOptions {
@@ -127,6 +153,8 @@ export interface AnalyzeBrandOptions {
 	maxCompetitors?: number;
 	/** 0 disables prompt generation entirely. */
 	maxPrompts?: number;
+	/** BCP-47 language code the questions are written in; defaults to the site's language. */
+	language?: string;
 }
 
 const DEFAULT_MAX_COMPETITORS = 10;
@@ -173,6 +201,7 @@ export async function buildAnalysisContext(options: AnalyzeBrandOptions): Promis
 		websiteExcerpt,
 		includeCompetitors: maxCompetitors > 0,
 		includePrompts: maxPrompts > 0,
+		language: options.language,
 	});
 
 	return {
@@ -181,7 +210,7 @@ export async function buildAnalysisContext(options: AnalyzeBrandOptions): Promis
 		brandNameHint,
 		...(providedBrandName !== undefined && { providedBrandName }),
 		prompt,
-		schema: buildSchema({ maxCompetitors, maxPrompts }),
+		schema: buildSchema({ maxCompetitors }),
 		maxCompetitors,
 		maxPrompts,
 	};
@@ -196,7 +225,6 @@ export function normalizeAnalysisResult(raw: RawSuggestion, ctx: AnalysisContext
 		includeCompetitors: ctx.maxCompetitors > 0,
 		includePrompts: ctx.maxPrompts > 0,
 		maxCompetitors: ctx.maxCompetitors,
-		maxPrompts: ctx.maxPrompts,
 	});
 }
 
@@ -252,6 +280,12 @@ function isSubPage(analysisUrl: string): boolean {
 	}
 }
 
+const LANGUAGE_NAMES: Record<string, string> = { tr: "Turkish", en: "English", de: "German" };
+
+function languageName(code: string): string {
+	return LANGUAGE_NAMES[code.toLowerCase().split("-")[0] ?? ""] ?? code;
+}
+
 function buildPrompt(args: {
 	analysisUrl: string;
 	trackedDomain: string;
@@ -260,6 +294,7 @@ function buildPrompt(args: {
 	websiteExcerpt: string;
 	includeCompetitors: boolean;
 	includePrompts: boolean;
+	language?: string;
 }): string {
 	const excerptBlock = args.websiteExcerpt
 		? `\nText from ${args.analysisUrl}:\n---\n${args.websiteExcerpt}\n---\n`
@@ -280,10 +315,16 @@ function buildPrompt(args: {
 	if (!args.includeCompetitors) skipNotes.push("Return an empty array for competitors.");
 	if (!args.includePrompts) skipNotes.push("Return an empty array for suggestedPrompts.");
 
+	const languageLine = args.language
+		? `Write suggestedPrompts in ${languageName(args.language)}.`
+		: "Write suggestedPrompts in the language the site is written in.";
+
 	return `Analyze the brand at ${args.analysisUrl}.
 
 ${nameLine}
 ${scopeNote}${excerptBlock}
+${languageLine}
+
 Use web search to verify facts. Never invent information — return empty arrays when uncertain.
 
 You MUST return the structured JSON object — even if you can find nothing about this brand. In that case set brandName to the likely name above and return empty arrays for every other field. Refusing to produce JSON, or replying with prose explaining what you don't know, is a failure mode; an object with mostly-empty arrays is the correct answer when information is genuinely unavailable.${skipNotes.length > 0 ? `\n\n${skipNotes.join(" ")}` : ""}`;
@@ -297,18 +338,8 @@ function normalize(args: {
 	includeCompetitors: boolean;
 	includePrompts: boolean;
 	maxCompetitors: number;
-	maxPrompts: number;
 }): OnboardingSuggestion {
-	const {
-		raw,
-		website,
-		brandNameHint,
-		providedBrandName,
-		includeCompetitors,
-		includePrompts,
-		maxCompetitors,
-		maxPrompts,
-	} = args;
+	const { raw, website, brandNameHint, providedBrandName, includeCompetitors, includePrompts, maxCompetitors } = args;
 
 	// A caller-supplied name wins: it's what the user asked to track, and for a
 	// sub-brand the model tends to answer with the parent it recognises
@@ -324,13 +355,20 @@ function normalize(args: {
 	const dedupedAdditionalDomains = uniqueLowercase(additionalDomains);
 	const aliases = filterRedundantAliases(uniqueTrim(raw.aliases ?? []), brandName);
 
+	const marketKey = MARKET_CATALOG.some((m) => m.key === raw.marketKey) ? (raw.marketKey as string) : null;
+
 	return {
 		brandName,
 		website,
 		additionalDomains: dedupedAdditionalDomains,
 		aliases,
 		competitors: includeCompetitors ? normalizeCompetitors(raw.competitors ?? [], ownedDomains, maxCompetitors) : [],
-		suggestedPrompts: includePrompts ? normalizePrompts(raw.suggestedPrompts ?? [], maxPrompts) : [],
+		suggestedPrompts: includePrompts
+			? selectQuestionSet(normalizePrompts(raw.suggestedPrompts ?? [], Number.MAX_SAFE_INTEGER), brandName, website)
+			: [],
+		sector: raw.sector?.trim() || null,
+		location: raw.location?.trim() || null,
+		marketKey,
 	};
 }
 
@@ -385,4 +423,18 @@ function normalizePrompts(raw: RawSuggestion["suggestedPrompts"], maxPrompts: nu
 	}
 
 	return prompts;
+}
+
+/**
+ * The fixed shape the wizard expects: up to 4 unbranded questions per intent,
+ * intents in catalog order, then up to 3 branded. Whatever the model sent
+ * beyond that is dropped rather than shown.
+ */
+export function selectQuestionSet(prompts: OnboardingPrompt[], brandName: string, website: string): OnboardingPrompt[] {
+	const branded = prompts.filter((p) => isPromptBranded(p.prompt, brandName, website)).slice(0, BRANDED_COUNT);
+	const unbranded = prompts.filter((p) => !isPromptBranded(p.prompt, brandName, website));
+	const byIntent = PROMPT_INTENTS.flatMap((intent: PromptIntent) =>
+		unbranded.filter((p) => p.intent === intent).slice(0, UNBRANDED_PER_INTENT),
+	);
+	return [...byIntent, ...branded.map((p) => ({ ...p, intent: null }))];
 }
