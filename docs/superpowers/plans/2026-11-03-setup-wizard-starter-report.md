@@ -4,7 +4,7 @@
 
 **Goal:** A logged-in user adds a brand through a 5-step wizard (site → questions → rivals → engines → first scan), watches the first scan arrive live, and opens a frozen starter report.
 
-**Architecture:** The wizard replaces `PromptWizard` on the brand route while `brands.onboarded` is false and keeps its working state in `brands.setup_draft`. Starting the scan writes everything in one transaction plus a `first_scans` row that lists every expected prompt × engine pair, then enqueues one `process-prompt` job per prompt carrying `firstScanId`; the worker runs those once per engine and stamps `first_scan_id` on runs and failure events. Completion is "every expected pair finished". The report is a snapshot built from that scan's runs and stored in `starter_reports`.
+**Architecture:** The wizard replaces `PromptWizard` on the brand route while `brands.onboarded` is false and keeps its working state in `brands.setup_draft`. Starting the scan claims the brand and writes everything in one transaction plus a `first_scans` row (one per brand) that lists every expected prompt × engine pair, then enqueues one `process-prompt` job per prompt carrying `firstScanId`; the worker runs those once per engine and stamps `first_scan_id` on runs and failure events. Completion is "every expected pair finished". The report is a snapshot built from that scan's runs and stored in `starter_reports`.
 
 **Tech Stack:** TypeScript, TanStack Start server functions + TanStack Query, React + shadcn (`@workspace/ui`), Drizzle + PostgreSQL, pg-boss worker, zod, Vitest, i18n via `t()` with `apps/web/src/locales/{en,tr}.json`.
 
@@ -17,8 +17,9 @@
 - Server modules that export anything besides `createServerFn` stubs are shipped whole to the client. Keep `*-core.ts` (plain functions, db imports) separate from `*.ts` (server functions only), as `onboarding.ts` / `onboarding-core.ts` do. Route and component files import from `@workspace/lib/db/schema` with `import type` only.
 - Every user-visible string goes through `t("setup.…")` / `t("starter_report.…")` with entries in **both** `apps/web/src/locales/en.json` and `tr.json`; Turkish copy comes from the board, English is the equivalent.
 - First-scan runs: replication 1, limited to the scan's engines, stamped with `first_scan_id`; regular tracking after the scan is unchanged.
-- `onboarded = true` is written last inside the start-scan transaction; enqueue happens after commit and is retried by the status poll; job `singletonKey: first-scan-${promptId}`.
-- Report snapshot numbers are computed once from runs with the scan's `first_scan_id` and never recomputed; `partial` only via the user's action at ≥ 50 % coverage.
+- Starting the scan is one transaction that first claims the brand with a guarded `onboarded = false → true` update (second caller gets `AlreadyStartedError`), and `first_scans.brand_id` is unique; enqueue happens after commit and is retried by the status poll; job `singletonKey: first-scan-${promptId}`.
+- Scan words: *done* = run saved, *failed* = failure event, *missing* = no outcome, *settled* = nothing missing. `complete` needs settled and zero failures; coverage and the 50 % partial threshold count successes only; `partial` is final.
+- Report snapshot numbers are computed once from runs with the scan's `first_scan_id` and never recomputed; `partial` only via the user's action at ≥ 50 % successful pairs.
 - No fixed duration is promised anywhere; `etaSeconds` is null until 5 pairs finished.
 - Commit subjects are plain imperative sentences. Comments explain why only. Mark deliberate shortcuts with `// ponytail:`.
 - Phase 1b items (public sign-up, plans, share links, PDF, email, locks) are out of scope; do not add them.
@@ -38,7 +39,7 @@
 | `apps/web/src/server/first-scan.ts` | Server functions wrapping the above + `saveSetupDraftFn` |
 | `apps/web/src/server/starter-report-core.ts` (+ test) | `buildStarterReport` (pure) + `getOrBuildStarterReport`, `retryStarterReportSection` |
 | `apps/web/src/server/starter-report.ts` | Server functions |
-| `apps/web/src/lib/postgres-read.ts` | `getFirstScanRuns`, `getFirstScanFinishedPairs`, `getFirstScanCitations` |
+| `apps/web/src/lib/postgres-read.ts` | `getFirstScanRuns`, `getFirstScanFinishedPairs`, `getFirstScanRivalCitations` |
 | `apps/web/src/routes/_authed/app/org/$org/new.tsx` | URL-only entry, enqueues analysis |
 | `apps/web/src/components/setup-wizard/*.tsx` | `SetupWizard`, `StepSite`, `StepQuestions`, `StepRivals`, `StepEngines`, `StepFirstScan`, `Stepper` |
 | `apps/web/src/routes/_authed/app/org/$org/brand/$brand/index.tsx` | Render `SetupWizard` while not onboarded |
@@ -104,9 +105,12 @@ export const firstScans = pgTable(
 	"first_scans",
 	{
 		id: uuid("id").defaultRandom().primaryKey().notNull(),
+		// One first scan per brand: the unique index is what makes a double
+		// "start" click or two concurrent requests collapse into one scan.
 		brandId: text("brand_id")
 			.references(() => brands.id)
-			.notNull(),
+			.notNull()
+			.unique(),
 		status: firstScanStatusEnum("status").notNull().default("queued"),
 		expected: jsonb("expected").$type<FirstScanExpectedPair[]>().notNull(),
 		startedAt: timestamp("started_at", { withTimezone: true }).defaultNow().notNull(),
@@ -115,9 +119,6 @@ export const firstScans = pgTable(
 		enqueuedAt: timestamp("enqueued_at", { withTimezone: true }),
 		completedAt: timestamp("completed_at", { withTimezone: true }),
 	},
-	(table) => ({
-		brandIdx: index("first_scans_brand_id_idx").on(table.brandId),
-	}),
 ).enableRLS();
 
 export type FirstScan = typeof firstScans.$inferSelect;
@@ -146,7 +147,7 @@ export const starterReports = pgTable(
 export type StarterReportRow = typeof starterReports.$inferSelect;
 ```
 
-Add `real` to the drizzle-orm/pg-core import if missing. Add `firstScanId` to the `promptRuns` index list only if type-check demands nothing; no index needed.
+Add `real` to the drizzle-orm/pg-core import if missing. The status poll filters both tables by scan id every few seconds, so add to the `promptRuns` index block `firstScanIdx: index("prompt_runs_first_scan_id_idx").on(table.firstScanId).where(sql\`first_scan_id IS NOT NULL\`)` and to the `usageEvents` index block `firstScanIdx: index("usage_events_first_scan_id_idx").on(table.firstScanId).where(sql\`first_scan_id IS NOT NULL\`)` (import `sql` from `drizzle-orm` if the file does not already).
 
 - [ ] **Step 2: Generate the migration**
 
@@ -154,7 +155,7 @@ Add `real` to the drizzle-orm/pg-core import if missing. Add `firstScanId` to th
 cd packages/lib && DATABASE_URL=postgres://x pnpm exec drizzle-kit generate --name first_scans
 ```
 
-Expected: `src/db/migrations/0028_first_scans.sql` with `CREATE TYPE "public"."first_scan_status"`, `CREATE TABLE "first_scans"`, `CREATE TABLE "starter_reports"` (with a unique constraint on `brand_id`), `ALTER TABLE "brands" ADD COLUMN "sector"/"location"/"setup_draft"`, `ALTER TABLE "prompt_runs" ADD COLUMN "first_scan_id" uuid`, `ALTER TABLE "usage_events" ADD COLUMN "first_scan_id" uuid`, plus `meta/0028_snapshot.json` and `_journal.json`. Confirm no `DEFAULT` on `setup_draft` or `first_scan_id`.
+Expected: `src/db/migrations/0028_first_scans.sql` with `CREATE TYPE "public"."first_scan_status"`, `CREATE TABLE "first_scans"`, `CREATE TABLE "starter_reports"` (with a unique constraint on `brand_id`), `ALTER TABLE "brands" ADD COLUMN "sector"/"location"/"setup_draft"`, `ALTER TABLE "prompt_runs" ADD COLUMN "first_scan_id" uuid`, `ALTER TABLE "usage_events" ADD COLUMN "first_scan_id" uuid`, two partial `CREATE INDEX ... WHERE first_scan_id IS NOT NULL`, a unique constraint on `first_scans.brand_id`, plus `meta/0028_snapshot.json` and `_journal.json`. Confirm no `DEFAULT` on `setup_draft` or `first_scan_id`.
 
 - [ ] **Step 3: Type-check and run lib tests**
 
@@ -186,7 +187,9 @@ git commit -m "add first scan and starter report tables"
 import { describe, expect, it, vi } from "vitest";
 
 const safeFetch = vi.hoisted(() => vi.fn());
-vi.mock("./net/safe-fetch", () => ({ safeFetch }));
+const lookup = vi.hoisted(() => vi.fn(async () => [{ address: "93.184.216.34", family: 4 }]));
+vi.mock("./net/safe-fetch", async (importOriginal) => ({ ...(await importOriginal<object>()), safeFetch }));
+vi.mock("node:dns/promises", () => ({ lookup }));
 // Jina is tried first; make it fail so the fallback runs.
 vi.stubGlobal(
 	"fetch",
@@ -212,10 +215,21 @@ describe("website excerpt fallback", () => {
 		);
 	});
 
-	it("returns nothing when safeFetch refuses the address", async () => {
-		safeFetch.mockResolvedValue({ status: "blocked", httpStatus: null, finalUrl: null, contentType: null, body: null });
+	it("refuses a private address before contacting Jina or the site", async () => {
+		(globalThis.fetch as ReturnType<typeof vi.fn>).mockClear();
+		safeFetch.mockClear();
 		const excerpt = await getWebsiteExcerpt("http://10.0.0.1/");
 		expect(excerpt).toBe("");
+		expect(globalThis.fetch).not.toHaveBeenCalled();
+		expect(safeFetch).not.toHaveBeenCalled();
+	});
+
+	it("refuses a hostname that resolves to a private address", async () => {
+		lookup.mockResolvedValueOnce([{ address: "192.168.1.10", family: 4 }]);
+		(globalThis.fetch as ReturnType<typeof vi.fn>).mockClear();
+		const excerpt = await getWebsiteExcerpt("https://intranet.example/");
+		expect(excerpt).toBe("");
+		expect(globalThis.fetch).not.toHaveBeenCalled();
 	});
 });
 ```
@@ -225,14 +239,53 @@ describe("website excerpt fallback", () => {
 - [ ] **Step 2: Run to verify it fails**
 
 Run: `cd packages/lib && pnpm exec vitest run src/website-excerpt.test.ts`
-Expected: FAIL (the fallback still calls the global `fetch`, so `safeFetch` is never called).
+Expected: FAIL (the fallback still calls the global `fetch`, so `safeFetch` is never called; the private address reaches Jina).
 
 - [ ] **Step 3: Implement**
 
-Replace the body of `fromReadability` up to the `parseHTML` line:
+Gate the URL once, before either source, in `getWebsiteExcerpt` right after `cleanUrl` is built:
 
 ```ts
-import { safeFetch } from "./net/safe-fetch";
+import { lookup } from "node:dns/promises";
+import { isDisallowedAddress, safeFetch } from "./net/safe-fetch";
+
+/**
+ * Jina fetches on our behalf, so safeFetch's per-hop checks never see that
+ * request: refuse anything but a public http(s) host up front.
+ * ponytail: resolve-then-fetch, so a DNS rebind between the two is not covered;
+ * the direct path re-checks every hop through safeFetch.
+ */
+async function isPublicWebsite(url: string): Promise<boolean> {
+	let u: URL;
+	try {
+		u = new URL(url);
+	} catch {
+		return false;
+	}
+	if (u.protocol !== "http:" && u.protocol !== "https:" || u.username || u.password) return false;
+	try {
+		const addresses = await lookup(u.hostname, { all: true });
+		return addresses.length > 0 && addresses.every((a) => !isDisallowedAddress(a.address));
+	} catch {
+		return false;
+	}
+}
+```
+
+and in `getWebsiteExcerpt`:
+
+```ts
+	if (!(await isPublicWebsite(cleanUrl))) {
+		console.warn(`[website-excerpt] refusing non-public url ${cleanUrl}`);
+		return "";
+	}
+```
+
+`isDisallowedAddress` is exported from `./net/safe-fetch:173` and already covers loopback, private, link-local, metadata and IPv6-mapped ranges; a literal IP hostname goes through `lookup` unchanged and is checked the same way.
+
+Then replace the body of `fromReadability` up to the `parseHTML` line:
+
+```ts
 
 /** The site's own apex and www hosts; a redirect anywhere else is refused. */
 function allowedHosts(url: string): string[] {
@@ -264,7 +317,7 @@ Expected: PASS.
 
 ```bash
 git add packages/lib/src/website-excerpt.ts packages/lib/src/website-excerpt.test.ts
-git commit -m "fetch the website excerpt fallback through the SSRF-safe client"
+git commit -m "refuse non-public websites before fetching their excerpt"
 ```
 
 ---
@@ -879,7 +932,7 @@ git commit -m "add the setup wizard rules"
 
 ```ts
 export interface StartFirstScanInput { brandId: string; draft: SetupDraft }
-export async function startFirstScan(input: StartFirstScanInput): Promise<{ firstScanId: string }>
+export async function startFirstScan(input: StartFirstScanInput): Promise<{ firstScanId: string }>  // throws AlreadyStartedError on a second call
 export async function enqueueFirstScanJobs(firstScanId: string): Promise<void>   // idempotent; sets enqueuedAt
 export interface FirstScanLatest { promptValue: string; model: string; mentioned: boolean; brandRank: number | null; competitorsMentioned: string[]; createdAt: string }
 export interface FirstScanStatus {
@@ -889,10 +942,17 @@ export interface FirstScanStatus {
   etaSeconds: number | null; canOpenPartial: boolean; reportReady: boolean;
 }
 export async function getFirstScanStatus(firstScanId: string): Promise<FirstScanStatus>   // also retries enqueue + flips complete
-export async function retryFirstScan(firstScanId: string): Promise<void>                  // re-sends jobs for prompts with unfinished pairs
-export async function openPartialFirstScan(firstScanId: string): Promise<void>            // ≥50% coverage → status partial
-export function computeStatus(args: { expected: FirstScanExpectedPair[]; finished: { promptId: string; model: string; failed: boolean }[]; startedAt: Date; now: Date }): Pick<FirstScanStatus, "done" | "failed" | "missing" | "etaSeconds" | "canOpenPartial">
+export async function retryFirstScan(firstScanId: string): Promise<void>                  // re-sends jobs for prompts with any pair not yet succeeded; no-op once complete/partial
+export async function openPartialFirstScan(firstScanId: string): Promise<void>            // done ≥ 50% of expected → status partial (final)
+export function computeStatus(args: { expected: FirstScanExpectedPair[]; finished: { promptId: string; model: string; failed: boolean }[]; startedAt: Date; now: Date }): Pick<FirstScanStatus, "done" | "failed" | "missing" | "etaSeconds" | "canOpenPartial" | "settled">
 ```
+
+Status words, used consistently from here to the UI:
+- **done** = pairs with a saved run; **failed** = pairs whose last outcome is a `prompt_run_failed` event; **missing** = pairs with no outcome yet.
+- **settled** (`missing === 0`) means the worker has nothing left to do, not that the data is complete.
+- `status` becomes `complete` only when settled **and** `failed === 0`. Settled with failures stays `running`: the UI offers "retry the failed ones" and "open the report now"; the report is never auto-opened over failures.
+- `coverage` and `canOpenPartial` use **done ÷ expected** (successes only).
+- `partial` is final: a frozen snapshot, no polling, no retry. The user chose it.
 
 `postgres-read.ts` gains:
 
@@ -931,6 +991,21 @@ const expected = [
 ];
 
 describe("computeStatus", () => {
+	it("is settled but not complete when every pair finished and some failed", () => {
+		const s = computeStatus({
+			expected,
+			finished: [
+				{ promptId: "a", model: "chatgpt", failed: false },
+				{ promptId: "a", model: "gemini", failed: true },
+				{ promptId: "b", model: "chatgpt", failed: true },
+				{ promptId: "b", model: "gemini", failed: true },
+			],
+			startedAt: new Date(),
+			now: new Date(),
+		});
+		expect(s).toMatchObject({ done: 1, failed: 3, missing: 0, settled: true, canOpenPartial: false });
+	});
+
 	it("counts done, failed and missing pairs and never counts a pair twice", () => {
 		const s = computeStatus({
 			expected,
@@ -956,11 +1031,13 @@ describe("computeStatus", () => {
 		expect(computeStatus({ expected: big, finished: five, startedAt: start, now: new Date(start.getTime() + 50_000) }).etaSeconds).toBe(50);
 	});
 
-	it("allows opening a partial report from 50% coverage", () => {
+	it("allows opening a partial report once half the pairs succeeded; failures do not count", () => {
 		const start = new Date();
 		const one = [{ promptId: "a", model: "chatgpt", failed: false }];
-		const two = [...one, { promptId: "a", model: "gemini", failed: true }];
+		const oneAndFail = [...one, { promptId: "a", model: "gemini", failed: true }];
+		const two = [...one, { promptId: "a", model: "gemini", failed: false }];
 		expect(computeStatus({ expected, finished: one, startedAt: start, now: start }).canOpenPartial).toBe(false);
+		expect(computeStatus({ expected, finished: oneAndFail, startedAt: start, now: start }).canOpenPartial).toBe(false);
 		expect(computeStatus({ expected, finished: two, startedAt: start, now: start }).canOpenPartial).toBe(true);
 	});
 });
@@ -1001,14 +1078,32 @@ export interface StartFirstScanInput {
 	draft: SetupDraft;
 }
 
+export class AlreadyStartedError extends Error {
+	constructor() {
+		super("First scan already started");
+		this.name = "AlreadyStartedError";
+	}
+}
+
 export async function startFirstScan(input: StartFirstScanInput): Promise<{ firstScanId: string }> {
 	const { brandId, draft } = input;
 	const brand = await db.query.brands.findFirst({ where: eq(brands.id, brandId) });
 	if (!brand) throw new Error("Brand not found");
-	if (brand.onboarded) throw new Error("Brand already set up");
+	if (brand.onboarded) throw new AlreadyStartedError();
 	const websiteHost = new URL(brand.website).hostname.replace(/^www\./, "");
 
 	const firstScanId = await db.transaction(async (tx) => {
+		// The guarded update takes the brand's row lock: a concurrent start
+		// blocks here, then sees onboarded = true and gets zero rows. Doing it
+		// first costs nothing — the transaction is atomic either way — and the
+		// unique first_scans.brand_id index is the second line of defence.
+		const claimed = await tx
+			.update(brands)
+			.set({ onboarded: true, updatedAt: new Date() })
+			.where(and(eq(brands.id, brandId), eq(brands.onboarded, false)))
+			.returning({ id: brands.id });
+		if (claimed.length === 0) throw new AlreadyStartedError();
+
 		await insertCompetitors({
 			brandId,
 			websiteHost,
@@ -1030,7 +1125,6 @@ export async function startFirstScan(input: StartFirstScanInput): Promise<{ firs
 			.insert(firstScans)
 			.values({ brandId, expected: expectedPairs(promptIds.map((id) => ({ id })), draft.engines) })
 			.returning({ id: firstScans.id });
-		// onboarded last: everything the brand route needs exists once this flips.
 		await tx
 			.update(brands)
 			.set({
@@ -1042,8 +1136,6 @@ export async function startFirstScan(input: StartFirstScanInput): Promise<{ firs
 				additionalDomains: draft.profile.additionalDomains,
 				enabledModels: draft.engines,
 				setupDraft: null,
-				onboarded: true,
-				updatedAt: new Date(),
 			})
 			.where(eq(brands.id, brandId));
 		return scan!.id;
@@ -1090,6 +1182,8 @@ export interface FirstScanStatus {
 	topRival: { name: string; count: number } | null;
 	latest: FirstScanLatest[];
 	etaSeconds: number | null;
+	/** Every expected pair has an outcome (success or failure). */
+	settled: boolean;
 	canOpenPartial: boolean;
 	reportReady: boolean;
 }
@@ -1101,7 +1195,7 @@ export function computeStatus(args: {
 	finished: { promptId: string; model: string; failed: boolean }[];
 	startedAt: Date;
 	now: Date;
-}): Pick<FirstScanStatus, "done" | "failed" | "missing" | "etaSeconds" | "canOpenPartial"> {
+}): Pick<FirstScanStatus, "done" | "failed" | "missing" | "etaSeconds" | "canOpenPartial" | "settled"> {
 	const wanted = new Set(args.expected.map(pairKey));
 	const seen = new Map<string, boolean>();
 	for (const f of args.finished) {
@@ -1116,7 +1210,14 @@ export function computeStatus(args: {
 	const missing = wanted.size - finishedCount;
 	const elapsed = (args.now.getTime() - args.startedAt.getTime()) / 1000;
 	const etaSeconds = finishedCount >= ETA_MIN_SAMPLES ? Math.round((elapsed / finishedCount) * missing) : null;
-	return { done, failed, missing, etaSeconds, canOpenPartial: wanted.size > 0 && finishedCount / wanted.size >= PARTIAL_MIN_COVERAGE };
+	return {
+		done,
+		failed,
+		missing,
+		etaSeconds,
+		settled: missing === 0,
+		canOpenPartial: wanted.size > 0 && done / wanted.size >= PARTIAL_MIN_COVERAGE,
+	};
 }
 
 export async function getFirstScanStatus(firstScanId: string): Promise<FirstScanStatus> {
@@ -1133,7 +1234,7 @@ export async function getFirstScanStatus(firstScanId: string): Promise<FirstScan
 	});
 
 	let status = scan.status;
-	if (counts.missing === 0 && (status === "queued" || status === "running")) {
+	if (counts.settled && counts.failed === 0 && (status === "queued" || status === "running")) {
 		status = "complete";
 		await db.update(firstScans).set({ status, completedAt: new Date() }).where(eq(firstScans.id, firstScanId));
 	}
@@ -1169,11 +1270,13 @@ export async function getFirstScanStatus(firstScanId: string): Promise<FirstScan
 	};
 }
 
+/** Re-sends every prompt that still has a failed or missing pair. A finished scan (complete or partial) is frozen. */
 export async function retryFirstScan(firstScanId: string): Promise<void> {
 	const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.id, firstScanId) });
 	if (!scan) throw new Error("First scan not found");
-	const finished = new Set((await getFirstScanFinishedPairs(firstScanId)).filter((f) => !f.failed).map((f) => `${f.prompt_id}:${f.model}`));
-	const promptIds = [...new Set(scan.expected.filter((p) => !finished.has(pairKey(p))).map((p) => p.promptId))];
+	if (scan.status === "complete" || scan.status === "partial") return;
+	const succeeded = new Set((await getFirstScanFinishedPairs(firstScanId)).filter((f) => !f.failed).map((f) => `${f.prompt_id}:${f.model}`));
+	const promptIds = [...new Set(scan.expected.filter((p) => !succeeded.has(pairKey(p))).map((p) => p.promptId))];
 	if (promptIds.length === 0) return;
 	const boss = await getBoss();
 	for (const promptId of promptIds) {
@@ -1194,7 +1297,7 @@ export async function openPartialFirstScan(firstScanId: string): Promise<void> {
 }
 ```
 
-Notes for the implementer: `insertCompetitors` (`apps/web/src/server/onboarding-core.ts:192`) already accepts `conn` but is not exported; add `export` to it. Prompt rows for first-scan prompts also need their regular schedule after the scan; the worker's `scheduleNextRun` handles that once a job runs, so no `createMultiplePromptJobSchedulers` call is needed here (remove that import if unused). `defaultMarketKey` is the existing `brands` column.
+Notes for the implementer: `insertCompetitors` (`apps/web/src/server/onboarding-core.ts:192`) already accepts `conn` but is not exported; add `export` to it. A retried prompt re-runs all of that prompt's engines; the worker's `firstScanTargets` runs the whole engine list for the prompt, so an already-succeeded engine may produce a second run for the same pair. That is accepted (the report builder reads runs, duplicates only add a sample) and `computeStatus` keys by pair, so counts stay right. Prompt rows for first-scan prompts also need their regular schedule after the scan; the worker's `scheduleNextRun` handles that once a job runs, so no `createMultiplePromptJobSchedulers` call is needed here (remove that import if unused). `defaultMarketKey` is the existing `brands` column.
 
 - [ ] **Step 4: Run the test and type-check**
 
@@ -1215,10 +1318,10 @@ git commit -m "add the first scan lifecycle"
 **Files:**
 - Create: `apps/web/src/server/starter-report-core.ts`
 - Create: `apps/web/src/server/starter-report-core.test.ts`
-- Modify: `apps/web/src/lib/postgres-read.ts` (append `getFirstScanCitations`)
+- Modify: `apps/web/src/lib/postgres-read.ts` (append `getFirstScanRivalCitations`)
 
 **Interfaces:**
-- Consumes: `starterReports`, `firstScans`, `promptRuns`, `prompts`, `competitors` (Task 1); `extractTextContent(rawOutput, providerOrModel)` from `@workspace/lib/text-extraction`; `resolveOpportunities(brandId, timezone)` → `{ report: { summary, opportunities: [{title, why, ...}] } | null }` from `./opportunities`; `getFirstScanStatus` (Task 6).
+- Consumes: `starterReports`, `firstScans`, `promptRuns`, `prompts`, `competitors` (Task 1); `extractTextContent(rawOutput, providerOrModel)` from `@workspace/lib/text-extraction`; `resolveOpportunities(brandId, timezone = "UTC")` (`apps/web/src/server/opportunities.ts:668`; pass `"UTC"` explicitly as `opportunities-core.ts` does) → `{ report: { summary, opportunities: [{title, why, ...}] } | null }`; `getFirstScanStatus` (Task 6).
 - Produces:
 
 ```ts
@@ -1228,7 +1331,7 @@ export interface StarterReport {
   headline: { mentionedRuns: number; totalRuns: number; mentionPercent: number; rivalsAhead: number };
   score: { mentionPercent: number; byIntent: { intent: PromptIntent; mentionPercent: number; runs: number }[]; accuracy: { assessed: number; accurate: number; unsupported: number } | null };
   whoIsThere: { name: string; count: number; isYou: boolean }[];   // top 6 by run count, brand included
-  whyThem: { domain: string; count: number; isYours: boolean }[];  // top 8 cited domains
+  whyThem: { domain: string; count: number; isYours: boolean }[];  // top 4 domains cited in buyer answers that named a rival but not the brand
   nextSteps: { title: string; why: string }[];                     // ≤ 3
   answers: { promptValue: string; model: string; mentioned: boolean; excerpt: string }[]; // 4
 }
@@ -1241,12 +1344,22 @@ export async function retryStarterReportSection(brandId: string, section: "nextS
 
 ```ts
 export interface FirstScanCitation { domain: string; count: number; }
-export async function getFirstScanCitations(firstScanId: string): Promise<FirstScanCitation[]> {
+/**
+ * "Why them": the sources behind buyer answers that recommended a rival and
+ * not the brand. Branded prompts and answers that already name the brand are
+ * excluded, so the list is what the brand is losing to.
+ */
+export async function getFirstScanRivalCitations(firstScanId: string): Promise<FirstScanCitation[]> {
 	return queryPg<FirstScanCitation>(sql`
 		SELECT c.domain, count(*)::int AS count
-		FROM citations c JOIN prompt_runs r ON r.id = c.prompt_run_id
+		FROM citations c
+		JOIN prompt_runs r ON r.id = c.prompt_run_id
+		JOIN prompts p ON p.id = r.prompt_id
 		WHERE r.first_scan_id = ${firstScanId}
-		GROUP BY c.domain ORDER BY count DESC LIMIT 8
+			AND r.brand_mentioned = false
+			AND cardinality(r.competitors_mentioned) > 0
+			AND p.intent IS NOT NULL
+		GROUP BY c.domain ORDER BY count DESC LIMIT 4
 	`);
 }
 ```
@@ -1258,7 +1371,7 @@ export async function getFirstScanCitations(firstScanId: string): Promise<FirstS
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@workspace/lib/db/db", () => ({ db: {} }));
-vi.mock("@/lib/postgres-read", () => ({ getFirstScanCitations: vi.fn() }));
+vi.mock("@/lib/postgres-read", () => ({ getFirstScanRivalCitations: vi.fn() }));
 vi.mock("@/server/opportunities", () => ({ resolveOpportunities: vi.fn() }));
 vi.mock("@/server/first-scan-core", () => ({ getFirstScanStatus: vi.fn() }));
 
@@ -1353,8 +1466,8 @@ import {
 	starterReports,
 } from "@workspace/lib/db/schema";
 import { extractTextContent } from "@workspace/lib/text-extraction";
-import { desc, eq } from "drizzle-orm";
-import { getFirstScanCitations } from "@/lib/postgres-read";
+import { eq } from "drizzle-orm";
+import { getFirstScanRivalCitations } from "@/lib/postgres-read";
 import { getFirstScanStatus } from "@/server/first-scan-core";
 import { resolveOpportunities } from "@/server/opportunities";
 
@@ -1485,7 +1598,7 @@ export async function getOrBuildStarterReport(brandId: string) {
 			createdAt: existing.createdAt.toISOString(),
 		};
 	}
-	const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.brandId, brandId), orderBy: desc(firstScans.startedAt) });
+	const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.brandId, brandId) });
 	if (!scan) return null;
 	const status = await getFirstScanStatus(scan.id);
 	if (status.status !== "complete" && status.status !== "partial") return null;
@@ -1509,8 +1622,8 @@ export async function getOrBuildStarterReport(brandId: string) {
 		.where(eq(promptRuns.firstScanId, scan.id));
 
 	const [citations, opportunities] = await Promise.all([
-		getFirstScanCitations(scan.id),
-		resolveOpportunities(brandId).catch(() => null),
+		getFirstScanRivalCitations(scan.id),
+		resolveOpportunities(brandId, "UTC").catch(() => null),
 	]);
 	const nextSteps = opportunities?.report?.opportunities.map((o) => ({ title: o.title, why: o.why })) ?? null;
 
@@ -1522,7 +1635,8 @@ export async function getOrBuildStarterReport(brandId: string) {
 		citations,
 		nextSteps,
 	});
-	const coverage = scan.expected.length === 0 ? 0 : (status.done + status.failed) / scan.expected.length;
+	// Successes only: a failed pair contributed no answer.
+	const coverage = scan.expected.length === 0 ? 0 : status.done / scan.expected.length;
 	const partial = status.status === "partial";
 	const [saved] = await db
 		.insert(starterReports)
@@ -1538,7 +1652,7 @@ export async function getOrBuildStarterReport(brandId: string) {
 export async function retryStarterReportSection(brandId: string, section: "nextSteps"): Promise<void> {
 	const existing = await db.query.starterReports.findFirst({ where: eq(starterReports.brandId, brandId) });
 	if (!existing || !existing.missingSections.includes(section)) return;
-	const opportunities = await resolveOpportunities(brandId).catch(() => null);
+	const opportunities = await resolveOpportunities(brandId, "UTC").catch(() => null);
 	const steps = opportunities?.report?.opportunities.map((o) => ({ title: o.title, why: o.why }));
 	if (!steps) return;
 	const report = { ...(existing.report as StarterReport), nextSteps: steps.slice(0, STEPS_LIMIT) };
@@ -1594,11 +1708,12 @@ retryStarterReportSectionFn({ brandId, section: "nextSteps" }) → { ok: true }
 import { createServerFn } from "@tanstack/react-start";
 import { db } from "@workspace/lib/db/db";
 import { brands, firstScans, PROMPT_INTENTS } from "@workspace/lib/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireBrandSession } from "@/lib/auth/helpers";
 import { MAX_BUYER, MAX_RIVALS } from "@/lib/setup-wizard";
 import {
+	AlreadyStartedError,
 	getFirstScanStatus,
 	openPartialFirstScan,
 	retryFirstScan,
@@ -1653,7 +1768,16 @@ export const startFirstScanFn = createServerFn({ method: "POST" })
 	.validator(z.object({ brandId: z.string(), draft: draftSchema }))
 	.handler(async ({ data }) => {
 		await requireBrandSession(data.brandId);
-		return startFirstScan({ brandId: data.brandId, draft: data.draft });
+		try {
+			return await startFirstScan({ brandId: data.brandId, draft: data.draft });
+		} catch (err) {
+			// A double click or a second tab: hand back the scan that exists.
+			if (err instanceof AlreadyStartedError) {
+				const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.brandId, data.brandId) });
+				if (scan) return { firstScanId: scan.id };
+			}
+			throw err;
+		}
 	});
 
 export const getFirstScanStatusFn = createServerFn({ method: "POST" })
@@ -1683,7 +1807,7 @@ export const getLatestFirstScanFn = createServerFn({ method: "POST" })
 	.validator(z.object({ brandId: z.string() }))
 	.handler(async ({ data }) => {
 		await requireBrandSession(data.brandId);
-		const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.brandId, data.brandId), orderBy: desc(firstScans.startedAt) });
+		const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.brandId, data.brandId) });
 		return scan ? { firstScanId: scan.id, status: scan.status } : null;
 	});
 ```
@@ -1811,6 +1935,8 @@ git commit -m "expose the first scan and starter report to the client"
 | `setup.scan.mentioned_badge` | Sizi andı | Named you |
 | `setup.scan.not_mentioned_badge` | Sizi anmadı | Did not name you |
 | `setup.scan.stalled` | Tarama beklenenden uzun sürüyor. | The scan is taking longer than expected. |
+| `setup.scan.settled_with_failures` | Bazı cevaplar alınamadı. Eksikleri yeniden deneyin veya raporu mevcut sonuçlarla açın. | Some answers could not be fetched. Retry them, or open the report with what is there. |
+| `setup.scan.retry_failed` | Başarısızları yeniden dene | Retry the failed ones |
 | `setup.scan.retry` | Eksikleri yeniden dene | Retry the missing ones |
 | `setup.scan.open_partial` | Raporu şimdi aç ({percent}%) | Open the report now ({percent}%) |
 | `setup.scan.open_report` | Raporu aç | Open the report |
@@ -2248,8 +2374,8 @@ git commit -m "add the setup wizard"
 - Replace: `apps/web/src/components/setup-wizard/step-first-scan.tsx`
 
 **Interfaces:**
-- Consumes: `getFirstScanStatusFn`, `retryFirstScanFn`, `openPartialFirstScanFn` (Task 8), `FirstScanStatus`.
-- Produces: `StepFirstScan({ brandId, firstScanId, onReport })`.
+- Consumes: `getFirstScanStatusFn`, `retryFirstScanFn`, `openPartialFirstScanFn` (Task 8), `FirstScanStatus` (with `settled`).
+- Produces: `StepFirstScan({ brandId, firstScanId, onReport })`. Behaviour: polls until `complete` or `partial`; auto-opens the report only on `complete`; when every pair has an outcome but some failed, shows the failure notice with "retry the failed ones" and, from 50 % successes, "open the report now"; `partial` is final and opens the report.
 
 - [ ] **Step 1: Implement**
 
@@ -2286,6 +2412,8 @@ export function StepFirstScan({ brandId, firstScanId, onReport }: { brandId: str
 	const finished = s.done + s.failed;
 	const lastAt = s.latest[0] ? new Date(s.latest[0].createdAt).getTime() : null;
 	const stalled = s.missing > 0 && lastAt !== null && Date.now() - lastAt > STALL_MS;
+	const needsAttention = s.status !== "complete" && s.status !== "partial" && (stalled || (s.settled && s.failed > 0));
+	const donePercent = s.expected === 0 ? 0 : Math.round((s.done * 100) / s.expected);
 
 	return (
 		<div className="max-w-3xl space-y-6 p-4">
@@ -2316,15 +2444,17 @@ export function StepFirstScan({ brandId, firstScanId, onReport }: { brandId: str
 					))}
 				</ul>
 			</div>
-			{(stalled || s.failed > 0) && s.missing > 0 && (
+			{needsAttention && (
 				<div className="flex flex-wrap items-center gap-2">
-					{stalled && <span className="text-sm text-muted-foreground">{t("setup.scan.stalled")}</span>}
+					<span className="text-sm text-muted-foreground">
+						{s.settled ? t("setup.scan.settled_with_failures") : t("setup.scan.stalled")}
+					</span>
 					<Button variant="outline" onClick={() => retry.mutate()} disabled={retry.isPending}>
-						{t("setup.scan.retry")}
+						{s.settled ? t("setup.scan.retry_failed") : t("setup.scan.retry")}
 					</Button>
 					{s.canOpenPartial && (
 						<Button onClick={() => openPartial.mutate()} disabled={openPartial.isPending}>
-							{t("setup.scan.open_partial", { percent: Math.round((finished * 100) / s.expected) })}
+							{t("setup.scan.open_partial", { percent: donePercent })}
 						</Button>
 					)}
 				</div>
