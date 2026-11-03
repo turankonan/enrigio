@@ -20,6 +20,10 @@ import { structuredResearch } from "./ai-sdk";
 import { nonEmptyStrings, sanitizeForJson, sleep } from "./scrape-shared";
 
 const DEFAULT_RESEARCH_MODEL = "claude-sonnet-5";
+// Completion-only structured calls (mention classifier, intent backfill) are
+// short classification jobs: Haiku answers them at a twentieth of Sonnet's
+// token price, while web-grounded research keeps Sonnet.
+const COMPLETION_MODEL = "claude-haiku-5-5";
 
 function getAnthropicLanguageModel(model: string) {
 	const apiKey = getCredential("ANTHROPIC_API_KEY");
@@ -118,13 +122,14 @@ export const anthropicApi: Provider = {
 		schema,
 		webSearch = true,
 	}: StructuredResearchOptions<T>): Promise<StructuredResearchResult<T>> {
-		const object = await structuredResearch(getAnthropicLanguageModel(DEFAULT_RESEARCH_MODEL), {
+		const model = webSearch ? DEFAULT_RESEARCH_MODEL : COMPLETION_MODEL;
+		const object = await structuredResearch(getAnthropicLanguageModel(model), {
 			prompt,
 			schema,
 			...(webSearch
 				? { tools: { web_search: anthropic.tools.webSearch_20250305({ maxUses: RESEARCH_WEB_SEARCH_MAX_USES }) } }
 				: {}),
 		});
-		return { object, modelVersion: DEFAULT_RESEARCH_MODEL };
+		return { object, modelVersion: model };
 	},
 };
