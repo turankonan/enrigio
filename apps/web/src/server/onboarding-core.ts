@@ -8,7 +8,7 @@ import { ensureOrganization } from "@workspace/lib/db/provisioning";
 import { brands, competitors, PROMPT_INTENTS, type PromptIntent, prompts } from "@workspace/lib/db/schema";
 import { claimNewBrandSlug, findUnusedBrandSlug } from "@workspace/lib/db/unique-names";
 import { assertCanAddPrompts, assertCompetitorCap, getBrandOrganizationId } from "@workspace/lib/entitlements";
-import { computeSystemTags, sanitizeUserTags } from "@workspace/lib/tag-utils";
+import { computeSystemTags, getEffectiveBrandedStatus, sanitizeUserTags } from "@workspace/lib/tag-utils";
 import { count, desc, eq, type SQL } from "drizzle-orm";
 import { z } from "zod";
 import { dedupeAliases, dedupeDomains } from "@/lib/domain-categories";
@@ -258,13 +258,14 @@ export async function insertPrompts(args: {
 		const key = value.toLowerCase();
 		if (seen.has(key)) continue;
 		seen.add(key);
+		const systemTags = computeSystemTags(value, args.brandName, args.website);
 		rows.push({
 			brandId: args.brandId,
 			value,
 			enabled: p.enabled,
 			tags: p.tags,
-			systemTags: computeSystemTags(value, args.brandName, args.website),
-			intent: p.intent ?? null,
+			systemTags,
+			intent: getEffectiveBrandedStatus(systemTags, p.tags).isBranded ? null : (p.intent ?? null),
 		});
 	}
 	if (rows.length === 0) return [];

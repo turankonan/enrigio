@@ -42,6 +42,18 @@ describe("insertPrompts intent", () => {
 
 		expect(inserted[0]?.map((r) => r.intent)).toEqual(["discovery", null]);
 	});
+
+	it("never stores an intent on a branded prompt", async () => {
+		await insertPrompts({
+			brandId: "brand_1",
+			brandName: "Acme",
+			website: "https://acme.example",
+			source: [{ value: "is acme any good", tags: [], enabled: true, intent: "comparison" }],
+			dedupeAgainstExisting: false,
+		});
+
+		expect(inserted[0]?.[0]?.intent).toBeNull();
+	});
 });
 
 describe("public create-brand input", () => {
