@@ -40,7 +40,7 @@ export const PRESELECT_PER_INTENT = 3;
 export const MAX_RIVALS = 5;
 export const DEFAULT_ENGINES = ["chatgpt", "gemini", "google-ai-overview", "perplexity"];
 
-const isBuyer = (q: DraftQuestion) => q.intent !== null;
+export const isBuyer = (q: DraftQuestion) => q.intent !== null;
 
 export function draftFromSuggestion(s: OnboardingSuggestion, availableModels: string[]): SetupDraft {
 	const perIntent = new Map<PromptIntent, number>();

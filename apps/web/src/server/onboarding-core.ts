@@ -189,7 +189,7 @@ export function apiUpdateInputToInternal(
 	return result;
 }
 
-async function insertCompetitors(args: {
+export async function insertCompetitors(args: {
 	brandId: string;
 	websiteHost: string;
 	source: { name: string; domains: string[]; aliases: string[] }[];

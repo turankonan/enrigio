@@ -1522,3 +1522,19 @@ export async function getDistinctModelCount(
 	`);
 	return row?.models ?? 0;
 }
+
+export interface FirstScanFinishedPair {
+	prompt_id: string;
+	model: string;
+	failed: boolean;
+}
+
+/** A pair is finished when a run was saved for it or a prompt_run_failed usage event was recorded for it. */
+export async function getFirstScanFinishedPairs(firstScanId: string): Promise<FirstScanFinishedPair[]> {
+	return queryPg<FirstScanFinishedPair>(sql`
+		SELECT prompt_id, model, false AS failed FROM prompt_runs WHERE first_scan_id = ${firstScanId}
+		UNION
+		SELECT prompt_id, model, true AS failed
+		FROM usage_events WHERE first_scan_id = ${firstScanId} AND event_type = 'prompt_run_failed'
+	`);
+}
