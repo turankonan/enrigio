@@ -1499,3 +1499,20 @@ export async function getModelCompetitorMentions(
 		ORDER BY t.model, competitor_count DESC, competitor
 	`);
 }
+
+export async function getDistinctModelCount(
+	brandId: string,
+	fromDate: string | null,
+	toDate: string | null,
+	timezone: string,
+	effectiveMarketKey: string,
+): Promise<number> {
+	const [row] = await queryPg<{ models: number }>(sql`
+		SELECT count(DISTINCT model)::int AS models
+		FROM prompt_runs
+		WHERE brand_id = ${brandId}
+			${dateFilter(fromDate, toDate, timezone)}
+			${marketScope(effectiveMarketKey)}
+	`);
+	return row?.models ?? 0;
+}
