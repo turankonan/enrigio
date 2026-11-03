@@ -9,7 +9,7 @@ import {
 	prompts,
 	starterReports,
 } from "@workspace/lib/db/schema";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { getBoss } from "@/lib/boss-client";
 import { dedupeAliases, dedupeDomains } from "@/lib/domain-categories";
 import { getFirstScanFinishedPairs } from "@/lib/postgres-read";
@@ -244,7 +244,20 @@ export async function retryFirstScan(firstScanId: string): Promise<void> {
 			.filter((f) => !f.failed)
 			.map((f) => pairKey({ promptId: f.prompt_id, model: f.model })),
 	);
-	const promptIds = [...new Set(scan.expected.filter((p) => !succeeded.has(pairKey(p))).map((p) => p.promptId))];
+	// In-flight work is never duplicated, so a retry is idempotent against
+	// double-clicks and spam: only prompts with a failed or missing pair and no
+	// queued or running job are re-sent.
+	const inFlightRows = await db.execute(sql`
+		SELECT data->>'promptId' AS prompt_id
+		FROM pgboss.job
+		WHERE name = 'process-prompt' AND state IN ('created', 'active') AND data->>'firstScanId' = ${firstScanId}
+	`);
+	const inFlight = new Set((inFlightRows.rows as { prompt_id: string }[]).map((r) => r.prompt_id));
+	const promptIds = [
+		...new Set(
+			scan.expected.filter((p) => !succeeded.has(pairKey(p)) && !inFlight.has(p.promptId)).map((p) => p.promptId),
+		),
+	];
 	if (promptIds.length === 0) return;
 	const boss = await getBoss();
 	let sent = 0;
