@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getModelMeta } from "@workspace/config/models";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useOrganizationsChanged } from "@/hooks/use-organizations";
 import {
 	DEFAULT_ENGINES,
 	defaultEngines,
@@ -86,6 +87,7 @@ export function useSetupWizard(brand: WizardBrand) {
 	const [phase, setPhase] = useState<Phase>({ kind: "booting" });
 	const startedAt = useRef(Date.now());
 	const saver = useDraftSaver(brand.id);
+	const organizationsChanged = useOrganizationsChanged();
 
 	const picker = useQuery({
 		queryKey: ["model-picker", brand.id],
@@ -187,7 +189,11 @@ export function useSetupWizard(brand: WizardBrand) {
 			saver.resume();
 			saver.save(draft, true);
 		},
-		onSuccess: ({ firstScanId }) => setPhase({ kind: "scanning", firstScanId }),
+		// The start onboards and renames the brand; the sidebar, switcher and route data still hold the old brand.
+		onSuccess: ({ firstScanId }) => {
+			setPhase({ kind: "scanning", firstScanId });
+			organizationsChanged().catch(() => {});
+		},
 	});
 
 	const continueLater = () => {
