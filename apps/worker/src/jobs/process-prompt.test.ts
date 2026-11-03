@@ -342,10 +342,23 @@ describe("firstScanTargets", () => {
 			{ promptId: "p1", model: "gemini" },
 			{ promptId: "p2", model: "claude" },
 		];
-		const out = firstScanTargets(targets as never, expected, "p1");
+		const out = firstScanTargets(targets as never, expected, "p1", new Set());
 		expect(out.map((t) => [t.config.model, t.replication])).toEqual([
 			["chatgpt", 1],
 			["gemini", 1],
 		]);
+	});
+
+	it("re-runs only the engines that have not answered yet when a scan is retried", () => {
+		const targets = [
+			{ config: { model: "chatgpt", provider: "openai-api", webSearch: true }, replication: 5 },
+			{ config: { model: "gemini", provider: "dataforseo", webSearch: true }, replication: 5 },
+		];
+		const expected = [
+			{ promptId: "p1", model: "chatgpt" },
+			{ promptId: "p1", model: "gemini" },
+		];
+		const out = firstScanTargets(targets as never, expected, "p1", new Set(["chatgpt"]));
+		expect(out.map((t) => t.config.model)).toEqual(["gemini"]);
 	});
 });

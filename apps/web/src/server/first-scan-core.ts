@@ -150,6 +150,17 @@ export interface FirstScanStatus {
 
 const pairKey = (p: { promptId: string; model: string }) => `${p.promptId}:${p.model}`;
 
+/** A retried pair can hold more than one answer; only its newest one counts. */
+export function latestPerPair<T extends { promptId: string; model: string; createdAt: Date }>(runs: T[]): T[] {
+	const latest = new Map<string, T>();
+	for (const r of runs) {
+		const k = pairKey(r);
+		const held = latest.get(k);
+		if (!held || r.createdAt > held.createdAt) latest.set(k, r);
+	}
+	return [...latest.values()];
+}
+
 export function computeStatus(args: {
 	expected: FirstScanExpectedPair[];
 	finished: { promptId: string; model: string; failed: boolean }[];
@@ -205,6 +216,7 @@ export async function getFirstScanStatus(firstScanId: string): Promise<FirstScan
 
 	const runs = await db
 		.select({
+			promptId: promptRuns.promptId,
 			promptValue: prompts.value,
 			model: promptRuns.model,
 			mentioned: promptRuns.brandMentioned,
@@ -217,8 +229,9 @@ export async function getFirstScanStatus(firstScanId: string): Promise<FirstScan
 		.where(eq(promptRuns.firstScanId, firstScanId))
 		.orderBy(desc(promptRuns.createdAt));
 
+	const answers = latestPerPair(runs);
 	const rivalCounts = new Map<string, number>();
-	for (const r of runs) for (const c of r.competitorsMentioned) rivalCounts.set(c, (rivalCounts.get(c) ?? 0) + 1);
+	for (const r of answers) for (const c of r.competitorsMentioned) rivalCounts.set(c, (rivalCounts.get(c) ?? 0) + 1);
 	const top = [...rivalCounts.entries()].sort((a, b) => b[1] - a[1])[0];
 	const report = await db.query.starterReports.findFirst({ where: eq(starterReports.firstScanId, firstScanId) });
 
@@ -227,7 +240,7 @@ export async function getFirstScanStatus(firstScanId: string): Promise<FirstScan
 		status,
 		expected: scan.expected.length,
 		...counts,
-		mentioned: runs.filter((r) => r.mentioned).length,
+		mentioned: answers.filter((r) => r.mentioned).length,
 		topRival: top ? { name: top[0], count: top[1] } : null,
 		latest: runs.slice(0, LATEST_LIMIT).map((r) => ({ ...r, createdAt: r.createdAt.toISOString() })),
 		reportReady: status === "complete" || status === "partial" || !!report,

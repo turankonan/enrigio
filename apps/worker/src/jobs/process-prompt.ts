@@ -469,15 +469,19 @@ export async function runModelIteration({
 /**
  * A first scan answers every chosen engine exactly once: the scan row lists
  * which engines this prompt owes, and replication is forced to 1 whatever the
- * plan or RUNS_PER_PROMPT would run on a normal day.
+ * plan or RUNS_PER_PROMPT would run on a normal day. Engines that already
+ * answered are skipped, so a retried scan re-runs only what failed or never ran.
  */
 export function firstScanTargets<T extends { config: { model: string }; replication: number }>(
 	targets: T[],
 	expected: FirstScanExpectedPair[],
 	promptId: string,
+	alreadyDone: ReadonlySet<string>,
 ): T[] {
 	const models = new Set(expected.filter((p) => p.promptId === promptId).map((p) => p.model));
-	return targets.filter((t) => models.has(t.config.model)).map((t) => ({ ...t, replication: 1 }));
+	return targets
+		.filter((t) => models.has(t.config.model) && !alreadyDone.has(t.config.model))
+		.map((t) => ({ ...t, replication: 1 }));
 }
 
 /**
@@ -501,7 +505,15 @@ async function selectCycleTargets(
 			.update(firstScans)
 			.set({ status: "running" })
 			.where(and(eq(firstScans.id, scan.id), eq(firstScans.status, "queued")));
-		return { dueTargets: firstScanTargets(plan.targets, scan.expected, promptId), activeScanId: scan.id };
+		const answered = await db
+			.selectDistinct({ model: promptRuns.model })
+			.from(promptRuns)
+			.where(and(eq(promptRuns.firstScanId, scan.id), eq(promptRuns.promptId, promptId)));
+		const alreadyDone = new Set(answered.map((r) => r.model));
+		return {
+			dueTargets: firstScanTargets(plan.targets, scan.expected, promptId, alreadyDone),
+			activeScanId: scan.id,
+		};
 	}
 
 	const lastRuns = await getLastRunsByTargetKey(promptId, slowestIntervalHours(plan.targets));

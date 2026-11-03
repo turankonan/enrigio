@@ -12,7 +12,7 @@ import {
 import { extractTextContent } from "@workspace/lib/text-extraction";
 import { eq } from "drizzle-orm";
 import { getFirstScanRivalCitations } from "@/lib/postgres-read";
-import { getFirstScanStatus } from "@/server/first-scan-core";
+import { getFirstScanStatus, latestPerPair } from "@/server/first-scan-core";
 import { resolveOpportunities } from "@/server/opportunities";
 
 const EXCERPT_CHARS = 300;
@@ -169,6 +169,8 @@ export async function getOrBuildStarterReport(brandId: string) {
 	if (!brand) return null;
 	const rows = await db
 		.select({
+			promptId: promptRuns.promptId,
+			createdAt: promptRuns.createdAt,
 			promptValue: prompts.value,
 			intent: prompts.intent,
 			model: promptRuns.model,
@@ -199,7 +201,7 @@ export async function getOrBuildStarterReport(brandId: string) {
 			domains: [websiteHost, ...brand.additionalDomains],
 		},
 		engines: [...new Set(scan.expected.map((p) => p.model))],
-		runs: rows.map((r) => ({ ...r, text: extractTextContent(r.rawOutput, r.provider ?? r.model) })),
+		runs: latestPerPair(rows).map((r) => ({ ...r, text: extractTextContent(r.rawOutput, r.provider ?? r.model) })),
 		citations,
 		nextSteps,
 	});

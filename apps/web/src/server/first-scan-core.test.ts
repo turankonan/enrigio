@@ -4,7 +4,7 @@ vi.mock("@workspace/lib/db/db", () => ({ db: {} }));
 vi.mock("@/lib/boss-client", () => ({ getBoss: vi.fn() }));
 vi.mock("@/lib/postgres-read", () => ({ getFirstScanFinishedPairs: vi.fn() }));
 
-const { computeStatus } = await import("./first-scan-core");
+const { computeStatus, latestPerPair } = await import("./first-scan-core");
 
 const expected = [
 	{ promptId: "a", model: "chatgpt" },
@@ -81,5 +81,18 @@ describe("computeStatus", () => {
 		expect(computeStatus({ expected, finished: one, startedAt: start, now: start }).canOpenPartial).toBe(false);
 		expect(computeStatus({ expected, finished: oneAndFail, startedAt: start, now: start }).canOpenPartial).toBe(false);
 		expect(computeStatus({ expected, finished: two, startedAt: start, now: start }).canOpenPartial).toBe(true);
+	});
+});
+
+describe("latestPerPair", () => {
+	it("keeps one answer per prompt and engine, the newest, so a retried pair is not counted twice", () => {
+		const runs = [
+			{ promptId: "a", model: "chatgpt", mentioned: false, createdAt: new Date("2026-11-03T10:00:00Z") },
+			{ promptId: "a", model: "chatgpt", mentioned: true, createdAt: new Date("2026-11-03T10:05:00Z") },
+			{ promptId: "a", model: "gemini", mentioned: false, createdAt: new Date("2026-11-03T10:01:00Z") },
+		];
+		const out = latestPerPair(runs);
+		expect(out).toHaveLength(2);
+		expect(out.find((r) => r.model === "chatgpt")?.mentioned).toBe(true);
 	});
 });
