@@ -30,6 +30,16 @@ export const runSentimentEnum = pgEnum("run_sentiment", ["positive", "neutral", 
 export const siteAuditStatusEnum = pgEnum("site_audit_status", ["running", "completed", "failed"]);
 export const keywordCheckStatusEnum = pgEnum("keyword_check_status", ["running", "completed", "failed"]);
 
+export const PROMPT_INTENTS = ["discovery", "comparison", "local", "price"] as const;
+export type PromptIntent = (typeof PROMPT_INTENTS)[number];
+export const promptIntentEnum = pgEnum("prompt_intent", PROMPT_INTENTS);
+
+/** One factual claim an AI answer made about the brand, judged against the brand profile. */
+export interface AccuracyClaim {
+	claim: string;
+	status: "contradicted" | "unsupported";
+}
+
 export const brands = pgTable(
 	"brands",
 	{
@@ -84,6 +94,8 @@ export const prompts = pgTable(
 		premiumModels: text("premium_models").array().notNull().default([]),
 		tags: text("tags").array().notNull().default([]),
 		systemTags: text("system_tags").array().notNull().default([]),
+		/** Buyer intent for the score's sub-scores. Null = not classified. Brand questions stay null. */
+		intent: promptIntentEnum("intent"),
 		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 		updatedAt: timestamp("updated_at", { withTimezone: true })
 			.defaultNow()
@@ -133,6 +145,10 @@ export const promptRuns = pgTable(
 		// the answer text. Null means "not mentioned" or "classifier unavailable".
 		sentiment: runSentimentEnum("sentiment"),
 		brandRank: smallint("brand_rank"),
+		// Null = not assessed (every historical row, a classifier failure, or an
+		// unbranded prompt). An empty array is a positive "assessed, nothing
+		// contradicted" — never default this column.
+		accuracyClaims: jsonb("accuracy_claims").$type<AccuracyClaim[]>(),
 		// Temporary cutover marker: 'legacy' means pre-cutover/unknown scope.
 		// 'global' is written only explicitly by app code for proven
 		// non-localizable prompts — never make it the default, or legacy rows
