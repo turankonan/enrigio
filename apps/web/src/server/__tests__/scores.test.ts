@@ -37,7 +37,7 @@ const { computeAdminScoreRows } = await import("@/server/scores");
 describe("computeAdminScoreRows", () => {
 	beforeEach(() => {
 		reads.getDashboardSummary.mockResolvedValue([{ total_runs: 120, avg_visibility: 41 }]);
-		reads.getScoreV2Summary.mockResolvedValue({ total_runs: 80, score_v2: 33 });
+		reads.getScoreV2Summary.mockResolvedValue({ total_runs: 80, prompt_count: 1, score_v2: 33 });
 		reads.getIntentScoreSummary.mockResolvedValue([
 			{ intent: "discovery", prompt_count: 1, total_runs: 40, score_v2: 29 },
 		]);
@@ -57,7 +57,7 @@ describe("computeAdminScoreRows", () => {
 			brandId: "b1",
 			v1: 41,
 			v2: 33,
-			cohortPrompts: 2,
+			cohortPrompts: 1,
 			classifiedPrompts: 1,
 			unbrandedPrompts: 2,
 			noContradiction: 90,
@@ -88,7 +88,7 @@ describe("computeAdminScoreRows", () => {
 
 	it("returns nulls rather than throwing for a brand without data", async () => {
 		reads.getDashboardSummary.mockResolvedValue([]);
-		reads.getScoreV2Summary.mockResolvedValue({ total_runs: 0, score_v2: null });
+		reads.getScoreV2Summary.mockResolvedValue({ total_runs: 0, prompt_count: 0, score_v2: null });
 		reads.getIntentScoreSummary.mockResolvedValue([]);
 		reads.getAccuracySummary.mockResolvedValue({
 			branded_mentioned_runs: 0,

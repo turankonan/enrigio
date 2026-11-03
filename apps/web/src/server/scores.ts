@@ -81,7 +81,7 @@ export async function computeAdminScoreRows(timezone: string): Promise<AdminScor
 				models,
 				v1: v1?.total_runs ? v1.avg_visibility : null,
 				v2: v2.score_v2,
-				cohortPrompts: unbranded.length,
+				cohortPrompts: v2.prompt_count,
 				intents,
 				classifiedPrompts: unbranded.filter((p) => p.intent !== null).length,
 				unbrandedPrompts: unbranded.length,

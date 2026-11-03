@@ -245,7 +245,11 @@ export async function getDashboardSummary(
 	return rows;
 }
 
-/** Same numbers as scoreV2(); the constant is the single source. */
+/**
+ * Same numbers as scoreV2(); the constant is the single source. The ::numeric casts matter:
+ * pg sends parameters untyped, so without them Postgres resolves the CASE to integer from
+ * the `THEN 0` branch and rejects 0.7 at runtime. Nothing tests this SQL.
+ */
 const RANK_WEIGHT_CASE = sql`CASE
 	WHEN NOT brand_mentioned THEN 0
 	WHEN brand_rank = 1 THEN ${RANK_WEIGHTS.rank1}::numeric
@@ -256,6 +260,7 @@ END`;
 
 export interface ScoreV2Summary {
 	total_runs: number;
+	prompt_count: number;
 	score_v2: number | null;
 }
 
@@ -267,10 +272,11 @@ export async function getScoreV2Summary(
 	promptIds: string[],
 	effectiveMarketKey: string,
 ): Promise<ScoreV2Summary> {
-	if (promptIds.length === 0) return { total_runs: 0, score_v2: null };
+	if (promptIds.length === 0) return { total_runs: 0, prompt_count: 0, score_v2: null };
 	const [row] = await queryPg<ScoreV2Summary>(sql`
 		SELECT
 			count(*)::int AS total_runs,
+			count(DISTINCT prompt_id)::int AS prompt_count,
 			round(avg(${RANK_WEIGHT_CASE}) * 100)::int AS score_v2
 		FROM prompt_runs
 		WHERE brand_id = ${brandId}
@@ -278,7 +284,7 @@ export async function getScoreV2Summary(
 			${promptIdFilter(promptIds)}
 			${marketScope(effectiveMarketKey)}
 	`);
-	return row ?? { total_runs: 0, score_v2: null };
+	return row ?? { total_runs: 0, prompt_count: 0, score_v2: null };
 }
 
 export interface IntentScoreRow {
