@@ -23,4 +23,36 @@ describe("classifyMention", () => {
 		const out = await classifyMention({ answer: "x", brandName: "Acme", competitorNames: [] });
 		expect(out).toBeNull();
 	});
+
+	it("asks for claims and returns them only when a profile is given", async () => {
+		runStructuredCompletionPrompt.mockResolvedValue({
+			object: {
+				sentiment: "neutral",
+				brandRank: null,
+				claims: [{ claim: "Acme is based in Berlin", status: "contradicted" }],
+			},
+		});
+		const out = await classifyMention({
+			answer: "Acme, based in Berlin, sells widgets.",
+			brandName: "Acme",
+			competitorNames: [],
+			profile: { name: "Acme", website: "acme.example", additionalDomains: [], aliases: [], keywords: ["widgets"] },
+		});
+		expect(out).toEqual({
+			sentiment: "neutral",
+			brandRank: null,
+			claims: [{ claim: "Acme is based in Berlin", status: "contradicted" }],
+		});
+		const prompt = runStructuredCompletionPrompt.mock.calls.at(-1)?.[0] as string;
+		expect(prompt).toContain("acme.example");
+		expect(prompt).toContain("widgets");
+	});
+
+	it("omits claims when no profile is given, even if the model returns some", async () => {
+		runStructuredCompletionPrompt.mockResolvedValue({
+			object: { sentiment: "positive", brandRank: 1, claims: [{ claim: "x", status: "unsupported" }] },
+		});
+		const out = await classifyMention({ answer: "Acme is first.", brandName: "Acme", competitorNames: [] });
+		expect(out).toEqual({ sentiment: "positive", brandRank: 1 });
+	});
 });
