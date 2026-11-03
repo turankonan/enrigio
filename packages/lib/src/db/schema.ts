@@ -31,6 +31,18 @@ export const reportStatusEnum = pgEnum("report_status", ["pending", "processing"
 export const runSentimentEnum = pgEnum("run_sentiment", ["positive", "neutral", "negative"]);
 export const siteAuditStatusEnum = pgEnum("site_audit_status", ["running", "completed", "failed"]);
 export const keywordCheckStatusEnum = pgEnum("keyword_check_status", ["running", "completed", "failed"]);
+/** A JSON object; the wizard owns the draft's shape. Recursive so it stays serializable across server functions. */
+export type SetupDraftJson = {
+	[key: string]:
+		| string
+		| number
+		| boolean
+		| null
+		| SetupDraftJson
+		| SetupDraftJson[]
+		| (string | number | boolean | null)[];
+};
+
 export const firstScanStatusEnum = pgEnum("first_scan_status", ["queued", "running", "complete", "partial"]);
 
 /** One prompt × engine the first scan must produce. */
@@ -70,8 +82,9 @@ export const brands = pgTable(
 		/** City or region the business serves, from the setup analysis. */
 		location: text("location"),
 		// The wizard's unsaved state, so "continue later" resumes where the user
-		// left off; cleared when the first scan starts.
-		setupDraft: jsonb("setup_draft"),
+		// left off; cleared when the first scan starts. Typed as a JSON object because
+		// an `unknown` column fails server-function serialization checks.
+		setupDraft: jsonb("setup_draft").$type<SetupDraftJson>(),
 		// Hard tenancy scope. Every brand belongs to exactly one better-auth
 		// organization; org membership (the `member` table) is the access-control
 		// mechanism. Brand and organization ids are independent, so billing and

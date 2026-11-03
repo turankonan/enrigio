@@ -23,8 +23,8 @@ const CANNED_RESEARCH = {
 	location: null,
 	marketKey: null,
 	suggestedPrompts: [
-		{ prompt: "best stub widgets", tags: ["stub"] },
-		{ prompt: "stub brand alternative", tags: ["stub"] },
+		{ prompt: "best stub widgets", tags: ["stub"], intent: "discovery" as const },
+		{ prompt: "stub brand alternative", tags: ["stub"], intent: "comparison" as const },
 	],
 };
 
