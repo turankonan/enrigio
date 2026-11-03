@@ -114,7 +114,14 @@ export async function enqueueFirstScanJobs(firstScanId: string): Promise<void> {
 		const jobId = await boss.send(
 			"process-prompt",
 			{ promptId, firstScanId },
-			{ singletonKey: `first-scan-${promptId}`, singletonSeconds: 60 * 60, retryLimit: 0, expireInSeconds: 60 * 90 },
+			// The heartbeat fails a job a dead or sleeping worker holds within minutes, not at the 90-minute expiry.
+			{
+				singletonKey: `first-scan-${promptId}`,
+				singletonSeconds: 60 * 60,
+				retryLimit: 0,
+				expireInSeconds: 60 * 90,
+				heartbeatSeconds: 60,
+			},
 		);
 		// null means a job for this prompt already holds the singleton slot.
 		if (jobId === null) console.info("first scan job already queued", { firstScanId, promptId });
@@ -279,7 +286,12 @@ export async function retryFirstScan(firstScanId: string): Promise<void> {
 		const jobId = await boss.send(
 			"process-prompt",
 			{ promptId, firstScanId },
-			{ singletonKey: `first-scan-${promptId}-retry-${Date.now()}`, retryLimit: 0, expireInSeconds: 60 * 90 },
+			{
+				singletonKey: `first-scan-${promptId}-retry-${Date.now()}`,
+				retryLimit: 0,
+				expireInSeconds: 60 * 90,
+				heartbeatSeconds: 60,
+			},
 		);
 		if (jobId === null) console.warn("first scan retry job was not sent", { firstScanId, promptId });
 		else sent++;
