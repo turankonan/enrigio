@@ -92,7 +92,12 @@ describe("resolveOpportunities — audit staleness", () => {
 		dbState.latest = storedReport({ siteAuditId: "audit-old", createdAt: new Date() });
 		getLatestCompletedAudit.mockResolvedValue(completedAudit("audit-new"));
 		let release: () => void = () => {};
-		resolveFilteredPrompts.mockImplementation(() => new Promise<never[]>((resolve) => { release = () => resolve([]); }));
+		resolveFilteredPrompts.mockImplementation(
+			() =>
+				new Promise<never[]>((resolve) => {
+					release = () => resolve([]);
+				}),
+		);
 
 		await Promise.all([resolveOpportunities(BRAND_ID), resolveOpportunities(BRAND_ID), resolveOpportunities(BRAND_ID)]);
 		await vi.waitFor(() => expect(resolveFilteredPrompts).toHaveBeenCalledTimes(1));
