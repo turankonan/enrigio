@@ -49,6 +49,13 @@ const draftSchema = z.object({
 	engines: z.array(z.string()).min(1).max(8),
 });
 
+// Saving captures work in progress, so a blank brand name or no engines yet must not
+// be rejected (that would silently drop the user's edits); only starting a scan is strict.
+const draftSaveSchema = draftSchema.extend({
+	profile: draftSchema.shape.profile.extend({ name: z.string().trim().max(120) }),
+	engines: z.array(z.string()).max(8),
+});
+
 const scanRef = z.object({ brandId: z.string(), firstScanId: z.string().uuid() });
 
 async function requireScan(brandId: string, firstScanId: string) {
@@ -58,7 +65,7 @@ async function requireScan(brandId: string, firstScanId: string) {
 }
 
 export const saveSetupDraftFn = createServerFn({ method: "POST" })
-	.validator(z.object({ brandId: z.string(), draft: draftSchema }))
+	.validator(z.object({ brandId: z.string(), draft: draftSaveSchema }))
 	.handler(async ({ data }) => {
 		await requireBrandSession(data.brandId);
 		await db.update(brands).set({ setupDraft: data.draft }).where(eq(brands.id, data.brandId));
