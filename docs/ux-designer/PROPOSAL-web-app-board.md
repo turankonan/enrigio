@@ -1,6 +1,6 @@
 # Enrigio Web App board — proposal for review
 
-Date: 2026-11-03 (rev 2, after review) · Author: Rigosis product · Status: proposal, nothing implemented
+Date: 2026-11-03 (rev 3, after second review) · Author: Rigosis product · Status: proposal, nothing implemented
 Source: `docs/Enrigio Web App.html` (13-screen Claude Design board, Turkish copy, 1440 px frames)
 
 ## 1. Summary
@@ -37,8 +37,10 @@ Concepts introduced: **buyer questions** (drive the score) vs **brand questions*
 never scored); "continue later"; the wizard is the same for the first brand and for every added brand.
 
 **Inconsistency in the board:** step 2 requires at least 10 buyer questions and adds 3 brand questions, but
-steps 5 and the report say "12 questions × 4 engines = 48 answers". Which questions run on which engines, and
-whether brand questions are part of the first scan, must be decided (section 6, D1).
+step 5 and the report say "12 questions × 4 engines = 48 answers". Proposed rule (D1): 12 buyer questions
+pre-selected, user may go down to 10 or up to 16; the 3 brand questions always run; every selected question runs
+on all 4 default engines. First scan is therefore (10–16 + 3) × 4 = 52–76 evaluations, 60 at the default. The
+board's "12 × 4 = 48" copy changes to "15 questions × 4 engines = 60 answers".
 
 ### 2.2 Free funnel (screens 5–6)
 
@@ -72,8 +74,10 @@ Checked against `main` on 2026-11-03.
 2. **Score definition.** Shipped: mentions ÷ answers as a percentage (`dashboard.ts`), already split into branded
    and non-branded visibility, plus an `averageWeightedMentions` figure on the Prompts page. Board: a rank-weighted
    score over buyer questions only, four intent sub-scores, and a separate brand-accuracy score. The board does not
-   define the weights, how rank is read from an answer, or how missing and inconsistent answers count. Changing
-   the headline number changes the worker's aggregation, every shipped card, and the shared report.
+   define the weights, how rank is read from an answer, or how missing and inconsistent answers count. Runs already
+   store `brandRank` and `sentiment`, so rank weighting has data to work from; nothing records factual accuracy,
+   so the brand-accuracy score needs a new evaluator output. Changing the headline number changes the worker's
+   aggregation, every shipped card, and the shared report.
 3. **Questions model.** Prompts are already auto-tagged branded/unbranded (`SYSTEM_TAGS`) and carry LLM-chosen
    topical tags, so the buyer/brand split largely exists. What is new: a fixed intent taxonomy (Discovery,
    Comparison, Local, Price), suggestion by sector + location, and the "volume" hint per question.
@@ -85,8 +89,9 @@ Checked against `main` on 2026-11-03.
    an append-only LLM digest with dismiss and "mark done". No table for actions exists.
 6. **Free tier and report snapshots.** No free tier exists; `choose-plan` is cloud billing. The `reports` table is
    the legacy standalone brand report (name, website, raw output), not an immutable snapshot of a brand's
-   evaluations. One-shot-per-domain enforcement needs: domain normalisation (www, subdomains, aliases), a claim
-   record independent of account and email, what a second account sees, and what the public share link exposes.
+   evaluations. Brands are not domain-verified today; any org can track any site. One-shot-per-domain enforcement
+   needs: domain normalisation (www, subdomains, aliases), a claim record independent of account and email, what a
+   second account sees, and what the public share link exposes (D4).
 7. **Pricing.** `packages/config/src/plans.ts` is the source of truth: Starter 29 $ (1 brand, 1 platform pick),
    Basic 99 $ (1 brand, 4 picks), Pro 299 $ (2 brands, 4 picks, 20 premium slots), Business 649 $ (5 brands,
    30 premium slots). Claude is sold as a premium grounded call; Copilot is an ordinary scraped pick on any
@@ -118,11 +123,16 @@ Sizes are deliberately absent until phase V closes; the review was right that th
 
 | Phase | Ships | Depends on | Acceptance |
 |---|---|---|---|
-| **V Validation** | Written decisions D1–D8 (section 6); score formula versioned and back-tested against existing evaluation data for 3 real brands; domain-claim rules; report privacy rules | Nothing | Each decision recorded in this file with an owner; new score correlates with the shipped one on the test brands or the divergence is explained |
-| **0 Foundations** | Intent tag on prompts; score v2 computed by the worker alongside v1; brand-accuracy score; backfill of intent on existing prompts (branded flag already exists) | V | Score v2 visible in an admin view for every brand; no user-facing number changes yet |
-| **1 Wizard + starter report** | 5-step wizard replacing `new.tsx`, extending the brand-analysis job with sector/market/location; question suggestions with intent; rival pre-scan; live first-scan with progress and recovery; immutable starter-report snapshot; domain claim; locked states; return-visit page | 0 | Setup completion ≥ 70 % of started wizards; first scan completes within the stated time for 95 % of runs; a second account on a claimed domain sees the same frozen report |
+| **V Validation** | Written decisions D1–D9 (section 6); score v2 and the accuracy rubric defined and back-tested offline against existing evaluation data; domain-claim rules; report privacy rules | Nothing | Each decision recorded in this file with an owner. Back-test set: every brand on the cloud instance with ≥ 30 days of runs on ≥ 4 platforms. Pass: per-brand Spearman correlation between v1 and v2 across prompts ≥ 0.7 for at least 80 % of brands, and no brand's 30-day direction (up/down/flat, ±3 points) flips between v1 and v2 |
+| **0 Foundations** | Intent tag on prompts; score v2 and the accuracy score computed by the worker beside v1; backfill of intent on existing prompts (branded flag already exists) | V | v2 visible in an admin view for every brand; every user-facing surface still shows v1 |
+| **1 Wizard + starter report** | 5-step wizard replacing `new.tsx`, extending the brand-analysis job with sector/market/location; question suggestions with intent; rival pre-scan; live first-scan with progress and recovery; immutable starter-report snapshot; domain claim; locked states; return-visit page | 0 | Setup completion ≥ 60 %: wizards reaching the first-scan screen ÷ wizards that submitted a URL, measured over the first 30 days after launch. First scan (60 evaluations) completes in ≤ 5 min for 95 % of runs and never leaves a wizard stuck: a scan older than 20 min is marked failed and offered a retry. A second account on a claimed domain sees exactly the frozen report |
 | **2 Action plan + Sources** | Action table (status, owner, due, question, source); "Done" enqueues a re-scan; 7-day and 21-day measurement job with comparability rules; how-to + email template content; Sources gap and your-pages tables | 0 | Every action links to one prompt and one source; measurement only compares scans with the same prompt, platform picks and market; UI wording never claims causation |
-| **3 Reports + plans** | Monthly report job + Monday digest emails; action impact table; plan packaging decided in D3 wired into `plans.ts` and Stripe; Brands portfolio with client-invite setup | 1, 2 | Report generated on the 1st for every active brand; free-to-paid conversion tracked from the starter report CTA |
+| **3 Reports + plans** | Monthly report job + Monday digest emails; action impact table; plan packaging decided in D3 wired into `plans.ts` and Stripe; Brands portfolio with client-invite setup | 1, 2 | Report generated on the 1st for every active brand; ≥ 3 % of starter reports convert to a paid plan within 30 days of the report date, measured over the first 90 days after launch |
+
+**Score versions as users see them.** Until the back-test in phase V passes, every surface (Home, Prompts, shared
+report, starter report) shows v1. When it passes, v2 replaces v1 on every surface in one release at the end of
+phase 0, with the Home delta recomputed from v2 history so no user sees a jump caused by the switch. The starter
+report never shows both. Intent sub-scores before the switch are v1 computed per intent group.
 | **4 Shell + language** | Sidebar vs top bar decision; Turkish via i18n or Turkish-first | 3 | — |
 
 ## 6. Decisions required before dependent work starts
@@ -131,14 +141,15 @@ These are product decisions and need an explicit answer, not a default. The sugg
 
 | # | Decision | Suggested | Blocks |
 |---|---|---|---|
-| D1 | First-scan composition: which questions on which engines; do brand questions run in the first scan | Buyer questions only (≥10) × 4 engines in the first scan; brand questions start on day 1 of daily tracking | 1 |
-| D2 | Score v2 definition: rank weights, how rank is read, treatment of missing/inconsistent answers; whether it replaces or sits beside mention-% | Define in V, run beside v1 in phase 0, replace only after back-test | 0, 1, 2 |
+| D1 | First-scan composition | 12 buyer questions pre-selected (min 10, max 16) plus the 3 brand questions, all on the 4 default engines: 60 evaluations at the default. Brand questions feed the accuracy score only and never the visibility score | 1 |
+| D2 | Score v2 definition: rank weights, how rank is read, treatment of missing/inconsistent answers | Starting formula for the back-test: per answer, rank 1 = 1.0, rank 2 = 0.7, rank 3 = 0.5, rank ≥ 4 = 0.3, not mentioned = 0, from the existing `brandRank`; score = mean × 100 over buyer-question answers in the window; an answer with no rank but a mention counts 0.3. Replaces v1 only after the phase V back-test passes | 0, 1, 2 |
 | D3 | Pricing and packaging: keep the four-plan catalog, or replace with the board's Growth/Pro; which engines are gated | Keep the catalog; map "Growth" to Basic or Pro; drop the Copilot gate; keep Claude as premium | 1 (locked states), 3 |
-| D4 | Free starter report: once per normalised domain across all accounts (as drawn) or once per account; subdomain and alias handling; what a share link shows | Per normalised registrable domain, across accounts; share link shows the report without answer text | 1 |
+| D4 | Free starter report: claim scope, ownership, disputes, and who sees what | Claim = one report per normalised registrable domain (www and subdomains collapse to it; aliases do not), created by whoever runs the wizard first. No ownership verification: the report contains only public AI answers and the suggested (not custom) question set, so it is domain-level data, not account data. A second account that enters the same domain sees the same frozen report in full and the same upgrade path. Claims are permanent and never released; a paid plan re-scans regardless. No dispute process. Share link shows the report with answer quotes removed | 1 |
 | D5 | Action measurement rules: what counts as improvement, which scans are comparable, how it is worded | Same prompt + picks + market; ≥ 3 scans each side; report "score moved from X to Y" with no causal claim | 2 |
 | D6 | Language: English-first then translate, or Turkish-first | English-first | 1 |
 | D7 | Site extraction: extend the existing brand-analysis LLM job vs a third-party enrichment API | Extend the existing job | 1 |
 | D8 | Shell: keep the top bar until phase 4 (defer) or adopt the sidebar now | Defer | 4 |
+| D9 | Brand-accuracy rubric | Per brand-question answer the evaluator records: factual claims about the brand (address, services, hours, pricing, ownership) and whether each matches the brand profile from setup; sentiment already exists. Accuracy = answers with zero contradicted claims ÷ all brand-question answers in the window × 100. Each contradicted claim surfaces as a warning (as the board's "Gemini gives the old address"). Needs its own back-test: 50 hand-labelled answers, evaluator agreement ≥ 90 % | 0, 1 |
 
 Low-risk details not listed here (card layouts, copy, the 5-active-action cap) take the board as drawn.
 
