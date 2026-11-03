@@ -33,8 +33,7 @@ function DashboardPage() {
 	const openReport = () => {
 		const template = context.clientConfig?.branding.onboardingRedirectUrlTemplate;
 		if (template) window.location.href = template.replace("{brandId}", brandId);
-		// href, not a typed `to`: the report route is not in the generated route tree yet.
-		else router.navigate({ href: `/app/org/${params.org}/brand/${params.brand}/report` });
+		else router.navigate({ to: "/app/org/$org/brand/$brand/report", params });
 	};
 
 	if (!brand) return null;
