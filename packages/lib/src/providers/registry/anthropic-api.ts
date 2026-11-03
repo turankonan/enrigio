@@ -55,11 +55,14 @@ async function runAnthropic(prompt: string, model: string, options?: ProviderOpt
 
 	let response = await makeRequest();
 
-	// Check for web search errors like max_uses_exceeded and retry once
+	// Retry once on a transient web search error. `max_uses_exceeded` is not one:
+	// the model already got its allowed search and finished the answer, so a
+	// retry would only pay the search fee and the tokens a second time.
 	for (const block of response.content) {
 		if (block.type !== "web_search_tool_result") continue;
 		const error = Array.isArray(block.content) ? undefined : block.content;
 		if (error?.type !== "web_search_tool_result_error") continue;
+		if (error.error_code === "max_uses_exceeded") continue;
 		console.warn(`[anthropic-api] web search error: ${error.error_code}, retrying in 10s...`);
 		await sleep(10_000);
 		response = await makeRequest();

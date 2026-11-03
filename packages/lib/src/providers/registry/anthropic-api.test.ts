@@ -103,7 +103,7 @@ describe("anthropic-api web search handling", () => {
 					{
 						type: "web_search_tool_result",
 						tool_use_id: "srv_1",
-						content: { type: "web_search_tool_result_error", error_code: "max_uses_exceeded" },
+						content: { type: "web_search_tool_result_error", error_code: "unavailable" },
 					},
 				],
 				model: "claude-sonnet-5",
@@ -117,5 +117,22 @@ describe("anthropic-api web search handling", () => {
 		expect(anthropicClient.create).toHaveBeenCalledTimes(2);
 		expect(res.webQueries).toEqual(["enrigio aeo"]);
 		vi.useRealTimers();
+	});
+
+	it("does not retry when the model merely hit its search allowance", async () => {
+		anthropicClient.create.mockResolvedValue({
+			model: "claude-sonnet-5",
+			content: [
+				{
+					type: "web_search_tool_result",
+					content: { type: "web_search_tool_result_error", error_code: "max_uses_exceeded" },
+				},
+				{ type: "text", text: "answer" },
+			],
+		});
+
+		await anthropicApi.run("claude", "prompt", { webSearch: true, version: "claude-sonnet-5" });
+
+		expect(anthropicClient.create).toHaveBeenCalledTimes(1);
 	});
 });
