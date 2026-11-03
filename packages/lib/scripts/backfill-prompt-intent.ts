@@ -8,8 +8,11 @@
  * Sends prompt text only, never answers. Prints the number of model calls it
  * will make and stops unless --yes is passed.
  *
+ * Needs DATABASE_URL and the provider keys the onboarding analysis uses
+ * (resolveResearchProvider), not only the database; the env file supplies both.
+ *
  * Usage:
- *   DATABASE_URL=postgres://... pnpm -C packages/lib exec tsx scripts/backfill-prompt-intent.ts [--yes]
+ *   pnpm -C packages/lib exec tsx --env-file=../../apps/web/.env scripts/backfill-prompt-intent.ts [--yes]
  */
 
 import { parseArgs } from "node:util";
@@ -50,16 +53,18 @@ async function main(): Promise<void> {
 			console.log("Dry run. Pass --yes to classify and write.");
 			return;
 		}
-		const intents = await classifyIntents(targets);
 		let written = 0;
-		for (const [id, intent] of intents) {
-			if (intent === null) continue;
-			const { rowCount } = await client.query("UPDATE prompts SET intent = $1 WHERE id = $2 AND intent IS NULL", [
-				intent,
-				id,
-			]);
-			written += rowCount ?? 0;
-		}
+		// Written per batch so a failure on batch N keeps batches 1..N-1.
+		await classifyIntents(targets, undefined, async (batch) => {
+			for (const [id, intent] of batch) {
+				if (intent === null) continue;
+				const { rowCount } = await client.query("UPDATE prompts SET intent = $1 WHERE id = $2 AND intent IS NULL", [
+					intent,
+					id,
+				]);
+				written += rowCount ?? 0;
+			}
+		});
 		console.log(`✓ set intent on ${written} prompt(s); ${targets.length - written} left null (no fitting intent)`);
 	} finally {
 		await client.end();
