@@ -44,6 +44,19 @@ describe("computeStatus", () => {
 		expect(s).toMatchObject({ done: 1, failed: 1, missing: 2 });
 	});
 
+	it("counts a pair that failed and then succeeded as done, not failed", () => {
+		const s = computeStatus({
+			expected,
+			finished: [
+				{ promptId: "a", model: "chatgpt", failed: true },
+				{ promptId: "a", model: "chatgpt", failed: false },
+			],
+			startedAt: new Date(),
+			now: new Date(),
+		});
+		expect(s).toMatchObject({ done: 1, failed: 0, missing: 3 });
+	});
+
 	it("gives no ETA until five pairs have finished, then extrapolates from the average", () => {
 		const start = new Date("2026-11-03T10:00:00Z");
 		const four = Array.from({ length: 4 }, (_, i) => ({ promptId: "a", model: `m${i}`, failed: false }));

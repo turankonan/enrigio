@@ -1,4 +1,5 @@
 /** Plain functions with db access; server functions live in ./first-scan.ts. */
+import { MARKET_CATALOG } from "@workspace/config/markets";
 import { db } from "@workspace/lib/db/db";
 import {
 	brands,
@@ -10,6 +11,7 @@ import {
 } from "@workspace/lib/db/schema";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { getBoss } from "@/lib/boss-client";
+import { dedupeAliases, dedupeDomains } from "@/lib/domain-categories";
 import { getFirstScanFinishedPairs } from "@/lib/postgres-read";
 import { expectedPairs, isBuyer, type SetupDraft } from "@/lib/setup-wizard";
 import { insertCompetitors, insertPrompts } from "@/server/onboarding-core";
@@ -68,6 +70,7 @@ export async function startFirstScan(input: StartFirstScanInput): Promise<{ firs
 			conn: tx,
 			organizationId: brand.organizationId,
 		});
+		if (promptIds.length === 0) throw new Error("No questions to scan");
 		const [scan] = await tx
 			.insert(firstScans)
 			.values({
@@ -82,11 +85,13 @@ export async function startFirstScan(input: StartFirstScanInput): Promise<{ firs
 			.update(brands)
 			.set({
 				name: draft.profile.name,
-				sector: draft.profile.sector || null,
-				location: draft.profile.location || null,
-				defaultMarketKey: draft.profile.marketKey ?? brand.defaultMarketKey,
-				aliases: draft.profile.aliases,
-				additionalDomains: draft.profile.additionalDomains,
+				sector: draft.profile.sector?.trim() || null,
+				location: draft.profile.location?.trim() || null,
+				defaultMarketKey: MARKET_CATALOG.some((m) => m.key === draft.profile.marketKey)
+					? draft.profile.marketKey
+					: brand.defaultMarketKey,
+				aliases: dedupeAliases(draft.profile.aliases),
+				additionalDomains: dedupeDomains(draft.profile.additionalDomains).filter((d) => d !== websiteHost),
 				enabledModels: draft.engines,
 				setupDraft: null,
 			})
@@ -106,11 +111,13 @@ export async function enqueueFirstScanJobs(firstScanId: string): Promise<void> {
 	const boss = await getBoss();
 	const promptIds = [...new Set(scan.expected.map((p) => p.promptId))];
 	for (const promptId of promptIds) {
-		await boss.send(
+		const jobId = await boss.send(
 			"process-prompt",
 			{ promptId, firstScanId },
 			{ singletonKey: `first-scan-${promptId}`, singletonSeconds: 60 * 60, retryLimit: 0, expireInSeconds: 60 * 90 },
 		);
+		// null means a job for this prompt already holds the singleton slot.
+		if (jobId === null) console.info("first scan job already queued", { firstScanId, promptId });
 	}
 	await db.update(firstScans).set({ enqueuedAt: new Date() }).where(eq(firstScans.id, firstScanId));
 }
@@ -176,7 +183,8 @@ export function computeStatus(args: {
 export async function getFirstScanStatus(firstScanId: string): Promise<FirstScanStatus> {
 	const scan = await db.query.firstScans.findFirst({ where: eq(firstScans.id, firstScanId) });
 	if (!scan) throw new Error("First scan not found");
-	if (!scan.enqueuedAt) await enqueueFirstScanJobs(firstScanId).catch(() => {});
+	if (!scan.enqueuedAt)
+		await enqueueFirstScanJobs(firstScanId).catch((err) => console.error("first scan enqueue retry failed", err));
 
 	const finished = await getFirstScanFinishedPairs(firstScanId);
 	const counts = computeStatus({
@@ -189,7 +197,10 @@ export async function getFirstScanStatus(firstScanId: string): Promise<FirstScan
 	let status = scan.status;
 	if (counts.settled && counts.failed === 0 && (status === "queued" || status === "running")) {
 		status = "complete";
-		await db.update(firstScans).set({ status, completedAt: new Date() }).where(eq(firstScans.id, firstScanId));
+		await db
+			.update(firstScans)
+			.set({ status, completedAt: new Date() })
+			.where(and(eq(firstScans.id, firstScanId), inArray(firstScans.status, ["queued", "running"])));
 	}
 
 	const runs = await db
@@ -236,13 +247,18 @@ export async function retryFirstScan(firstScanId: string): Promise<void> {
 	const promptIds = [...new Set(scan.expected.filter((p) => !succeeded.has(pairKey(p))).map((p) => p.promptId))];
 	if (promptIds.length === 0) return;
 	const boss = await getBoss();
+	let sent = 0;
 	for (const promptId of promptIds) {
-		await boss.send(
+		// A fresh key per retry: pg-boss singleton slots are epoch-aligned and finished jobs still hold them.
+		const jobId = await boss.send(
 			"process-prompt",
 			{ promptId, firstScanId },
-			{ singletonKey: `first-scan-${promptId}`, singletonSeconds: 60 * 5, retryLimit: 0, expireInSeconds: 60 * 90 },
+			{ singletonKey: `first-scan-${promptId}-retry-${Date.now()}`, retryLimit: 0, expireInSeconds: 60 * 90 },
 		);
+		if (jobId === null) console.warn("first scan retry job was not sent", { firstScanId, promptId });
+		else sent++;
 	}
+	if (sent === 0) return;
 	await db
 		.update(firstScans)
 		.set({ status: "running" })
@@ -253,5 +269,8 @@ export async function openPartialFirstScan(firstScanId: string): Promise<void> {
 	const status = await getFirstScanStatus(firstScanId);
 	if (status.status === "complete" || status.status === "partial") return;
 	if (!status.canOpenPartial) throw new Error("Not enough answers yet");
-	await db.update(firstScans).set({ status: "partial", completedAt: new Date() }).where(eq(firstScans.id, firstScanId));
+	await db
+		.update(firstScans)
+		.set({ status: "partial", completedAt: new Date() })
+		.where(and(eq(firstScans.id, firstScanId), inArray(firstScans.status, ["queued", "running"])));
 }
