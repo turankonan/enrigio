@@ -21,7 +21,13 @@ import { getOrgEntitlements } from "@workspace/lib/entitlements";
 import { resolveEffectiveMarket } from "@workspace/lib/markets";
 import { type BrandProfile, classifyMention } from "@workspace/lib/mention-classify";
 import { analyzeMentions } from "@workspace/lib/mentions";
-import { getProvider, type ModelConfig, type Provider, resolveLocalizable } from "@workspace/lib/providers";
+import {
+	getProvider,
+	isGroundedApiTarget,
+	type ModelConfig,
+	type Provider,
+	resolveLocalizable,
+} from "@workspace/lib/providers";
 import { failureBackoffHours } from "@workspace/lib/run-backoff";
 import {
 	dailyRunCeiling,
@@ -472,18 +478,18 @@ export async function runModelIteration({
  * plan or RUNS_PER_PROMPT would run on a normal day. Engines that already
  * answered are skipped, so a retried scan re-runs only what failed or never ran.
  */
-export function firstScanTargets<T extends { config: { model: string }; replication: number }>(
+export function firstScanTargets<T extends { config: ModelConfig; replication: number }>(
 	targets: T[],
 	expected: FirstScanExpectedPair[],
 	promptId: string,
 	alreadyDone: ReadonlySet<string>,
 ): T[] {
 	const models = new Set(expected.filter((p) => p.promptId === promptId).map((p) => p.model));
-	// One answer per engine: when several routes serve the same model, the
-	// first configured one carries the first scan.
+	// One answer per engine: when several routes serve the same model, a direct
+	// API route beats a scraper, then the first configured one.
+	const wanted = targets.filter((t) => models.has(t.config.model) && !alreadyDone.has(t.config.model));
 	const seen = new Set<string>();
-	return targets
-		.filter((t) => models.has(t.config.model) && !alreadyDone.has(t.config.model))
+	return [...wanted.filter((t) => isGroundedApiTarget(t.config)), ...wanted]
 		.filter((t) => !seen.has(t.config.model) && seen.add(t.config.model))
 		.map((t) => ({ ...t, replication: 1 }));
 }
