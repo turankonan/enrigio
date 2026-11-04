@@ -349,6 +349,15 @@ describe("firstScanTargets", () => {
 		]);
 	});
 
+	it("asks one route per engine when several serve the same model", () => {
+		const targets = [
+			{ config: { model: "chatgpt", provider: "openai-api", webSearch: true }, replication: 5 },
+			{ config: { model: "chatgpt", provider: "dataforseo", webSearch: true }, replication: 5 },
+		];
+		const out = firstScanTargets(targets as never, [{ promptId: "p1", model: "chatgpt" }], "p1", new Set());
+		expect(out.map((t) => t.config.provider)).toEqual(["openai-api"]);
+	});
+
 	it("re-runs only the engines that have not answered yet when a scan is retried", () => {
 		const targets = [
 			{ config: { model: "chatgpt", provider: "openai-api", webSearch: true }, replication: 5 },

@@ -479,8 +479,12 @@ export function firstScanTargets<T extends { config: { model: string }; replicat
 	alreadyDone: ReadonlySet<string>,
 ): T[] {
 	const models = new Set(expected.filter((p) => p.promptId === promptId).map((p) => p.model));
+	// One answer per engine: when several routes serve the same model, the
+	// first configured one carries the first scan.
+	const seen = new Set<string>();
 	return targets
 		.filter((t) => models.has(t.config.model) && !alreadyDone.has(t.config.model))
+		.filter((t) => !seen.has(t.config.model) && seen.add(t.config.model))
 		.map((t) => ({ ...t, replication: 1 }));
 }
 
