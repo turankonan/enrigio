@@ -73,6 +73,14 @@ describe("buildStarterReport", () => {
 		expect(report.answers[0]!.excerpt.length).toBeLessThanOrEqual(300);
 	});
 
+	it("quotes answers as plain prose, without markdown marks", () => {
+		const { report } = buildStarterReport({
+			...base,
+			runs: [run({ mentioned: true, text: "## Best apps\n\n**Getir** is _fast_.\n> quote" })],
+		});
+		expect(report.answers[0]!.excerpt).toBe("Best apps Getir is fast. quote");
+	});
+
 	it("reports accuracy only when something was assessed and lists missing sections", () => {
 		const { report, missingSections } = buildStarterReport({
 			...base,

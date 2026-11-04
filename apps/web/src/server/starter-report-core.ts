@@ -16,6 +16,15 @@ import { getFirstScanStatus, latestPerPair } from "@/server/first-scan-core";
 import { resolveOpportunities } from "@/server/opportunities";
 
 const EXCERPT_CHARS = 300;
+
+/** Answers arrive as markdown; the report quotes them as plain prose. */
+function excerptOf(text: string): string {
+	const plain = text
+		.replace(/[#*_`>]+/g, "")
+		.replace(/\s+/g, " ")
+		.trim();
+	return plain.length > EXCERPT_CHARS ? `${plain.slice(0, EXCERPT_CHARS - 1).trimEnd()}…` : plain;
+}
 const ANSWER_COUNT = 4;
 const WHO_LIMIT = 6;
 const STEPS_LIMIT = 3;
@@ -94,7 +103,7 @@ export function buildStarterReport(input: BuildInput): { report: StarterReport; 
 		promptValue: r.promptValue,
 		model: r.model,
 		mentioned: r.mentioned,
-		excerpt: r.text.length > EXCERPT_CHARS ? `${r.text.slice(0, EXCERPT_CHARS - 1).trimEnd()}…` : r.text,
+		excerpt: excerptOf(r.text),
 	}));
 
 	const missingSections: string[] = [];

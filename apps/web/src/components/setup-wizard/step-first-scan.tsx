@@ -103,11 +103,13 @@ function ScanStats({ s, finished }: { s: FirstScanStatus; finished: number }) {
 	return (
 		<div className="flex flex-wrap gap-4 text-sm">
 			<span>{t("setup.scan.progress", { done: finished, expected: s.expected })}</span>
-			<span>
-				{s.etaSeconds === null
-					? t("setup.scan.eta_unknown")
-					: t("setup.scan.eta", { minutes: Math.max(1, Math.ceil(s.etaSeconds / 60)) })}
-			</span>
+			{!s.settled && (
+				<span>
+					{s.etaSeconds === null
+						? t("setup.scan.eta_unknown")
+						: t("setup.scan.eta", { minutes: Math.max(1, Math.ceil(s.etaSeconds / 60)) })}
+				</span>
+			)}
 			<span>{t("setup.scan.mentioned", { count: s.mentioned })}</span>
 			{s.topRival && <span>{t("setup.scan.top_rival", s.topRival)}</span>}
 			{s.failed > 0 && <span className="text-destructive">{t("setup.scan.failed", { count: s.failed })}</span>}

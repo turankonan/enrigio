@@ -6,7 +6,7 @@ import { Button, buttonVariants } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Progress } from "@workspace/ui/components/progress";
 import { useBrandParams } from "@/hooks/use-route-params";
-import { t } from "@/lib/i18n";
+import { locale, t } from "@/lib/i18n";
 import { INTENT_LABEL } from "@/lib/setup-wizard-labels";
 import { retryStarterReportSectionFn, type StarterReport } from "@/server/starter-report";
 
@@ -23,7 +23,7 @@ export function StarterReportView({ brandId, data, onChanged }: Props) {
 		mutationFn: () => retryStarterReportSectionFn({ data: { brandId, section: "nextSteps" } }),
 		onSuccess: onChanged,
 	});
-	const date = new Date(data.createdAt).toLocaleDateString();
+	const date = new Date(data.createdAt).toLocaleDateString(locale, { year: "numeric", month: "long", day: "numeric" });
 
 	return (
 		<div className="mx-auto max-w-3xl space-y-6 p-4">
