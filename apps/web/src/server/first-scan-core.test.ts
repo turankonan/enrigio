@@ -1,10 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@workspace/lib/db/db", () => ({ db: {} }));
+const findFirst = vi.fn();
+vi.mock("@workspace/lib/db/db", () => ({
+	db: { query: { brands: { findFirst: (...a: unknown[]) => findFirst(...a) } }, transaction: vi.fn() },
+}));
 vi.mock("@/lib/boss-client", () => ({ getBoss: vi.fn() }));
+vi.mock("@/lib/auth/helpers", () => ({ requirePlatformPicksEditable: vi.fn() }));
 vi.mock("@/lib/postgres-read", () => ({ getFirstScanFinishedPairs: vi.fn() }));
 
-const { computeStatus, latestPerPair } = await import("./first-scan-core");
+const { computeStatus, latestPerPair, startFirstScan } = await import("./first-scan-core");
 
 const T0 = new Date("2026-11-03T10:00:00Z");
 
@@ -113,5 +117,26 @@ describe("latestPerPair", () => {
 		const out = latestPerPair(runs);
 		expect(out).toHaveLength(2);
 		expect(out.find((r) => r.model === "chatgpt")?.mentioned).toBe(true);
+	});
+});
+
+describe("startFirstScan", () => {
+	it("rejects an engine that is not configured before writing anything", async () => {
+		vi.stubEnv("SCRAPE_TARGETS", "chatgpt:openai-api");
+		findFirst.mockResolvedValue({ id: "b", website: "https://b.example", onboarded: false, organizationId: "o" });
+		const { db } = await import("@workspace/lib/db/db");
+		await expect(
+			startFirstScan({
+				brandId: "b",
+				draft: {
+					step: 4,
+					profile: { name: "B", sector: "", location: "", marketKey: "tr", aliases: [], additionalDomains: [] },
+					questions: [],
+					rivals: [],
+					engines: ["chatgpt", "not-a-model"],
+				},
+			}),
+		).rejects.toThrow(/not in SCRAPE_TARGETS/);
+		expect(db.transaction).not.toHaveBeenCalled();
 	});
 });

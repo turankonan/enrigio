@@ -1,5 +1,6 @@
 /** Plain functions with db access; server functions live in ./first-scan.ts. */
 import { MARKET_CATALOG } from "@workspace/config/markets";
+import { parseScrapeTargets } from "@workspace/config/scrape-targets";
 import { getDefaultDelayHours, getRunsPerPrompt } from "@workspace/lib/constants";
 import { db } from "@workspace/lib/db/db";
 import {
@@ -10,8 +11,10 @@ import {
 	prompts,
 	starterReports,
 } from "@workspace/lib/db/schema";
-import { getOrgEntitlements } from "@workspace/lib/entitlements";
+import { assertEnabledModelsAllowed, getOrgEntitlements } from "@workspace/lib/entitlements";
+import { selectTargetsForBrand } from "@workspace/lib/providers";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { requirePlatformPicksEditable } from "@/lib/auth/helpers";
 import { getBoss } from "@/lib/boss-client";
 import { dedupeAliases, dedupeDomains } from "@/lib/domain-categories";
 import { getFirstScanFinishedPairs } from "@/lib/postgres-read";
@@ -42,6 +45,11 @@ export async function startFirstScan(input: StartFirstScanInput): Promise<{ firs
 	if (!brand) throw new Error("Brand not found");
 	if (brand.onboarded) throw new AlreadyStartedError();
 	const websiteHost = new URL(brand.website).hostname.replace(/^www\./, "");
+	// The wizard's engine picks are client input: same gates as brand creation.
+	requirePlatformPicksEditable();
+	const engines = [...new Set(draft.engines)];
+	selectTargetsForBrand(parseScrapeTargets(process.env.SCRAPE_TARGETS), engines);
+	await assertEnabledModelsAllowed(brand.organizationId, engines);
 
 	const firstScanId = await db.transaction(async (tx) => {
 		// The guarded update takes the brand's row lock: a concurrent start
@@ -81,7 +89,7 @@ export async function startFirstScan(input: StartFirstScanInput): Promise<{ firs
 				brandId,
 				expected: expectedPairs(
 					promptIds.map((id) => ({ id })),
-					draft.engines,
+					engines,
 				),
 			})
 			.returning({ id: firstScans.id });
@@ -96,7 +104,7 @@ export async function startFirstScan(input: StartFirstScanInput): Promise<{ firs
 					: brand.defaultMarketKey,
 				aliases: dedupeAliases(draft.profile.aliases),
 				additionalDomains: dedupeDomains(draft.profile.additionalDomains).filter((d) => d !== websiteHost),
-				enabledModels: draft.engines,
+				enabledModels: engines,
 				setupDraft: null,
 			})
 			.where(eq(brands.id, brandId));
