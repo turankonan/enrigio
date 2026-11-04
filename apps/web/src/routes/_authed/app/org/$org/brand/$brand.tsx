@@ -64,11 +64,14 @@ export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand")({
 	staticData: { shell: "brand" },
 	validateSearch: validateBrandFilterSearch,
 	beforeLoad: async ({ params, location, context }): Promise<{ brandId: string }> => {
-		// The parent context can predate a brand created on the previous page; the
-		// query cache is what the create flow invalidates, so resolve against it.
-		const { organizations } = await context.queryClient.ensureQueryData(organizationsQuery);
-		const owned = organizations.find((o) => o.id === context.organization.id)?.brands ?? context.organization.brands;
-		const brand = resolveSegment(owned, params.brand);
+		// A brand created a moment ago can be missing from the cached list the
+		// context was built from; refetch once before calling it not found.
+		let brand = resolveSegment(context.organization.brands, params.brand);
+		if (!brand) {
+			const { organizations } = await context.queryClient.fetchQuery({ ...organizationsQuery, staleTime: 0 });
+			const owned = organizations.find((o) => o.id === context.organization.id)?.brands ?? [];
+			brand = resolveSegment(owned, params.brand);
+		}
 		if (!brand) throw notFound();
 
 		const canonical = brandSegment(brand);
