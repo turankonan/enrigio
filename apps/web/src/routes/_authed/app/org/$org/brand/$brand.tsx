@@ -11,6 +11,7 @@ import { z } from "zod";
 import { validateBrandFilterSearch } from "@/hooks/use-list-filters";
 import { requireAuthSession, requireOrgAccess } from "@/lib/auth/helpers";
 import { t } from "@/lib/i18n";
+import { organizationsQuery } from "@/lib/organizations/queries";
 import { getAppName } from "@/lib/route-head";
 
 interface BrandData {
@@ -62,8 +63,11 @@ function BrandLayoutSkeleton() {
 export const Route = createFileRoute("/_authed/app/org/$org/brand/$brand")({
 	staticData: { shell: "brand" },
 	validateSearch: validateBrandFilterSearch,
-	beforeLoad: ({ params, location, context }): { brandId: string } => {
-		const { brands: owned } = context.organization;
+	beforeLoad: async ({ params, location, context }): Promise<{ brandId: string }> => {
+		// The parent context can predate a brand created on the previous page; the
+		// query cache is what the create flow invalidates, so resolve against it.
+		const { organizations } = await context.queryClient.ensureQueryData(organizationsQuery);
+		const owned = organizations.find((o) => o.id === context.organization.id)?.brands ?? context.organization.brands;
 		const brand = resolveSegment(owned, params.brand);
 		if (!brand) throw notFound();
 
