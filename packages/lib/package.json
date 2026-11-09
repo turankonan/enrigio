@@ -55,7 +55,7 @@
 	"dependencies": {
 		"@ai-sdk/anthropic": "^4.0.49",
 		"@ai-sdk/openai": "^4.0.60",
-		"@anthropic-ai/sdk": "^0.124.0",
+		"@anthropic-ai/sdk": "^1.5.0",
 		"@better-auth/api-key": "1.7.4",
 		"@better-auth/cimd": "1.7.4",
 		"@better-auth/core": "1.7.4",
