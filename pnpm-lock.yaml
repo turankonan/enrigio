@@ -316,8 +316,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       auth0:
-        specifier: ^6.4.0
-        version: 6.4.0
+        specifier: ^7.8.0
+        version: 7.8.0
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@12.11.1)(kysely@0.28.17)(pg@8.23.0)
@@ -443,8 +443,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/lib
       auth0:
-        specifier: ^6.4.0
-        version: 6.4.0
+        specifier: ^7.8.0
+        version: 7.8.0
       drizzle-orm:
         specifier: ^0.45.2
         version: 0.45.2(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0)(@types/pg@8.23.1)(@upstash/redis@1.38.4)(better-sqlite3@12.11.1)(kysely@0.28.17)(pg@8.23.0)
@@ -4762,8 +4762,8 @@ packages:
     resolution: {integrity: sha512-XELtfGo0wc6et4cYr3ds+9NNHZ63BpJa/VdXRY1UuijFPIIPslYL2a2ZWe8rQh5g1DFcOyAD06ubH37BRk0T+Q==}
     engines: {node: ^20.19.0 || ^22.12.0 || ^24.0.0 || ^26.0.0}
 
-  auth0@6.4.0:
-    resolution: {integrity: sha512-5F63B8R1s+CasVQXDcxVhSZiDcJSFHqCcCAgHkHfIdNrD/buON0FoQrAlVtZ8q3Z51UlIx6///1ef6YUhwkZIw==}
+  auth0@7.8.0:
+    resolution: {integrity: sha512-ofhoIDAAgDs4mw52hMIVoAuubr6m6EZ3q2m2UGdRU6oJqkwlkwg2jK99LGPs3XAZEvGzIGTs/TtK7wuwCjfGCg==}
     engines: {node: ^20.19.0 || ^22.12.0 || ^24.0.0 || ^26.0.0}
 
   auth@1.7.4:
@@ -7855,11 +7855,6 @@ packages:
   split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
-
-  srvx@0.11.15:
-    resolution: {integrity: sha512-iXsux0UcOjdvs0LCMa2Ws3WwcDUozA3JN3BquNXkaFPP7TpRqgunKdEgoZ/uwb1J6xaYHfxtz9Twlh6yzwM6Tg==}
-    engines: {node: '>=20.16.0'}
-    hasBin: true
 
   srvx@0.11.22:
     resolution: {integrity: sha512-LqZxxBDMKuMAZzFzJnDCkFOrs9MZQZr0LvHiO/SuSZVdQaXD7xQ5UWTUxheJrQPve1qk9MG2B/yttUvJxw8egQ==}
@@ -13284,7 +13279,7 @@ snapshots:
       jose: 5.10.0
       uuid: 14.0.2
 
-  auth0@6.4.0:
+  auth0@7.8.0:
     dependencies:
       auth0-legacy: auth0@4.37.1
       jose: 5.10.0
@@ -14514,14 +14509,14 @@ snapshots:
   h3@2.0.1-rc.20(crossws@0.4.4(srvx@0.11.22)):
     dependencies:
       rou3: 0.8.1
-      srvx: 0.11.15
+      srvx: 0.11.22
     optionalDependencies:
       crossws: 0.4.4(srvx@0.11.22)
 
   h3@2.0.1-rc.20(crossws@0.4.4(srvx@0.12.4)):
     dependencies:
       rou3: 0.8.1
-      srvx: 0.11.15
+      srvx: 0.11.22
     optionalDependencies:
       crossws: 0.4.4(srvx@0.12.4)
     optional: true
@@ -16765,8 +16760,6 @@ snapshots:
   space-separated-tokens@2.0.2: {}
 
   split2@4.2.0: {}
-
-  srvx@0.11.15: {}
 
   srvx@0.11.22: {}
 
