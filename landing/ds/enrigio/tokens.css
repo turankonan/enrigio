@@ -1,0 +1,92 @@
+/* Enrigio Design System — generated from tokens.json */
+:root, [data-theme="light"] {
+  --indigo: #2B2BD9;
+  --spark: #FF7A3D;
+  --night: #0B0B1A;
+  --mist: #F5F5FA;
+  --surface: #FFFFFF;
+  --surface-muted: #F5F5FA;
+  --surface-raised: #FFFFFF;
+  --ink: #0B0B1A;
+  --ink-muted: #4A4A60;
+  --brand: #2B2BD9;
+  --brand-hover: #1F1FB0;
+  --brand-soft: #EEEEFB;
+  --on-brand: #FFFFFF;
+  --logo-mark: #2B2BD9;
+  --spark-text: #B24412;
+  --spark-soft: #FFF0E8;
+  --border: #E2E2EC;
+  --border-strong: #8A8AA0;
+  --focus: #2B2BD9;
+  --success: #0F7B4A;
+  --success-soft: #E6F5EC;
+  --warning: #9A5800;
+  --warning-soft: #FFF3DC;
+  --danger: #C2312F;
+  --danger-soft: #FDECEC;
+  --shadow-sm: 0 1px 2px rgba(11, 11, 26, 0.06), 0 1px 1px rgba(11, 11, 26, 0.04);
+  --shadow-md: 0 8px 24px rgba(11, 11, 26, 0.08), 0 2px 6px rgba(11, 11, 26, 0.05);
+}
+[data-theme="dark"] {
+  --indigo: #2B2BD9;
+  --spark: #FF7A3D;
+  --night: #0B0B1A;
+  --mist: #F5F5FA;
+  --surface: #0B0B1A;
+  --surface-muted: #14142A;
+  --surface-raised: #1A1A33;
+  --ink: #F2F2F8;
+  --ink-muted: #A8A8C0;
+  --brand: #8C8CFF;
+  --brand-hover: #A6A6FF;
+  --brand-soft: #1E1E46;
+  --on-brand: #0B0B1A;
+  --logo-mark: #FFFFFF;
+  --spark-text: #FF9A66;
+  --spark-soft: #33200F;
+  --border: #2A2A44;
+  --border-strong: #6A6A88;
+  --focus: #A6A6FF;
+  --success: #4FD08A;
+  --success-soft: #10291C;
+  --warning: #FFB547;
+  --warning-soft: #2E2410;
+  --danger: #FF7A73;
+  --danger-soft: #33161A;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.55);
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+  --container: 1200px;
+  --container-narrow: 720px;
+  --nav-height: 72px;
+  --font-sans: "Manrope", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+.display-xl { font-family: var(--font-sans); font-size: 72px; line-height: 76px; font-weight: 800; letter-spacing: -0.04em; }
+.display-l { font-family: var(--font-sans); font-size: 56px; line-height: 60px; font-weight: 800; letter-spacing: -0.035em; }
+.h1 { font-family: var(--font-sans); font-size: 40px; line-height: 46px; font-weight: 800; letter-spacing: -0.03em; }
+.h2 { font-family: var(--font-sans); font-size: 30px; line-height: 36px; font-weight: 800; letter-spacing: -0.02em; }
+.h3 { font-family: var(--font-sans); font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -0.01em; }
+.body-l { font-family: var(--font-sans); font-size: 18px; line-height: 28px; font-weight: 500; }
+.body { font-family: var(--font-sans); font-size: 16px; line-height: 24px; font-weight: 500; }
+.body-s { font-family: var(--font-sans); font-size: 14px; line-height: 20px; font-weight: 500; }
+.label { font-family: var(--font-sans); font-size: 13px; line-height: 16px; font-weight: 700; letter-spacing: 0.04em; }
+.caption { font-family: var(--font-sans); font-size: 12px; line-height: 16px; font-weight: 500; }
+.mono { font-family: var(--font-mono); font-size: 13px; line-height: 20px; font-weight: 500; }

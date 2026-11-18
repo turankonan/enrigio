@@ -1,0 +1,820 @@
+<!doctype html>
+<meta charset="utf-8"><style data-dc-design-system-vars>@layer{:root{--indigo:#2b2bd9;--spark:#ff7a3d;--night:#0b0b1a;--mist:#f5f5fa;--surface:#ffffff;--surface-muted:#f5f5fa;--surface-raised:#ffffff;--ink:#0b0b1a;--ink-muted:#4a4a60;--brand:#2b2bd9;--brand-hover:#1f1fb0;--brand-soft:#eeeefb;--on-brand:#ffffff;--logo-mark:#2b2bd9;--spark-text:#b24412;--spark-soft:#fff0e8;--border:#e2e2ec;--border-strong:#8a8aa0;--focus:#2b2bd9;--success:#0f7b4a;--success-soft:#e6f5ec;--warning:#9a5800;--warning-soft:#fff3dc;--danger:#c2312f;--danger-soft:#fdecec;--shadow-sm:0 1px 2px rgba(11, 11, 26, 0.06), 0 1px 1px rgba(11, 11, 26, 0.04);--shadow-md:0 8px 24px rgba(11, 11, 26, 0.08), 0 2px 6px rgba(11, 11, 26, 0.05);--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:64px;--space-9:96px;--space-10:128px;--radius-sm:6px;--radius-md:10px;--radius-lg:14px;--radius-xl:22px;--radius-pill:999px;--container:1200px;--container-narrow:720px;--nav-height:72px;--font-sans:"Manrope", "Segoe UI", system-ui, sans-serif;--font-mono:"JetBrains Mono", ui-monospace, Menlo, monospace;--text-display-xl:800 72px/76px var(--font-sans);--text-display-l:800 56px/60px var(--font-sans);--text-h1:800 40px/46px var(--font-sans);--text-h2:800 30px/36px var(--font-sans);--text-h3:700 22px/28px var(--font-sans);--text-body-l:500 18px/28px var(--font-sans);--text-body:500 16px/24px var(--font-sans);--text-body-s:500 14px/20px var(--font-sans);--text-label:700 13px/16px var(--font-sans);--text-caption:500 12px/16px var(--font-sans);--text-mono:500 13px/20px var(--font-mono);}}</style>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>x-dc{display:none}</style>
+<link rel="icon" href="/favicon.ico">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enrigio · AI visibility for your brand</title>
+<script src="/vendor/react.js"></script>
+<script src="/vendor/react-dom.js"></script>
+<script src="/support.js"></script>
+<link rel="stylesheet" href="/ds/enrigio/tokens.css">
+<link rel="stylesheet" href="/ds/enrigio/components/bundle.css">
+<script src="/ds/enrigio/components/bundle.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap">
+<style>
+/* v2 — design-elevation pass. Ground: soft neutral, one accent (brand indigo), spark only as a signal.
+   Spacing: 8/16/24/32/48/64/96/128. Radius: 12 controls, 20 cards, 28 feature blocks. */
+body{margin:0;background:#FAFAFC;color:var(--ink);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+a{color:var(--brand)}a:hover{color:var(--brand-hover)}
+*:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:6px}
+.n2{overflow-x:clip;--ground:#FAFAFC;--card:#FFFFFF;--line:#E7E7F0;--soft:#F1F1F7;--muted:#56566E;--glow:0 24px 48px -12px rgba(43,43,217,0.18)}
+.wrap{box-sizing:border-box;width:100%;max-width:1232px;margin:0 auto;padding-inline:32px}
+
+/* nav */
+.soon-bar{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;min-height:40px;padding:8px 16px;background:var(--ink);color:#FFFFFF;font-size:14px;font-weight:600;text-align:center}
+.soon-bar b{display:inline-flex;align-items:center;gap:6px;padding:2px 10px;border-radius:999px;background:var(--spark);color:var(--ink);font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+.soon-bar a{color:#FFFFFF;font-weight:800}
+.soon-tag{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;border:1px solid var(--line);font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);vertical-align:middle;margin-left:8px}
+.nav{position:sticky;top:0;z-index:20;background:rgba(250,250,252,0.82);backdrop-filter:saturate(1.5) blur(14px);-webkit-backdrop-filter:saturate(1.5) blur(14px);border-bottom:1px solid transparent;transition:border-color 200ms}
+.nav-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;min-height:72px;padding-block:12px;box-sizing:border-box}
+.nav-links{display:flex;gap:4px;flex:1;justify-content:center}
+.nav-links a{display:inline-flex;align-items:center;flex:none;white-space:nowrap;min-height:44px;padding:0 14px;border-radius:999px;color:var(--ink);text-decoration:none;font-size:15px;font-weight:700;transition:background 150ms}
+.nav-links a:hover{background:var(--soft);color:var(--ink)}
+.nav-row>a:first-child{flex:none;display:inline-flex}
+.nav-right{display:flex;align-items:center;gap:8px;flex:none;margin-left:auto}
+.lang{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:999px;background:var(--soft);border:1px solid var(--line)}
+.lang a{display:inline-flex;align-items:center;justify-content:center;min-width:40px;min-height:36px;padding:0 10px;border-radius:999px;font-size:13px;font-weight:800;letter-spacing:.02em;color:var(--muted);text-decoration:none;transition:background 150ms,color 150ms}
+.lang a:hover{color:var(--ink)}
+.lang a.on{background:#FFFFFF;color:var(--ink);box-shadow:0 1px 3px rgba(11,11,26,0.12)}
+@media (max-width:640px){.lang a{min-width:32px;min-height:34px;padding:0 6px;font-size:12px}.nav-right .cta--sm{padding:0 14px;font-size:14px}.nav-right{gap:6px}}
+@media (max-width:400px){.nav-row>a:first-child svg{height:26px;width:auto}}
+.soon-msg{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}
+.soon-bar{column-gap:16px;row-gap:8px}
+.cta.cta--bar{min-height:34px;padding:0 16px;font-size:14px;border-radius:10px;box-shadow:none}
+.cta.cta--bar:hover{transform:none;box-shadow:none}
+.lang-toggle{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;align-items:center;padding:3px;border-radius:999px;background:var(--soft);border:1px solid var(--line);text-decoration:none;cursor:pointer}
+.lang-toggle:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.lt-thumb{position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:999px;background:#FFFFFF;box-shadow:0 1px 3px rgba(11,11,26,0.16);transition:transform 220ms cubic-bezier(.2,.8,.2,1)}
+.lang-toggle--en .lt-thumb{transform:translateX(100%)}
+.lt-opt{position:relative;z-index:1;min-width:40px;padding:0 8px;line-height:34px;text-align:center;font-size:13px;font-weight:800;letter-spacing:.04em;color:var(--muted);transition:color 200ms}
+.lt-opt.on{color:var(--ink)}
+.lt-opt:hover,.lt-opt.on:hover{color:var(--brand)}
+@media (prefers-reduced-motion:reduce){.lt-thumb{transition:none}}
+.lang-pill{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink)!important;font-size:13px;font-weight:800;letter-spacing:.04em;text-decoration:none;transition:border-color 150ms}
+.lang-pill:hover{border-color:var(--ink)}
+.nav-text{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--ink);text-decoration:none;font-size:15px;font-weight:700}
+.nav-text:hover{color:var(--brand)}
+
+/* primary action button (custom so we can add arrow motion) */
+.cta{box-sizing:border-box;position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 24px;border:0;border-radius:14px;background:var(--brand);color:#FFFFFF;font:800 16px var(--font-sans);cursor:pointer;white-space:nowrap;box-shadow:0 1px 0 rgba(255,255,255,0.25) inset,0 10px 24px -8px rgba(43,43,217,0.55);transition:transform 180ms cubic-bezier(.2,.8,.2,1),box-shadow 180ms,background 150ms}
+.cta:hover{background:var(--brand-hover);transform:translateY(-2px);box-shadow:0 1px 0 rgba(255,255,255,0.25) inset,0 16px 32px -10px rgba(43,43,217,0.6)}
+.cta:active{transform:translateY(0)}
+.cta svg{transition:transform 180ms cubic-bezier(.2,.8,.2,1)}
+.cta:hover svg{transform:translateX(4px)}
+.cta--light{background:#FFFFFF;color:var(--brand);box-shadow:0 10px 24px -8px rgba(11,11,26,0.35)}
+.cta--light:hover{background:#F0F0FF;color:var(--brand)}
+.cta--sm{min-height:44px;padding:0 18px;font-size:15px;border-radius:12px}
+
+/* hero */
+.hero{position:relative;padding:72px 0 64px}
+.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,#DCDCE8 1px,transparent 0);background-size:32px 32px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 30% 40%,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse 70% 60% at 30% 40%,#000 30%,transparent 80%);pointer-events:none}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,0.92fr);gap:64px;align-items:center}
+.eng-strip{display:flex;flex-wrap:wrap;gap:8px}
+.eng-pill{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:0 14px 0 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);font:800 13px var(--font-sans);color:var(--muted);cursor:pointer;transition:border-color 300ms,color 300ms,transform 300ms cubic-bezier(.2,.8,.2,1),box-shadow 300ms}
+.eng-pill:hover{border-color:var(--ink);color:var(--ink)}
+.eng-pill--on{border-color:var(--ink);color:var(--ink);transform:translateY(-2px);box-shadow:0 8px 18px -8px rgba(11,11,26,0.25)}
+.eng-logo{width:18px;height:18px;object-fit:contain;flex:none;border-radius:4px;filter:grayscale(1);opacity:0.5;transition:filter 300ms,opacity 300ms}
+.eng-pill--on .eng-logo{filter:none;opacity:1}
+.h-big{margin:0;font-size:88px;line-height:0.96;font-weight:800;letter-spacing:-0.055em;color:var(--ink)}
+.rot{display:inline-block;position:relative;vertical-align:bottom;perspective:1100px;perspective-origin:30% 50%}
+.rot-ghost{display:inline-block;visibility:hidden}
+.prism{position:absolute;inset:0;transform-style:preserve-3d;transition:transform 950ms cubic-bezier(.7,0,.2,1)}
+.prism>span{position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;white-space:nowrap;backface-visibility:hidden;-webkit-backface-visibility:hidden;opacity:0.3;transition:opacity 950ms}
+.prism>span.on{opacity:1}
+.prism>span.w-chatgpt{color:#10A37F}
+.prism>span.w-claude{color:#D97757}
+.prism>span.w-perplexity{color:#20808D}
+.prism>span.w-gemini{color:#4285F4;background-image:linear-gradient(90deg,#4285F4 0%,#9B72CB 55%,#D96570 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.strike{position:relative;white-space:nowrap}
+.strike svg{position:absolute;left:-2%;bottom:-0.1em;width:104%;height:0.3em;overflow:visible}
+.strike path{stroke:var(--spark);stroke-width:7;fill:none;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:draw 900ms 700ms cubic-bezier(.6,0,.2,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.sub{margin:0;max-width:34ch;font-size:20px;line-height:30px;font-weight:500;color:var(--muted)}
+.sub strong{color:var(--ink);font-weight:700}
+
+.field{box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px;border-radius:20px;background:var(--card);border:1px solid var(--line);box-shadow:var(--glow);max-width:560px;transition:border-color 200ms,box-shadow 200ms}
+.field:focus-within{border-color:var(--brand);box-shadow:0 0 0 4px rgba(43,43,217,0.12),var(--glow)}
+.field label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.field-pre{padding-left:12px;font:500 17px var(--font-mono);color:var(--muted)}
+.field input{flex:1 1 180px;min-width:0;min-height:56px;border:0;outline:0;background:transparent;font:600 18px var(--font-sans);color:var(--ink)}
+.field input::placeholder{color:#9A9AB0}
+.fine{display:flex;flex-wrap:wrap;gap:16px;margin:0;font-size:14px;font-weight:600;color:var(--muted)}
+.fine span{display:inline-flex;align-items:center;gap:6px}
+.fine svg{color:var(--success)}
+
+/* answer card (no product UI: this is what an AI assistant shows) */
+.answer{position:relative;background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:0 40px 80px -24px rgba(11,11,26,0.18),0 2px 6px rgba(11,11,26,0.04);padding:24px;display:flex;flex-direction:column;gap:16px;min-height:440px;box-sizing:border-box}
+.a-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.a-eng{display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:800}
+.a-eng img{width:22px;height:22px;object-fit:contain;border-radius:5px}
+.a-tag{font:500 12px var(--font-mono);color:var(--muted);padding:6px 10px;border-radius:999px;background:var(--soft)}
+.a-q{align-self:flex-end;max-width:88%;background:var(--ink);color:#FFFFFF;border-radius:20px 20px 6px 20px;padding:14px 18px;font-size:15px;line-height:22px;font-weight:700;min-height:22px}
+.caret{display:inline-block;width:2px;height:1em;margin-left:2px;vertical-align:-0.15em;background:var(--spark);animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.a-intro{font-size:14px;font-weight:700;color:var(--muted);opacity:0;transition:opacity 300ms}
+.a-intro.on{opacity:1}
+.a-list{display:flex;flex-direction:column;gap:8px}
+.a-item{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--soft);opacity:0;transform:translateY(10px);transition:opacity 340ms,transform 420ms cubic-bezier(.2,.8,.2,1)}
+.a-item.on{opacity:1;transform:none}
+.a-item b{width:32px;height:32px;border-radius:10px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+.a-item span{font-size:15px;line-height:20px;font-weight:500;color:var(--muted)}
+.a-item strong{color:var(--ink);font-weight:800}
+.a-miss{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px dashed var(--danger);background:var(--danger-soft);color:var(--danger);font-size:15px;font-weight:800;opacity:0;transform:translateY(8px);transition:opacity 300ms,transform 300ms}
+.a-miss.on{opacity:1;transform:none;animation:nudge 520ms 200ms}
+@keyframes nudge{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.a-score{position:absolute;right:-20px;bottom:-24px;display:flex;align-items:center;gap:12px;padding:12px 18px 12px 12px;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:0 20px 40px -12px rgba(11,11,26,0.22);opacity:0;transform:translateY(16px) rotate(-2deg);transition:opacity 360ms,transform 520ms cubic-bezier(.2,.8,.2,1)}
+.a-score.on{opacity:1;transform:rotate(-2deg)}
+.a-score circle.arc{transition:stroke-dashoffset 900ms cubic-bezier(.2,.8,.2,1)}
+.mono{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+
+/* marquee */
+.mq-wrap{padding:32px 0 28px;display:flex;flex-direction:column;gap:12px;background:#EEEEF7;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.mq-rows{display:flex;flex-direction:column;gap:12px;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.mq-cap{text-align:center;margin:0 0 4px;font-size:13px;font-weight:700;color:var(--muted)}
+.mq{display:flex;width:max-content;gap:12px;animation:mq 64s linear infinite}
+.mq--rev{animation-direction:reverse;animation-duration:76s}
+.mq-wrap:hover .mq{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+.mq>span{flex:none;display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 18px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:15px;font-weight:700;color:var(--ink)}
+.mq>span::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--brand)}
+.mq--rev>span::before{background:var(--spark)}
+
+/* sections */
+.sec{padding:128px 0}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;margin:0;font-size:13px;line-height:16px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--brand)}
+.eyebrow::before{content:"";width:16px;height:2px;border-radius:2px;background:currentColor}
+.h-sec{margin:0;font-size:56px;line-height:1.02;font-weight:800;letter-spacing:-0.045em;text-wrap:balance}
+.lead{margin:0;font-size:19px;line-height:30px;font-weight:500;color:var(--muted);max-width:56ch}
+.head{display:flex;flex-direction:column;gap:20px;max-width:820px;margin-bottom:56px}
+
+/* shift (split) */
+.shift{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:64px;align-items:center}
+.shift .head{margin:0}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.vs{border-radius:28px;padding:32px;display:flex;flex-direction:column;gap:16px;min-height:340px;box-sizing:border-box}
+.vs--old{background:var(--card);border:1px solid var(--line)}
+.vs--new{background:var(--ink);color:#FFFFFF;transform:translateY(32px)}
+.vs h3{margin:0;font-size:28px;line-height:33px;font-weight:800;letter-spacing:-0.03em;text-wrap:balance}
+.vs .tag{font:500 12px var(--font-mono);color:var(--muted)}
+.vs--new .tag{color:#FF9A66}
+.serp{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.serp i{display:block;height:10px;border-radius:5px;background:#E2E2EC}
+.serp i:nth-child(odd){background:#D3D3F5}
+.pick{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.pick div{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,0.08);font-size:15px;font-weight:700}
+.pick div span:last-child{font:500 12px var(--font-mono);color:#C9C9DA}
+.pick div.you{background:transparent;border:1.5px dashed rgba(255,154,102,0.85);color:#FF9A66}
+.pick div.you span:last-child{color:#FF9A66}
+
+/* vault */
+.sec--night{background:var(--ink);color:#FFFFFF;padding:112px 0 120px}
+.sec--night .eyebrow{color:#A7A7FF}
+.sec--night .h-sec{color:#FFFFFF}
+.sec--night .lead{color:#C9C9DA}
+.sec--night .vcard{border-color:transparent;color:var(--ink)}
+.sec--night .vcard--dark{color:#FFFFFF}
+.sec--night .vcard:hover{box-shadow:0 24px 48px -12px rgba(0,0,0,0.6)}
+.sec--night .after p{color:#C9C9DA}
+.sec--night .ghost{border-color:#FFFFFF;color:#FFFFFF}
+.sec--night .ghost:hover{background:#FFFFFF;color:var(--ink)}
+.vault{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.vcard{position:relative;border-radius:28px;background:#FAFAFC;border:1px solid var(--line);padding:32px;min-height:320px;box-sizing:border-box;display:flex;flex-direction:column;gap:20px;transition:transform 300ms cubic-bezier(.2,.8,.2,1),box-shadow 300ms}
+.vcard:hover{transform:translateY(-6px);box-shadow:var(--glow)}
+.vcard--dark{background:var(--brand);border-color:var(--brand);color:#FFFFFF}
+.vk{font:500 13px var(--font-mono);color:var(--brand)}
+.vcard--dark .vk{color:#C9C9FF}
+.vq{margin:0;font-size:28px;line-height:33px;font-weight:800;letter-spacing:-0.03em;text-wrap:balance}
+.redact{display:flex;flex-direction:column;gap:10px;margin-top:auto}
+.redact i{display:block;height:16px;border-radius:4px;background:linear-gradient(100deg,var(--ink) 40%,#3A3A5C 50%,var(--ink) 60%);background-size:250% 100%;animation:shim 2.6s linear infinite}
+.vcard--dark .redact i{background-image:linear-gradient(100deg,#1C1CA8 40%,#5A5AF0 50%,#1C1CA8 60%)}
+.redact i:nth-child(2){animation-delay:.3s}
+@keyframes shim{from{background-position:150% 0}to{background-position:-100% 0}}
+.vlock{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;color:var(--muted)}
+.vcard--dark .vlock{color:#DCDCFF}
+.after{display:flex;flex-wrap:wrap;align-items:center;gap:24px;margin-top:48px}
+.after p{margin:0;font-size:16px;font-weight:600;color:var(--muted)}
+
+/* how: timeline */
+.bg-w{background:#FFFFFF}
+.bg-g{background:#FAFAFC}
+.alt{padding:112px 0}
+.final.alt{padding:112px 0}
+.track{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding:0}
+.node{position:relative;display:flex;flex-direction:column;gap:14px;border-radius:24px;border:1px solid var(--line);background:var(--card);padding:28px;transition:transform 260ms cubic-bezier(.2,.8,.2,1),box-shadow 260ms,border-color 260ms}
+.node:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(43,43,217,0.12);border-color:var(--brand)}
+.node .k{font:500 13px var(--font-mono);color:var(--brand)}
+.node h3{margin:0;font-size:30px;line-height:34px;font-weight:800;letter-spacing:-0.03em}
+.node p{margin:0;font-size:16px;line-height:24px;font-weight:500;color:var(--muted)}
+
+/* sectors */
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{min-height:48px;padding:0 20px;border-radius:999px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:800 15px var(--font-sans);cursor:pointer;transition:border-color 150ms,background 150ms,color 150ms}
+.tab:hover{border-color:var(--ink)}
+.tab--on,.tab--on:hover{background:var(--ink);border-color:var(--ink);color:#FFFFFF}
+.sector{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center;margin-top:40px}
+.quote{margin:0;font-size:44px;line-height:50px;font-weight:800;letter-spacing:-0.04em;text-wrap:balance}
+.quote::before{content:"“";color:var(--spark)}.quote::after{content:"”";color:var(--spark)}
+.s-card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:28px;display:flex;flex-direction:column;gap:14px}
+.s-row{display:grid;grid-template-columns:32px minmax(0,1fr);gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--soft);font-size:15px;font-weight:500;color:var(--muted)}
+.s-row b{width:32px;height:32px;border-radius:10px;background:var(--card);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--ink)}
+.s-row strong{color:var(--ink);font-weight:800}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:stretch}
+.plan--ent{border-color:var(--ink)}
+.plan--ent .plan-price{font-size:40px;line-height:1.1;letter-spacing:-0.03em}
+.plan--ent .plan-price small{display:block;font-size:15px;opacity:1;color:var(--muted);margin-top:6px}
+.plan{border-radius:28px;border:1px solid var(--line);background:var(--card);padding:40px;display:flex;flex-direction:column;gap:24px}
+.plan--hot{background:var(--brand);border-color:var(--brand);color:#FFFFFF;box-shadow:0 40px 80px -24px rgba(43,43,217,0.45)}
+.plan-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.plan-name{font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.plan--hot .plan-name{color:#DCDCFF}
+.plan-price{font-size:72px;line-height:1;font-weight:800;letter-spacing:-0.05em;font-variant-numeric:tabular-nums}
+.plan-price small{font-size:17px;letter-spacing:0;font-weight:700;opacity:.75}
+.plan ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px;font-size:17px;line-height:24px;font-weight:600}
+.plan li{display:flex;gap:12px;align-items:flex-start}
+.plan li::before{content:"";flex:none;width:6px;height:11px;margin:4px 6px 0 4px;border:solid var(--brand);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.plan--hot li::before{border-color:#FFFFFF}
+.plan li.no{color:var(--muted)}
+.plan li.no::before{width:10px;height:0;margin:11px 4px 0 2px;border-width:0 0 2.5px 0;border-color:#B8B8CC;transform:none}
+.plan-note{font-size:14px;line-height:20px;font-weight:600;color:var(--muted)}
+.plan--hot .plan-note{color:#DCDCFF}
+.plan .cta,.plan .ghost{width:100%}
+.ghost{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 24px;border-radius:14px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);font:800 16px var(--font-sans);cursor:pointer;transition:background 150ms,color 150ms}
+.ghost:hover{background:var(--ink);color:#FFFFFF}
+
+/* faq */
+.faq-grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:64px;align-items:start}
+.faq{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:24px;min-height:44px;padding:24px 0;font-size:20px;line-height:28px;font-weight:800;letter-spacing:-0.01em;color:var(--ink)}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"";flex:none;width:12px;height:12px;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-3px);transition:transform 220ms cubic-bezier(.2,.8,.2,1)}
+.faq details[open] summary::after{transform:rotate(225deg) translateY(-3px)}
+.faq summary:hover{color:var(--brand)}
+.faq details p{margin:0;padding:0 0 24px;font-size:17px;line-height:27px;font-weight:500;color:var(--muted);max-width:60ch}
+
+/* final */
+.final{padding:0 0 128px}
+.final-box{position:relative;overflow:hidden;border-radius:36px;background:var(--brand);color:#FFFFFF;padding:96px 72px;display:flex;flex-direction:column;gap:32px;align-items:flex-start}
+.final-box h2{position:relative;margin:0;font-size:84px;line-height:0.98;font-weight:800;letter-spacing:-0.055em;max-width:16ch;text-wrap:balance}
+.final-box p{position:relative;margin:0;font-size:20px;line-height:30px;font-weight:500;color:#DCDCFF}
+.final-box .field{position:relative;width:100%;box-shadow:0 30px 60px -20px rgba(11,11,26,0.45);border-color:transparent}
+.ring-deco{position:absolute;right:-140px;top:-140px;width:560px;height:560px;pointer-events:none}
+@keyframes spin-rev{to{transform:rotate(-360deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.faq-head{position:sticky;top:120px}
+@media (max-width:960px){.faq-head{position:static}}
+.foot{padding:32px 0;border-top:1px solid var(--line)}
+.foot-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:20px}
+.foot-links{display:flex;flex-wrap:wrap;gap:4px}
+.foot-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:700}
+.foot-links a:hover{color:var(--ink)}
+
+.info{padding-block:80px 120px;display:flex;flex-direction:column;gap:48px}
+.info-head{display:flex;flex-direction:column;gap:16px}
+.info-grid{display:grid;grid-template-columns:minmax(0,0.8fr) minmax(0,1.2fr);gap:48px;align-items:stretch}
+.info-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.info-list li{display:flex;flex-direction:column;gap:6px;padding:24px 0;border-bottom:1px solid var(--line)}
+.info-k{font-size:14px;font-weight:700;color:var(--muted)}
+.info-v{font-size:22px;line-height:30px;font-weight:800;letter-spacing:-0.01em;color:var(--ink)}
+.info-link{text-decoration:none}.info-link:hover{color:var(--brand)}
+.info-a{align-self:flex-start;margin-top:6px;font-size:15px;font-weight:800}
+.map{position:relative;display:block;min-height:420px;border-radius:28px;overflow:hidden;border:1px solid var(--line);color:var(--ink);text-decoration:none}
+.map-art{position:absolute;inset:0;width:100%;height:100%}
+.map-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);filter:drop-shadow(0 8px 12px rgba(43,43,217,0.35));transition:transform 200ms cubic-bezier(.2,.8,.2,1)}
+.map:hover .map-pin{transform:translate(-50%,-110%)}
+.map-card{position:absolute;left:20px;bottom:20px;display:flex;flex-direction:column;gap:2px;padding:14px 18px;border-radius:16px;background:#FFFFFF;box-shadow:0 12px 28px -10px rgba(11,11,26,0.25);font-size:14px;font-weight:600;color:var(--muted)}
+.map-card b{font-size:16px;color:var(--ink)}
+.map-open{margin-top:6px;color:var(--brand);font-weight:800}
+@media (max-width:860px){.info-grid{grid-template-columns:minmax(0,1fr)}.map{min-height:300px}.info{padding-block:48px 80px}}
+.legal{padding-block:80px 120px;display:flex;flex-direction:column;gap:48px}
+.legal-meta{margin:0;font-size:15px;font-weight:600;color:var(--muted)}
+.legal-body{display:flex;flex-direction:column;gap:40px}
+.legal-body section{display:flex;flex-direction:column;gap:14px}
+.legal-body h2{margin:0;font-size:24px;line-height:30px;font-weight:800;letter-spacing:-0.02em}
+.legal-body p.li{padding-left:20px}
+.legal-body p{margin:0;font-size:17px;line-height:28px;font-weight:500;color:var(--muted)}
+.legal-contact{padding-top:24px;border-top:1px solid var(--line)}
+.signup{display:flex;flex-direction:column;gap:20px;max-width:560px;margin:0 auto;padding:96px 32px}
+.site-box{display:flex;align-items:center;gap:12px;padding:16px;border-radius:16px;background:var(--brand-soft)}
+
+/* scroll-driven reveals and timeline fill */
+@supports (animation-timeline: view()){
+  .rv{animation:rise linear both;animation-timeline:view();animation-range:entry 0% cover 26%}
+  @keyframes rise{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:none}}
+  .track::after{animation:fill linear both;animation-timeline:view();animation-range:entry 40% cover 55%}
+  @keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+}
+@media (max-width:1100px){.h-big{font-size:72px}.final-box h2{font-size:64px}.a-score{right:12px}}
+@media (max-width:1200px){.plans{grid-template-columns:repeat(2,minmax(0,1fr))}.plan--ent{grid-column:1 / -1}}
+@media (max-width:960px){.hero-grid,.shift,.sector,.faq-grid{grid-template-columns:minmax(0,1fr);gap:48px}.vault,.plans,.track{grid-template-columns:minmax(0,1fr)}.track{gap:20px}.nav-links{order:3;flex-basis:100%;justify-content:flex-start;overflow-x:auto;padding-bottom:4px}.h-sec{font-size:44px}.vs--new{transform:none}.sec{padding:96px 0}}
+@media (max-width:640px){.after{flex-direction:column;align-items:stretch;gap:12px;margin-top:32px}.after .cta{width:100%}.after p{text-align:center}.foot-row{flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:16px}.foot-links{justify-content:center}.nav-links{display:none}.nav-row{min-height:64px;gap:12px}.soon-bar{font-size:13px;line-height:18px;gap:6px}.wrap{padding-inline:16px}.hero{padding-top:40px}.h-big{font-size:50px}.sec{padding:80px 0}.h-sec{font-size:36px}.pair{grid-template-columns:minmax(0,1fr)}.final-box{padding:56px 24px;border-radius:28px}.final-box h2{font-size:44px}.nav-text{display:none}.quote{font-size:32px;line-height:38px}.plan{padding:28px}.plan-price{font-size:56px}.a-score{position:static;align-self:flex-start;transform:none}.a-score.on{transform:none}.answer{min-height:0}.field .cta{width:100%}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.strike path{stroke-dashoffset:0}.rv{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div class="n2" data-theme="light" style="min-height: 100vh; background: #FAFAFC; color: var(--ink)">
+
+<sc-if value="{{isLanding}}" hint-placeholder-val="{{ true }}">
+
+<div class="soon-bar"><div class="soon-msg"><b>Coming soon</b><span>Enrigio is getting ready to launch. Everyone on the early access list gets a free measurement.</span></div><button type="button" class="cta cta--bar" onClick="{{go}}">Join early access</button></div>
+<header class="nav">
+<div class="wrap nav-row">
+<a href="#ust" onClick="{{back}}" aria-label="Enrigio home" style="display: inline-flex"><x-import component-from-global-scope="Enrigio.Logo" height="{{logoH}}"></x-import></a>
+<nav class="nav-links" aria-label="Main menu">
+<a href="#neden">Why now</a>
+<a href="#nasil">How it works</a>
+<a href="#sektor">Industries</a>
+<a href="#fiyat">Pricing</a>
+<a href="#sss">FAQ</a>
+</nav>
+<div class="nav-right">
+<a class="lang-toggle lang-toggle--en" href="{{trUrl}}" hreflang="tr" aria-label="Language: English. Switch to Turkish"><span class="lt-thumb" aria-hidden="true"></span><span class="lt-opt" lang="tr">TR</span><span class="lt-opt on" lang="en">EN</span></a>
+</div>
+</div>
+</header>
+
+<main id="ust">
+
+<section class="hero">
+<div class="wrap hero-grid">
+<div style="display: flex; flex-direction: column; gap: 32px">
+<div class="eng-strip" aria-hidden="true">
+<sc-for list="{{engines}}" as="e" hint-placeholder-count="4"><button type="button" class="{{e.pill}}" aria-pressed="{{e.pressed}}" aria-label="Show the {{e.name}} answer" onClick="{{e.pick}}"><img class="eng-logo" sc-camel-src="{{e.logo}}" alt="" width="18" height="18">{{e.name}}</button></sc-for>
+</div>
+<h1 class="h-big" aria-label="AI picked someone today. Not you.">
+<span aria-hidden="true"><span class="rot"><span class="rot-ghost">Perplexity</span><span class="prism" style="transform: {{prismT}}"><sc-for list="{{engines}}" as="e" hint-placeholder-count="4"><span class="{{e.word}}" style="transform: {{e.faceT}}">{{e.name}}</span></sc-for></span></span><br>picked someone<br>today. <span class="strike">Not you.<svg viewBox="0 0 400 30" preserveAspectRatio="none"><path d="M4 22 C 90 6, 200 4, 396 14"></path></svg></span></span>
+</h1>
+<p class="sub">Your customers now ask AI instead. Enrigio asks the same questions every day, measures <strong>who shows up in the answer</strong>, and lines up the work that gets you onto that list.</p>
+<form class="field" onSubmit="{{go}}">
+<label for="v2-site">Your website</label>
+<span class="field-pre" aria-hidden="true">https://</span>
+<input id="v2-site" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="yoursite.com" value="{{site}}" onInput="{{onSite}}">
+<button type="button" class="cta" onClick="{{go}}">Join early access<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9h10M10 5l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+</form>
+<p class="fine"><span><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.5 2.5L11 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>Launching soon</span><span><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 7.5l2.5 2.5L11 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>Everyone on the list gets a free measurement on day one</span></p>
+</div>
+
+<div class="answer" role="img" aria-label="Example: an AI assistant is asked an industry question; three competing brands appear in the answer, your site does not.">
+<div class="a-top" aria-hidden="true"><span class="a-eng"><img sc-camel-src="{{cur.logo}}" alt="" width="22" height="22">{{cur.name}}</span><span class="a-tag">sample answer</span></div>
+<div class="a-q" aria-hidden="true">{{qTyped}}<span class="caret"></span></div>
+<span class="{{cls.intro}}" aria-hidden="true">{{cur.intro}}</span>
+<div class="a-list" aria-hidden="true"><sc-for list="{{items}}" as="it" hint-placeholder-count="3"><div class="{{it.cls}}"><b>{{it.n}}</b><span><strong>{{it.b}}</strong> · {{it.d}}</span></div></sc-for></div>
+<div class="{{cls.miss}}" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="7.5" fill="none" stroke="currentColor" stroke-width="1.8"></circle><path d="M6 6l6 6M12 6l-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path></svg>{{siteShown}} is not in this answer</div>
+<div class="{{cls.score}}" aria-hidden="true">
+<svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="22" fill="none" stroke="#F1F1F7" stroke-width="7"></circle><circle class="arc" cx="28" cy="28" r="22" fill="none" stroke="#FF7A3D" stroke-width="7" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="{{ringOff}}" transform="rotate(-90 28 28)"></circle></svg>
+<div style="display: flex; flex-direction: column"><span class="mono">visibility score</span><span style="font-size: 28px; line-height: 32px; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{cur.score}}<span style="font-size: 14px; color: var(--muted)"> / 100</span></span></div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="mq-wrap" aria-label="The kind of questions customers ask AI">
+<p class="mq-cap">The kind of questions your customers ask AI</p>
+<div class="mq-rows">
+<div class="mq" aria-hidden="true"><sc-for list="{{qRow1}}" as="q" hint-placeholder-count="12"><span>{{q}}</span></sc-for></div>
+<div class="mq mq--rev" aria-hidden="true"><sc-for list="{{qRow2}}" as="q" hint-placeholder-count="12"><span>{{q}}</span></sc-for></div>
+</div>
+</div>
+
+<section id="neden" class="sec">
+<div class="wrap shift">
+<div class="head rv">
+<p class="eyebrow">What changed</p>
+<h2 class="h-sec">The search era is over. The conversation era has begun.</h2>
+<p class="lead">Your customers no longer type keywords into a search box; they ask AI a question. If your name isn’t in the answer they get, they decide without ever seeing you. And that loss never shows up in any of your reports.</p>
+</div>
+<div class="pair">
+<div class="vs vs--old rv">
+<span class="tag">before · search</span>
+<h3>Being on page one was enough.</h3>
+<div class="serp" aria-hidden="true"><i style="width: 92%"></i><i style="width: 70%"></i><i style="width: 84%"></i><i style="width: 60%"></i><i style="width: 88%"></i><i style="width: 66%"></i><i style="width: 78%"></i></div>
+</div>
+<div class="vs vs--new rv">
+<span class="tag">now · AI</span>
+<h3>If you’re not in the answer, you don’t exist.</h3>
+<div class="pick" aria-hidden="true"><div><span>Brand A</span><span>recommended</span></div><div><span>Brand B</span><span>recommended</span></div><div><span>Brand C</span><span>recommended</span></div><div class="you"><span>You</span><span>not mentioned</span></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="urun" class="sec alt bg-w">
+<div class="wrap">
+<div class="head rv" style="max-width: none">
+<p class="eyebrow">In your report</p>
+<h2 class="h-sec">Three answers.<br>Locked for now.</h2>
+<p class="lead" style="max-width: none">The moment you enter your site, everything AI knows about you but never told you is unlocked.</p>
+</div>
+<div class="vault">
+<article class="vcard rv">
+<span class="vk">01</span>
+<h3 class="vq">Which questions are costing you customers?</h3>
+<div class="redact" aria-hidden="true"><i style="width: 92%"></i><i style="width: 64%"></i></div>
+<span class="vlock"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="6" width="9" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"></rect><path d="M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.6"></path></svg>Unlocks with your score</span>
+</article>
+<article class="vcard vcard--dark rv">
+<span class="vk">02</span>
+<h3 class="vq">Who gets recommended instead of you?</h3>
+<div class="redact" aria-hidden="true"><i style="width: 70%"></i><i style="width: 86%"></i></div>
+<span class="vlock"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="6" width="9" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"></rect><path d="M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.6"></path></svg>Unlocks with your score</span>
+</article>
+<article class="vcard rv">
+<span class="vk">03</span>
+<h3 class="vq">What should you do first tomorrow morning?</h3>
+<div class="redact" aria-hidden="true"><i style="width: 80%"></i><i style="width: 58%"></i></div>
+<span class="vlock"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x="2.5" y="6" width="9" height="6.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"></rect><path d="M4.5 6V4.5a2.5 2.5 0 0 1 5 0V6" fill="none" stroke="currentColor" stroke-width="1.6"></path></svg>Unlocks with your score</span>
+</article>
+</div>
+<div class="after rv">
+<button type="button" class="cta" onClick="{{go}}">Join early access<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9h10M10 5l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+<p>First report free at launch. No card required.</p>
+</div>
+</div>
+</section>
+
+<section id="nasil" class="sec alt bg-g">
+<div class="wrap">
+<div class="head rv">
+<p class="eyebrow">How it works</p>
+<h2 class="h-sec">Measure. Understand. Act. Every month.</h2>
+</div>
+<ol class="track" style="list-style: none; margin: 0">
+<li class="node rv"><span class="k">01 · measure</span><h3>We ask the questions.</h3><p>Every day we ask four AI assistants the real buyer questions in your industry, and turn whether you’re mentioned, and in what position, into a single score.</p></li>
+<li class="node rv"><span class="k">02 · understand</span><h3>We show you why.</h3><p>Which sources get your competitors recommended, and why aren’t you? Missing content, vague service descriptions, weak trust signals.</p></li>
+<li class="node rv"><span class="k">03 · act</span><h3>We tell you what to do.</h3><p>An action plan ranked by impact. Your team or agency puts it in place, and we verify the result on the next scan.</p></li>
+</ol>
+</div>
+</section>
+
+<section id="sektor" class="sec alt bg-w">
+<div class="wrap">
+<div class="head rv">
+<p class="eyebrow">Industries</p>
+<h2 class="h-sec">This question is being asked in your industry too.</h2>
+</div>
+<div class="tabs" role="tablist" aria-label="Choose an industry">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="4">
+<button type="button" role="tab" id="{{t.tabId}}" aria-controls="n2-sektor-panel" aria-selected="{{t.sel}}" class="{{t.cls}}" onClick="{{t.pick}}">{{t.label}}</button>
+</sc-for>
+</div>
+<div class="sector" id="n2-sektor-panel" role="tabpanel" aria-labelledby="{{sec.tabId}}">
+<p class="quote">{{sec.q}}</p>
+<div class="s-card">
+<span class="mono">AI answer · sample</span>
+<span style="font-size: 15px; font-weight: 700; color: var(--muted)">{{sec.intro}}</span>
+<sc-for list="{{sec.items}}" as="it" hint-placeholder-count="3"><div class="s-row"><b>{{it.n}}</b><span><strong>{{it.b}}</strong> · {{it.d}}</span></div></sc-for>
+<div style="display: flex"><x-import component-from-global-scope="Enrigio.Badge" tone="danger">Your brand isn’t in this answer</x-import></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="fiyat" class="sec alt bg-g">
+<div class="wrap">
+<div class="head rv">
+<p class="eyebrow">Pricing</p>
+<h2 class="h-sec">See it free first. Then grow.</h2>
+</div>
+<div class="plans">
+<div class="plan rv">
+<div class="plan-top"><span class="plan-name">Free</span></div>
+<span class="plan-price">$0</span>
+<ul>
+<li>One-time starter report</li>
+<li>3 low-impact actions out of 12</li>
+<li class="no">No score updates</li>
+<li class="no">Sources and competitor reasons locked</li>
+</ul>
+<span class="plan-note">No card required. One report per site.</span>
+<div style="margin-top: auto"><button type="button" class="ghost" onClick="{{go}}">Join early access</button></div>
+</div>
+<div class="plan plan--hot rv">
+<div class="plan-top"><span class="plan-name">Growth</span><x-import component-from-global-scope="Enrigio.Badge" tone="spark">Featured</x-import></div>
+<span class="plan-price">$199<small> / month</small></span>
+<ul>
+<li><span><strong>All 12 actions</strong>, including the 5 high-impact ones, with ready-made templates</span></li>
+<li>Daily scans, 4 engines, weekly score</li>
+<li>The sources AI relies on, and why competitors are ahead</li>
+<li>Each action’s impact measured after 21 days · 3 sites · monthly report</li>
+</ul>
+<span class="plan-note">Cancel anytime. Your free report and questions carry over as they are.</span>
+<div style="margin-top: auto"><button type="button" class="cta cta--light" onClick="{{go}}">Join early access</button></div>
+</div>
+<div class="plan plan--ent rv">
+<div class="plan-top"><span class="plan-name">Enterprise</span></div>
+<span class="plan-price">Get a quote<small>Based on number of brands and scope</small></span>
+<ul>
+<li>5+ sites and brands, multi-account setup for agencies and groups</li>
+<li>More engines including Claude and Copilot, custom question sets</li>
+<li>White-label reports, SSO, flexible billing and contracts</li>
+<li>Dedicated account manager and onboarding support</li>
+</ul>
+<span class="plan-note">Fill in a short form and we’ll call you within one business day.</span>
+<div style="margin-top: auto"><button type="button" class="ghost" onClick="{{goContact}}">Talk to sales</button></div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="sss" class="sec alt bg-w">
+<div class="wrap faq-grid">
+<div class="head rv faq-head" style="margin: 0">
+<p class="eyebrow">SSS</p>
+<h2 class="h-sec">Frequently asked questions</h2>
+<p class="lead">Can’t find your answer here? <a href="#iletisim" onClick="{{goInfo}}" style="font-weight: 700">Write to us</a>.</p>
+</div>
+<div class="faq">
+<details open="{{yes}}"><summary>What is AI visibility?</summary><p>How often, and in what position, your business is mentioned in the answers that assistants like ChatGPT, Gemini, Claude and Perplexity give to customer questions.</p></details>
+<details><summary>We already do SEO. Isn’t that enough?</summary><p>SEO affects your search rankings. AI answers look at different signals. A site that ranks well on Google may never appear in AI answers.</p></details>
+<details><summary>How is the score calculated?</summary><p>Questions relevant to your industry are asked to several models; we measure whether you’re mentioned, in what position and in what context.</p></details>
+<details><summary>Who carries out the action plan?</summary><p>You, your team or your agency. Every item is written so it can be understood without technical knowledge.</p></details>
+<details><summary>When will I see results?</summary><p>We measure each action’s impact after 21 days. Models update at different speeds, so we don’t promise a fixed timeline.</p></details>
+</div>
+</div>
+</section>
+
+<section class="final alt bg-g">
+<div class="wrap">
+<div class="final-box rv">
+<svg class="ring-deco" viewBox="0 0 560 560" aria-hidden="true"><g><animateTransform attributeName="transform" type="rotate" from="0 280 280" to="360 280 280" dur="90s" repeatCount="indefinite"></animateTransform><circle cx="280" cy="280" r="240" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="2" stroke-dasharray="6 14"></circle></g><circle cx="280" cy="280" r="170" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="44"></circle><g class="orbit"><animateTransform attributeName="transform" type="rotate" from="0 280 280" to="-360 280 280" dur="36s" repeatCount="indefinite"></animateTransform><g class="star"><animateTransform attributeName="transform" type="rotate" from="0 280 40" to="360 280 40" dur="12s" repeatCount="indefinite"></animateTransform><path d="M280 20 Q280 40 300 40 Q280 40 280 60 Q280 40 260 40 Q280 40 280 20 Z" fill="#FF7A3D"></path></g></g></svg>
+<h2>Your competitor is being recommended right now. Are you?</h2>
+<p>Enter your site and see which questions you show up in.</p>
+<form class="field" onSubmit="{{go}}" style="max-width: 640px">
+<label for="v2-site-2">Your website</label>
+<span class="field-pre" aria-hidden="true">https://</span>
+<input id="v2-site-2" type="text" inputmode="url" autocomplete="url" spellcheck="false" placeholder="yoursite.com" value="{{site}}" onInput="{{onSite}}">
+<button type="button" class="cta" onClick="{{go}}">Join early access<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M4 9h10M10 5l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></button>
+</form>
+</div>
+</div>
+</section>
+</main>
+
+<footer id="iletisim" class="foot">
+<div class="wrap foot-row">
+<a href="https://www.enrigio.com" aria-label="Enrigio home (www.enrigio.com)" style="display: inline-flex"><x-import component-from-global-scope="Enrigio.Logo" height="{{footLogoH}}"></x-import></a>
+<nav class="foot-links" aria-label="Footer"><a href="#gizlilik" onClick="{{goPrivacy}}">Privacy</a><a href="#kvkk" onClick="{{goKvkk}}">GDPR Notice</a><a href="#iletisim" onClick="{{goInfo}}">Contact</a><a href="#kurumsal" onClick="{{goContact}}">Enterprise plans</a></nav>
+<span class="caption" style="color: var(--muted)">© 2026 Enrigio</span>
+</div>
+</footer>
+</sc-if>
+
+<sc-if value="{{isSignup}}" hint-placeholder-val="{{ false }}">
+<header class="nav">
+<div class="wrap nav-row" style="justify-content: space-between">
+<a href="#ust" onClick="{{back}}" aria-label="Enrigio home" style="display: inline-flex"><x-import component-from-global-scope="Enrigio.Logo" height="{{logoH}}"></x-import></a>
+<x-import component-from-global-scope="Enrigio.Button" variant="ghost" on-click="{{back}}">← Back to home</x-import>
+</div>
+</header>
+<main>
+<sc-if value="{{notDone}}" hint-placeholder-val="{{ true }}">
+<form class="signup" onSubmit="{{submitSignup}}">
+<p class="eyebrow">Early access</p>
+<h1 class="h-sec" style="font-size: 48px">Coming soon. Be among the first to measure.</h1>
+<p class="sub" style="max-width: none">Enrigio is getting ready to launch. Leave your email and we’ll let you know on launch day and run your site’s first visibility score for free.</p>
+<sc-if value="{{hasSite}}" hint-placeholder-val="{{ false }}">
+<div class="site-box"><x-import component-from-global-scope="Enrigio.Logo" variant="mark" height="{{markH}}"></x-import><span class="body">Site to measure: <strong>{{site}}</strong></span></div>
+</sc-if>
+<x-import component-from-global-scope="Enrigio.Input" label="Website" placeholder="yoursite.com" inputmode="url" autocomplete="url" value="{{site}}" on-change="{{onSite}}" on-input="{{onSite}}" error="{{siteErr}}"></x-import>
+<x-import component-from-global-scope="Enrigio.Input" label="Work email" type="email" autocomplete="email" placeholder="name@company.com" value="{{email}}" on-change="{{onEmail}}" on-input="{{onEmail}}" error="{{emailErr}}"></x-import>
+<button type="button" class="cta" style="width: 100%" onClick="{{submitSignup}}">Join the list</button>
+<p class="fine" style="justify-content: center">No credit card, no password. Just launch news and a free first measurement.</p>
+</form>
+</sc-if>
+<sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+<div class="signup" style="align-items: flex-start">
+<x-import component-from-global-scope="Enrigio.Badge" tone="success">You’re on the list</x-import>
+<h1 class="h-sec" style="font-size: 48px">Thanks, you’re in line.</h1>
+<p class="sub" style="max-width: none">{{doneLine}}</p>
+<button type="button" class="ghost" onClick="{{back}}">Back to home</button>
+</div>
+</sc-if>
+</main>
+</sc-if>
+
+<sc-if value="{{isContact}}" hint-placeholder-val="{{ false }}">
+<header class="nav">
+<div class="wrap nav-row" style="justify-content: space-between">
+<a href="#ust" onClick="{{back}}" aria-label="Enrigio home" style="display: inline-flex"><x-import component-from-global-scope="Enrigio.Logo" height="{{logoH}}"></x-import></a>
+<x-import component-from-global-scope="Enrigio.Button" variant="ghost" on-click="{{back}}">← Back to home</x-import>
+</div>
+</header>
+<main>
+<sc-if value="{{contactNotDone}}" hint-placeholder-val="{{ true }}">
+<form class="signup" onSubmit="{{submitContact}}">
+<p class="eyebrow">Enterprise plan</p>
+<h1 class="h-sec" style="font-size: 48px">Let’s define the right scope together.</h1>
+<p class="sub" style="max-width: none">Leave a few details. We’ll call you within one business day and prepare a quote based on your number of brands and your needs.</p>
+<x-import component-from-global-scope="Enrigio.Input" label="Full name" autocomplete="name" value="{{cf.name}}" on-change="{{cSet.name}}" on-input="{{cSet.name}}" error="{{cErr.name}}"></x-import>
+<x-import component-from-global-scope="Enrigio.Input" label="Work email" type="email" autocomplete="email" placeholder="name@company.com" value="{{cf.email}}" on-change="{{cSet.email}}" on-input="{{cSet.email}}" error="{{cErr.email}}"></x-import>
+<x-import component-from-global-scope="Enrigio.Input" label="Company" autocomplete="organization" value="{{cf.company}}" on-change="{{cSet.company}}" on-input="{{cSet.company}}" error="{{cErr.company}}"></x-import>
+<x-import component-from-global-scope="Enrigio.Input" label="Phone" type="tel" autocomplete="tel" placeholder="+1 555 123 4567" value="{{cf.phone}}" on-change="{{cSet.phone}}" on-input="{{cSet.phone}}" error="{{cErr.phone}}"></x-import>
+<x-import component-from-global-scope="Enrigio.Input" label="How many brands / sites do you want to monitor?" placeholder="e.g. 8 brands, 3 countries" value="{{cf.scope}}" on-change="{{cSet.scope}}" on-input="{{cSet.scope}}" error="{{cErr.scope}}"></x-import>
+<x-import component-from-global-scope="Enrigio.Input" label="Tell us briefly" multiline="{{yes}}" placeholder="Agency or group? Which engines and markets matter to you?" value="{{cf.note}}" on-change="{{cSet.note}}" on-input="{{cSet.note}}" error="{{cErr.note}}"></x-import>
+<p class="fine" style="margin: 0">All fields are required.</p>
+<button type="button" class="cta" style="width: 100%" onClick="{{submitContact}}">Request a call</button>
+<p class="fine" style="justify-content: center">Your details are used only to prepare a quote.</p>
+</form>
+</sc-if>
+<sc-if value="{{contactDone}}" hint-placeholder-val="{{ false }}">
+<div class="signup" style="align-items: flex-start">
+<x-import component-from-global-scope="Enrigio.Badge" tone="success">Request received</x-import>
+<h1 class="h-sec" style="font-size: 48px">We’ll call you within one business day.</h1>
+<p class="sub" style="max-width: none">Thank you. In the meantime, you can see one of your sites’ scores with the free report.</p>
+<button type="button" class="ghost" onClick="{{back}}">Back to home</button>
+</div>
+</sc-if>
+</main>
+</sc-if>
+<sc-if value="{{isInfo}}" hint-placeholder-val="{{ false }}">
+<header class="nav">
+<div class="wrap nav-row" style="justify-content: space-between">
+<a href="#ust" onClick="{{back}}" aria-label="Enrigio home" style="display: inline-flex"><x-import component-from-global-scope="Enrigio.Logo" height="{{logoH}}"></x-import></a>
+<x-import component-from-global-scope="Enrigio.Button" variant="ghost" on-click="{{back}}">← Back to home</x-import>
+</div>
+</header>
+<main class="wrap info">
+<div class="info-head">
+<p class="eyebrow">Contact</p>
+<h1 class="h-sec" style="font-size: 48px">Get in touch.</h1>
+<p class="sub" style="max-width: 48ch">Write or call us with questions, partnership ideas or press requests. Our office is at Medeniyet Technopark.</p>
+</div>
+<div class="info-grid">
+<ul class="info-list">
+<li><span class="info-k">Address</span><span class="info-v">Ünalan Mah. Ünalan Cad.<br>Medeniyet Teknopark No:1/12<br>Istanbul, Türkiye</span><a class="info-a" href="https://www.google.com/maps/search/?api=1&amp;query=Medeniyet+Teknopark%2C+%C3%9Cnalan+Mah.+%C3%9Cnalan+Cad.+No%3A1%2F12%2C+%C3%9Csk%C3%BCdar%2C+%C4%B0stanbul" target="_blank" rel="noopener">Get directions</a></li>
+<li><span class="info-k">Email</span><a class="info-v info-link" href="mailto:info@enrigio.com">info@enrigio.com</a></li>
+<li><span class="info-k">Phone</span><a class="info-v info-link" href="tel:+908507777446">+90 (850) 777 74 46</a></li>
+</ul>
+<a class="map" href="https://www.google.com/maps/search/?api=1&amp;query=Medeniyet+Teknopark%2C+%C3%9Cnalan+Mah.+%C3%9Cnalan+Cad.+No%3A1%2F12%2C+%C3%9Csk%C3%BCdar%2C+%C4%B0stanbul" target="_blank" rel="noopener" aria-label="Open the Medeniyet Technopark location in Google Maps">
+<svg class="map-art" viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="640" height="420" fill="#EEF0F5"></rect><path d="M0 300 C 160 270, 260 330, 420 290 S 600 240, 640 250 L640 420 L0 420Z" fill="#DDE7F3"></path><g fill="none" stroke="#FFFFFF" stroke-linecap="round"><path d="M-20 120 L660 180" stroke-width="22"></path><path d="M180 -20 L250 440" stroke-width="16"></path><path d="M420 -20 C 400 120, 470 220, 440 440" stroke-width="16"></path><path d="M0 230 L640 210" stroke-width="10"></path><path d="M90 -20 L130 440" stroke-width="8"></path><path d="M560 -20 L520 440" stroke-width="8"></path></g><g fill="#E3E6EE"><rect x="270" y="196" width="130" height="70" rx="6"></rect><rect x="40" y="140" width="110" height="60" rx="6"></rect><rect x="470" y="110" width="70" height="80" rx="6"></rect></g></svg>
+<span class="map-pin" aria-hidden="true"><svg width="40" height="52" viewBox="0 0 40 52"><path d="M20 51s17-16.6 17-31A17 17 0 0 0 3 20c0 14.4 17 31 17 31z" fill="#2B2BD9"></path><circle cx="20" cy="20" r="7" fill="#FFFFFF"></circle></svg></span>
+<span class="map-card"><b>Medeniyet Teknopark</b><span>Ünalan, Istanbul</span><span class="map-open">Open in Google Maps</span></span>
+</a>
+</div>
+</main>
+</sc-if>
+<sc-if value="{{isLegal}}" hint-placeholder-val="{{ false }}">
+<header class="nav">
+<div class="wrap nav-row" style="justify-content: space-between">
+<a href="#ust" onClick="{{back}}" aria-label="Enrigio home" style="display: inline-flex"><x-import component-from-global-scope="Enrigio.Logo" height="{{logoH}}"></x-import></a>
+<x-import component-from-global-scope="Enrigio.Button" variant="ghost" on-click="{{back}}">← Back to home</x-import>
+</div>
+</header>
+<main class="wrap legal">
+<div class="info-head">
+<p class="eyebrow">Legal</p>
+<h1 class="h-sec" style="font-size: 48px">{{legal.title}}</h1>
+<p class="legal-meta">Last updated: {{legal.date}}</p>
+</div>
+<div class="legal-body">
+<sc-for list="{{legal.sections}}" as="sec" hint-placeholder-count="5">
+<section><h2>{{sec.h}}</h2><sc-for list="{{sec.ps}}" as="b" hint-placeholder-count="2"><p class="{{b.cls}}">{{b.t}}</p></sc-for></section>
+</sc-for>
+<p class="legal-contact">For questions, write to <a href="mailto:info@enrigio.com">info@enrigio.com</a>.</p>
+</div>
+</main>
+</sc-if>
+
+
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"trUrl":{"editor":"text","default":"/","section":"Dil linkleri"},"enUrl":{"editor":"text","default":"/en/","section":"Dil linkleri"},"$preview":{"width":1440,"height":7100}}'>
+var ENGINES = [
+  { name: 'ChatGPT', logo: '/logos/chatgpt.png', q: 'What’s the best project management tool for my team?', intro: 'Three standout options by team size:', score: 12,
+    items: [{ b: 'Brand A', d: 'flexible boards' }, { b: 'Brand B', d: 'strong reporting' }, { b: 'Brand C', d: 'affordable price' }] },
+  { name: 'Gemini', logo: '/logos/gemini.png', q: 'A trustworthy physiotherapy clinic near me?', intro: 'Clinics that stand out in reviews:', score: 18,
+    items: [{ b: 'Brand A', d: 'expert staff' }, { b: 'Brand B', d: 'easy to reach' }, { b: 'Brand C', d: 'weekend appointments' }] },
+  { name: 'Claude', logo: '/logos/claude.png', q: 'Can you recommend a good accounting firm for a small business?', intro: 'Firms that work with small businesses:', score: 9,
+    items: [{ b: 'Brand A', d: 'fixed monthly fee' }, { b: 'Brand B', d: 'company formation advice' }, { b: 'Brand C', d: 'online document tracking' }] },
+  { name: 'Perplexity', logo: '/logos/perplexity.png', q: 'Is there a good beauty salon near me?', intro: 'Highly rated places in your area:', score: 15,
+    items: [{ b: 'Brand A', d: 'skin care' }, { b: 'Brand B', d: 'online booking' }, { b: 'Brand C', d: 'long opening hours' }] }
+];
+var SECTORS = [
+  { label: 'Software & SaaS', q: 'What’s the best project management tool for my team?', intro: 'There are three standout options depending on team size:', items: [{ b: 'Brand A', d: 'flexible boards and easy setup.' }, { b: 'Brand B', d: 'powerful reporting for large teams.' }, { b: 'Brand C', d: 'affordable starter plan.' }] },
+  { label: 'Health & clinics', q: 'Which physiotherapy clinic near me can I trust?', intro: 'Clinics that stand out for patient reviews and expert staff:', items: [{ b: 'Brand A', d: 'team specialised in sports injuries.' }, { b: 'Brand B', d: 'two locations, easy to reach.' }, { b: 'Brand C', d: 'weekend appointments available.' }] },
+  { label: 'Professional services', q: 'Can you recommend a good accounting or law firm for a small company?', intro: 'Frequently recommended firms that work with small companies:', items: [{ b: 'Brand A', d: 'fixed-fee monthly accounting package.' }, { b: 'Brand B', d: 'company formation and contract advice.' }, { b: 'Brand C', d: 'online document tracking.' }] },
+  { label: 'Local businesses', q: 'Is there a good beauty salon near me?', intro: 'Highly rated places in your area:', items: [{ b: 'Brand A', d: 'skin care specialists.' }, { b: 'Brand B', d: 'online booking system.' }, { b: 'Brand C', d: 'long opening hours.' }] }
+];
+var QS1 = ['What’s the best CRM?', 'Can you recommend a dentist nearby?', 'Accounting software for B2B?', 'A trustworthy law firm?', 'Cloud provider for a startup?', 'Pilates studio near me?'];
+var QS2 = ['Compare HR software', 'Best e-commerce platform?', 'Enterprise cybersecurity firm?', 'Swimming lessons for my kid?', 'Can you recommend an ITSM consultant?', 'Affordable web agency?'];
+var CIRC = 138.2;
+var LEGAL = {"kvkk": {"title": "KVKK Notice", "date": "November 10, 2026", "sections": [{"h": "Explicit Consent Statement under the Personal Data Protection Law", "ps": [{"t": "As the Company, we have prepared this information notice to inform you, our employees, job applicants, interns, visitors, suppliers, people who purchase our products and services, and our potential customers, about the processing, storage and transfer of your personal data within the framework of our activities arising from Law No. 6698 on the Protection of Personal Data (“KVKK”) and related legislation and regulations. As the Company, we want to inform you in line with the importance we place on the security of personal data.", "cls": ""}, {"t": "As data controller and data processor under the Law, your personal data is recorded and stored in order to establish the service relationship, ensure the continuity of service, perform our services and meet our responsibilities as a company arising from other laws.", "cls": ""}, {"t": "In this context, in its capacity as data controller and within the framework set out in the Law, the Company may obtain, record, retain, update and reorganise personal information in order to maintain the contractual relationship, disclose, transfer, convey and share it with third parties where and to the extent permitted by the relevant legislation, and process it in the other ways listed in the Law. Your personal data means data and information that identifies you, such as the name and surname, address, contact numbers, identity number and billing information you provide in order to benefit from our service agreements, the questions put to you by our customer representatives, the answers you give, the transactions you request, and access and traffic information.", "cls": ""}, {"t": "Your personal data may be collected, wholly or partly by automated means, when you create a user account; when you use call centre services, by recording the information requested by our customer representatives and your statements for your user security; and through the transmission to us of data and documents such as identity copies requested for documented domain names and other services. Special categories of personal data means data relating to a person’s race, ethnic origin, political opinion, philosophical belief, religion, sect or other beliefs, appearance and dress, membership of an association, foundation or trade union, health, sexual life, criminal convictions and security measures, as well as biometric and genetic data.", "cls": ""}]}, {"h": "How Is Your Personal Data Kept, and on What Legal Grounds?", "ps": [{"t": "The Company collects your personal data when you contact our Company and/or when your legal relationship is established and for as long as that relationship continues; from you, from third parties including partnerships, group companies, affiliates and solution partners with whom we cooperate or have a contractual relationship, and from legal authorities; through call centres, the internet, mobile applications, social media and other public channels, or through trainings, organisations and similar events held, so that the purposes and services set out above can be provided within the framework of Articles 5, 6 and 8 of the Law. The legal grounds for keeping your personal data are set out in detail below.", "cls": ""}, {"t": "The personal data of our employees mentioned above is collected for the purpose of signing contracts with employees and the legitimate interests of the data controller. The personal data of our job applicants mentioned above is collected for the legitimate interests of the data controller and because it is required by law. The personal data of our interns mentioned above is collected for the legitimate interests of the data controller. The identity (name and surname) data of our visitors is collected to fulfil a legal obligation. The personal data of our shareholders/partners mentioned above is collected to fulfil a legal obligation. The identity (name and surname) and contact (such as address, phone number, email and IBAN details) data of our suppliers is collected for the legitimate interests of the data controller. The personal data of people who purchase products and services mentioned above is collected for the purpose of signing contracts with our customers and in line with the legitimate interests of our company as data controller. The personal data of our potential customers mentioned above is collected in line with the legitimate interests of our company as data controller.", "cls": ""}]}, {"h": "Your Rights Regarding the Protection of Personal Data", "ps": [{"t": "With regard to your personal data, you have the right to:", "cls": ""}, {"t": "• learn whether your personal data is being processed,", "cls": "li"}, {"t": "• request information about it if your personal data has been processed,", "cls": "li"}, {"t": "• learn the purpose of processing your personal data and whether it is used in accordance with that purpose,", "cls": "li"}, {"t": "• know the third parties, in Türkiye or abroad, to whom your personal data is transferred,", "cls": "li"}, {"t": "• request correction of your personal data if it has been processed incompletely or inaccurately,", "cls": "li"}, {"t": "• request deletion or destruction of your personal data under the conditions set out in the KVKK legislation,", "cls": "li"}, {"t": "• request that third parties to whom your personal data has been transferred be notified when you request correction of incomplete or inaccurate data or deletion or destruction of your personal data,", "cls": "li"}, {"t": "• claim compensation if you suffer damage because your personal data has been processed unlawfully.", "cls": "li"}]}]}, "privacy": {"title": "Privacy", "date": "November 10, 2026", "sections": [{"h": "1. Definition of Confidential Information", "ps": [{"t": "Within the scope of the confidentiality principle that is the subject of this Agreement and established between the parties, information disclosed directly or indirectly, in writing or orally, visually, magnetically or in any other medium, by either Party itself or by its employees, agents or staff to the other party’s employees, agents or staff, to be defined as “Confidential Information”, includes:", "cls": ""}, {"t": "a) all kinds of ideas, inventions, works and methods,", "cls": "li"}, {"t": "b) patents, know-how, copyrights, trademarks and trade secrets,", "cls": "li"}, {"t": "c) all kinds of innovations, whether or not subject to legal protection,", "cls": "li"}, {"t": "d) all commercial, financial and technical information, legal information in written or oral form, and subscription and communication information that the parties learn within the scope of the commercial relationship and business ventures they intend to establish and/or have established,", "cls": "li"}, {"t": "e) other development projects,", "cls": "li"}, {"t": "f) all written and oral commercial information that either party qualifies as confidential,", "cls": "li"}, {"t": "g) databases, computer programs and their documentation, encryption techniques, processes, advertising, packaging and marketing plans, product plans, technical plans, business strategies, information on strategic alliances and partners, engineering data, personnel information, product designs, specifications, offers, data, graphics, formulas, processes, designs, plans, samples, reports, financial information, customer information, sales information, marketing information, production information, commercial information, definitions, computer programs, designs, analyses, passwords, techniques, concepts, systems and experimental work that it has written, discovered, developed, carried out or put into practice are deemed confidential information.", "cls": "li"}, {"t": "h) Without being limited to the above, this includes all documents and other information prepared by each other’s managers, personnel, representatives or financial and legal advisers that contain, reflect or are derived from such information.", "cls": "li"}, {"t": "The obligation to protect the matters defined above as Confidential Information also covers information disclosed by the disclosing party itself, or by its employees, agents or staff, to the other party’s employees, agents or staff.", "cls": ""}]}, {"h": "2. Protection of Confidential Information", "ps": [{"t": "The Parties mutually, irrevocably and in advance declare and undertake that, with respect to Confidential Information they obtain from the other party in any way under this Agreement, they will:", "cls": ""}, {"t": "• keep it confidential, store it and protect it at all times,", "cls": "li"}, {"t": "• not use it, directly or indirectly, for purposes other than their commercial relationship,", "cls": "li"}, {"t": "• not disclose or provide it to third parties without the other party’s written consent.", "cls": "li"}, {"t": "The Parties have the right not to share Confidential Information electronically and, where necessary, to show it without providing a copy.", "cls": ""}, {"t": "The Parties agree and undertake to exercise the same care in protecting the other party’s Confidential Information as they exercise in protecting their own. Except for confidential information provided on a personal basis, the Parties may disclose such information only when necessary and only to those employees and subordinates who need to know it for their work, and shall warn them about its confidentiality. The Parties agree and undertake in advance that they will be directly liable if their employees or subordinates breach the obligations of this Agreement.", "cls": ""}]}, {"h": "3. Information Not Covered by the Definition of Confidential Information", "ps": [{"t": "a) Information previously obtained by either Party without an obligation of confidentiality,", "cls": "li"}, {"t": "b) Information that has become public without fault of either Party,", "cls": "li"}, {"t": "c) Information that must be disclosed under applicable laws or regulations, or pursuant to a court decision or administrative order.", "cls": "li"}, {"t": "Each Party acknowledges that its Confidential Information and its rights in such information remain its property and that disclosure of this information grants no rights to the receiving party. Each party further acknowledges that the other’s Confidential Information contains valuable trade secrets and that it has no obligation to provide its trade secrets to the other party. Neither Party can give any warranty as to the completeness, accuracy or precision of its Confidential Information.", "cls": ""}]}, {"h": "4. Measures", "ps": [{"t": "If either party becomes aware that it has caused an unauthorised disclosure of the other’s Confidential Information, it shall immediately notify the other party in writing of this unauthorised disclosure and make every effort to mitigate the damage the other party may suffer as a result. The aggrieved party may, either on its own initiative or upon notification by the other party, from the moment it learns of the disclosure and at the expense of the disclosing party, pursue all remedies provided by law and claim compensation for any loss or damage it has suffered. The disclosing party agrees and undertakes in advance to cover all loss and damage suffered by the other party as a result.", "cls": ""}, {"t": "In all cases, the Firm also undertakes to pay compensation for any other damage calculated by the INSTITUTION for conduct in breach of this agreement.", "cls": ""}, {"t": "To prevent unintentional disclosure of each other’s Confidential Information and to protect corporate identity and confidentiality, the Parties agree and undertake to conduct their correspondence through email addresses opened by the Company specifically for each Employee.", "cls": ""}]}, {"h": "5. Return of Confidential Information", "ps": [{"t": "Upon termination of the commercial relationship between the parties or of the Agreement, and upon the other party’s written notice, all Confidential Information shall be returned immediately to the party to which it belongs. Any future business relationships between the parties on this matter shall be the subject of a separate agreement to be negotiated and implemented.", "cls": ""}, {"t": "If it is found that any returned information has been copied or reproduced, the penalty specified in Article 5 shall apply.", "cls": ""}]}, {"h": "6. Permitted Disclosure", "ps": [{"t": "Continuation of obligations: the obligation to protect confidential information continues even after an employee leaves.", "cls": ""}, {"t": "Except in cases expressly provided by law, neither Party may distribute Confidential Information in any way or by any means, disclose it through the press, media organisations or outlets, use it for advertising purposes, or otherwise reveal it. Nor may it present it as a reference or use it as an advertising tool through visual or written media.", "cls": ""}, {"t": "The only exceptions to the confidentiality obligations stated above are the cases set out in Article 3 and disclosure of such information with the other party’s written permission.", "cls": ""}]}, {"h": "7. Assignment and Term", "ps": [{"t": "The Parties’ confidentiality obligations shall remain in force for as long as their business relationship continues and for 10 (ten) years following the termination of that relationship for any reason. This Agreement, or any right under it, may not be assigned in whole or in part.", "cls": ""}]}, {"h": "8. Governing Law and Jurisdiction", "ps": [{"t": "In the interpretation of this Agreement and in all disputes arising from it, the courts and enforcement offices of Istanbul shall have jurisdiction, and Turkish law shall apply. In disputes, the Company’s books and records shall constitute the sole evidence, and the counterparty may not offer an oath against the Company.", "cls": ""}]}, {"h": "9. Copies", "ps": [{"t": "This Agreement has been drawn up in two original copies. Each Party is responsible for the stamp duty on its own copy.", "cls": ""}]}, {"h": "10. Validity", "ps": [{"t": "If any provision of this Agreement is deemed invalid, cancelled or not enforced, this shall not affect the validity of the other provisions of the Agreement.", "cls": ""}]}, {"h": "11. Amendments", "ps": [{"t": "This Agreement reflects the true intentions of the parties and supersedes all prior written and oral agreements on this matter. No amendment shall have effect unless made in writing and signed by both parties.", "cls": ""}]}, {"h": "12. Notices", "ps": [{"t": "The Parties have agreed that all notices to be given between them under the Agreement must be in writing and that, unless otherwise notified in writing, the addresses stated above are their legal notification addresses, and that written notices sent to these addresses shall have all the legal consequences of a valid legal notification.", "cls": ""}]}]}, "terms": {"title": "Terms of Use", "date": "November 10, 2026", "sections": [{"h": "1. Parties and scope", "ps": [{"t": "These Terms of Use govern the relationship between the people and organisations (“User”) who use the Enrigio website and Enrigio services (“Service”) and the company that provides the Service (“Company”). By visiting the site, joining the early access list or using the Service, you are deemed to accept these terms. If you do not accept them, please do not use the Service.", "cls": ""}]}, {"h": "2. Description of the Service", "ps": [{"t": "Enrigio is a software service that measures how often and in what context brands are mentioned in the answers of AI assistants such as ChatGPT, Gemini, Claude and Perplexity, turns the results into a visibility score and suggests actions for improvement.", "cls": ""}, {"t": "Measurements are based on the answers those AI services give at the time of measurement. These services are not under the Company’s control, and their answers may change over time. The Company therefore does not guarantee any particular score, ranking or result.", "cls": ""}]}, {"h": "3. Early access", "ps": [{"t": "The Service is currently in pre-launch early access. Joining the early access list does not mean the Service will be offered on a particular date or with particular features. During early access the scope, features and prices of the Service may change; the Company will announce such changes to Users within a reasonable time.", "cls": ""}]}, {"h": "4. Account and security", "ps": [{"t": "You may need to create an account to use some parts of the Service. You are responsible for keeping the information you provide accurate and up to date, for keeping your account credentials confidential and for all activity under your account. If you notice unauthorised use of your account, let us know immediately at info@enrigio.com.", "cls": ""}]}, {"h": "5. Acceptable use", "ps": [{"t": "When using the Service, you agree not to:", "cls": ""}, {"t": "• use the Service for purposes that violate applicable law, third-party rights or these terms,", "cls": "li"}, {"t": "• attempt to gain unauthorised access to the Service, its servers or other users’ data, or interfere with the operation of the Service,", "cls": "li"}, {"t": "• copy or reverse-engineer the Service or its software, or collect data without permission using automated tools,", "cls": "li"}, {"t": "• run measurements for brands you do not own or are not authorised to represent, or use results in a misleading way.", "cls": "li"}, {"t": "The Company reserves the right to suspend or close an account when it detects use in breach of these rules.", "cls": ""}]}, {"h": "6. Fees and cancellation", "ps": [{"t": "The scope and prices of the free and paid plans are published on the site. Unless stated otherwise, paid plans are billed monthly in advance and renew at the start of each period until the User cancels. The User may cancel their plan at any time; cancellation takes effect at the end of the current billing period. No refunds are given for partial periods, without prejudice to rights under applicable consumer law.", "cls": ""}]}, {"h": "7. Intellectual property", "ps": [{"t": "All intellectual property rights in the software, design, text, logos, images and other content on the site and in the Service belong to the Company or its licensors. These terms grant the User a limited, non-transferable, non-exclusive right to use the Service solely for its own internal purposes.", "cls": ""}, {"t": "Information the User enters into the Service, such as brand names and website addresses, and the reports produced for the User belong to the User. The Company may use this information to provide and improve the Service by converting it into aggregate statistics that do not identify anyone.", "cls": ""}]}, {"h": "8. Personal data", "ps": [{"t": "Your personal data is processed in accordance with Turkish Law No. 6698 on the Protection of Personal Data (KVKK). Details about which data is processed for what purposes and about your rights are on our KVKK Notice page.", "cls": ""}]}, {"h": "9. Limitation of liability", "ps": [{"t": "The Service is provided “as is”. The Company does not guarantee that the Service will run uninterrupted or error-free, or that recommended actions will produce a particular commercial result. To the extent permitted by applicable law, the Company is not liable for indirect damages or loss of profit or customers. The Company’s total liability under these terms is limited to the total fees the User paid the Company in the 12 months before the event giving rise to the claim.", "cls": ""}]}, {"h": "10. Third-party services", "ps": [{"t": "The Service uses third-party AI services to run measurements, and the site may contain links to third-party sites. The Company is not responsible for the content or availability of these services and sites, or for their own terms of use.", "cls": ""}]}, {"h": "11. Suspension and termination", "ps": [{"t": "The User may close their account at any time. The Company may suspend or terminate the Service in the event of a breach of these terms, a legal requirement, or a situation that threatens the security of the Service. Upon termination, provisions relating to fees paid and provisions that by their nature should survive remain in force.", "cls": ""}]}, {"h": "12. Changes", "ps": [{"t": "The Company may update these Terms of Use from time to time. The current version is published on this page and the “Last updated” date at the top is changed. Material changes are also notified to registered Users by email. Continuing to use the Service after a change means you accept the updated terms.", "cls": ""}]}, {"h": "13. Governing law and jurisdiction", "ps": [{"t": "These terms are governed by the laws of the Republic of Türkiye. Without prejudice to consumers’ statutory rights, the courts and enforcement offices of Istanbul have jurisdiction over disputes arising from these terms.", "cls": ""}]}, {"h": "14. Contact", "ps": [{"t": "For questions about these terms, write to info@enrigio.com or call +90 (850) 777 74 46. Address: Ünalan Mah. Ünalan Cad. Medeniyet Teknopark No:1/12, Istanbul, Türkiye.", "cls": ""}]}]}};
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { site: '', email: '', siteErr: '', emailErr: '', cf: { name: '', email: '', company: '', phone: '', scope: '', note: '' }, cErr: {}, screen: 'landing', tab: 0, done: false, contactDone: false, eng: 0, spin: 0, chars: 0, phase: 0 }; }
+  componentDidMount() { this.run(); }
+  componentWillUnmount() { clearTimeout(this.t); }
+  toTop() {
+    var top = function () {
+      try { window.scrollTo(0, 0); } catch (e) {}
+      try { if (document.scrollingElement) document.scrollingElement.scrollTop = 0; document.documentElement.scrollTop = 0; document.body.scrollTop = 0; } catch (e) {}
+    };
+    top();
+    try { requestAnimationFrame(function () { top(); requestAnimationFrame(top); }); } catch (e) {}
+    setTimeout(top, 60); setTimeout(top, 200);
+  }
+  goTo(patch) { this.setState(patch); this.toTop(); }
+  componentDidUpdate(pp, ps) {
+    if (ps && ps.screen !== this.state.screen) { this.toTop(); if (this.state.screen === 'landing') this.run(); else clearTimeout(this.t); }
+  }
+  run() {
+    var self = this;
+    clearTimeout(this.t);
+    var reduce = false;
+    try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    if (reduce) { this.setState({ chars: 999, phase: 6 }); return; }
+    var tick = function () {
+      var s = self.state, q = ENGINES[s.eng].q;
+      if (s.chars < q.length) { self.setState({ chars: s.chars + 1 }); self.t = setTimeout(tick, 26 + Math.random() * 30); return; }
+      if (s.phase < 6) { self.setState({ phase: s.phase + 1 }); self.t = setTimeout(tick, s.phase === 0 ? 350 : 520); return; }
+      self.t = setTimeout(function () {
+        self.setState({ eng: (s.eng + 1) % ENGINES.length, spin: s.spin + 1, chars: 0, phase: 0 });
+        self.t = setTimeout(tick, 600);
+      }, 2400);
+    };
+    this.setState({ chars: 0, phase: 0 });
+    this.t = setTimeout(tick, 800);
+  }
+  renderVals() {
+    var self = this, s = this.state, cur = ENGINES[s.eng];
+    var go = function (e) { if (e && e.preventDefault) e.preventDefault(); self.goTo({ screen: 'signup', done: false }); };
+    var engines = ENGINES.map(function (x, i) {
+      return { name: x.name, logo: x.logo, pill: i === s.eng ? 'eng-pill eng-pill--on' : 'eng-pill', pressed: i === s.eng ? 'true' : 'false',
+        pick: function () { if (i === s.eng) return; var sp = s.spin + 1; while (sp % ENGINES.length !== i) sp++; self.setState({ eng: i, spin: sp, chars: 0, phase: 0 }); self.run(); },
+        word: 'w-' + x.name.toLowerCase() + (i === s.eng ? ' on' : ''), faceT: 'rotateX(' + (i * 90) + 'deg) translateZ(0.48em)' };
+    });
+    var items = cur.items.map(function (x, i) { return { n: i + 1, b: x.b, d: x.d, cls: s.phase >= i + 2 ? 'a-item on' : 'a-item' }; });
+    var tabs = SECTORS.map(function (x, i) {
+      return { label: x.label, tabId: 'n2-tab-' + i, sel: i === s.tab ? 'true' : 'false', cls: i === s.tab ? 'tab tab--on' : 'tab', pick: function () { self.setState({ tab: i }); } };
+    });
+    var sec = SECTORS[s.tab];
+    var site = s.site.trim().replace(/^https?:\/\//, '');
+    return {
+      isLanding: s.screen === 'landing', isSignup: s.screen === 'signup', isContact: s.screen === 'contact', isInfo: s.screen === 'info',
+      isLegal: s.screen === 'privacy' || s.screen === 'terms' || s.screen === 'kvkk',
+      legal: s.screen === 'terms' ? LEGAL.terms : (s.screen === 'kvkk' ? LEGAL.kvkk : LEGAL.privacy),
+      goKvkk: function (e) { if (e && e.preventDefault) e.preventDefault(); self.goTo({ screen: 'kvkk' }); },
+      goPrivacy: function (e) { if (e && e.preventDefault) e.preventDefault(); self.goTo({ screen: 'privacy' }); },
+      goTerms: function (e) { if (e && e.preventDefault) e.preventDefault(); self.goTo({ screen: 'terms' }); },
+      goInfo: function (e) { if (e && e.preventDefault) e.preventDefault(); self.goTo({ screen: 'info' }); },
+      contactDone: s.contactDone, contactNotDone: !s.contactDone,
+      goContact: function (e) { if (e && e.preventDefault) e.preventDefault(); self.goTo({ screen: 'contact', contactDone: false }); },
+      cf: s.cf, cErr: s.cErr,
+      cSet: (function () { var o = {}; ['name', 'email', 'company', 'phone', 'scope', 'note'].forEach(function (k) { o[k] = function (e) { var cf = Object.assign({}, self.state.cf); cf[k] = e.target.value; var ce = Object.assign({}, self.state.cErr); delete ce[k]; self.setState({ cf: cf, cErr: ce }); }; }); return o; })(),
+      submitContact: function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var f = self.state.cf, err = {};
+        var v = function (k) { return (f[k] || '').trim(); };
+        if (!v('name')) err.name = 'Enter your full name.'; else if (v('name').split(/\s+/).length < 2) err.name = 'Enter both your first and last name.';
+        if (!v('email')) err.email = 'Enter your work email.'; else if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v('email'))) err.email = 'The email address looks incomplete, e.g. name@company.com';
+        if (!v('company')) err.company = 'Enter your company name.';
+        var digits = v('phone').replace(/\D/g, '');
+        if (!v('phone')) err.phone = 'Enter your phone number.'; else if (digits.length < 10 || digits.length > 13) err.phone = 'Enter a valid phone number with country code, e.g. +1 555 123 4567';
+        if (!v('scope')) err.scope = 'Tell us how many brands or sites you want to monitor.';
+        if (!v('note')) err.note = 'Briefly describe your needs; we tailor the quote to them.'; else if (v('note').length < 15) err.note = 'Please add a bit more detail (at least 15 characters).';
+        if (Object.keys(err).length) { self.setState({ cErr: err }); return; }
+        self.setState({ contactDone: true, cErr: {} });
+      },
+      engines: engines, cur: cur, items: items,
+      prismT: 'translateZ(-0.48em) rotateX(' + (-s.spin * 90) + 'deg)',
+      qTyped: cur.q.slice(0, s.chars),
+      siteShown: site || 'yoursite.com',
+      cls: { intro: s.phase >= 1 ? 'a-intro on' : 'a-intro', miss: s.phase >= 5 ? 'a-miss on' : 'a-miss', score: s.phase >= 6 ? 'a-score on' : 'a-score' },
+      ringOff: s.phase >= 6 ? (CIRC * (1 - cur.score / 100)).toFixed(1) : CIRC,
+      qRow1: QS1.concat(QS1, QS1, QS1), qRow2: QS2.concat(QS2, QS2, QS2),
+      tabs: tabs, sec: { tabId: 'n2-tab-' + s.tab, q: sec.q, intro: sec.intro, items: sec.items.map(function (x, i) { return { n: i + 1, b: x.b, d: x.d }; }) },
+      site: s.site, hasSite: site.length > 0,
+      onSite: function (e) { self.setState({ site: e.target.value, siteErr: '' }); },
+      email: s.email, siteErr: s.siteErr, emailErr: s.emailErr,
+      onEmail: function (e) { self.setState({ email: e.target.value, emailErr: '' }); },
+      go: go,
+      back: function (e) { if (e && e.preventDefault) e.preventDefault(); self.goTo({ screen: 'landing' }); },
+      submitSignup: function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var st = (self.state.site || '').trim().replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+        var em = (self.state.email || '').trim();
+        var siteErr = !st ? 'Enter your website address.' : (!/^([a-z0-9\u00e7\u011f\u0131\u00f6\u015f\u00fc-]+\.)+[a-z]{2,}$/i.test(st) ? 'Enter a valid website address, e.g. yoursite.com' : '');
+        var emailErr = !em ? 'Enter your work email.' : (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em) ? 'The email address looks incomplete, e.g. name@company.com' : '');
+        if (siteErr || emailErr) { self.setState({ siteErr: siteErr, emailErr: emailErr }); return; }
+        self.setState({ done: true, siteErr: '', emailErr: '', site: st });
+      },
+      done: s.done, notDone: !s.done,
+      doneLine: 'On launch day we’ll run the first visibility score for ' + (site || 'your site') + ' and email it to you.',
+      trUrl: this.props.trUrl || '/', enUrl: this.props.enUrl || '/en/',
+      logoH: 32, footLogoH: 28, markH: 24, yes: true
+    };
+  }
+}
+</script>
+</body>
+</html>
